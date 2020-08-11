@@ -1,0 +1,14 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <strong>Name:</strong>
+  <%= @organism.name %>
+</p>
+
+<p>
+  <strong>Ncbi taxon:</strong>
+  <%= @organism.ncbi_taxon_id %>
+</p>
+
+<%= link_to 'Edit', edit_organism_path(@organism) %> |
+<%= link_to 'Back', organisms_path %>

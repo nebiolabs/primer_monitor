@@ -1,0 +1,27 @@
+<%= form_with(model: primer_set, local: true) do |form| %>
+  <% if primer_set.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(primer_set.errors.count, "error") %> prohibited this primer_set from being saved:</h2>
+
+      <ul>
+        <% primer_set.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= form.label :name %>
+    <%= form.text_field :name %>
+  </div>
+
+  <div class="field">
+    <%= form.label :creator_id %>
+    <%= form.number_field :creator_id %>
+  </div>
+
+  <div class="actions">
+    <%= form.submit %>
+  </div>
+<% end %>

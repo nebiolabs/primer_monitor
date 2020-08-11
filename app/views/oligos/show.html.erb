@@ -1,0 +1,14 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <strong>Name:</strong>
+  <%= @oligo.name %>
+</p>
+
+<p>
+  <strong>Sequence:</strong>
+  <%= @oligo.sequence %>
+</p>
+
+<%= link_to 'Edit', edit_oligo_path(@oligo) %> |
+<%= link_to 'Back', oligos_path %>

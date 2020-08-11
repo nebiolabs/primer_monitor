@@ -1,0 +1,14 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <strong>Name:</strong>
+  <%= @primer_set.name %>
+</p>
+
+<p>
+  <strong>Creator:</strong>
+  <%= @primer_set.creator_id %>
+</p>
+
+<%= link_to 'Edit', edit_primer_set_path(@primer_set) %> |
+<%= link_to 'Back', primer_sets_path %>

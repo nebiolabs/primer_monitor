@@ -1,0 +1,27 @@
+<%= form_with(model: oligo, local: true) do |form| %>
+  <% if oligo.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(oligo.errors.count, "error") %> prohibited this oligo from being saved:</h2>
+
+      <ul>
+        <% oligo.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= form.label :name %>
+    <%= form.text_field :name %>
+  </div>
+
+  <div class="field">
+    <%= form.label :sequence %>
+    <%= form.text_field :sequence %>
+  </div>
+
+  <div class="actions">
+    <%= form.submit %>
+  </div>
+<% end %>

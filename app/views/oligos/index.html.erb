@@ -1,0 +1,29 @@
+<p id="notice"><%= notice %></p>
+
+<h1>Oligos</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Sequence</th>
+      <th colspan="3"></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @oligos.each do |oligo| %>
+      <tr>
+        <td><%= oligo.name %></td>
+        <td><%= oligo.sequence %></td>
+        <td><%= link_to 'Show', oligo %></td>
+        <td><%= link_to 'Edit', edit_oligo_path(oligo) %></td>
+        <td><%= link_to 'Destroy', oligo, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<br>
+
+<%= link_to 'New Oligo', new_oligo_path %>
