@@ -92,6 +92,43 @@ ALTER SEQUENCE public.blast_hits_id_seq OWNED BY public.blast_hits.id;
 
 
 --
+-- Name: fasta_records; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.fasta_records (
+    id bigint NOT NULL,
+    strain character varying,
+    genbank_accession character varying,
+    gisaid_epi_isl character varying,
+    region character varying,
+    country character varying,
+    division character varying,
+    date_submitted date,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: fasta_records_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.fasta_records_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: fasta_records_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.fasta_records_id_seq OWNED BY public.fasta_records.id;
+
+
+--
 -- Name: oligos; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -101,7 +138,9 @@ CREATE TABLE public.oligos (
     sequence character varying,
     amplicon_id bigint,
     created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL
+    updated_at timestamp(6) without time zone NOT NULL,
+    start_pos integer,
+    end_pos integer
 );
 
 
@@ -200,6 +239,39 @@ ALTER SEQUENCE public.users_id_seq OWNED BY public.users.id;
 
 
 --
+-- Name: variant_sites; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.variant_sites (
+    id bigint NOT NULL,
+    "position" integer,
+    variant_type character varying,
+    fasta_record_id bigint,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: variant_sites_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.variant_sites_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: variant_sites_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.variant_sites_id_seq OWNED BY public.variant_sites.id;
+
+
+--
 -- Name: amplicons id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -211,6 +283,13 @@ ALTER TABLE ONLY public.amplicons ALTER COLUMN id SET DEFAULT nextval('public.am
 --
 
 ALTER TABLE ONLY public.blast_hits ALTER COLUMN id SET DEFAULT nextval('public.blast_hits_id_seq'::regclass);
+
+
+--
+-- Name: fasta_records id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.fasta_records ALTER COLUMN id SET DEFAULT nextval('public.fasta_records_id_seq'::regclass);
 
 
 --
@@ -235,6 +314,13 @@ ALTER TABLE ONLY public.users ALTER COLUMN id SET DEFAULT nextval('public.users_
 
 
 --
+-- Name: variant_sites id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.variant_sites ALTER COLUMN id SET DEFAULT nextval('public.variant_sites_id_seq'::regclass);
+
+
+--
 -- Name: amplicons amplicons_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -256,6 +342,14 @@ ALTER TABLE ONLY public.ar_internal_metadata
 
 ALTER TABLE ONLY public.blast_hits
     ADD CONSTRAINT blast_hits_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: fasta_records fasta_records_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.fasta_records
+    ADD CONSTRAINT fasta_records_pkey PRIMARY KEY (id);
 
 
 --
@@ -288,6 +382,14 @@ ALTER TABLE ONLY public.schema_migrations
 
 ALTER TABLE ONLY public.users
     ADD CONSTRAINT users_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: variant_sites variant_sites_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.variant_sites
+    ADD CONSTRAINT variant_sites_pkey PRIMARY KEY (id);
 
 
 --
@@ -326,11 +428,26 @@ CREATE INDEX index_oligos_on_amplicon_id ON public.oligos USING btree (amplicon_
 
 
 --
+-- Name: index_variant_sites_on_fasta_record_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_variant_sites_on_fasta_record_id ON public.variant_sites USING btree (fasta_record_id);
+
+
+--
 -- Name: blast_hits fk_rails_1f04a34db0; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.blast_hits
     ADD CONSTRAINT fk_rails_1f04a34db0 FOREIGN KEY (organism_id) REFERENCES public.organisms(id);
+
+
+--
+-- Name: variant_sites fk_rails_2c76e30b83; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.variant_sites
+    ADD CONSTRAINT fk_rails_2c76e30b83 FOREIGN KEY (fasta_record_id) REFERENCES public.fasta_records(id);
 
 
 --
@@ -376,6 +493,9 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20200809190500'),
 ('20200809190541'),
 ('20200809190725'),
-('20200810101557');
+('20200810101557'),
+('20201023152436'),
+('20201023153637'),
+('20201023161602');
 
 
