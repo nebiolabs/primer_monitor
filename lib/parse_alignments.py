@@ -7,7 +7,7 @@ def parse_cigar(cigar_string):
     parsed = re.findall("(\d+[\w=])", cigar_string)
     return parsed
 
-print("Sample\tReference position\tMismatch type\tMismatch")
+print("Strain\tReference position\tVariant type\tVariant")
 for line in sys.stdin:
     line = line.strip().split("\t")
     query_name = line[0]
