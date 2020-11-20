@@ -29,6 +29,12 @@ Dir["#{__dir__}/app/models/*.rb"].each do |f|
   require_relative f
 end
 
+def setup_db_connection
+    # Reasonable guesses to improve run time, as of 02/18/16 H:
+    db_config = YAML.safe_load(File.open(File.join(File.dirname(__FILE__), 'config', 'database.yml')))[ENV['DATABASE_ENV'] || 'production']
+    ActiveRecord::Base.establish_connection(db_config)
+  end
+  
 # def parse_options
 #     # ADDING A NEW OPTION? TODO CHECKLIST:
   
@@ -77,15 +83,19 @@ end
   
 def import_metadata(metadata_file)
     if metadata_file  
-      metadata_records = Metadata.parse(metadata_file)
-      Metadata.import(metadata_records, validate: false)
+      metadata_records = FastaRecord.parse(metadata_file)
+      FastaRecord.import(metadata_records, validate: false)
     end
 end
   
 def import_variants(variants_file)
-    if variants_file  
-      variant_records = Variants.parse(variants_file)
-      Variants.import(variant_records, validate: false)
+    if variants_file
+      variant_records = VariantSite.parse(variants_file)
+      fasta_ids = variant_records.map(&:fasta_record_id).uniq
+      fasta_ids.each do |fasta_id|
+        VariantSite.where(fasta_record_id: fasta_id).delete_all
+      end
+      VariantSite.import(variant_records, validate: false)
     end
 end
 
@@ -94,6 +104,7 @@ def main
     # @log.level = Logger.const_get(opts[:verbose])
 
     # @log.debug 'checking samtools is installed properly...'
+    setup_db_connection
 
     import_metadata("./test/fixtures/metadata.tsv")
     import_variants("./test/fixtures/variants.tsv")

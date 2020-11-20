@@ -45,6 +45,8 @@ GEM
     activerecord (6.0.3.4)
       activemodel (= 6.0.3.4)
       activesupport (= 6.0.3.4)
+    activerecord-import (1.0.7)
+      activerecord (>= 3.2)
     activestorage (6.0.3.4)
       actionpack (= 6.0.3.4)
       activejob (= 6.0.3.4)
@@ -74,6 +76,7 @@ GEM
     childprocess (3.0.0)
     concurrent-ruby (1.1.7)
     crass (1.0.6)
+    descriptive_statistics (2.5.1)
     erubi (1.10.0)
     ffi (1.13.1)
     globalid (0.4.2)
@@ -198,12 +201,14 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  activerecord-import
   bootsnap (>= 1.4.2)
   byebug
   capybara (>= 2.15)
+  descriptive_statistics
   jbuilder (~> 2.7)
   listen (~> 3.2)
-  pg
+  pg (>= 1.2.3)
   puma (~> 4.1)
   rails (~> 6.0.3, >= 6.0.3.2)
   sass-rails (>= 6)
