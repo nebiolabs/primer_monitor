@@ -246,6 +246,7 @@ CREATE TABLE public.variant_sites (
     id bigint NOT NULL,
     "position" integer,
     variant_type character varying,
+    variant character varying,
     fasta_record_id bigint,
     created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL
