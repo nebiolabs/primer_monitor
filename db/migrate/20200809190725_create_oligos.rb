@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CreateOligos < ActiveRecord::Migration[6.0]
   def change
     create_table :oligos do |t|
@@ -6,7 +8,7 @@ class CreateOligos < ActiveRecord::Migration[6.0]
       t.references :amplicon, foreign_key: true
       t.ref_start :integer
       t.ref_end :integer
-      
+
       t.timestamps
     end
   end

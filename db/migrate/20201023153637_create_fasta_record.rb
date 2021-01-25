@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CreateFastaRecord < ActiveRecord::Migration[6.0]
   def change
     create_table :fasta_records do |t|
@@ -10,6 +12,6 @@ class CreateFastaRecord < ActiveRecord::Migration[6.0]
       t.date :date_submitted
 
       t.timestamps
-      end
+    end
   end
 end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class User < ApplicationRecord
-    has_many :primer_sets
+  has_many :primer_sets
 end

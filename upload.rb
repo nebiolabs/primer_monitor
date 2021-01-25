@@ -1,4 +1,5 @@
 #!/usr/bin/env ruby
+# frozen_string_literal: true
 
 # aggregates results from the passed files and stores them in the configured database
 require 'rubygems'
@@ -30,21 +31,26 @@ Dir["#{__dir__}/app/models/*.rb"].each do |f|
 end
 
 def setup_db_connection
-    # Reasonable guesses to improve run time, as of 02/18/16 H:
-    db_config = YAML.safe_load(File.open(File.join(File.dirname(__FILE__), 'config', 'database.yml')))[ENV['DATABASE_ENV'] || 'production']
-    ActiveRecord::Base.establish_connection(db_config)
-  end
-  
+  db_config = YAML.safe_load(
+    File.open(
+      File.join(
+        File.dirname(__FILE__), 'config', 'database.yml'
+      )
+    )
+  )[ENV['DATABASE_ENV'] || 'production']
+  ActiveRecord::Base.establish_connection(db_config)
+end
+
 # def parse_options
 #     # ADDING A NEW OPTION? TODO CHECKLIST:
-  
+
 #     # Does the option specify an input file? Add it to input_file_params
 #     # hash/method.
-  
+
 #     # Is the option required for read_group (library)? Add it to
 #     # required_read_group_params hash/method, otherwise to
 #     # optional_read_group_params.
-  
+
 #     # Does the option processing change the data for the view in
 #     # dna_production_quality_metrics (the view is in Tableau for DNA
 #     # production QC table)? See, for example,
@@ -52,17 +58,17 @@ def setup_db_connection
 #     # to matview_for_option_str multiline string/table both the option
 #     # and the corresponding materialized view(s) to be refreshed when
 #     # the option is processed.
-  
+
 #     begin
 #       slop_opts = Slop.parse(ARGV.map(&:strip)) do |o|
 #         o.string '--metadata_tsv', 'Tsv file containing metadata information'
 #         o.string '--variants_tsv', 'Tsv file containing variants information'
-  
+
 #         # The available log levels are: :debug, :info, :warn, :error, and
 #         # :fatal, corresponding to the log level numbers from 0 up to 4
 #         # respectively. See rails docs.
 #         o.string '--verbose', 'Verbosity level of ActiveRecord logger', default: 'INFO'
-  
+
 #         o.on '--help' do
 #           puts o
 #           exit
@@ -80,33 +86,33 @@ def setup_db_connection
 #     end
 #     slop_opts.to_hash
 #   end
-  
+
 def import_metadata(metadata_file)
-    if metadata_file  
-      metadata_records = FastaRecord.parse(metadata_file)
-      FastaRecord.import(metadata_records, validate: false)
-    end
+  return unless metadata_file
+
+  metadata_records = FastaRecord.parse(metadata_file)
+  FastaRecord.import(metadata_records, validate: false)
 end
-  
+
 def import_variants(variants_file)
-    if variants_file
-      variant_records = VariantSite.parse(variants_file)
-      fasta_ids = variant_records.map(&:fasta_record_id).uniq
-      fasta_ids.each do |fasta_id|
-        VariantSite.where(fasta_record_id: fasta_id).delete_all
-      end
-      VariantSite.import(variant_records, validate: false)
-    end
+  return unless variants_file
+
+  variant_records = VariantSite.parse(variants_file)
+  fasta_ids = variant_records.map(&:fasta_record_id).uniq
+  fasta_ids.each do |fasta_id|
+    VariantSite.where(fasta_record_id: fasta_id).delete_all
+  end
+  VariantSite.import(variant_records, validate: false)
 end
 
 def main
-    # opts = parse_options
-    # @log.level = Logger.const_get(opts[:verbose])
+  # opts = parse_options
+  # @log.level = Logger.const_get(opts[:verbose])
 
-    # @log.debug 'checking samtools is installed properly...'
-    setup_db_connection
+  # @log.debug 'checking samtools is installed properly...'
+  setup_db_connection
 
-    import_metadata("./test/fixtures/metadata.tsv")
-    import_variants("./test/fixtures/variants.tsv")
+  import_metadata('./test/fixtures/metadata.tsv')
+  import_variants('./test/fixtures/variants.tsv')
 end
 main if $PROGRAM_NAME.end_with?('upload.rb')
