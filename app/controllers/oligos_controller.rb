@@ -1,5 +1,7 @@
+# frozen_string_literal: true
+
 class OligosController < ApplicationController
-  before_action :set_oligo, only: [:show, :edit, :update, :destroy]
+  before_action :set_oligo, only: %i[show edit update destroy]
 
   # GET /oligos
   # GET /oligos.json
@@ -9,8 +11,7 @@ class OligosController < ApplicationController
 
   # GET /oligos/1
   # GET /oligos/1.json
-  def show
-  end
+  def show; end
 
   # GET /oligos/new
   def new
@@ -18,8 +19,7 @@ class OligosController < ApplicationController
   end
 
   # GET /oligos/1/edit
-  def edit
-  end
+  def edit; end
 
   # POST /oligos
   # POST /oligos.json
@@ -62,13 +62,14 @@ class OligosController < ApplicationController
   end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
-    def set_oligo
-      @oligo = Oligo.find(params[:id])
-    end
 
-    # Only allow a list of trusted parameters through.
-    def oligo_params
-      params.require(:oligo).permit(:name, :sequence)
-    end
+  # Use callbacks to share common setup or constraints between actions.
+  def set_oligo
+    @oligo = Oligo.find(params[:id])
+  end
+
+  # Only allow a list of trusted parameters through.
+  def oligo_params
+    params.require(:oligo).permit(:name, :sequence)
+  end
 end

@@ -1,1 +1,3 @@
-json.partial! "organisms/organism", organism: @organism
+# frozen_string_literal: true
+
+json.partial! 'organisms/organism', organism: @organism

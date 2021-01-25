@@ -1,1 +1,3 @@
-json.partial! "oligos/oligo", oligo: @oligo
+# frozen_string_literal: true
+
+json.partial! 'oligos/oligo', oligo: @oligo
