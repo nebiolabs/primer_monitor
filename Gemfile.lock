@@ -105,7 +105,6 @@ GEM
     cocoon (1.2.15)
     concurrent-ruby (1.1.8)
     crass (1.0.6)
-    descriptive_statistics (2.5.1)
     erubi (1.10.0)
     ffi (1.14.2)
     ffi-compiler (1.0.1)
@@ -280,7 +279,6 @@ DEPENDENCIES
   capistrano-rbenv (~> 2.2)
   capybara (>= 2.15)
   cocoon
-  descriptive_statistics
   jbuilder (~> 2.7)
   listen (~> 3.2)
   pg (>= 1.2.3)
