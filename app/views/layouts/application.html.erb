@@ -1,15 +1,49 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>PrimerMonitor</title>
-    <%= csrf_meta_tags %>
-    <%= csp_meta_tag %>
+<head>
+  <title>Primer Monitor</title>
+  <%= csrf_meta_tags %>
+  <%= csp_meta_tag %>
 
-    <%= stylesheet_link_tag 'application', media: 'all', 'data-turbolinks-track': 'reload' %>
-    <%= javascript_pack_tag 'application', 'data-turbolinks-track': 'reload' %>
-  </head>
+  <%= stylesheet_link_tag 'application', media: 'all', 'data-turbolinks-track': 'reload' %>
+  <%= javascript_pack_tag 'application', 'data-turbolinks-track': 'reload' %>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
 
-  <body>
+<body>
+<nav class="navbar" role="navigation" aria-label="main navigation">
+  <div class="navbar-brand">
+    <a class="navbar-item" href="https://cov.neb.com/">
+      <img src="/neb_logo_dark.png" alt="NEB Logo"/>
+    </a>
+    <span class="navbar-item is-size-7-mobile">SARS-CoV-2 Surveillance Project</span>
+    <a role="button" class="navbar-burger burger" aria-label="menu" aria-expanded="false" data-target="navMenu">
+      <span aria-hidden="true"></span>
+      <span aria-hidden="true"></span>
+      <span aria-hidden="true"></span>
+    </a>
+  </div>
+  <div id="navMenu" class="navbar-menu">
+    <% if can? :index, User %>
+      <%= link_to "Participants", users_path, class: 'navbar-item'%>
+    <% end %>
+    <div class="navbar-end">
+      <div class="navbar-item">
+        <div class="buttons is-size-7">
+          <% if @current_user %>
+            Logged in as: <%= link_to @current_user.login, edit_user_path(@current_user), class: 'navbar-item' %>
+          <% else %>
+            <%= link_to 'Log in', new_user_sessions_path, class: "button is-primary" %>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>
+<section class="section">
+  <div class="container">
     <%= yield %>
-  </body>
+  </div>
+</section>
+</body>
 </html>

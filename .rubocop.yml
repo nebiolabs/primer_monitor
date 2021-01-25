@@ -5,6 +5,8 @@ AllCops:
     - 'bin/*'
     - 'node_modules/**/*'
     - 'vendor/**/*'
+    - 'config/**/*'
+    - 'db/**/*'
 
 Metrics/MethodLength:
   Max: 20

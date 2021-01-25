@@ -1,0 +1,40 @@
+<%= form_for @user_session do |f| %>
+  <% if @user_session.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@user_session.errors.count, "error") %> prohibited:</h2>
+      <ul>
+        <% @user_session.errors.full_messages.each do |msg| %>
+          <li><%= msg %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+  <div class="field is-horizontal">
+    <div class="field-label">
+      <%= f.label :login %>
+    </div>
+    <div class='control field-body'>
+      <%= f.text_field :login %>
+    </div>
+  </div>
+
+  <div class="field is-horizontal">
+    <div class="field-label">
+      <%= f.label :password %>
+    </div>
+    <div class="control field-body">
+      <%= f.text_field :password, type: :password%>
+    </div>
+  </div>
+  <div class="field is-horizontal">
+    <div class="field-label">
+      <%= f.label :remember_me %>
+    </div>
+    <div class="control field-body">
+      <%= f.check_box :remember_me %>
+    </div>
+  </div>
+
+
+  <%= f.submit "Login", class: 'button is-link'%>
+<% end %>
