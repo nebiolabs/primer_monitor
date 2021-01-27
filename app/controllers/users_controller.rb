@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class UsersController < ApplicationController
+  load_and_authorize_resource
+
   before_action :set_user, only: %i[show edit update destroy]
 
   # GET /users
@@ -28,6 +30,7 @@ class UsersController < ApplicationController
 
     respond_to do |format|
       if @user.save
+        UserMailer.with(user: @user).verification_email.deliver_later
         format.html { redirect_to @user, notice: 'User was successfully created.' }
         format.json { render :show, status: :created, location: @user }
       else
@@ -70,6 +73,6 @@ class UsersController < ApplicationController
 
   # Only allow a list of trusted parameters through.
   def user_params
-    params.require(:user).permit(:first, :last, :email)
+    params.require(:user).permit(:first, :last, :email, :password, :password_confirmation)
   end
 end

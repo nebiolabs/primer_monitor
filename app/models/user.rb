@@ -24,10 +24,6 @@ class User < ApplicationRecord
             allow_blank: true
 
   validates :login,
-            format: {
-              with: /\A[A-z0-9._-]+\z/,
-              message: 'should use only letters and numbers.'
-            },
             length: { within: 3..100 },
             uniqueness: {
               case_sensitive: false,
@@ -35,17 +31,17 @@ class User < ApplicationRecord
             },
             allow_blank: true
 
-  # validates :password,
-  #           confirmation: { if: :require_password? },
-  #           length: {
-  #             minimum: 8,
-  #             if: :require_password?
-  #           }
-  # validates :password_confirmation,
-  #           length: {
-  #             minimum: 8,
-  #             if: :require_password?
-  #           }
+  validates :password,
+            confirmation: { if: :require_password? },
+            length: {
+              minimum: 8,
+              if: :require_password?
+            }
+  validates :password_confirmation,
+            length: {
+              minimum: 8,
+              if: :require_password?
+            }
 
   before_validation :set_login_from_email
 
@@ -58,7 +54,7 @@ class User < ApplicationRecord
   end
 
   def set_login_from_email
-    self.login = email.split('@')[0] if email
+    self.login ||= email
   end
 
   def role_symbols
@@ -72,5 +68,16 @@ class User < ApplicationRecord
                          [role_to_test]
                        end
     !(role_to_test_ary & role_symbols).empty?
+  end
+
+  def deliver_password_reset_instructions!
+    reset_perishable_token!
+
+    Notifier.deliver_password_reset_instructions(self)
+  end
+
+  def confirm!
+    self.confirmed = true
+    save
   end
 end

@@ -7,7 +7,7 @@ class OligosTest < ApplicationSystemTestCase
     @oligo = oligos(:one)
   end
 
-  test 'visiting the index' do
+  test 'visiting the show' do
     visit oligos_url
     assert_selector 'h1', text: 'Oligos'
   end

@@ -26,7 +26,16 @@
     <%= form.text_field :email %>
   </div>
 
-  <div class="actions">
-    <%= form.submit %>
+  <div class="field">
+    <%= form.label :password %>
+    <%= form.password_field :password %>
   </div>
+
+  <div class="field">
+    <%= form.label :password_confirmation %>
+    <%= form.password_field  :password_confirmation %>
+  </div>
+
+  <%= form.submit "Login", class: 'button is-link'%>
+
 <% end %>

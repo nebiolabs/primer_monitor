@@ -7,7 +7,7 @@ class UsersTest < ApplicationSystemTestCase
     @user = users(:one)
   end
 
-  test 'visiting the index' do
+  test 'visiting the show' do
     visit users_url
     assert_selector 'h1', text: 'Users'
   end

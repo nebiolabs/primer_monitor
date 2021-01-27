@@ -3,6 +3,6 @@
 # this is the landing page for the application
 class WelcomeController < ApplicationController
   def index
-    authorize! :index, WelcomeController
+    authorize! :show, WelcomeController
   end
 end

@@ -8,7 +8,7 @@ class Ability
 
   def initialize(user)
     clear_aliased_actions
-    alias_action :index, :show, to: :read
+    alias_action :show, :show, to: :read
     alias_action :edit, to: :update
 
     @user = user || User.new
@@ -20,8 +20,15 @@ class Ability
   end
 
   def guest_ability
-    can :index, WelcomeController
+    can :show, WelcomeController
+    can :show, AboutController
+    can :show, HelpController
+    can :show, HistoryController
+    can :show, UserEmailConfirmationsController
     can :create, UserSession
+    can %i[new create], User
+    can :read, PrimerSet
+    can :read, Oligo
   end
 
   def admin_ability

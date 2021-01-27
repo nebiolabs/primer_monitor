@@ -29,7 +29,7 @@ gem 'jbuilder', '~> 2.7'
 gem 'bootsnap', '>= 1.4.2', require: false
 
 gem 'authlogic'
-gem 'cancancan'
+gem 'cancancan', '~> 3.2.1'
 gem 'scrypt', '~> 3.0'
 
 # for nested form management

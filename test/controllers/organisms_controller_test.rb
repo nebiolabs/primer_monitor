@@ -7,7 +7,7 @@ class OrganismsControllerTest < ActionDispatch::IntegrationTest
     @organism = organisms(:one)
   end
 
-  test 'should get index' do
+  test 'should get show' do
     get organisms_url
     assert_response :success
   end

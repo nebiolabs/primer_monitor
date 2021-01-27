@@ -7,7 +7,7 @@ class OrganismsTest < ApplicationSystemTestCase
     @organism = organisms(:one)
   end
 
-  test 'visiting the index' do
+  test 'visiting the show' do
     visit organisms_url
     assert_selector 'h1', text: 'Organisms'
   end

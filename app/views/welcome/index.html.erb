@@ -1,25 +1,18 @@
 
 <% if @current_user %>
-  <ul>
-    <% if can? :show, current_user %>
-      <li><%= link_to "Status", user_path(current_user) %></li>
-    <% end %>
-    <% if can? :index, Sample %>
-      <li><%= link_to "Samples", samples_path %></li>
-    <% end %>
-    <% if can? :index, Experiment %>
-      <li><%= link_to "Experiments", experiments_path %></li>
-    <% end %>
-    <% if can? :index, User %>
-      <li><%= link_to "Participants", users_path %></li>
-    <% end %>
-    <% if can? :create, Sample %>
-      <li><%= link_to "Submit Sample", new_sample_path %></li>
-    <% end %>
-  </ul>
+ <div>
+   <%= link_to 'Primer sets', primer_sets_path %>
+ </div>
 <% else %>
+  <h1 class="title">Welcome to Primer Monitor</h1>
   <div>
-    Please <%= link_to 'log in', new_user_sessions_path %> or scan a sample barcode to continue.
+    <%= link_to 'About this Application', about_path %>
+  </div>
+  <div>
+    <%= link_to 'Create an account', new_user_path %>
+  </div>
+  <div>
+    <%= link_to 'Log in', new_user_sessions_path %>
   </div>
 <% end %>
 

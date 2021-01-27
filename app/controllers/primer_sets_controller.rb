@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 class PrimerSetsController < ApplicationController
+  load_and_authorize_resource
   before_action :set_primer_set, only: %i[show edit update destroy]
 
   # GET /primer_sets
