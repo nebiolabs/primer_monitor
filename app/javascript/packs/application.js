@@ -18,6 +18,8 @@ require( 'datatables.net-buttons/js/buttons.html5.js' );
 require( 'datatables.net-buttons/js/buttons.print.js' );
 require( 'datatables.net-select-dt' );
 
+// Load datatables styles
+import 'datatables.net-dt/css/jquery.dataTables.css'
 
 $(document).on('turbolinks:load', () => {
     if($('[id^=DataTables_Table]').length == 0) {
