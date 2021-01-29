@@ -5,7 +5,8 @@
 
 #password should be changed...
 admin = User.create_with(first: 'Admin', last:'User',
-                         password: 'admin123',password_confirmation: 'admin123',
+                         password: Rails.application.credentials.admin_password,
+                         password_confirmation: Rails.application.credentials.admin_password,
                          active: true, approved: true, confirmed: true)
             .find_or_create_by!(email: 'primer-monitor-admin@neb.com')
 
