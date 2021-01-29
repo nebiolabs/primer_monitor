@@ -78,6 +78,8 @@ class User < ApplicationRecord
 
   def confirm!
     self.confirmed = true
+    self.enabled = true
+    self.approved = true
     save
   end
 end

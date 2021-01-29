@@ -10,15 +10,22 @@
       </ul>
     </div>
   <% end %>
-
-  <div class="field">
-    <%= form.label :name %>
-    <%= form.text_field :name %>
+  <div class="field is-horizontal">
+    <div class="field-label">
+      <%= form.label :name %>
+    </div>
+    <div class="control field-body">
+      <%= form.text_field :name %>
+    </div>
   </div>
 
-  <div class="field">
-    <%= form.label :ncbi_taxon_id %>
-    <%= form.number_field :ncbi_taxon_id %>
+  <div class="field is-horizontal">
+    <div class="field-label">
+      <%= form.label :ncbi_taxon_id %>
+    </div>
+    <div class="control field-body">
+      <%= form.number_field :ncbi_taxon_id %>
+    </div>
   </div>
 
   <div class="actions">

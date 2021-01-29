@@ -7,7 +7,7 @@ class PrimerSetsController < ApplicationController
   # GET /primer_sets
   # GET /primer_sets.json
   def index
-    @primer_sets = PrimerSet.all
+    @primer_sets = PrimerSet.includes(:organism, :oligos).all()
   end
 
   # GET /primer_sets/1
@@ -26,6 +26,7 @@ class PrimerSetsController < ApplicationController
   # POST /primer_sets.json
   def create
     @primer_set = PrimerSet.new(primer_set_params)
+    @primer_set.user ||= current_user
 
     respond_to do |format|
       if @primer_set.save
@@ -71,6 +72,7 @@ class PrimerSetsController < ApplicationController
 
   # Only allow a list of trusted parameters through.
   def primer_set_params
-    params.require(:primer_set).permit(:name, :creator_id)
+    params.require(:primer_set).permit(:name, :user_id, :organism_id,
+                                       oligos_attributes: %i[id primer_set_id name sequence _destroy])
   end
 end

@@ -170,7 +170,7 @@ CREATE TABLE public.primer_sets (
     id bigint NOT NULL,
     name character varying,
     user_id bigint,
-    organism_id bigint,
+    organism_id integer NOT NULL,
     created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL
 );
@@ -294,7 +294,8 @@ CREATE TABLE public.users (
     last_login_ip character varying,
     active boolean DEFAULT false,
     approved boolean DEFAULT false,
-    confirmed boolean DEFAULT false
+    confirmed boolean DEFAULT false,
+    send_primer_updates boolean DEFAULT false NOT NULL
 );
 
 
@@ -661,6 +662,8 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20210125033513'),
 ('20210125033734'),
 ('20210125034331'),
-('20210125101936');
+('20210125101936'),
+('20210128221802'),
+('20210129031328');
 
 

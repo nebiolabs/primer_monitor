@@ -13,16 +13,21 @@
 <body>
 <nav class="navbar" role="navigation" aria-label="main navigation">
   <div class="navbar-brand">
-    <a class="navbar-item" href="/">
-      <img src="/neb_logo_dark.png" alt="NEB Logo"/>
-    </a>
-    <span class="navbar-item is-size-7-mobile">Primer Monitor</span>
+    <%= link_to root_path, class: "navbar-item" do %>
+      <%= image_tag "appMainLogo.svg", alt: "Primer Monitoring Tool",  height: '30' %>
+    <% end %>
     <a role="button" class="navbar-burger burger" aria-label="menu" aria-expanded="false" data-target="navMenu">
       <span aria-hidden="true"></span>
       <span aria-hidden="true"></span>
       <span aria-hidden="true"></span>
     </a>
   </div>
+  <% if can? :index, PrimerSet %>
+    <%= link_to "Primer Sets", primer_sets_path, class: 'navbar-item' %>
+  <% end %>
+
+  <%= link_to 'About', about_path,  class: 'navbar-item' %>
+
   <div id="navMenu" class="navbar-menu">
     <div class="navbar-end">
       <div class="navbar-item">
@@ -30,6 +35,7 @@
           <% if @current_user %>
             Logged in as: <%= link_to @current_user.login, edit_user_path(@current_user), class: 'navbar-item' %>
           <% else %>
+            <%= link_to 'Create Account', new_user_path, class: "button is-link" %>
             <%= link_to 'Log in', new_user_sessions_path, class: "button is-link" %>
           <% end %>
         </div>

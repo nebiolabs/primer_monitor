@@ -11,31 +11,47 @@
     </div>
   <% end %>
 
-  <div class="field">
-    <%= form.label :first %>
-    <%= form.text_field :first %>
+
+  <div class="field is-horizontal">
+    <div class="field-label">
+      <%= form.label 'Name' %>
+    </div>
+    <div class="control field-body">
+      <%= form.text_field :first, placeholder: "First"%>
+      <%= form.text_field :last, placeholder: "Last" %>
+    </div>
   </div>
 
-  <div class="field">
-    <%= form.label :last %>
-    <%= form.text_field :last %>
+  <div class="field is-horizontal">
+    <div class="field-label">
+      <%= form.label :email %>
+    </div>
+    <div class="control field-body">
+      <%= form.text_field :email, size: 30 %>
+    </div>
   </div>
 
-  <div class="field">
-    <%= form.label :email %>
-    <%= form.text_field :email %>
+  <div class="field is-horizontal">
+    <div class="field-label">
+      <%= form.label :password %>
+    </div>
+    <div class="control field-body">
+      <%= form.password_field :password, placeholder: 'New password' %>
+      <%= form.password_field  :password_confirmation, placeholder: 'Confirmation' %>
+    </div>
   </div>
 
-  <div class="field">
-    <%= form.label :password %>
-    <%= form.password_field :password %>
+  <div class="field is-horizontal">
+    <div class="field-label">
+      <%= form.label "Send updates about primer variants" %>
+    </div>
+    <div class="control field-body">
+      <%= form.check_box :send_primer_updates %>
+    </div>
   </div>
 
-  <div class="field">
-    <%= form.label :password_confirmation %>
-    <%= form.password_field  :password_confirmation %>
-  </div>
 
-  <%= form.submit "Login", class: 'button is-link'%>
+  <%= form.submit "Save", class: 'button is-link'%>
+  <%= link_to 'Log Out', user_sessions_path, method: :delete, class:"button is-link" %></td>
 
 <% end %>

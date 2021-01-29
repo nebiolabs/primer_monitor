@@ -23,6 +23,8 @@ $sky_blue: #85abff;
 $blue: #4556ba;
 $green: #214f35;
 
+$title-size: 1.5rem;
+
 // Update Bulma's global variables
 $family-sans-serif: "Helvetica", sans-serif;
 //$grey-dark: $sky_blue;
@@ -33,12 +35,20 @@ $widescreen-enabled: false;
 $fullhd-enabled: false;
 $footer-padding:  1rem 1.5rem 1rem;
 
+$navbar-item-img-max-height: 3rem;
+
   // Update some of Bulma's component variables
 //$body-background-color: $cream;
 //$control-border-width: 2px;
 //$input-border-color: transparent;
 //$input-shadow: none;
 
+.icon {
+  height: 20px;
+  width: auto;
+  vertical-align: middle;
+  margin-left: 0.5em;
+}
 
 .tool-footer {
   position: relative;
@@ -79,6 +89,7 @@ $footer-padding:  1rem 1.5rem 1rem;
   margin-right: 0;
   height: 20px;
   width: auto;
+  vertical-align: middle;
 }
 
 .tool-footer-copyright {

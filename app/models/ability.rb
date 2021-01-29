@@ -17,6 +17,7 @@ class Ability
     return if @user.new_record?
 
     admin_ability if @user.has_role?(:administrator)
+    user_ability if @user
   end
 
   def guest_ability
@@ -25,10 +26,17 @@ class Ability
     can :show, HelpController
     can :show, HistoryController
     can :show, UserEmailConfirmationsController
+    can :show, Oligo
+    can :show, Organism
     can :create, UserSession
     can %i[new create], User
-    can :read, PrimerSet
-    can :read, Oligo
+    can %i[index read], PrimerSet
+  end
+
+  def user_ability
+    can :manage, @user
+    can :manage, PrimerSet, user_id: @user.id
+    can :create, PrimerSet
   end
 
   def admin_ability
