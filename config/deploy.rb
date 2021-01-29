@@ -1,9 +1,9 @@
 # config valid for current version and patch releases of Capistrano
-lock '~> 3.14.1'
+lock '~> 3.15.0'
 
 set :application, 'primer-monitor'
 set :ssh_options, { forward_agent: true }
-set :repo_url, 'git@github.com:bwlang/primer-monitor.git'
+set :repo_url, 'git@github.com:bwlang/primer_monitor.git'
 set :puma_service_name, 'puma'
 
 # only migrate if there are migrations pending
