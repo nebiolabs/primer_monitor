@@ -1,4 +1,3 @@
-#!/usr/bin/python3
 
 import sys
 import re
@@ -7,8 +6,10 @@ def parse_cigar(cigar_string):
     parsed = re.findall("(\d+[\w=])", cigar_string)
     return parsed
 
-print("Sample\tReference position\tMismatch type\tMismatch")
+# print("Sample\tReference position\tMismatch type\tMismatch")
 for line in sys.stdin:
+    if line.startswith("@"):
+        continue
     line = line.strip().split("\t")
     query_name = line[0]
     ref_start = int(line[3])
