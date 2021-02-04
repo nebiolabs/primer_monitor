@@ -1,0 +1,102 @@
+/*
+ * This is a manifest file that'll be compiled into application.css, which will include all the files
+ * listed below.
+ *
+ * Any CSS and SCSS file within this directory, lib/assets/stylesheets, or any plugin's
+ * vendor/assets/stylesheets directory can be referenced here using a relative path.
+ *
+ * You're free to add application-wide styles to this file and they'll appear at the bottom of the
+ * compiled file so the styles you add here take precedence over styles defined in any other CSS/SCSS
+ * files in this directory. Styles in this file should be added after the last require_* statement.
+ * It is generally better to create a new file per style scope.
+ *
+ *= require_tree .
+ *= require_self
+ */
+
+@charset "utf-8";
+
+// Set your brand colors
+$orange: #ffb463;
+$cream: #fffdc2;
+$sky_blue: #85abff;
+$blue: #4556ba;
+$green: #214f35;
+
+$title-size: 1.5rem;
+
+// Update Bulma's global variables
+$family-sans-serif: "Helvetica", sans-serif;
+//$grey-dark: $sky_blue;
+//$grey-light: $cream;
+//$primary: $blue;
+//$link: $blue;
+$widescreen-enabled: false;
+$fullhd-enabled: false;
+$footer-padding:  1rem 1.5rem 1rem;
+
+$navbar-item-img-max-height: 3rem;
+
+  // Update some of Bulma's component variables
+//$body-background-color: $cream;
+//$control-border-width: 2px;
+//$input-border-color: transparent;
+//$input-shadow: none;
+
+.icon {
+  height: 20px;
+  width: auto;
+  vertical-align: middle;
+  margin-left: 0.5em;
+}
+
+.tool-footer {
+  position: relative;
+  width: 100%;
+  text-align: center;
+}
+
+.tool-footer-link-container {
+  width: 100%;
+  display: inline-block;
+  margin: 10px auto;
+  vertical-align: baseline;
+  text-align: center;
+  border-style: solid;
+  border-width: 1pt 0 0 0;
+  border-color: #ccc;
+}
+
+.tool-footer-link {
+  display: inline-block;
+  vertical-align: middle;
+  margin: 10px 10px 0 10px;
+  height: 30px;
+  color: #505050;
+  background-color: transparent;
+  text-decoration: none;
+  font-family: Arial;
+  font-size: 10pt;
+  font-weight: 400;
+  &:hover {
+    color: #cb521e;
+  }
+}
+
+.tool-footer-link-img,
+.tool-footer-link svg,
+.tool-footer-link img {
+  margin-right: 0;
+  height: 20px;
+  width: auto;
+  vertical-align: middle;
+}
+
+.tool-footer-copyright {
+  width: 100%;
+  text-align: center;
+  margin-top:10px;
+  font-size: 12pt;
+}
+
+@import "bulma";

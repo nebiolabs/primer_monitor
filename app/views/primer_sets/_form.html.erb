@@ -1,8 +1,7 @@
 <%= form_with(model: primer_set, local: true) do |form| %>
-  <% if primer_set.errors.any? %>
+    <% if primer_set.errors.any? %>
     <div id="error_explanation">
-      <h2><%= pluralize(primer_set.errors.count, "error") %> prohibited this primer_set from being saved:</h2>
-
+      <h2><%= pluralize(primer_set.errors.count, "error") %> prohibited this primer set from being saved:</h2>
       <ul>
         <% primer_set.errors.full_messages.each do |message| %>
           <li><%= message %></li>
@@ -11,17 +10,44 @@
     </div>
   <% end %>
 
-  <div class="field">
-    <%= form.label :name %>
-    <%= form.text_field :name %>
+  <div class="field is-horizontal">
+    <div class="field-label">
+      <%= form.label :name %>
+    </div>
+    <div class="control field-body">
+      <%= form.text_field :name %>
+    </div>
   </div>
 
-  <div class="field">
-    <%= form.label :creator_id %>
-    <%= form.number_field :creator_id %>
+  <div class="field is-horizontal">
+    <div class="field-label">
+      <%= form.label :organism %>
+    </div>
+    <div class="control field-body">
+      <%= form.select :organism_id, options_from_collection_for_select(Organism.all, :id, :name)  %>
+      <% if can? :create, Organism %>
+        <%= link_to new_organism_path do %>
+          <%= image_tag("add_icon.svg", alt: 'add organism',class: 'icon')%>
+        <% end %>
+      <% end %>
+    </div>
   </div>
+
+  <section class="section">
+    <div class="container">
+      <h4 class="subtitle is-4">Oligos</h4>
+      <div id="samples">
+        <%= form.fields_for :oligos do |es| %>
+          <%= render 'oligo_fields', f: es %>
+        <% end %>
+        <p>
+          <%= link_to_add_association 'Add Oligo', form, :oligos, class:'button' %>
+        </p>
+      </div>
+    </div>
+  </section>
 
   <div class="actions">
-    <%= form.submit %>
+    <%= form.submit class: 'button is-link'%>
   </div>
 <% end %>

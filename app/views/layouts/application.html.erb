@@ -1,15 +1,84 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>PrimerMonitor</title>
-    <%= csrf_meta_tags %>
-    <%= csp_meta_tag %>
+<head>
+  <title>Primer Monitor</title>
+  <%= csrf_meta_tags %>
+  <%= csp_meta_tag %>
 
-    <%= stylesheet_link_tag 'application', media: 'all', 'data-turbolinks-track': 'reload' %>
-    <%= javascript_pack_tag 'application', 'data-turbolinks-track': 'reload' %>
-  </head>
+  <%= stylesheet_link_tag 'application', media: 'all', 'data-turbolinks-track': 'reload' %>
+  <%= javascript_pack_tag 'application', 'data-turbolinks-track': 'reload' %>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
 
-  <body>
+<body>
+<nav class="navbar" role="navigation" aria-label="main navigation">
+  <div class="navbar-brand">
+    <%= link_to root_path, class: "navbar-item" do %>
+      <%= image_tag "appMainLogo.svg", alt: "Primer Monitoring Tool",  height: '30' %>
+    <% end %>
+    <a role="button" class="navbar-burger burger" aria-label="menu" aria-expanded="false" data-target="navMenu">
+      <span aria-hidden="true"></span>
+      <span aria-hidden="true"></span>
+      <span aria-hidden="true"></span>
+    </a>
+  </div>
+  <% if can? :index, PrimerSet %>
+    <%= link_to "Primer Sets", primer_sets_path, class: 'navbar-item' %>
+  <% end %>
+
+  <%= link_to 'About', about_path,  class: 'navbar-item' %>
+
+  <div id="navMenu" class="navbar-menu">
+    <div class="navbar-end">
+      <div class="navbar-item">
+        <div class="buttons is-size-7">
+          <% if @current_user %>
+            Logged in as: <%= link_to @current_user.login, edit_user_path(@current_user), class: 'navbar-item' %>
+          <% else %>
+            <%= link_to 'Create Account', new_user_path, class: "button is-link is-small" %>
+            <%= link_to 'Log in', new_user_sessions_path, class: "button is-link is-small" %>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>
+<section class="section">
+  <div class="container">
+    <div class="has-text-danger"><%= flash[:error] %></div>
+    <div class="has-text-warning"><%= flash[:warning] %></div>
+    <div class="has-text-info"><%= flash[:notice] %></div>
     <%= yield %>
-  </body>
+  </div>
+</section>
+<footer class="footer">
+  <div class="content has-text-centered">
+    <div class="level">
+      <p class="level-item has-text-centered">
+        <a href="/about" class="tool-footer-link">
+          <%= image_tag "NEBtools_about_footer_icon.svg", class: 'tool-footer-link-img' %> ABOUT THIS TOOL
+        </a>
+      </p>
+      <p class="level-item has-text-centered">
+        <a href="/history" class="tool-footer-link">
+          <%= image_tag "NEBtools_history_footer_icon.svg", class: 'tool-footer-link-img' %> HISTORY
+        </a>
+      </p>
+      <p class="level-item has-text-centered">
+        <a href="https://www.neb.com/tools-and-resources/interactive-tools" class="tool-footer-link">
+          <%= image_tag "NEBtools_footer_icon.svg", class: 'tool-footer-link-img' %> ALL TOOLS
+        </a>
+      </p>
+      <p class="level-item has-text-centered">
+        <a href="https://www.neb.com/support/neb-technical-support" class="tool-footer-link">
+          <%= image_tag "NEBtools_TS_footer_icon.svg", class: 'tool-footer-link-img' %> TECH SUPPORT
+        </a>
+      </p>
+    </div>
+    <div class="tool-footer-copyright">
+      <small>&copy; Copyright 2021 New England Biolabs. All Rights Reserved.</small>
+    </div>
+  </div>
+</footer>
+</body>
 </html>

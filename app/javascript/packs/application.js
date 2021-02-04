@@ -7,11 +7,36 @@ require("@rails/ujs").start()
 require("turbolinks").start()
 require("@rails/activestorage").start()
 require("channels")
+require("@nathanvda/cocoon")
 
+let $ = require('jquery');
 
-// Uncomment to copy all static images under ../images to the output folder and reference
-// them with the image_pack_tag helper in views (e.g <%= image_pack_tag 'rails.png' %>)
-// or the `imagePath` JavaScript helper below.
-//
-// const images = require.context('../images', true)
-// const imagePath = (name) => images(name, true)
+require( 'datatables.net-dt/css/jquery.dataTables.min.css' );
+require( 'datatables.net-dt' );
+require( 'datatables.net-buttons-dt' );
+require( 'datatables.net-buttons/js/buttons.html5.js' );
+require( 'datatables.net-buttons/js/buttons.print.js' );
+require( 'datatables.net-select-dt' );
+
+// Load datatables styles
+import 'datatables.net-dt/css/jquery.dataTables.css'
+
+$(document).on('turbolinks:load', () => {
+    if($('[id^=DataTables_Table]').length == 0) {
+        $('table').DataTable({
+            dom: 'lfBrtip',
+            select: true,
+            buttons: [
+                'copy', 'excel'
+            ]
+        });
+    }
+
+    // Check for click events on the navbar burger icon
+    $(".navbar-burger").click(function() {
+        // Toggle the "is-active" class on both the "navbar-burger" and the "navbar-menu"
+        $(".navbar-burger").toggleClass("is-active");
+        $(".navbar-menu").toggleClass("is-active");
+
+    });
+})

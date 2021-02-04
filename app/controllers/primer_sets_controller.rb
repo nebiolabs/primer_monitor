@@ -1,16 +1,18 @@
+# frozen_string_literal: true
+
 class PrimerSetsController < ApplicationController
-  before_action :set_primer_set, only: [:show, :edit, :update, :destroy]
+  load_and_authorize_resource
+  before_action :set_primer_set, only: %i[show edit update destroy]
 
   # GET /primer_sets
   # GET /primer_sets.json
   def index
-    @primer_sets = PrimerSet.all
+    @primer_sets = PrimerSet.includes(:organism, :oligos).all()
   end
 
   # GET /primer_sets/1
   # GET /primer_sets/1.json
-  def show
-  end
+  def show; end
 
   # GET /primer_sets/new
   def new
@@ -18,13 +20,13 @@ class PrimerSetsController < ApplicationController
   end
 
   # GET /primer_sets/1/edit
-  def edit
-  end
+  def edit; end
 
   # POST /primer_sets
   # POST /primer_sets.json
   def create
     @primer_set = PrimerSet.new(primer_set_params)
+    @primer_set.user ||= current_user
 
     respond_to do |format|
       if @primer_set.save
@@ -62,13 +64,15 @@ class PrimerSetsController < ApplicationController
   end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
-    def set_primer_set
-      @primer_set = PrimerSet.find(params[:id])
-    end
 
-    # Only allow a list of trusted parameters through.
-    def primer_set_params
-      params.require(:primer_set).permit(:name, :creator_id)
-    end
+  # Use callbacks to share common setup or constraints between actions.
+  def set_primer_set
+    @primer_set = PrimerSet.find(params[:id])
+  end
+
+  # Only allow a list of trusted parameters through.
+  def primer_set_params
+    params.require(:primer_set).permit(:name, :user_id, :organism_id,
+                                       oligos_attributes: %i[id primer_set_id name sequence _destroy])
+  end
 end

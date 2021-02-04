@@ -1,101 +1,42 @@
-params.primer_bed = "../n2_e1_primers.bed"
-params.fasta = "../gisaid_hcov-19_2020_06_13_01.fasta"
-params.ref = "../NC_045512.2.fasta"
+primer_bed = params.primer_bed //= "../n2_e1_primers.bed"
+fasta = params.fasta //= "../gisaid_hcov-19_2020_06_13_01.fasta"
+ref = params.ref //= "../NC_045512.2.fasta"
 
-input_fasta = Channel.fromPath(params.fasta)
+input_fasta = Channel.fromPath(fasta).splitFasta(file: true, by: 10000)
 
-ref = file(params.ref).toAbsolutePath()
-primer_bed = file(params.primer_bed).toAbsolutePath()
+ref = file(ref).toAbsolutePath()
+primer_bed = file(primer_bed).toAbsolutePath()
 
 process align {
     cpus 16
-    publishDir "output"
-    conda "minimap2=2.17 sambamba=0.7.1 sed"
+    conda "minimap2=2.17 sed"
 
     input:
         file(fasta) from input_fasta
     output:
-        tuple file('*.bam'),file('*.bai') into combined_bam
+        file('*.tsv') into split_variants
 
     shell:
     '''
         sed -E 's/ /_/g' !{fasta} \
-        | minimap2 -t !{task.cpus} -x map-ont -a !{ref} /dev/stdin \
-        | sambamba view -S -f bam -l 0 /dev/stdin  \
-        | sambamba sort -t !{task.cpus} -o combined.bam /dev/stdin
+        | minimap2 -t !{task.cpus} --eqx -x map-ont -a !{ref} /dev/stdin \
+        | python3 /mnt/home/mcampbell/src/primer_monitor/lib/parse_alignments.py > $(basename $PWD).tsv
+
     '''
 }
 
-process split_bam_by_region{
-    cpus 16
-    publishDir "output"
-    conda "sambamba=0.7.1 parallel findutils gawk"
+process combine_variants {
+    cpus 1
+    publishDir "output", mode: 'copy'
 
-    input: 
-        tuple file(bam), file(bai) from combined_bam
+    input:
+        file(variants) from split_variants.collect()
     output:
-        tuple file('*.bam'), file('*.bai') into bams
+        file("combined_variants.tsv") into combined_variants
 
     shell:
     '''
-        sambamba view combined.bam \
-        | /usr/bin/awk 'BEGIN {FS="\\t"}; { split($1,a,"/"); split(a[3],b,"-"); a[2] == "USA" ? file=a[2]"_"substr(b[1],1,2)".sam" : file=a[2]".sam" ; print >> file; close file; }'
-
-        sambamba view -H combined.bam > common_header.txt
-
-        find . -maxdepth 1 -name '*.sam' | parallel -j!{task.cpus} \
-        "cat common_header.txt {} | sambamba view -S -f bam -o {/.}.bam /dev/stdin"
-
-        rm *.sam
-    '''
-}
-
-bams.map { bam,bai -> tuple(bam.simpleName,bam,bai) }.transpose().into{region_bams}
-
-process summarize_variants {
-    conda 'samtools gawk sed'
-
-    input: 
-        tuple region, file(bam), file(bai) from region_bams
-    output: 
-        tuple region, file('*.tsv') into region_variant_summaries
-
-    shell:
-    '''
-        samtools mpileup -f !{ref} -d 1000000 -B -L 1000000 -l !{primer_bed} !{bam} \
-        | cut -f 1-5 | gawk -F"\\t" -v OFS="\\t" '{gsub("[N\\\\]\\\\.\\\\$\\\\^]","",$5); print}' \
-        | sed -E 's/^/!{region}\\t/' \
-        > tmp
-
-        awk -F"\\t" -v OFS="\\t" '{
-            if(NR==FNR) {
-                primers[$2 ":" $3] = $4
-            } else { 
-                for (p in primers) { 
-                    split(p,loc,":"); 
-                    start= loc[1]; end=loc[2]
-
-                    if ($3 >= start && $3 <= end) {
-                        name=primers[start":"end]
-                        print $1,name,$2,$3,$4,$5,$6
-                        break;
-                    }
-                }
-            }
-        }' !{primer_bed} tmp > !{region}_variant_summary.tsv 
-    '''
-}
-
-process aggregate_variants {
-
-    publishDir "output", mode: "copy"
-
-    input: 
-        file('*') from region_variant_summaries.flatten().toList()
-    output: 
-        file('*combined.tsv') into combined_variant_summary
-    shell:
-    ''' 
-        cat *.tsv > variant_summary.combined.tsv
+    echo -e 'Sample\tReference position\tMismatch type\tMismatch' > combined_variants.tsv
+    cat !{variants} >> combined_variants.tsv
     '''
 }

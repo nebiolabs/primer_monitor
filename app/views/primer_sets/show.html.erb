@@ -1,14 +1,27 @@
-<p id="notice"><%= notice %></p>
 
 <p>
   <strong>Name:</strong>
   <%= @primer_set.name %>
 </p>
 
-<p>
-  <strong>Creator:</strong>
-  <%= @primer_set.creator_id %>
-</p>
+<table>
+  <thead>
+  <tr>
+    <th>Name</th>
+    <th>Sequence</th>
+  </tr>
+  </thead>
+
+  <tbody>
+  <% @primer_set.oligos.each do |oligo| %>
+    <tr>
+      <td><%= oligo.name %></td>
+      <td><%= oligo.sequence %></td>
+    </tr>
+  <% end %>
+  </tbody>
+</table>
+
 
 <%= link_to 'Edit', edit_primer_set_path(@primer_set) %> |
-<%= link_to 'Back', primer_sets_path %>
+<%= link_to 'All Primer Sets', primer_sets_path %>

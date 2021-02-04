@@ -1,5 +1,8 @@
+# frozen_string_literal: true
+
 class OrganismsController < ApplicationController
-  before_action :set_organism, only: [:show, :edit, :update, :destroy]
+  load_and_authorize_resource
+  before_action :set_organism, only: %i[show edit update destroy]
 
   # GET /organisms
   # GET /organisms.json
@@ -9,8 +12,7 @@ class OrganismsController < ApplicationController
 
   # GET /organisms/1
   # GET /organisms/1.json
-  def show
-  end
+  def show; end
 
   # GET /organisms/new
   def new
@@ -18,8 +20,7 @@ class OrganismsController < ApplicationController
   end
 
   # GET /organisms/1/edit
-  def edit
-  end
+  def edit; end
 
   # POST /organisms
   # POST /organisms.json
@@ -62,13 +63,14 @@ class OrganismsController < ApplicationController
   end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
-    def set_organism
-      @organism = Organism.find(params[:id])
-    end
 
-    # Only allow a list of trusted parameters through.
-    def organism_params
-      params.require(:organism).permit(:name, :ncbi_taxon_id)
-    end
+  # Use callbacks to share common setup or constraints between actions.
+  def set_organism
+    @organism = Organism.find(params[:id])
+  end
+
+  # Only allow a list of trusted parameters through.
+  def organism_params
+    params.require(:organism).permit(:name, :ncbi_taxon_id)
+  end
 end

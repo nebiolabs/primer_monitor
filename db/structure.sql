@@ -14,39 +14,6 @@ SET default_tablespace = '';
 SET default_table_access_method = heap;
 
 --
--- Name: amplicons; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.amplicons (
-    id bigint NOT NULL,
-    name character varying,
-    user_id bigint,
-    organism_id bigint,
-    created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL
-);
-
-
---
--- Name: amplicons_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE public.amplicons_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: amplicons_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE public.amplicons_id_seq OWNED BY public.amplicons.id;
-
-
---
 -- Name: ar_internal_metadata; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -136,7 +103,7 @@ CREATE TABLE public.oligos (
     id bigint NOT NULL,
     name character varying,
     sequence character varying,
-    amplicon_id bigint,
+    primer_set_id bigint,
     created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL,
     start_pos integer,
@@ -196,12 +163,108 @@ ALTER SEQUENCE public.organisms_id_seq OWNED BY public.organisms.id;
 
 
 --
+-- Name: primer_sets; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.primer_sets (
+    id bigint NOT NULL,
+    name character varying,
+    user_id bigint,
+    organism_id integer NOT NULL,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: primer_sets_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.primer_sets_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: primer_sets_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.primer_sets_id_seq OWNED BY public.primer_sets.id;
+
+
+--
+-- Name: roles; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.roles (
+    id bigint NOT NULL,
+    name character varying,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: roles_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.roles_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: roles_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.roles_id_seq OWNED BY public.roles.id;
+
+
+--
 -- Name: schema_migrations; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.schema_migrations (
     version character varying NOT NULL
 );
+
+
+--
+-- Name: user_roles; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.user_roles (
+    id bigint NOT NULL,
+    user_id bigint NOT NULL,
+    role_id bigint NOT NULL,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: user_roles_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.user_roles_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: user_roles_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.user_roles_id_seq OWNED BY public.user_roles.id;
 
 
 --
@@ -215,7 +278,24 @@ CREATE TABLE public.users (
     email character varying NOT NULL,
     activated boolean DEFAULT false NOT NULL,
     created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL
+    updated_at timestamp(6) without time zone NOT NULL,
+    login character varying,
+    crypted_password character varying,
+    password_salt character varying,
+    persistence_token character varying,
+    single_access_token character varying,
+    perishable_token character varying,
+    login_count integer DEFAULT 0 NOT NULL,
+    failed_login_count integer DEFAULT 0 NOT NULL,
+    last_request_at timestamp without time zone,
+    current_login_at timestamp without time zone,
+    last_login_at timestamp without time zone,
+    current_login_ip character varying,
+    last_login_ip character varying,
+    active boolean DEFAULT false,
+    approved boolean DEFAULT false,
+    confirmed boolean DEFAULT false,
+    send_primer_updates boolean DEFAULT false NOT NULL
 );
 
 
@@ -246,6 +326,7 @@ CREATE TABLE public.variant_sites (
     id bigint NOT NULL,
     "position" integer,
     variant_type character varying,
+    variant character varying,
     fasta_record_id bigint,
     created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL
@@ -269,13 +350,6 @@ CREATE SEQUENCE public.variant_sites_id_seq
 --
 
 ALTER SEQUENCE public.variant_sites_id_seq OWNED BY public.variant_sites.id;
-
-
---
--- Name: amplicons id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.amplicons ALTER COLUMN id SET DEFAULT nextval('public.amplicons_id_seq'::regclass);
 
 
 --
@@ -307,6 +381,27 @@ ALTER TABLE ONLY public.organisms ALTER COLUMN id SET DEFAULT nextval('public.or
 
 
 --
+-- Name: primer_sets id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.primer_sets ALTER COLUMN id SET DEFAULT nextval('public.primer_sets_id_seq'::regclass);
+
+
+--
+-- Name: roles id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.roles ALTER COLUMN id SET DEFAULT nextval('public.roles_id_seq'::regclass);
+
+
+--
+-- Name: user_roles id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.user_roles ALTER COLUMN id SET DEFAULT nextval('public.user_roles_id_seq'::regclass);
+
+
+--
 -- Name: users id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -318,14 +413,6 @@ ALTER TABLE ONLY public.users ALTER COLUMN id SET DEFAULT nextval('public.users_
 --
 
 ALTER TABLE ONLY public.variant_sites ALTER COLUMN id SET DEFAULT nextval('public.variant_sites_id_seq'::regclass);
-
-
---
--- Name: amplicons amplicons_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.amplicons
-    ADD CONSTRAINT amplicons_pkey PRIMARY KEY (id);
 
 
 --
@@ -369,11 +456,35 @@ ALTER TABLE ONLY public.organisms
 
 
 --
+-- Name: primer_sets primer_sets_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.primer_sets
+    ADD CONSTRAINT primer_sets_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: roles roles_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.roles
+    ADD CONSTRAINT roles_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: schema_migrations schema_migrations_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.schema_migrations
     ADD CONSTRAINT schema_migrations_pkey PRIMARY KEY (version);
+
+
+--
+-- Name: user_roles user_roles_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.user_roles
+    ADD CONSTRAINT user_roles_pkey PRIMARY KEY (id);
 
 
 --
@@ -393,20 +504,6 @@ ALTER TABLE ONLY public.variant_sites
 
 
 --
--- Name: index_amplicons_on_organism_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_amplicons_on_organism_id ON public.amplicons USING btree (organism_id);
-
-
---
--- Name: index_amplicons_on_user_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_amplicons_on_user_id ON public.amplicons USING btree (user_id);
-
-
---
 -- Name: index_blast_hits_on_oligo_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -421,10 +518,59 @@ CREATE INDEX index_blast_hits_on_organism_id ON public.blast_hits USING btree (o
 
 
 --
--- Name: index_oligos_on_amplicon_id; Type: INDEX; Schema: public; Owner: -
+-- Name: index_oligos_on_primer_set_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_oligos_on_amplicon_id ON public.oligos USING btree (amplicon_id);
+CREATE INDEX index_oligos_on_primer_set_id ON public.oligos USING btree (primer_set_id);
+
+
+--
+-- Name: index_primer_sets_on_organism_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_primer_sets_on_organism_id ON public.primer_sets USING btree (organism_id);
+
+
+--
+-- Name: index_primer_sets_on_user_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_primer_sets_on_user_id ON public.primer_sets USING btree (user_id);
+
+
+--
+-- Name: index_user_roles_on_role_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_user_roles_on_role_id ON public.user_roles USING btree (role_id);
+
+
+--
+-- Name: index_user_roles_on_user_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_user_roles_on_user_id ON public.user_roles USING btree (user_id);
+
+
+--
+-- Name: index_users_on_perishable_token; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_users_on_perishable_token ON public.users USING btree (perishable_token);
+
+
+--
+-- Name: index_users_on_persistence_token; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_users_on_persistence_token ON public.users USING btree (persistence_token);
+
+
+--
+-- Name: index_users_on_single_access_token; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_users_on_single_access_token ON public.users USING btree (single_access_token);
 
 
 --
@@ -451,10 +597,26 @@ ALTER TABLE ONLY public.variant_sites
 
 
 --
--- Name: amplicons fk_rails_52b9cf4012; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: user_roles fk_rails_318345354e; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.amplicons
+ALTER TABLE ONLY public.user_roles
+    ADD CONSTRAINT fk_rails_318345354e FOREIGN KEY (user_id) REFERENCES public.users(id);
+
+
+--
+-- Name: user_roles fk_rails_3369e0d5fc; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.user_roles
+    ADD CONSTRAINT fk_rails_3369e0d5fc FOREIGN KEY (role_id) REFERENCES public.roles(id);
+
+
+--
+-- Name: primer_sets fk_rails_52b9cf4012; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.primer_sets
     ADD CONSTRAINT fk_rails_52b9cf4012 FOREIGN KEY (organism_id) REFERENCES public.organisms(id);
 
 
@@ -463,14 +625,14 @@ ALTER TABLE ONLY public.amplicons
 --
 
 ALTER TABLE ONLY public.oligos
-    ADD CONSTRAINT fk_rails_58e7536518 FOREIGN KEY (amplicon_id) REFERENCES public.amplicons(id);
+    ADD CONSTRAINT fk_rails_58e7536518 FOREIGN KEY (primer_set_id) REFERENCES public.primer_sets(id);
 
 
 --
--- Name: amplicons fk_rails_a78cff2c70; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: primer_sets fk_rails_a78cff2c70; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.amplicons
+ALTER TABLE ONLY public.primer_sets
     ADD CONSTRAINT fk_rails_a78cff2c70 FOREIGN KEY (user_id) REFERENCES public.users(id);
 
 
@@ -496,6 +658,12 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20200810101557'),
 ('20201023152436'),
 ('20201023153637'),
-('20201023161602');
+('20201023161602'),
+('20210125033513'),
+('20210125033734'),
+('20210125034331'),
+('20210125101936'),
+('20210128221802'),
+('20210129031328');
 
 

@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="209.3mm" height="82.484mm" version="1.1" viewBox="0 0 209.3 82.484" xmlns="http://www.w3.org/2000/svg" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+ <defs>
+  <marker id="Arrow1Mstart" overflow="visible" orient="auto">
+   <path transform="matrix(.4 0 0 .4 4 0)" d="m0 0 5-5-17.5 5 17.5 5z" fill="#666767" fill-rule="evenodd" stroke="#666767" stroke-width="1pt"/>
+  </marker>
+ </defs>
+ <metadata>
+  <rdf:RDF>
+   <cc:Work rdf:about="">
+    <dc:format>image/svg+xml</dc:format>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:title/>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <g transform="translate(-3.9734 -48.985)">
+  <rect x="22.981" y="58.964" width="45.357" height="43.089" fill="none" stop-color="#000000" stroke="#9d9fa2" stroke-width="4"/>
+  <rect x="73.299" y="55.985" width="115.41" height="49.347" fill="none" stop-color="#000000" stroke="#9d9fa2" stroke-linejoin="round" stroke-width="4" style="paint-order:normal"/>
+  <g fill="none" stroke="#9d9fa2" stroke-opacity=".56078">
+   <path d="m189.9 98.103h15.119" stroke-width="3.0237"/>
+   <g stroke-width="3.0237">
+    <path d="m189.9 64.558h15.119"/>
+    <path d="m189.9 72.944h15.119"/>
+    <path d="m189.9 81.331h15.119"/>
+    <path d="m189.9 89.717h15.119"/>
+   </g>
+  </g>
+  <g fill="none">
+   <g stroke="#666767">
+    <path d="m43.748 92.618-8.5694-9.9341-10.495 0.75177-4.7098-8.9073-10.936-1.4261" marker-start="url(#Arrow1Mstart)"/>
+    <path d="m43.748 92.618c26.296-12.605 54.926-15.811 54.926-15.811" stroke-dasharray="1, 1" stroke-dashoffset="2"/>
+    <path d="m100.84 78.429-0.67045 11.599" stroke-dasharray="1, 1" stroke-dashoffset="2"/>
+   </g>
+   <path d="m169.22 75.593c8.3109 1.202 10.208 5.6107 10.715 10.715" stroke="#9d9fa2" stroke-linecap="round" stroke-width="2"/>
+  </g>
+  <g transform="translate(-1.0583)" fill="none" stroke="#9d9fa2" stroke-linecap="round" stroke-width="2">
+   <path d="m87.197 71.309h9.2369l8.498 9.2369"/>
+   <path d="m112.33 93.171h-9.237l-8.498-9.2369"/>
+  </g>
+  <g transform="translate(-3.0487 -.012525)" fill="none" stroke="#9d9fa2" stroke-linecap="round" stroke-width="2">
+   <path d="m110.32 71.322h9.2369l8.498 9.2369"/>
+   <path d="m135.45 93.184h-9.237l-8.498-9.2369"/>
+  </g>
+  <g transform="translate(-2.6108 .955)" fill="none" stroke="#9d9fa2" stroke-linecap="round" stroke-width="2">
+   <path d="m131.01 70.354h9.237l8.498 9.2369"/>
+   <path d="m156.15 92.216h-9.237l-8.498-9.2369"/>
+  </g>
+  <g transform="translate(-1.0583 .42583)" fill="none" stroke="#9d9fa2" stroke-linecap="round" stroke-width="2">
+   <path d="m150.59 70.883h9.237l8.498 9.2369"/>
+   <path d="m175.73 92.745h-9.237l-8.498-9.2369"/>
+  </g>
+  <g fill="none" stroke="#666767" stroke-dasharray="1, 1" stroke-dashoffset="2">
+   <path d="m98.83 76.763-0.67045 11.599"/>
+   <path d="m118.75 75.328c-5.3214 6.8016-12.161 10.566-18.493 15.348"/>
+   <path d="m117.75 73.573c-4.8903 6.6022-12.094 10.506-18.493 15.348"/>
+   <path d="m119.87 77.173c-6.0066 10.462-12.319 10.538-18.493 15.348"/>
+   <path d="m116.34 72.9c-4.8903 6.6022-12.094 10.506-18.493 15.348"/>
+  </g>
+  <text x="27.083948" y="78.909966" fill="#4556ba" font-family="Helvetica" font-size="17.639px" font-weight="bold" stroke-width=".26458" style="font-variant-caps:normal;font-variant-east-asian:normal;font-variant-ligatures:normal;font-variant-numeric:normal;line-height:1.25" xml:space="preserve"><tspan x="27.083948" y="78.909966" fill="#4556ba" font-family="Helvetica" font-size="17.639px" font-weight="bold" stroke-width=".26458" style="font-variant-caps:normal;font-variant-east-asian:normal;font-variant-ligatures:normal;font-variant-numeric:normal">PMT</tspan></text>
+  <text x="16.761673" y="125.27386" fill="#4556ba" font-family="Helvetica" font-size="17.639px" font-weight="bold" stroke-width=".26458" style="font-variant-caps:normal;font-variant-east-asian:normal;font-variant-ligatures:normal;font-variant-numeric:normal;line-height:1.25" xml:space="preserve"><tspan x="16.761673" y="125.27386" fill="#4556ba" font-family="Helvetica" font-size="17.639px" font-weight="bold" stroke-width=".26458" style="font-variant-caps:normal;font-variant-east-asian:normal;font-variant-ligatures:normal;font-variant-numeric:normal">Primer Monitoring Tool</tspan></text>
+ </g>
+</svg>
