@@ -2,7 +2,7 @@ ref = params.ref
 ref = file(ref).toAbsolutePath()
 
 ncov_path = '/mnt/home/mcampbell/src/ncov-ingest'
-primer_path = '/mnt/home/mcampbell/src/primer_monitor'
+primer_monitor_path = '/mnt/bioinfo/prg/primer_monitor'
 
 process download_data {
     cpus 1
@@ -15,8 +15,9 @@ process download_data {
 
     shell:
     '''
+    source !{primer_monitor_path}/.env
     date_today=$(date +%Y-%m-%d)
-    curl -u <username>:<password> https://www.epicov.org/epi3/3p/neb/export/provision.json.xz | xz -d -T8 > ${date_today}.json
+    curl -u $GISAID_USER:$GISAID_PASSWORD https://www.epicov.org/epi3/3p/neb/export/provision.json.xz | xz -d -T8 > ${date_today}.json
     '''
 
 }
@@ -35,6 +36,7 @@ process transform_data {
     shell:
     '''
     date_today=$(date +%Y-%m-%d)
+
     !{ncov_path}/bin/transform-gisaid --output-metadata ${date_today}.metadata --output-fasta ${date_today}.fasta --output-additional-info ${date_today}.info ${date_today}.json 
     '''
 
@@ -42,7 +44,7 @@ process transform_data {
 
 process align {
     cpus 16
-    conda "minimap2=2.17 sed"
+    conda "minimap2=2.17 sed python=3.9"
 
     input:
         file(fasta) from transformed_fasta.splitFasta(file: true, by: 10000)
@@ -53,7 +55,7 @@ process align {
     '''
         sed -E 's/ /_/g' !{fasta} \
         | minimap2 -t !{task.cpus} --eqx -x map-ont -a !{ref} /dev/stdin \
-        | python3 !{primer_path}/primer_monitor/lib/parse_alignments.py > $(basename $PWD).tsv
+        | python3 !{primer_monitor_path}/lib/parse_alignments.py > $(basename $PWD).tsv
 
     '''
 }
@@ -83,7 +85,7 @@ process load_to_db {
 
     shell:
     '''
-    ruby !{primer_path}/upload.rb --metadata_tsv !{metadata} --variants_tsv !{variants}
+    ruby !{primer_monitor_path}/upload.rb --metadata_tsv !{metadata} --variants_tsv !{variants}
     '''
 
 }
