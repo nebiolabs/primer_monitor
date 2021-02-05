@@ -11,7 +11,7 @@ require 'logger'
 require 'pg'
 require 'yaml'
 require 'pp'
-# require 'slop'
+require 'slop'
 # require 'digest/md5'
 # require 'date'
 # require 'tempfile'
@@ -20,13 +20,13 @@ require 'pp'
 
 # Use 'safe' in order to prevent rails from failing due to monkey
 # patching Enumerable:
-require 'descriptive_statistics/safe'
+# require 'descriptive_statistics/safe'
 
 # need application record first since others depend on it
 require_relative "#{__dir__}/app/models/application_record.rb"
 
 # requires all the model files
-Dir["#{__dir__}/app/models/*.rb"].each do |f|
+Dir["#{__dir__}/app/models/fasta_record.rb", "#{__dir__}/app/models/variant_site.rb"].each do |f|
   require_relative f
 end
 
@@ -107,15 +107,15 @@ end
 
 def main
   opts = parse_options
-  @log.level = Logger.const_get(opts[:verbose])
+  # @log.level = Logger.const_get(opts[:verbose])
 
   # @log.debug 'checking samtools is installed properly...'
   setup_db_connection
 
   # import_metadata('./test/fixtures/metadata.tsv')
   # import_variants('./test/fixtures/variants.tsv')
-  import_metadata(opts[:metadata])
-  import_variants(opts[:variants])
+  import_metadata(opts[:metadata_tsv])
+  import_variants(opts[:variants_tsv])
 
 end
 main if $PROGRAM_NAME.end_with?('upload.rb')
