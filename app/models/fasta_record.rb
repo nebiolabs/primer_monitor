@@ -19,17 +19,19 @@ class FastaRecord < ApplicationRecord
   end
 
   def self.build_fasta_record(line)
-    (strain, _virus, gisaid_epi_isl, genbank_accession, _date, region, country, division, _location,
+    (strain, _virus, gisaid_epi_isl, genbank_accession, date, region, country, division, _location,
       _region_exposure, _country_exposure, _division_exposure, _segment, _length, _host, _age, _sex,
       _pangolin_lineage, _gisaid_clade, _originating_lab, _submitting_lab, _authors, _url, _title,
-      _paper_url, date_submitted) = line.chomp.split("\t")
+      _paper_url, _date_submitted) = line.chomp.split("\t")
 
-    return unless strain && gisaid_epi_isl && genbank_accession && region && country && division && date_submitted
-    return if FastaRecord.exists?(strain)
+    return unless strain && gisaid_epi_isl && genbank_accession && region && country && division && date
+    return if FastaRecord.exists?(strain: strain)
+    region = strain.split("/")[0]
+    division = strain.split("/")[1]
 
     FastaRecord.new(strain: strain, gisaid_epi_isl: gisaid_epi_isl,
                     genbank_accession: genbank_accession, region: region,
                     country: country, division: division,
-                    date_submitted: date_submitted)
+                    date_submitted: date)
   end
 end
