@@ -1,12 +1,17 @@
 ref = params.ref 
 ref = file(ref).toAbsolutePath()
 
+prev_json = params.pref_json
+prev_json = file(prev_json).toAbsolutePath()
+
 ncov_path = '/mnt/home/mcampbell/src/ncov-ingest'
 primer_monitor_path = '/mnt/bioinfo/prg/primer_monitor'
 
 process download_data {
+    // Downloads the full dataset, then keeps only new records added since yesterday
     cpus 1
     conda "curl"
+    publishDir "output", mode: 'copy', pattern: 'gisaid.sorted_json'
 
     input:
         
@@ -17,7 +22,12 @@ process download_data {
     '''
     source !{primer_monitor_path}/.env
     date_today=$(date +%Y-%m-%d)
-    curl -u $GISAID_USER:$GISAID_PASSWORD https://www.epicov.org/epi3/3p/neb/export/provision.json.xz | xz -d -T8 > ${date_today}.json
+    curl -u $GISAID_USER:$GISAID_PASSWORD https://www.epicov.org/epi3/3p/neb/export/provision.json.xz | xz -d -T8 > tmp.json
+
+    sort tmp.json > gisaid.sorted_json
+    rm tmp.json
+
+    comm -13 !{prev_json} gisaid.sorted_json > ${date_today}.json
     '''
 
 }
