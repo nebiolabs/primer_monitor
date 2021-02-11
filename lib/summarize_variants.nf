@@ -1,7 +1,7 @@
 ref = params.ref 
 ref = file(ref).toAbsolutePath()
 
-prev_json = params.pref_json
+prev_json = params.prev_json
 prev_json = file(prev_json).toAbsolutePath()
 
 ncov_path = '/mnt/home/mcampbell/src/ncov-ingest'
@@ -11,12 +11,13 @@ process download_data {
     // Downloads the full dataset, then keeps only new records added since yesterday
     cpus 1
     conda "curl"
-    publishDir "output", mode: 'copy', pattern: 'gisaid.sorted_json'
+    publishDir "output", mode: 'copy', pattern: 'gisaid.sorted_json', overwrite: true
 
     input:
         
     output:
         file('*json') into downloaded_data
+        file('gisaid.sorted_json')
 
     shell:
     '''
@@ -81,10 +82,10 @@ process combine_variants {
 
     shell:
     '''
-    echo -e 'Sample\tReference position\tMismatch type\tMismatch' > combined_variants.tsv
     cat !{variants} >> combined_variants.tsv
     '''
 }
+//    echo -e 'Sample\tReference position\tMismatch type\tMismatch' > combined_variants.tsv
 
 
 process load_to_db {
