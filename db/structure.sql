@@ -67,12 +67,10 @@ CREATE TABLE public.fasta_records (
     strain character varying,
     genbank_accession character varying,
     gisaid_epi_isl character varying,
-    region character varying,
-    country character varying,
-    division character varying,
-    date_submitted date,
+    date_collected date,
     created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL
+    updated_at timestamp(6) without time zone NOT NULL,
+    geo_loc_id integer
 );
 
 
@@ -96,6 +94,39 @@ ALTER SEQUENCE public.fasta_records_id_seq OWNED BY public.fasta_records.id;
 
 
 --
+-- Name: geo_location; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.geo_location (
+    id bigint NOT NULL,
+    parent_location character varying,
+    region character varying NOT NULL,
+    division character varying NOT NULL,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: geo_location_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.geo_location_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: geo_location_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.geo_location_id_seq OWNED BY public.geo_location.id;
+
+
+--
 -- Name: oligos; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -105,9 +136,7 @@ CREATE TABLE public.oligos (
     sequence character varying,
     primer_set_id bigint,
     created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL,
-    start_pos integer,
-    end_pos integer
+    updated_at timestamp(6) without time zone NOT NULL
 );
 
 
@@ -367,6 +396,13 @@ ALTER TABLE ONLY public.fasta_records ALTER COLUMN id SET DEFAULT nextval('publi
 
 
 --
+-- Name: geo_location id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.geo_location ALTER COLUMN id SET DEFAULT nextval('public.geo_location_id_seq'::regclass);
+
+
+--
 -- Name: oligos id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -437,6 +473,14 @@ ALTER TABLE ONLY public.blast_hits
 
 ALTER TABLE ONLY public.fasta_records
     ADD CONSTRAINT fasta_records_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: geo_location geo_location_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.geo_location
+    ADD CONSTRAINT geo_location_pkey PRIMARY KEY (id);
 
 
 --
@@ -664,6 +708,13 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20210125034331'),
 ('20210125101936'),
 ('20210128221802'),
-('20210129031328');
+('20210129031328'),
+('20210211193202'),
+('20210211212104'),
+('20210211220241'),
+('20210212182903'),
+('20210212195828'),
+('20210212203816'),
+('20210212204343');
 
 
