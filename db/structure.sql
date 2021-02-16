@@ -132,9 +132,11 @@ ALTER SEQUENCE public.geo_location_id_seq OWNED BY public.geo_location.id;
 
 CREATE TABLE public.oligos (
     id bigint NOT NULL,
-    name character varying,
-    sequence character varying,
-    primer_set_id bigint,
+    name character varying NOT NULL,
+    sequence character varying NOT NULL,
+    primer_set_id bigint NOT NULL,
+    ref_start bigint,
+    ref_end bigint,
     created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL
 );
