@@ -15,7 +15,7 @@ class VariantSite < ApplicationRecord
 
       next unless strain && ref_pos && variant_type && variant
 
-      variant = "#{variant.length}-" if variant_type.inclue? 'D'
+      variant = "#{variant.length}-" if variant_type.include? 'D'
       variant = "#{variant.length}N" if variant.include? 'N'
       variants << VariantSite.new(position: ref_pos, variant_type: variant_type,
                                   variant: variant, fasta_record_id: fasta_record_id)

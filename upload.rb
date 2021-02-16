@@ -26,7 +26,7 @@ require 'slop'
 require_relative "#{__dir__}/app/models/application_record.rb"
 
 # requires all the model files
-Dir["#{__dir__}/app/models/fasta_record.rb", "#{__dir__}/app/models/variant_site.rb"].each do |f|
+Dir["#{__dir__}/app/models/fasta_record.rb", "#{__dir__}/app/models/variant_site.rb", "#{__dir__}/app/models/geo_location.rb"].each do |f|
   require_relative f
 end
 
@@ -112,8 +112,6 @@ def main
   # @log.debug 'checking samtools is installed properly...'
   setup_db_connection
 
-  # import_metadata('./test/fixtures/metadata.tsv')
-  # import_variants('./test/fixtures/variants.tsv')
   import_metadata(opts[:metadata_tsv])
   import_variants(opts[:variants_tsv])
 

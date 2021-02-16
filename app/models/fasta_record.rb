@@ -27,11 +27,17 @@ class FastaRecord < ApplicationRecord
     return unless strain && gisaid_epi_isl && genbank_accession && region && country && division && date
     return if FastaRecord.exists?(strain: strain)
     region = strain.split("/")[0]
-    division = strain.split("/")[1]
+    division = strain.split("/")[1].split("-")[0]
+
+    unless GeoLocation.exists?(region: region, division: division)
+      GeoLocation.new(region: region, division: division).save!
+    end
+
+    geo_location = GeoLocation.find_by(region: region, division: division)
+    geo_location_id = geo_location.id
 
     FastaRecord.new(strain: strain, gisaid_epi_isl: gisaid_epi_isl,
-                    genbank_accession: genbank_accession, region: region,
-                    country: country, division: division,
-                    date_submitted: date)
+                    genbank_accession: genbank_accession, geo_loc_id: geo_location_id,
+                    date_collected: date)
   end
 end
