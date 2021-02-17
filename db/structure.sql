@@ -94,10 +94,10 @@ ALTER SEQUENCE public.fasta_records_id_seq OWNED BY public.fasta_records.id;
 
 
 --
--- Name: geo_location; Type: TABLE; Schema: public; Owner: -
+-- Name: geo_locations; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE public.geo_location (
+CREATE TABLE public.geo_locations (
     id bigint NOT NULL,
     parent_location character varying,
     region character varying NOT NULL,
@@ -108,10 +108,10 @@ CREATE TABLE public.geo_location (
 
 
 --
--- Name: geo_location_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: geo_locations_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE public.geo_location_id_seq
+CREATE SEQUENCE public.geo_locations_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -120,10 +120,10 @@ CREATE SEQUENCE public.geo_location_id_seq
 
 
 --
--- Name: geo_location_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+-- Name: geo_locations_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE public.geo_location_id_seq OWNED BY public.geo_location.id;
+ALTER SEQUENCE public.geo_locations_id_seq OWNED BY public.geo_locations.id;
 
 
 --
@@ -398,10 +398,10 @@ ALTER TABLE ONLY public.fasta_records ALTER COLUMN id SET DEFAULT nextval('publi
 
 
 --
--- Name: geo_location id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: geo_locations id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.geo_location ALTER COLUMN id SET DEFAULT nextval('public.geo_location_id_seq'::regclass);
+ALTER TABLE ONLY public.geo_locations ALTER COLUMN id SET DEFAULT nextval('public.geo_locations_id_seq'::regclass);
 
 
 --
@@ -478,11 +478,11 @@ ALTER TABLE ONLY public.fasta_records
 
 
 --
--- Name: geo_location geo_location_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: geo_locations geo_locations_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.geo_location
-    ADD CONSTRAINT geo_location_pkey PRIMARY KEY (id);
+ALTER TABLE ONLY public.geo_locations
+    ADD CONSTRAINT geo_locations_pkey PRIMARY KEY (id);
 
 
 --
@@ -717,6 +717,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20210212182903'),
 ('20210212195828'),
 ('20210212203816'),
-('20210212204343');
+('20210212204343'),
+('20210216221118');
 
 
