@@ -70,7 +70,7 @@ CREATE TABLE public.fasta_records (
     date_collected date,
     created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL,
-    geo_loc_id integer
+    geo_location_id integer
 );
 
 
@@ -564,6 +564,13 @@ CREATE INDEX index_blast_hits_on_organism_id ON public.blast_hits USING btree (o
 
 
 --
+-- Name: index_fasta_records_on_geo_location_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_fasta_records_on_geo_location_id ON public.fasta_records USING btree (geo_location_id);
+
+
+--
 -- Name: index_oligos_on_primer_set_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -675,6 +682,14 @@ ALTER TABLE ONLY public.oligos
 
 
 --
+-- Name: fasta_records fk_rails_8783be51d9; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.fasta_records
+    ADD CONSTRAINT fk_rails_8783be51d9 FOREIGN KEY (geo_location_id) REFERENCES public.geo_locations(id);
+
+
+--
 -- Name: primer_sets fk_rails_a78cff2c70; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -718,6 +733,8 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20210212195828'),
 ('20210212203816'),
 ('20210212204343'),
-('20210216221118');
+('20210216221118'),
+('20210217145903'),
+('20210217152635');
 
 
