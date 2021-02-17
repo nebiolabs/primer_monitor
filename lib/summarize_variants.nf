@@ -8,28 +8,41 @@ ncov_path = '/mnt/home/mcampbell/src/ncov-ingest'
 primer_monitor_path = '/mnt/bioinfo/prg/primer_monitor'
 
 process download_data {
-    // Downloads the full dataset, then keeps only new records added since yesterday
+    // Downloads the full dataset
     cpus 1
     conda "curl"
-    publishDir "output", mode: 'copy', pattern: 'gisaid.sorted_json', overwrite: true
 
-    input:
-        file(prev_json) from prev_json_path
     output:
-        file('*json') into downloaded_data
-        file('gisaid.sorted_json')
+        file('gisaid.full_json') into downloaded_data
 
     shell:
     '''
     source !{primer_monitor_path}/.env
+    curl -u $GISAID_USER:$GISAID_PASSWORD https://www.epicov.org/epi3/3p/neb/export/provision.json.xz | xz -d -T8 > gisaid.full_json
+    '''
+
+}
+
+process sort_and_filter_data {
+    // Sorts full dataset, then keeps only new records added since previous run
+    cpus 1
+    conda "python=3.9"
+    publishDir "output", mode: 'copy', pattern: 'gisaid.sorted_json', overwrite: true
+
+    input:
+        file(prev_json) from prev_json_path
+        file(full_json) from downloaded_data
+    output:
+        file('*.json') into sorted_data
+        file('gisaid.sorted_json')
+
+
+    shell:
+    '''
     mv !{prev_json} !{prev_json}.old
     date_today=$(date +%Y-%m-%d)
-    curl -u $GISAID_USER:$GISAID_PASSWORD https://www.epicov.org/epi3/3p/neb/export/provision.json.xz | xz -d -T8 > tmp.json
 
-    sort tmp.json > gisaid.sorted_json
-    rm tmp.json
-
-    comm -13 !{prev_json}.old gisaid.sorted_json > ${date_today}.json
+    python3 !{primer_monitor_path}/lib/filter_duplicates.py !{prev_json.old} !{full_json} > ${date_today}.json
     '''
 
 }
@@ -39,7 +52,7 @@ process transform_data {
     conda "regex fsspec pandas typing"
 
     input:
-        file(gisaid_json) from downloaded_data
+        file(gisaid_json) from sorted_data
     output:
         file('*.metadata') into transformed_metadata
         file('*.fasta') into transformed_fasta
@@ -86,7 +99,6 @@ process combine_variants {
     cat !{variants} >> combined_variants.tsv
     '''
 }
-//    echo -e 'Sample\tReference position\tMismatch type\tMismatch' > combined_variants.tsv
 
 
 process load_to_db {
