@@ -1,8 +1,8 @@
 ref = params.ref 
 ref = file(ref).toAbsolutePath()
 
-prev_json = params.prev_json
-prev_json = file(prev_json).toAbsolutePath()
+prev_json_path = Channel.fromPath(params.prev_json)
+// prev_json = file(prev_json).toAbsolutePath()
 
 ncov_path = '/mnt/home/mcampbell/src/ncov-ingest'
 primer_monitor_path = '/mnt/bioinfo/prg/primer_monitor'
@@ -14,7 +14,7 @@ process download_data {
     publishDir "output", mode: 'copy', pattern: 'gisaid.sorted_json', overwrite: true
 
     input:
-        
+        file(prev_json) from prev_json_path
     output:
         file('*json') into downloaded_data
         file('gisaid.sorted_json')
