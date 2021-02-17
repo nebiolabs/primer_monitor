@@ -22,13 +22,14 @@ process download_data {
     shell:
     '''
     source !{primer_monitor_path}/.env
+    mv !{prev_json} !{prev_json}.old
     date_today=$(date +%Y-%m-%d)
     curl -u $GISAID_USER:$GISAID_PASSWORD https://www.epicov.org/epi3/3p/neb/export/provision.json.xz | xz -d -T8 > tmp.json
 
     sort tmp.json > gisaid.sorted_json
     rm tmp.json
 
-    comm -13 !{prev_json} gisaid.sorted_json > ${date_today}.json
+    comm -13 !{prev_json}.old gisaid.sorted_json > ${date_today}.json
     '''
 
 }
