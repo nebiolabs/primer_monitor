@@ -29,15 +29,15 @@ class FastaRecord < ApplicationRecord
     region = strain.split("/")[0]
     division = strain.split("/")[1].split("-")[0]
 
+    # The geo location record needs to exist before the fasta record does
     unless GeoLocation.exists?(region: region, division: division)
       GeoLocation.new(region: region, division: division).save!
     end
 
-    geo_location = GeoLocation.find_by(region: region, division: division)
-    geo_location_id = geo_location.id
+    geo_location_id = GeoLocation.find_by(region: region, division: division).id
 
     FastaRecord.new(strain: strain, gisaid_epi_isl: gisaid_epi_isl,
-                    genbank_accession: genbank_accession, geo_loc_id: geo_location_id,
+                    genbank_accession: genbank_accession, geo_location_id: geo_location_id,
                     date_collected: date)
   end
 end
