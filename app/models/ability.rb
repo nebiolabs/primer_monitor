@@ -16,8 +16,8 @@ class Ability
     guest_ability
     return if @user.new_record?
 
-    admin_ability if @user.has_role?(:administrator)
     user_ability if @user
+    admin_ability if @user.has_role?(:administrator)
   end
 
   def guest_ability
@@ -35,9 +35,11 @@ class Ability
     can :manage, @user
     can :manage, PrimerSet, user_id: @user.id
     can :create, PrimerSet
+    cannot :confirm, PrimerSet
   end
 
   def admin_ability
     can :manage, :all
+    can :confirm, PrimerSet
   end
 end

@@ -18,14 +18,17 @@
       <%= form.text_field :name %>
     </div>
   </div>
-  <div class="field is-horizontal">
-    <div class="field-label">
-      <%= form.label :status %>
+
+  <% if can? :confirm, PrimerSet %>
+    <div class="field is-horizontal">
+      <div class="field-label">
+        <%= form.label :status %>
+      </div>
+      <div class="control field-body">
+        <%= form.select :status, collection: PrimerSet.statuses.keys %>
+      </div>
     </div>
-    <div class="control field-body">
-      <%= form.select :status, collection: PrimerSet.statuses.keys %>
-    </div>
-  </div>
+  <% end %>
 
   <div class="field is-horizontal">
     <div class="field-label">
