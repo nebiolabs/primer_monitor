@@ -21,7 +21,7 @@ class Users::OmniauthCallbacksController < Devise::OmniauthCallbacksController
 
   protected
 
-  def after_omniauth_failure_path_for(_scope)
+  def after_omniauth_failure_path_for(scope)
     super(scope)
     new_user_session_path
   end
