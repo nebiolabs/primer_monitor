@@ -1,7 +1,9 @@
 <div class='nested-fields is-horizontal'>
   <div class="field-body is-horizontal">
     <%= f.text_field :name, placeholder: "Oligo name" %>
+    <%= f.text_field :locus, placeholder: "locus (e.g. N1)" %>
     <%= f.text_field :sequence, placeholder: "DNA sequence (GCAT)" %>
+    <%= f.select :category, collection: Oligo.categories.keys %>
     <%= link_to_remove_association "Remove Oligo", f %>
   </div>
 </div>

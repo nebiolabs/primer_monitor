@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 class OligosController < ApplicationController
+  load_and_authorize_resource
   before_action :set_oligo, only: %i[show edit update destroy]
 
   # GET /oligos

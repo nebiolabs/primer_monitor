@@ -13,6 +13,8 @@
   <thead>
   <tr>
     <th>Name</th>
+    <th>Locus</th>
+    <th>Category</th>
     <th>Sequence</th>
   </tr>
   </thead>
@@ -20,7 +22,9 @@
   <tbody>
   <% @primer_set.oligos.each do |oligo| %>
     <tr>
-      <td><%= oligo.name %></td>
+      <td><%= link_to_if can?(:edit, oligo), oligo.name, edit_oligo_path(oligo) %></td>
+      <td><%= oligo.locus %></td>
+      <td><%= oligo.category %></td>
       <td><%= oligo.sequence %></td>
     </tr>
   <% end %>
@@ -28,5 +32,7 @@
 </table>
 
 
-<%= link_to 'Edit', edit_primer_set_path(@primer_set) %> |
+<% if can? :edit, @primer_set %>
+  <%= link_to 'Edit', edit_primer_set_path(@primer_set) %> |
+<% end %>
 <%= link_to 'All Primer Sets', primer_sets_path %>
