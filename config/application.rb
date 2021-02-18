@@ -18,5 +18,11 @@ module PrimerMonitor
     # -- all .rb files in that directory are automatically loaded after loading
     # the framework and any gems in your application.
     config.active_record.schema_format = :sql
+
+    # Rails.application.config.middleware.use OmniAuth::Builder do
+    #   require 'openid/store/filesystem'
+    #   provider :github, ENV['GITHUB_KEY'], ENV['GITHUB_SECRET']
+    #   provider :openid, store: OpenID::Store::Filesystem.new('/tmp')
+    # end
   end
 end

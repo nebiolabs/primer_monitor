@@ -28,15 +28,17 @@ gem 'jbuilder', '~> 2.7'
 # Reduces boot times through caching; required in config/boot.rb
 gem 'bootsnap', '>= 1.4.2', require: false
 
-gem 'authlogic'
 gem 'cancancan', '~> 3.2.1'
-gem 'scrypt', '~> 3.0'
+gem 'devise', github: 'heartcombo/devise', branch: 'master'
+gem 'omniauth-google-oauth2'
+gem 'omniauth-rails_csrf_protection', '~> 1.0'
 
 # for nested form management
 gem 'cocoon'
 
 # for styling, responsive display
 gem 'bulma-rails', '~> 0.9.0'
+
 
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
