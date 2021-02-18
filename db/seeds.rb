@@ -8,7 +8,7 @@ admin = User.create_with(first: 'Admin', last:'User',
                          password: Rails.application.credentials.admin_password,
                          password_confirmation: Rails.application.credentials.admin_password,
                          active: true, approved: true, confirmed: true)
-            .find_or_create_by!(email: 'primer-monitor-admin@neb.com')
+            .find_or_create_by!(email: 'primer-monitor@neb.com')
 
 %w[administrator pi operator participant].each do |role_name|
   Role.find_or_create_by!(name: role_name)
@@ -34,7 +34,7 @@ lamp_primers = {
   'N2-FIP': 'TTCCGAAGAACGCTGAAGCGGAACTGATTACAAACATTGGCC',
   'N2-BIP': 'CGCATTGGCATGGAAGTCACAATTTGATGGCACCTGTGTA',
   'N2-LF': 'GGGGGCAAATTGTGCAATTTG',
-  'N2-LB': 'CTTCGGGAACGTGGTTGACC'
+  'N2-LB': 'CTTCGGGAACGTGGTTGACC',
 }
 lamp_primers.each_pair do |name,seq|
   Oligo.find_or_create_by(name: name, sequence: seq, primer_set: lamp_primerset)
@@ -46,7 +46,7 @@ luna_primers = {
   'N1-F': 'GACCCCAAAATCAGCGAAAT',
   'N1-R': 'TCTGGTTACTGCCAGTTGAATCTG',
   'N2-F': 'TTACAAACATTGGCCGCAAA',
-  'N2-R:': 'GCGCGACATTCCGAAGAA',
+  'N2-R': 'GCGCGACATTCCGAAGAA',
   'N2-Probe': 'ACAATTTGCCCCCAGCGCTTCAG',
   'N1-Probe': 'ACCCCGCATTACGTTTGGTGGACC'
 }

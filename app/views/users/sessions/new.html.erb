@@ -1,0 +1,40 @@
+<h2>Log in</h2>
+
+<%= form_for(resource, as: resource_name, url: session_path(resource_name)) do |f| %>
+
+  <div class="field is-horizontal">
+    <div class="field-label">
+      <%= f.label :email %>
+    </div>
+    <div class="control field-body">
+      <%= f.email_field :email, autofocus: true, autocomplete: 'email' %>
+    </div>
+  </div>
+
+  <div class="field is-horizontal">
+    <div class="field-label">
+      <%= f.label :password %>
+    </div>
+    <div class="control field-body">
+      <%= f.password_field :password, placeholder: 'New password', autocomplete: 'current-password' %>
+    </div>
+  </div>
+
+  <% if devise_mapping.rememberable? %>
+    <div class="field is-horizontal">
+      <div class="field-label">
+        <%= f.label :remember_me %>
+      </div>
+      <div class="control field-body">
+        <%= f.check_box :remember_me %>
+      </div>
+    </div>
+
+  <% end %>
+
+  <div class="actions">
+    <%= f.submit "Log in", class: 'button is-link'%>
+  </div>
+<% end %>
+
+<%= render "users/shared/links" %>

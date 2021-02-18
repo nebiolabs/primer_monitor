@@ -1,0 +1,22 @@
+<h2>Change your password</h2>
+
+<%= form_for(resource, as: resource_name, url: password_path(resource_name), html: { method: :put }) do |f| %>
+  <%= render "users/shared/error_messages", resource: resource %>
+  <%= f.hidden_field :reset_password_token %>
+
+  <div class="field is-horizontal">
+    <div class="field-label">
+      <%= f.label :password %>
+    </div>
+    <div class="control field-body">
+      <%= f.password_field :password, placeholder: 'New password', autocomplete: 'new-password' %>
+      <%= f.password_field  :password_confirmation, placeholder: 'Confirmation', autocomplete: 'new-password' %>
+    </div>
+  </div>
+
+  <div class="actions">
+    <%= f.submit 'Change',  class: 'button is-link' %>
+  </div>
+<% end %>
+
+<%= render "users/shared/links" %>

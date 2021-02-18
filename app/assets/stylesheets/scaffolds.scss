@@ -1,5 +1,6 @@
+@import "bulma";
 body {
-  background-color: #fff;
+  background-color: $background;
   color: #333;
   margin: 33px; }
 
@@ -9,15 +10,9 @@ body, p, ol, ul, td {
   line-height: 18px; }
 
 pre {
-  background-color: #eee;
+  background-color: $background;
   padding: 10px;
   font-size: 11px; }
-
-a {
-  color: #000; }
-
-a:visited {
-  color: #666; }
 
 
 th {
@@ -31,19 +26,18 @@ div.actions {
   margin-bottom: 10px; }
 
 #notice {
-  color: green; }
+  color: $success; }
 
 .field_with_errors {
-  padding: 2px;
-  background-color: red;
-  display: table; }
+  @extend .is-danger
+ }
 
 #error_explanation {
   width: 450px;
-  border: 2px solid red;
+  border: 2px solid $danger;
   padding: 7px 7px 0;
   margin-bottom: 20px;
-  background-color: #f0f0f0; }
+  background-color: $background; }
 
 #error_explanation h2 {
   text-align: left;
@@ -51,8 +45,8 @@ div.actions {
   padding: 5px 5px 5px 15px;
   font-size: 12px;
   margin: -7px -7px 0;
-  background-color: #c00;
-  color: #fff; }
+  background-color: $danger;
+  color: $background; }
 
 #error_explanation ul li {
   font-size: 12px;

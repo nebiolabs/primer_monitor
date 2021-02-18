@@ -9,6 +9,17 @@ SET xmloption = content;
 SET client_min_messages = warning;
 SET row_security = off;
 
+--
+-- Name: primer_set_status; Type: TYPE; Schema: public; Owner: -
+--
+
+CREATE TYPE public.primer_set_status AS ENUM (
+    'pending',
+    'complete',
+    'failed'
+);
+
+
 SET default_tablespace = '';
 
 SET default_table_access_method = heap;
@@ -133,11 +144,9 @@ ALTER SEQUENCE public.geo_locations_id_seq OWNED BY public.geo_locations.id;
 
 CREATE TABLE public.oligos (
     id bigint NOT NULL,
-    name character varying NOT NULL,
-    sequence character varying NOT NULL,
-    primer_set_id bigint NOT NULL,
-    ref_start bigint,
-    ref_end bigint,
+    name character varying,
+    sequence character varying,
+    primer_set_id bigint,
     created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL
 );
@@ -204,7 +213,8 @@ CREATE TABLE public.primer_sets (
     user_id bigint,
     organism_id integer NOT NULL,
     created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL
+    updated_at timestamp(6) without time zone NOT NULL,
+    status public.primer_set_status DEFAULT 'pending'::public.primer_set_status
 );
 
 
@@ -312,22 +322,32 @@ CREATE TABLE public.users (
     created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL,
     login character varying,
-    crypted_password character varying,
-    password_salt character varying,
-    persistence_token character varying,
-    single_access_token character varying,
-    perishable_token character varying,
-    login_count integer DEFAULT 0 NOT NULL,
+    encrypted_password character varying,
+    sign_in_count integer DEFAULT 0 NOT NULL,
     failed_login_count integer DEFAULT 0 NOT NULL,
     last_request_at timestamp without time zone,
-    current_login_at timestamp without time zone,
-    last_login_at timestamp without time zone,
-    current_login_ip character varying,
-    last_login_ip character varying,
+    current_sign_in_at timestamp without time zone,
+    last_sign_in_at timestamp without time zone,
+    current_sign_in_ip character varying,
+    last_sign_in_ip character varying,
     active boolean DEFAULT false,
     approved boolean DEFAULT false,
     confirmed boolean DEFAULT false,
-    send_primer_updates boolean DEFAULT false NOT NULL
+    send_primer_updates boolean DEFAULT false NOT NULL,
+    reset_password_token character varying,
+    reset_password_sent_at timestamp without time zone,
+    remember_token character varying,
+    remember_created_at timestamp without time zone,
+    authentication_token character varying,
+    confirmation_token character varying(255),
+    confirmed_at timestamp without time zone,
+    confirmation_sent_at timestamp without time zone,
+    unconfirmed_email character varying,
+    failed_attempts integer DEFAULT 0 NOT NULL,
+    unlock_token character varying,
+    locked_at timestamp without time zone,
+    provider character varying,
+    uid character varying
 );
 
 
@@ -615,24 +635,38 @@ CREATE INDEX index_user_roles_on_user_id ON public.user_roles USING btree (user_
 
 
 --
--- Name: index_users_on_perishable_token; Type: INDEX; Schema: public; Owner: -
+-- Name: index_users_on_confirmation_token; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE UNIQUE INDEX index_users_on_perishable_token ON public.users USING btree (perishable_token);
-
-
---
--- Name: index_users_on_persistence_token; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE UNIQUE INDEX index_users_on_persistence_token ON public.users USING btree (persistence_token);
+CREATE UNIQUE INDEX index_users_on_confirmation_token ON public.users USING btree (confirmation_token);
 
 
 --
--- Name: index_users_on_single_access_token; Type: INDEX; Schema: public; Owner: -
+-- Name: index_users_on_email; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE UNIQUE INDEX index_users_on_single_access_token ON public.users USING btree (single_access_token);
+CREATE UNIQUE INDEX index_users_on_email ON public.users USING btree (email);
+
+
+--
+-- Name: index_users_on_reset_password_token; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_users_on_reset_password_token ON public.users USING btree (reset_password_token);
+
+
+--
+-- Name: index_users_on_unconfirmed_email; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_users_on_unconfirmed_email ON public.users USING btree (unconfirmed_email);
+
+
+--
+-- Name: index_users_on_unlock_token; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_users_on_unlock_token ON public.users USING btree (unlock_token);
 
 
 --
@@ -735,6 +769,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20210125101936'),
 ('20210128221802'),
 ('20210129031328'),
+('20210130131727'),
 ('20210211193202'),
 ('20210211212104'),
 ('20210211220241'),
@@ -749,5 +784,8 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20210218161800'),
 ('20210218172439'),
 ('20210218172905');
+('20210218005924'),
+('20210218022343'),
+('20210218123414');
 
 

@@ -1,6 +1,6 @@
 <%= form_with(model: oligo, local: true) do |form| %>
   <% if oligo.errors.any? %>
-    <div id="error_explanation">
+    <div class="notification is-warning">
       <h2><%= pluralize(oligo.errors.count, "error") %> prohibited this oligo from being saved:</h2>
 
       <ul>

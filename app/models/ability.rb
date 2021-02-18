@@ -25,10 +25,8 @@ class Ability
     can :show, AboutController
     can :show, HelpController
     can :show, HistoryController
-    can :show, UserEmailConfirmationsController
     can :show, Oligo
     can :show, Organism
-    can :create, UserSession
     can %i[new create], User
     can %i[index read], PrimerSet
   end

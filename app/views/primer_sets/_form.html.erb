@@ -1,6 +1,6 @@
 <%= form_with(model: primer_set, local: true) do |form| %>
     <% if primer_set.errors.any? %>
-    <div id="error_explanation">
+    <div class="notification is-warning">
       <h2><%= pluralize(primer_set.errors.count, "error") %> prohibited this primer set from being saved:</h2>
       <ul>
         <% primer_set.errors.full_messages.each do |message| %>
@@ -16,6 +16,14 @@
     </div>
     <div class="control field-body">
       <%= form.text_field :name %>
+    </div>
+  </div>
+  <div class="field is-horizontal">
+    <div class="field-label">
+      <%= form.label :status %>
+    </div>
+    <div class="control field-body">
+      <%= form.select :status, collection: PrimerSet.statuses.keys %>
     </div>
   </div>
 
