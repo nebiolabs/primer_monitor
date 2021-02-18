@@ -70,7 +70,8 @@ CREATE TABLE public.fasta_records (
     date_collected date,
     created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL,
-    geo_location_id integer
+    geo_location_id integer,
+    variant_name character varying
 );
 
 
@@ -355,12 +356,13 @@ ALTER SEQUENCE public.users_id_seq OWNED BY public.users.id;
 
 CREATE TABLE public.variant_sites (
     id bigint NOT NULL,
-    "position" integer,
+    ref_start integer,
     variant_type character varying,
     variant character varying,
     fasta_record_id bigint,
     created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL
+    updated_at timestamp(6) without time zone NOT NULL,
+    ref_end integer
 );
 
 
@@ -571,6 +573,13 @@ CREATE INDEX index_fasta_records_on_geo_location_id ON public.fasta_records USIN
 
 
 --
+-- Name: index_fasta_records_on_strain; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_fasta_records_on_strain ON public.fasta_records USING btree (strain);
+
+
+--
 -- Name: index_oligos_on_primer_set_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -735,6 +744,10 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20210212204343'),
 ('20210216221118'),
 ('20210217145903'),
-('20210217152635');
+('20210217152635'),
+('20210218161052'),
+('20210218161800'),
+('20210218172439'),
+('20210218172905');
 
 

@@ -22,9 +22,9 @@ class FastaRecord < ApplicationRecord
     (strain, _virus, gisaid_epi_isl, genbank_accession, date, region, country, division, _location,
       _region_exposure, _country_exposure, _division_exposure, _segment, _length, _host, _age, _sex,
       _pangolin_lineage, _gisaid_clade, _originating_lab, _submitting_lab, _authors, _url, _title,
-      _paper_url, _date_submitted) = line.chomp.split("\t")
+      _paper_url, _date_submitted, variant_name) = line.chomp.split("\t")
 
-    return unless strain && gisaid_epi_isl && genbank_accession && region && country && division && date
+    return unless strain && gisaid_epi_isl && genbank_accession && region && country && division && date && variant_name
     return if FastaRecord.exists?(strain: strain)
     region = strain.split("/")[0]
     division = strain.split("/")[1].split("-")[0]
@@ -38,6 +38,6 @@ class FastaRecord < ApplicationRecord
 
     FastaRecord.new(strain: strain, gisaid_epi_isl: gisaid_epi_isl,
                     genbank_accession: genbank_accession, geo_location_id: geo_location_id,
-                    date_collected: date)
+                    date_collected: date, variant_name: variant_name)
   end
 end
