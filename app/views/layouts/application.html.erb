@@ -35,9 +35,10 @@
         <div class="buttons is-size-7">
           <% if current_user %>
             Logged in as: <%= link_to current_user.login, edit_user_registration_path(current_user), class: 'navbar-item' %>
+            <%= link_to 'Log out', destroy_user_session_path, :method => :delete , class: 'button is-link is-small' %>
           <% else %>
-            <%= link_to 'Create Account', new_registration_path('user'), class: "button is-link is-small" %>
-            <%= link_to 'Log in', new_user_session_path, class: "button is-link is-small" %>
+            <%= link_to 'Create Account', new_registration_path('user'), class: 'button is-link is-small' %>
+            <%= link_to 'Log in', new_user_session_path, class: 'button is-link is-small' %>
           <% end %>
         </div>
       </div>

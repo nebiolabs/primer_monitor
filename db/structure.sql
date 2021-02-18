@@ -10,6 +10,23 @@ SET client_min_messages = warning;
 SET row_security = off;
 
 --
+-- Name: oligo_category; Type: TYPE; Schema: public; Owner: -
+--
+
+CREATE TYPE public.oligo_category AS ENUM (
+    'BIP',
+    'FIP',
+    'LB',
+    'LF',
+    'B3',
+    'F3',
+    'Reverse',
+    'Forward',
+    'Probe'
+);
+
+
+--
 -- Name: primer_set_status; Type: TYPE; Schema: public; Owner: -
 --
 
@@ -148,7 +165,9 @@ CREATE TABLE public.oligos (
     sequence character varying,
     primer_set_id bigint,
     created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL
+    updated_at timestamp(6) without time zone NOT NULL,
+    locus character varying,
+    category public.oligo_category
 );
 
 
@@ -786,6 +805,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20210218172905');
 ('20210218005924'),
 ('20210218022343'),
-('20210218123414');
+('20210218123414'),
+('20210218180015');
 
 
