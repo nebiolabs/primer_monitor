@@ -1,4 +1,4 @@
-git class AddCategoryToOligos < ActiveRecord::Migration[6.1]
+class AddCategoryToOligos < ActiveRecord::Migration[6.1]
   def up
     add_column :oligos, :locus, :string
     add_column :oligos, :category, :string
