@@ -114,5 +114,6 @@ Rails.application.configure do
   #
 
   config.action_mailer.default_url_options = { host: 'primer-monitor.neb.com' }
+  config.action_mailer.delivery_method = :sendmail
 
 end
