@@ -14,7 +14,7 @@ class AddStatusToPrimerSet < ActiveRecord::Migration[6.1]
     execute <<-SQL
       ALTER TABLE primer_sets ALTER COLUMN status DROP DEFAULT;
       ALTER TABLE primer_sets ALTER COLUMN status SET DATA TYPE VARCHAR(255);
-      DROP TYPE IF EXISTS fa_tools_status;
+      DROP TYPE IF EXISTS primer_set_status;
     SQL
     remove_column :primer_sets, :status
 
