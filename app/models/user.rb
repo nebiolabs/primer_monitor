@@ -1,49 +1,26 @@
 # frozen_string_literal: true
 
-# stores information about users of this system (including submitters and administrators/operators)
+# stores information about users of this system (including submitters and administrators)
 class User < ApplicationRecord
-  acts_as_authentic do |c|
-    c.crypto_provider = ::Authlogic::CryptoProviders::SCrypt
-  end
+  devise :database_authenticatable, :registerable, :recoverable, :rememberable,
+         :validatable, :confirmable, :omniauthable, omniauth_providers: [:google_oauth2]
 
   has_many :primer_sets
   has_many :user_roles, dependent: :destroy
   has_many :roles, through: :user_roles
   accepts_nested_attributes_for :user_roles, reject_if: :all_blank, allow_destroy: true
 
-  validates :email,
-            format: {
-              with: /@/,
-              message: 'should look like an email address.'
-            },
-            length: { maximum: 100 },
-            uniqueness: {
-              case_sensitive: false,
-              if: :will_save_change_to_email?
-            },
-            allow_blank: true
-
-  validates :login,
-            length: { within: 3..100 },
-            uniqueness: {
-              case_sensitive: false,
-              if: :will_save_change_to_login?
-            },
-            allow_blank: true
-
-  validates :password,
-            confirmation: { if: :require_password? },
-            length: {
-              minimum: 8,
-              if: :require_password?
-            }
-  validates :password_confirmation,
-            length: {
-              minimum: 8,
-              if: :require_password?
-            }
-
   before_validation :set_login_from_email
+
+  def self.from_omniauth(auth)
+    # Either create a User record or update it based on the provider (Google) and the UID
+    where(provider: auth.provider, uid: auth.uid).first_or_create do |user|
+      user.token = auth.credentials.token
+      user.expires = auth.credentials.expires
+      user.expires_at = auth.credentials.expires_at
+      user.refresh_token = auth.credentials.refresh_token
+    end
+  end
 
   def to_s
     if first && last
@@ -70,16 +47,4 @@ class User < ApplicationRecord
     !(role_to_test_ary & role_symbols).empty?
   end
 
-  def deliver_password_reset_instructions!
-    reset_perishable_token!
-
-    Notifier.deliver_password_reset_instructions(self)
-  end
-
-  def confirm!
-    self.confirmed = true
-    self.enabled = true
-    self.approved = true
-    save
-  end
 end
