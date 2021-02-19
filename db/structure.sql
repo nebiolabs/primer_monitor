@@ -206,12 +206,40 @@ CREATE MATERIALIZED VIEW public.oligo_variant_overlaps AS
             variant_sites.ref_end AS variant_end,
             geo_locations.region,
             geo_locations.division,
+            geo_locations.id AS geo_id,
             fasta_records.date_collected
            FROM (((public.variant_sites
              JOIN public.fasta_records ON ((variant_sites.fasta_record_id = fasta_records.id)))
              JOIN public.geo_locations ON ((fasta_records.geo_location_id = geo_locations.id)))
              JOIN public.oligos ON ((((variant_sites.ref_start >= oligos.ref_start) AND (variant_sites.ref_start <= oligos.ref_end)) OR ((variant_sites.ref_end >= oligos.ref_start) AND (variant_sites.ref_end <= oligos.ref_end)) OR ((variant_sites.ref_start < oligos.ref_start) AND (variant_sites.ref_end > oligos.ref_end)))))
-          WHERE (((variant_sites.variant_type)::text <> 'S'::text) AND ((variant_sites.variant_type)::text <> 'H'::text) AND ((variant_sites.variant)::text !~~ '%N%'::text))
+          WHERE ((((variant_sites.variant_type)::text = 'D'::text) OR ((variant_sites.variant_type)::text = 'X'::text)) AND ((variant_sites.variant)::text !~~ '%N%'::text))
+        ), count_query AS (
+         SELECT count(*) AS geo_id_count,
+            geo_locations.id,
+            geo_locations.region,
+            geo_locations.division
+           FROM (public.fasta_records
+             JOIN public.geo_locations ON ((fasta_records.geo_location_id = geo_locations.id)))
+          GROUP BY geo_locations.id, geo_locations.region, geo_locations.division
+        ), insert_query AS (
+         SELECT oligos.id AS oligo_id,
+            oligos.name AS oligo_name,
+            oligos.ref_start AS oligo_start,
+            oligos.ref_end AS oligo_end,
+            variant_sites.id AS variant_id,
+            variant_sites.variant_type,
+            variant_sites.variant,
+            variant_sites.ref_start AS variant_start,
+            variant_sites.ref_end AS variant_end,
+            geo_locations.region,
+            geo_locations.division,
+            geo_locations.id AS geo_id,
+            fasta_records.date_collected
+           FROM (((public.variant_sites
+             JOIN public.fasta_records ON ((variant_sites.fasta_record_id = fasta_records.id)))
+             JOIN public.geo_locations ON ((fasta_records.geo_location_id = geo_locations.id)))
+             JOIN public.oligos ON ((((variant_sites.ref_start >= oligos.ref_start) AND (variant_sites.ref_start <= oligos.ref_end)) OR ((variant_sites.ref_end >= oligos.ref_start) AND (variant_sites.ref_end <= oligos.ref_end)) OR ((variant_sites.ref_start < oligos.ref_start) AND (variant_sites.ref_end > oligos.ref_end)))))
+          WHERE (((variant_sites.variant_type)::text = 'I'::text) AND ((variant_sites.variant)::text !~~ '%N%'::text))
         )
  SELECT big_query.oligo_id,
     big_query.oligo_name,
@@ -224,10 +252,32 @@ CREATE MATERIALIZED VIEW public.oligo_variant_overlaps AS
     big_query.variant_end,
     big_query.region,
     big_query.division,
+    big_query.geo_id,
     big_query.date_collected,
+    count_query.geo_id_count,
     generate_series(lower((numrange((coord_overlaps.oligo_start)::numeric, (coord_overlaps.oligo_end)::numeric) * numrange((coord_overlaps.variant_start)::numeric, (coord_overlaps.variant_end)::numeric))), (upper((numrange((coord_overlaps.oligo_start)::numeric, (coord_overlaps.oligo_end)::numeric) * numrange((coord_overlaps.variant_start)::numeric, (coord_overlaps.variant_end)::numeric))) - (1)::numeric)) AS coords
-   FROM (big_query coord_overlaps
+   FROM ((big_query coord_overlaps
      JOIN big_query ON (((coord_overlaps.oligo_id = big_query.oligo_id) AND (coord_overlaps.variant_id = big_query.variant_id))))
+     JOIN count_query ON ((count_query.id = big_query.geo_id)))
+UNION
+ SELECT insert_query.oligo_id,
+    insert_query.oligo_name,
+    insert_query.oligo_start,
+    insert_query.oligo_end,
+    insert_query.variant_id,
+    insert_query.variant_type,
+    insert_query.variant,
+    insert_query.variant_start,
+    insert_query.variant_end,
+    insert_query.region,
+    insert_query.division,
+    insert_query.geo_id,
+    insert_query.date_collected,
+    count_query.geo_id_count,
+    insert_query.variant_start AS coords
+   FROM ((insert_query coord_overlaps
+     JOIN insert_query ON (((coord_overlaps.oligo_id = insert_query.oligo_id) AND (coord_overlaps.variant_id = insert_query.variant_id))))
+     JOIN count_query ON ((count_query.id = insert_query.geo_id)))
   WITH NO DATA;
 
 
@@ -851,6 +901,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20210218172439'),
 ('20210218172905'),
 ('20210218180015'),
-('20210219153745');
+('20210219153745'),
+('20210219185233');
 
 
