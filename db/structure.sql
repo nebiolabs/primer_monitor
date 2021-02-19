@@ -174,6 +174,64 @@ CREATE TABLE public.oligos (
 
 
 --
+-- Name: variant_sites; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.variant_sites (
+    id bigint NOT NULL,
+    ref_start integer,
+    variant_type character varying,
+    variant character varying,
+    fasta_record_id bigint,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL,
+    ref_end integer
+);
+
+
+--
+-- Name: oligo_variant_overlaps; Type: MATERIALIZED VIEW; Schema: public; Owner: -
+--
+
+CREATE MATERIALIZED VIEW public.oligo_variant_overlaps AS
+ WITH big_query AS (
+         SELECT oligos.id AS oligo_id,
+            oligos.name AS oligo_name,
+            oligos.ref_start AS oligo_start,
+            oligos.ref_end AS oligo_end,
+            variant_sites.id AS variant_id,
+            variant_sites.variant_type,
+            variant_sites.variant,
+            variant_sites.ref_start AS variant_start,
+            variant_sites.ref_end AS variant_end,
+            geo_locations.region,
+            geo_locations.division,
+            fasta_records.date_collected
+           FROM (((public.variant_sites
+             JOIN public.fasta_records ON ((variant_sites.fasta_record_id = fasta_records.id)))
+             JOIN public.geo_locations ON ((fasta_records.geo_location_id = geo_locations.id)))
+             JOIN public.oligos ON ((((variant_sites.ref_start >= oligos.ref_start) AND (variant_sites.ref_start <= oligos.ref_end)) OR ((variant_sites.ref_end >= oligos.ref_start) AND (variant_sites.ref_end <= oligos.ref_end)) OR ((variant_sites.ref_start < oligos.ref_start) AND (variant_sites.ref_end > oligos.ref_end)))))
+          WHERE (((variant_sites.variant_type)::text <> 'S'::text) AND ((variant_sites.variant_type)::text <> 'H'::text) AND ((variant_sites.variant)::text !~~ '%N%'::text))
+        )
+ SELECT big_query.oligo_id,
+    big_query.oligo_name,
+    big_query.oligo_start,
+    big_query.oligo_end,
+    big_query.variant_id,
+    big_query.variant_type,
+    big_query.variant,
+    big_query.variant_start,
+    big_query.variant_end,
+    big_query.region,
+    big_query.division,
+    big_query.date_collected,
+    generate_series(lower((numrange((coord_overlaps.oligo_start)::numeric, (coord_overlaps.oligo_end)::numeric) * numrange((coord_overlaps.variant_start)::numeric, (coord_overlaps.variant_end)::numeric))), (upper((numrange((coord_overlaps.oligo_start)::numeric, (coord_overlaps.oligo_end)::numeric) * numrange((coord_overlaps.variant_start)::numeric, (coord_overlaps.variant_end)::numeric))) - (1)::numeric)) AS coords
+   FROM (big_query coord_overlaps
+     JOIN big_query ON (((coord_overlaps.oligo_id = big_query.oligo_id) AND (coord_overlaps.variant_id = big_query.variant_id))))
+  WITH NO DATA;
+
+
+--
 -- Name: oligos_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
@@ -389,22 +447,6 @@ CREATE SEQUENCE public.users_id_seq
 --
 
 ALTER SEQUENCE public.users_id_seq OWNED BY public.users.id;
-
-
---
--- Name: variant_sites; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.variant_sites (
-    id bigint NOT NULL,
-    ref_start integer,
-    variant_type character varying,
-    variant character varying,
-    fasta_record_id bigint,
-    created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL,
-    ref_end integer
-);
 
 
 --
@@ -808,6 +850,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20210218161800'),
 ('20210218172439'),
 ('20210218172905'),
-('20210218180015');
+('20210218180015'),
+('20210219153745');
 
 
