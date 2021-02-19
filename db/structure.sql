@@ -213,14 +213,6 @@ CREATE MATERIALIZED VIEW public.oligo_variant_overlaps AS
              JOIN public.geo_locations ON ((fasta_records.geo_location_id = geo_locations.id)))
              JOIN public.oligos ON ((((variant_sites.ref_start >= oligos.ref_start) AND (variant_sites.ref_start <= oligos.ref_end)) OR ((variant_sites.ref_end >= oligos.ref_start) AND (variant_sites.ref_end <= oligos.ref_end)) OR ((variant_sites.ref_start < oligos.ref_start) AND (variant_sites.ref_end > oligos.ref_end)))))
           WHERE ((((variant_sites.variant_type)::text = 'D'::text) OR ((variant_sites.variant_type)::text = 'X'::text)) AND ((variant_sites.variant)::text !~~ '%N%'::text))
-        ), count_query AS (
-         SELECT count(*) AS geo_id_count,
-            geo_locations.id,
-            geo_locations.region,
-            geo_locations.division
-           FROM (public.fasta_records
-             JOIN public.geo_locations ON ((fasta_records.geo_location_id = geo_locations.id)))
-          GROUP BY geo_locations.id, geo_locations.region, geo_locations.division
         ), insert_query AS (
          SELECT oligos.id AS oligo_id,
             oligos.name AS oligo_name,
@@ -240,6 +232,34 @@ CREATE MATERIALIZED VIEW public.oligo_variant_overlaps AS
              JOIN public.geo_locations ON ((fasta_records.geo_location_id = geo_locations.id)))
              JOIN public.oligos ON ((((variant_sites.ref_start >= oligos.ref_start) AND (variant_sites.ref_start <= oligos.ref_end)) OR ((variant_sites.ref_end >= oligos.ref_start) AND (variant_sites.ref_end <= oligos.ref_end)) OR ((variant_sites.ref_start < oligos.ref_start) AND (variant_sites.ref_end > oligos.ref_end)))))
           WHERE (((variant_sites.variant_type)::text = 'I'::text) AND ((variant_sites.variant)::text !~~ '%N%'::text))
+        ), region_count AS (
+         SELECT count(*) AS region_count,
+            geo_locations.region
+           FROM (public.fasta_records
+             JOIN public.geo_locations ON ((fasta_records.geo_location_id = geo_locations.id)))
+          GROUP BY geo_locations.region
+        ), region_division_count AS (
+         SELECT count(*) AS region_division_count,
+            geo_locations.region,
+            geo_locations.division
+           FROM (public.fasta_records
+             JOIN public.geo_locations ON ((fasta_records.geo_location_id = geo_locations.id)))
+          GROUP BY geo_locations.id, geo_locations.region, geo_locations.division
+        ), region_time_count AS (
+         SELECT count(*) AS region_time_count,
+            geo_locations.region,
+            fasta_records.date_collected
+           FROM (public.fasta_records
+             JOIN public.geo_locations ON ((fasta_records.geo_location_id = geo_locations.id)))
+          GROUP BY geo_locations.region, fasta_records.date_collected
+        ), region_division_time_count AS (
+         SELECT count(*) AS region_division_time_count,
+            geo_locations.region,
+            geo_locations.division,
+            fasta_records.date_collected
+           FROM (public.fasta_records
+             JOIN public.geo_locations ON ((fasta_records.geo_location_id = geo_locations.id)))
+          GROUP BY geo_locations.region, geo_locations.division, fasta_records.date_collected
         )
  SELECT big_query.oligo_id,
     big_query.oligo_name,
@@ -254,11 +274,17 @@ CREATE MATERIALIZED VIEW public.oligo_variant_overlaps AS
     big_query.division,
     big_query.geo_id,
     big_query.date_collected,
-    count_query.geo_id_count,
+    region_count.region_count,
+    region_division_count.region_division_count,
+    region_time_count.region_time_count,
+    region_division_time_count.region_division_time_count,
     generate_series(lower((numrange((coord_overlaps.oligo_start)::numeric, (coord_overlaps.oligo_end)::numeric) * numrange((coord_overlaps.variant_start)::numeric, (coord_overlaps.variant_end)::numeric))), (upper((numrange((coord_overlaps.oligo_start)::numeric, (coord_overlaps.oligo_end)::numeric) * numrange((coord_overlaps.variant_start)::numeric, (coord_overlaps.variant_end)::numeric))) - (1)::numeric)) AS coords
-   FROM ((big_query coord_overlaps
+   FROM (((((big_query coord_overlaps
      JOIN big_query ON (((coord_overlaps.oligo_id = big_query.oligo_id) AND (coord_overlaps.variant_id = big_query.variant_id))))
-     JOIN count_query ON ((count_query.id = big_query.geo_id)))
+     JOIN region_count ON (((region_count.region)::text = (big_query.region)::text)))
+     JOIN region_division_count ON ((((region_division_count.region)::text = (big_query.region)::text) AND ((region_division_count.division)::text = (big_query.division)::text))))
+     JOIN region_time_count ON ((((region_time_count.region)::text = (big_query.region)::text) AND (region_time_count.date_collected = big_query.date_collected))))
+     JOIN region_division_time_count ON ((((region_division_time_count.region)::text = (big_query.region)::text) AND ((region_division_time_count.division)::text = (big_query.division)::text) AND (region_division_time_count.date_collected = big_query.date_collected))))
 UNION
  SELECT insert_query.oligo_id,
     insert_query.oligo_name,
@@ -273,11 +299,17 @@ UNION
     insert_query.division,
     insert_query.geo_id,
     insert_query.date_collected,
-    count_query.geo_id_count,
+    region_count.region_count,
+    region_division_count.region_division_count,
+    region_time_count.region_time_count,
+    region_division_time_count.region_division_time_count,
     insert_query.variant_start AS coords
-   FROM ((insert_query coord_overlaps
+   FROM (((((insert_query coord_overlaps
      JOIN insert_query ON (((coord_overlaps.oligo_id = insert_query.oligo_id) AND (coord_overlaps.variant_id = insert_query.variant_id))))
-     JOIN count_query ON ((count_query.id = insert_query.geo_id)))
+     JOIN region_count ON (((region_count.region)::text = (insert_query.region)::text)))
+     JOIN region_division_count ON ((((region_division_count.region)::text = (insert_query.region)::text) AND ((region_division_count.division)::text = (insert_query.division)::text))))
+     JOIN region_time_count ON ((((region_time_count.region)::text = (insert_query.region)::text) AND (region_time_count.date_collected = insert_query.date_collected))))
+     JOIN region_division_time_count ON ((((region_division_time_count.region)::text = (insert_query.region)::text) AND ((region_division_time_count.division)::text = (insert_query.division)::text) AND (region_division_time_count.date_collected = insert_query.date_collected))))
   WITH NO DATA;
 
 
@@ -868,6 +900,7 @@ ALTER TABLE ONLY public.blast_hits
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+(''),
 ('20200809190433'),
 ('20200809190500'),
 ('20200809190541'),
