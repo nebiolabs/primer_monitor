@@ -38,7 +38,7 @@ class User < ApplicationRecord
     roles.map { |r| r.name.gsub(/\s+/, '_').downcase.to_sym }
   end
 
-  def has_role?(role_to_test)
+  def role?(role_to_test)
     role_to_test_ary = if role_to_test.is_a?(Array)
                          role_to_test
                        else
@@ -46,5 +46,4 @@ class User < ApplicationRecord
                        end
     !(role_to_test_ary & role_symbols).empty?
   end
-
 end

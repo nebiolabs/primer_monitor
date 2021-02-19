@@ -26,7 +26,8 @@ require 'slop'
 require_relative "#{__dir__}/app/models/application_record.rb"
 
 # requires all the model files
-Dir["#{__dir__}/app/models/fasta_record.rb", "#{__dir__}/app/models/variant_site.rb", "#{__dir__}/app/models/geo_location.rb"].each do |f|
+Dir["#{__dir__}/app/models/fasta_record.rb", "#{__dir__}/app/models/variant_site.rb",
+    "#{__dir__}/app/models/geo_location.rb"].each do |f|
   require_relative f
 end
 
@@ -42,50 +43,47 @@ def setup_db_connection
 end
 
 def parse_options
-    # ADDING A NEW OPTION? TODO CHECKLIST:
+  # ADDING A NEW OPTION? TODO CHECKLIST:
 
-    # Does the option specify an input file? Add it to input_file_params
-    # hash/method.
+  # Does the option specify an input file? Add it to input_file_params
+  # hash/method.
 
-    # Is the option required for read_group (library)? Add it to
-    # required_read_group_params hash/method, otherwise to
-    # optional_read_group_params.
+  # Is the option required for read_group (library)? Add it to
+  # required_read_group_params hash/method, otherwise to
+  # optional_read_group_params.
 
-    # Does the option processing change the data for the view in
-    # dna_production_quality_metrics (the view is in Tableau for DNA
-    # production QC table)? See, for example,
-    # db/migrate/20190530213731_chg_dna_production_quality_metrics_to_matviews.rb. Add
-    # to matview_for_option_str multiline string/table both the option
-    # and the corresponding materialized view(s) to be refreshed when
-    # the option is processed.
+  # Does the option processing change the data for the view in
+  # dna_production_quality_metrics (the view is in Tableau for DNA
+  # production QC table)? See, for example,
+  # db/migrate/20190530213731_chg_dna_production_quality_metrics_to_matviews.rb. Add
+  # to matview_for_option_str multiline string/table both the option
+  # and the corresponding materialized view(s) to be refreshed when
+  # the option is processed.
 
-    begin
-      slop_opts = Slop.parse(ARGV.map(&:strip)) do |o|
-        o.string '--metadata_tsv', 'Tsv file containing metadata information'
-        o.string '--variants_tsv', 'Tsv file containing variants information'
+  begin
+    slop_opts = Slop.parse(ARGV.map(&:strip)) do |o|
+      o.string '--metadata_tsv', 'Tsv file containing metadata information'
+      o.string '--variants_tsv', 'Tsv file containing variants information'
 
-        # The available log levels are: :debug, :info, :warn, :error, and
-        # :fatal, corresponding to the log level numbers from 0 up to 4
-        # respectively. See rails docs.
-        o.string '--verbose', 'Verbosity level of ActiveRecord logger', default: 'INFO'
+      # The available log levels are: :debug, :info, :warn, :error, and
+      # :fatal, corresponding to the log level numbers from 0 up to 4
+      # respectively. See rails docs.
+      o.string '--verbose', 'Verbosity level of ActiveRecord logger', default: 'INFO'
 
-        o.on '--help' do
-          puts o
-          exit
-        end
+      o.on '--help' do
+        puts o
+        exit
       end
-    rescue Slop::MissingArgument => e
-      @log.error "fatal: #{e}"
-      exit(1)
-    rescue Slop::UnknownOption => e
-      @log.error "fatal: #{e}"
-      exit(1)
-    rescue Slop::UnknownOption => e
-      @log.error 'fatal: ' + String(e)
-      exit(1)
     end
-    slop_opts.to_hash
+  rescue Slop::MissingArgument => e
+    @log.error "fatal: #{e}"
+    exit(1)
+  rescue Slop::UnknownOption => e
+    @log.error "fatal: #{e}"
+    exit(1)
   end
+  slop_opts.to_hash
+end
 
 def import_metadata(metadata_file)
   return unless metadata_file
@@ -114,6 +112,5 @@ def main
 
   import_metadata(opts[:metadata_tsv])
   import_variants(opts[:variants_tsv])
-
 end
 main if $PROGRAM_NAME.end_with?('upload.rb')

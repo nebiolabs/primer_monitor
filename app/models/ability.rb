@@ -17,7 +17,7 @@ class Ability
     return if @user.new_record?
 
     user_ability if @user
-    admin_ability if @user.has_role?(:administrator)
+    admin_ability if @user.role?(:administrator)
   end
 
   def guest_ability

@@ -1,4 +1,3 @@
-inherit_from: .rubocop_todo.yml
 AllCops:
   NewCops: disable
   Exclude:
@@ -12,11 +11,13 @@ Metrics/MethodLength:
   Max: 20
 
 Metrics/AbcSize:
-  Max: 20
+  Max: 26
 
 Metrics/CyclomaticComplexity:
-  Max: 10
+  Max: 12
 
 Metrics/PerceivedComplexity:
   Max: 12
 
+Style/Documentation:
+  Enabled: false

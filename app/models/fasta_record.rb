@@ -26,8 +26,9 @@ class FastaRecord < ApplicationRecord
 
     return unless strain && gisaid_epi_isl && genbank_accession && region && country && division && date && variant_name
     return if FastaRecord.exists?(strain: strain)
-    region = strain.split("/")[0]
-    division = strain.split("/")[1].split("-")[0]
+
+    region = strain.split('/')[0]
+    division = strain.split('/')[1].split('-')[0]
 
     # The geo location record needs to exist before the fasta record does
     unless GeoLocation.exists?(region: region, division: division)

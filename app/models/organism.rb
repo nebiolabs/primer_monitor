@@ -5,6 +5,6 @@ class Organism < ApplicationRecord
   has_many :primer_sets
 
   def to_s
-    self.name
+    name
   end
 end
