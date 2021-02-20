@@ -16,6 +16,7 @@
     </div>
     <div class="control field-body">
       <%= form.text_field :name %>
+      <%= form.text_field :alias, placeholder: 'Alias' %>
     </div>
   </div>
 
@@ -29,6 +30,6 @@
   </div>
 
   <div class="actions">
-    <%= form.submit %>
+    <%= form.submit class:"button is-primary"%>
   </div>
 <% end %>

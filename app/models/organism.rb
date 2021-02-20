@@ -7,4 +7,8 @@ class Organism < ApplicationRecord
   def to_s
     name
   end
+
+  def full_name
+    "#{name} (#{self.alias})"
+  end
 end

@@ -13,7 +13,7 @@
   <tbody>
     <% @organisms.each do |organism| %>
       <tr>
-        <td><%= organism.name %></td>
+        <td><%= organism.full_name %></td>
         <td><%= organism.ncbi_taxon_id %></td>
         <td><%= link_to 'Show', organism %></td>
         <td><%= link_to 'Edit', edit_organism_path(organism) %></td>

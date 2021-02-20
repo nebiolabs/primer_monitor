@@ -342,7 +342,8 @@ CREATE TABLE public.organisms (
     ncbi_taxon_id integer NOT NULL,
     name character varying NOT NULL,
     created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL
+    updated_at timestamp(6) without time zone NOT NULL,
+    alias character varying
 );
 
 
@@ -1021,6 +1022,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20210219000134'),
 ('20210219153745'),
 ('20210219185233'),
-('20210220203358');
+('20210220203358'),
+('20210220215944');
 
 

@@ -2,19 +2,55 @@
 <div class="content">
   <p>
     This application compares primer sequences with known SARS-CoV-2 variants as reported in the
-    <a href="https://www.gisaid.org/">GISAID</a> database to allow for simple evaluation of their potential impact on primer effectiveness
+    <a href="https://www.gisaid.org/">GISAID</a> database to allow for simple evaluation of their potential impact on
+    primer effectiveness
   </p>
   <p>
     <%= link_to "Logged in", new_user_session_path %> users can subscribe to be notified when a variant overlapping
     a primer set reaches a threshold fraction of observed sequences in any geographic region.
   </p>
   <p>
-    This tool has been released quickly in response to concerns about the effects of emergent viral variants on primer effectiveness.
+    This tool has been released quickly in response to concerns about the effects of emergent viral variants on primer
+    effectiveness.
     It is under active development at <a href='https://github.com/bwlang/primer_monitor'>GitHub</a>.
     Contributions, problem reports, and feature requests are welcome.
   </p>
   <p>
-    Your email address (if you have registered for an account) is used only in relation to this application as you indicate.
+    Your email address (if you have registered for an account) is used only in relation to this application as you
+    indicate.
     The tool intends to reliably detect variation but comes with no warranty.
   </p>
+  <section>
+    <h2>Acknowledgments:</h2>
+
+    Enabled by data from
+    <%= link_to 'https://www.gisaid.org/' do %>
+      <%= image_tag 'gisaid.png', alt: 'GISAID logo', height: '20', width: '50' %>
+    <% end %>
+    <p>
+      We would like to thank the GISAID Initiative and are grateful to all of the data contributors,
+      i.e.the Authors, the Originating laboratories responsible for obtaining the specimens,
+      and the Submitting laboratories for generating the genetic sequence and metadata
+      and sharing via the GISAID Initiative, on which this research is based.
+    </p>
+    <p>
+      Elbe, S., and Buckland-Merrett, G. (2017) Data, disease and diplomacy: GISAID’s innovative contribution to global
+      health. Global Challenges, 1:33-46.
+      DOI: <%= link_to '10.1002/gch2.1018', 'http://dx.doi.org/10.1002/gch2.1018' %>
+      PMCID: <%= link_to '31565258', 'https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6607375/' %>
+    </p>
+    <p>
+      Note: When using results from these analyses in your manuscript,
+      ensure that you also acknowledge the Contributors of data,
+      i.e.“We gratefully acknowledge all the Authors, the Originating laboratories responsible
+      for obtaining the specimens, and the Submitting laboratories for generating the genetic
+      sequence and metadata and sharing via the GISAID Initiative, on which this research is based.”
+    </p>
+    <p>
+      Also, cite the following reference:Shu, Y., McCauley, J. (2017) GISAID: From vision to reality.EuroSurveillance,
+      22(13)
+      DOI: <%= link_to '10.2807/1560-7917.ES.2017.22.13.30494', 'http://dx.doi.org/10.2807/1560-7917.ES.2017.22.13.30494' %>
+      PMCID: <%= link_to 'PMC5388101', 'https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5388101/' %>
+    </p>
+  </section>
 </div>

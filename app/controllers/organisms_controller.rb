@@ -73,6 +73,6 @@ class OrganismsController < ApplicationController
 
   # Only allow a list of trusted parameters through.
   def organism_params
-    params.require(:organism).permit(:name, :ncbi_taxon_id)
+    params.require(:organism).permit(:name, :alias, :ncbi_taxon_id)
   end
 end
