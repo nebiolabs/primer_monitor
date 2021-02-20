@@ -1,0 +1,5 @@
+$('input:submit.primer_set_<%= @primer_set_id %>')
+    .val("Subscribe")
+    .parent('form').attr('action','<%= primer_set_subscriptions_path( primer_set_id: @primer_set_id ) %>');
+$('input:submit.primer_set_<%= @primer_set_id %>')
+    .siblings('input:hidden[name="_method"]').remove()

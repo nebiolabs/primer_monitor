@@ -8,6 +8,7 @@ class PrimerSetsController < ApplicationController
   # GET /primer_sets.json
   def index
     @primer_sets = PrimerSet.includes(:organism, :oligos).where(status: :complete)
+    @subscriptions = PrimerSetSubscription.subscriptions_for_user_by_primer_set(current_user)
   end
 
   # GET /primer_sets/1
@@ -30,7 +31,10 @@ class PrimerSetsController < ApplicationController
 
     respond_to do |format|
       if @primer_set.save
-        format.html { redirect_to @primer_set, notice: 'Primer set was successfully added. It will be visible after processing and review.' }
+        format.html do
+          redirect_to @primer_set,
+                      notice: 'Primer set was successfully added. It will be visible after processing and review.'
+        end
         format.json { render :show, status: :created, location: @primer_set }
       else
         format.html { render :new }

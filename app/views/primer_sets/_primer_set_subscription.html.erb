@@ -1,0 +1,11 @@
+<% if user %>
+  <% if primer_set_subscription %>
+    <%= button_to "Unsubscribe", primer_set_subscription_path(primer_set_subscription),
+                  remote: true, method: :delete, class: "button is-link is-small primer_set_#{primer_set.id}" %>
+  <% else %>
+    <%= button_to "Subscribe", primer_set_subscriptions_path( primer_set_id: primer_set.id ),
+                  remote: true, class:"button is-link is-small primer_set_#{primer_set.id}" %>
+  <% end %>
+<% else %>
+  <%= link_to 'Log in to subscribe', new_user_session_path %>"
+<% end %>

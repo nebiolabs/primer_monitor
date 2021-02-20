@@ -3,9 +3,10 @@
 <table>
   <thead>
     <tr>
-      <th>Set Name</th>
-      <th>Organism</th>
-      <th>Oligos</th>
+      <th data-priority="1">Set Name</th>
+      <th data-priority="3">Organism</th>
+      <th data-priority="2">Oligos</th>
+      <th data-priority="1">Subscribed?</th>
     </tr>
   </thead>
 
@@ -15,6 +16,12 @@
         <td><%= link_to primer_set.name, primer_set %></td>
         <td><%= link_to primer_set.organism, primer_set.organism %></td>
         <td><%= primer_set.oligos.join(", ") %></td>
+        <td>
+          <%= render 'primer_set_subscription',
+                       user: current_user,
+                       primer_set: primer_set,
+                       primer_set_subscription: @subscriptions[primer_set.id] %>
+        </td>
       </tr>
     <% end %>
   </tbody>

@@ -16,6 +16,7 @@ require( 'datatables.net-dt' );
 require( 'datatables.net-buttons-dt' );
 require( 'datatables.net-buttons/js/buttons.html5.js' );
 require( 'datatables.net-buttons/js/buttons.print.js' );
+require( 'datatables.net-responsive' );
 require( 'datatables.net-select-dt' );
 
 // Load datatables styles
@@ -25,10 +26,10 @@ $(document).on('turbolinks:load', () => {
     if($('[id^=DataTables_Table]').length == 0) {
         $('table').DataTable({
             dom: 'lfBrtip',
-            select: true,
             buttons: [
                 'copy', 'excel'
-            ]
+            ],
+            responsive: true
         });
     }
 

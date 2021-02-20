@@ -161,15 +161,15 @@ ALTER SEQUENCE public.geo_locations_id_seq OWNED BY public.geo_locations.id;
 
 CREATE TABLE public.oligos (
     id bigint NOT NULL,
-    name character varying NOT NULL,
-    sequence character varying NOT NULL,
-    primer_set_id bigint NOT NULL,
-    ref_start bigint,
-    ref_end bigint,
+    name character varying,
+    sequence character varying,
+    primer_set_id bigint,
     created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL,
     locus character varying,
-    category public.oligo_category
+    category public.oligo_category,
+    ref_start bigint,
+    ref_end bigint
 );
 
 
@@ -362,6 +362,38 @@ CREATE SEQUENCE public.organisms_id_seq
 --
 
 ALTER SEQUENCE public.organisms_id_seq OWNED BY public.organisms.id;
+
+
+--
+-- Name: primer_set_subscriptions; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.primer_set_subscriptions (
+    id bigint NOT NULL,
+    primer_set_id bigint,
+    user_id bigint,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: primer_set_subscriptions_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.primer_set_subscriptions_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: primer_set_subscriptions_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.primer_set_subscriptions_id_seq OWNED BY public.primer_set_subscriptions.id;
 
 
 --
@@ -586,6 +618,13 @@ ALTER TABLE ONLY public.organisms ALTER COLUMN id SET DEFAULT nextval('public.or
 
 
 --
+-- Name: primer_set_subscriptions id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.primer_set_subscriptions ALTER COLUMN id SET DEFAULT nextval('public.primer_set_subscriptions_id_seq'::regclass);
+
+
+--
 -- Name: primer_sets id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -669,6 +708,14 @@ ALTER TABLE ONLY public.organisms
 
 
 --
+-- Name: primer_set_subscriptions primer_set_subscriptions_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.primer_set_subscriptions
+    ADD CONSTRAINT primer_set_subscriptions_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: primer_sets primer_sets_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -749,6 +796,27 @@ CREATE UNIQUE INDEX index_fasta_records_on_strain ON public.fasta_records USING 
 --
 
 CREATE INDEX index_oligos_on_primer_set_id ON public.oligos USING btree (primer_set_id);
+
+
+--
+-- Name: index_primer_set_subscriptions_on_primer_set_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_primer_set_subscriptions_on_primer_set_id ON public.primer_set_subscriptions USING btree (primer_set_id);
+
+
+--
+-- Name: index_primer_set_subscriptions_on_user_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_primer_set_subscriptions_on_user_id ON public.primer_set_subscriptions USING btree (user_id);
+
+
+--
+-- Name: index_primer_set_subscriptions_on_user_id_and_primer_set_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_primer_set_subscriptions_on_user_id_and_primer_set_id ON public.primer_set_subscriptions USING btree (user_id, primer_set_id);
 
 
 --
@@ -878,6 +946,14 @@ ALTER TABLE ONLY public.fasta_records
 
 
 --
+-- Name: primer_set_subscriptions fk_rails_99041872f6; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.primer_set_subscriptions
+    ADD CONSTRAINT fk_rails_99041872f6 FOREIGN KEY (primer_set_id) REFERENCES public.primer_sets(id);
+
+
+--
 -- Name: primer_sets fk_rails_a78cff2c70; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -894,13 +970,20 @@ ALTER TABLE ONLY public.blast_hits
 
 
 --
+-- Name: primer_set_subscriptions fk_rails_e7701775d5; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.primer_set_subscriptions
+    ADD CONSTRAINT fk_rails_e7701775d5 FOREIGN KEY (user_id) REFERENCES public.users(id);
+
+
+--
 -- PostgreSQL database dump complete
 --
 
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
-(''),
 ('20200809190433'),
 ('20200809190500'),
 ('20200809190541'),
@@ -934,6 +1017,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20210218172439'),
 ('20210218172905'),
 ('20210218180015'),
+('20210219000134'),
 ('20210219153745'),
 ('20210219185233');
 

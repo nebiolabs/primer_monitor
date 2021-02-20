@@ -1,21 +1,25 @@
-
-<p>
-  <strong>Name:</strong>
-  <%= @primer_set.name %>
-</p>
-
-<p>
-  <strong>Status:</strong>
-  <%= @primer_set.status %>
-</p>
-
+<h1 class="title">Primer Set: <%= @primer_set.name %> </h1>
+<div class="tile">
+  <div class="tile">
+    <strong>Organism:</strong>
+    <%= link_to @primer_set.organism, @primer_set.organism %>
+  </div>
+  <% if can?(:confirm, PrimerSet) %>
+    <div class="tile">
+      <strong>Status:</strong>
+      <%= @primer_set.status %>
+    </div>
+  <% end %>
+</div>
+<hr/>
+<h2 class="title">Primers:</h2>
 <table>
   <thead>
   <tr>
-    <th>Name</th>
+    <th data-priority="1">Name</th>
     <th>Locus</th>
     <th>Category</th>
-    <th>Sequence</th>
+    <th data-priority="2">Sequence</th>
   </tr>
   </thead>
 

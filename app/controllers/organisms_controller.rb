@@ -12,7 +12,9 @@ class OrganismsController < ApplicationController
 
   # GET /organisms/1
   # GET /organisms/1.json
-  def show; end
+  def show
+    @subscriptions = PrimerSetSubscription.subscriptions_for_user_by_primer_set(current_user)
+  end
 
   # GET /organisms/new
   def new

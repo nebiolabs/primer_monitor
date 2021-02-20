@@ -28,13 +28,14 @@ class Ability
     can :show, Oligo
     can :show, Organism
     can %i[new create], User
-    can %i[index read], PrimerSet
+    can %i[index read], PrimerSet, status: 'complete'
   end
 
   def user_ability
     can :manage, @user
     can :manage, PrimerSet, user_id: @user.id
     can :create, PrimerSet
+    can %i[create destroy], PrimerSetSubscription, user_id: @user.id
     cannot :confirm, PrimerSet
   end
 
