@@ -4,12 +4,9 @@ class PrimerSetSubscriptionsController < ApplicationController
   load_and_authorize_resource
 
   def create
-
     @primer_set_subscription = PrimerSetSubscription.find_or_initialize_by(primer_set_subscription_params)
     respond_to do |format|
-      if @primer_set_subscription.save
-        format.js
-      end
+      format.js if @primer_set_subscription.save
     end
   end
 
