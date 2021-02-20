@@ -25,7 +25,7 @@
         <%= form.label :status %>
       </div>
       <div class="control field-body">
-        <%= form.select :status, collection: PrimerSet.statuses.keys %>
+        <%= form.select :status, PrimerSet.statuses.keys %>
       </div>
     </div>
   <% end %>
