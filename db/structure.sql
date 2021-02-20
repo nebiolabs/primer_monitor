@@ -169,7 +169,8 @@ CREATE TABLE public.oligos (
     locus character varying,
     category public.oligo_category,
     ref_start bigint,
-    ref_end bigint
+    ref_end bigint,
+    short_name character varying
 );
 
 
@@ -1019,6 +1020,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20210218180015'),
 ('20210219000134'),
 ('20210219153745'),
-('20210219185233');
+('20210219185233'),
+('20210220203358');
 
 

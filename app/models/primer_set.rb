@@ -3,7 +3,7 @@
 class PrimerSet < ApplicationRecord
   belongs_to :user
   belongs_to :organism
-  has_many :oligos, dependent: :destroy
+  has_many :oligos, -> { order("oligos.ref_start") }, dependent: :destroy
   has_many :subscriptions, dependent: :destroy, class_name: 'PrimerSetSubscription'
   has_many :subscribers, through: :subscriptions, source: :user
 

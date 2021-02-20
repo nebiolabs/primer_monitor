@@ -11,28 +11,54 @@
     </div>
   <% end %>
 
-  <div class="field">
-    <%= form.label :name %>
-    <%= form.text_field :name %>
+  <div class="field is-horizontal">
+    <div class="field-label">
+      <%= form.label :name %>
+    </div>
+    <div class="control field-body">
+      <%= form.text_field :name %>
+      <%= form.text_field :short_name, maxlength: 5, size: 12, placeholder: 'Short Name' %>
+    </div>
+  </div>
+  <div class="field is-horizontal">
+    <div class="field-label">
+      <%= form.label :locus %>
+    </div>
+    <div class="control field-body">
+      <%= form.text_field :locus, size: 12 %>
+    </div>
   </div>
 
-  <div class="field">
-    <%= form.label :locus %>
-    <%= form.text_field :locus %>
+  <div class="field is-horizontal">
+    <div class="field-label">
+      <%= form.label :category %>
+    </div>
+    <div class="control field-body">
+      <%= form.select :category, Oligo.categories.keys, prompt: 'Select' %>
+    </div>
   </div>
 
-  <div class="field">
-    <%= form.label :category %>
-    <%= form.text_field :category %>
+  <div class="field is-horizontal">
+    <div class="field-label">
+      <%= form.label :sequence %>
+    </div>
+    <div class="control field-body">
+      <%= form.text_field :sequence, placeholder: "DNA sequence (GCAT)", maxlength: 50 %>
+    </div>
   </div>
-
-  <div class="field">
-    <%= form.label :sequence %>
-    <%= form.text_field :sequence %>
+  <div class="field is-horizontal">
+    <div class="field-label">
+      <%= form.label 'Reference Position' %>
+    </div>
+    <div class="control field-body">
+      <%= form.number_field :ref_start, placeholder: 'ref start', size: 10 %>
+      -
+      <%= form.number_field :ref_end, placeholder: 'ref end', size: 10 %>
+    </div>
   </div>
 
 
   <div class="actions">
-    <%= form.submit %>
+    <%= form.submit class: 'button is-primary' %>
   </div>
 <% end %>

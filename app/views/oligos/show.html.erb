@@ -19,5 +19,11 @@
   <%= @oligo.sequence %>
 </p>
 
+<p>
+  <strong>Reference Position:</strong>
+  <%= @oligo.ref_start %> - <%= @oligo.ref_end %>
+</p>
+<hr/>
+
 <%= link_to 'Edit', edit_oligo_path(@oligo) %> |
 <%= link_to 'Back', oligos_path %>
