@@ -1,16 +1,20 @@
 <h1 class="title">Primer Monitoring Tool</h1>
-<p>
-  This application compares primer sequences with known SARS-CoV-2 variants as reported in the
-  <a href="https://www.gisaid.org/">GISAID</a> database to allow for simple evaluation of their potential impact on primer effectiveness
-</p>
-
-<p>
-  This tool has been released quickly in response to concerns about the effects of emergent viral variants on primer effectiveness.
-  It is under active development at <a href='https://github.com/bwlang/primer_monitor'>GitHub</a>.
-  Contributions, problem reports, and feature requests are welcome.
-</p>
-
-<p>
-  Your email address (if you have registered for an account) is used only in relation to this application as you indicate.
-  The tool intends to reliably detect variation but comes with no warranty.
-</p>
+<div class="content">
+  <p>
+    This application compares primer sequences with known SARS-CoV-2 variants as reported in the
+    <a href="https://www.gisaid.org/">GISAID</a> database to allow for simple evaluation of their potential impact on primer effectiveness
+  </p>
+  <p>
+    <%= link_to "Logged in", new_user_session_path %> users can subscribe to be notified when a variant overlapping
+    a primer set reaches a threshold fraction of observed sequences in any geographic region.
+  </p>
+  <p>
+    This tool has been released quickly in response to concerns about the effects of emergent viral variants on primer effectiveness.
+    It is under active development at <a href='https://github.com/bwlang/primer_monitor'>GitHub</a>.
+    Contributions, problem reports, and feature requests are welcome.
+  </p>
+  <p>
+    Your email address (if you have registered for an account) is used only in relation to this application as you indicate.
+    The tool intends to reliably detect variation but comes with no warranty.
+  </p>
+</div>
