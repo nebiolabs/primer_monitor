@@ -18,6 +18,14 @@
       <%= form.text_field :name %>
     </div>
   </div>
+  <div class="field is-horizontal">
+    <div class="field-label">
+      <%= form.label 'Amplification method' %>
+    </div>
+    <div class="control field-body">
+      <%= form.collection_select :amplification_method_id, AmplificationMethod.all, :id, :name, prompt: true  %>
+    </div>
+  </div>
 
   <% if can? :confirm, PrimerSet %>
     <div class="field is-horizontal">

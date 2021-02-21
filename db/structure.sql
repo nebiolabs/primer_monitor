@@ -42,6 +42,38 @@ SET default_tablespace = '';
 SET default_table_access_method = heap;
 
 --
+-- Name: amplification_methods; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.amplification_methods (
+    id bigint NOT NULL,
+    name character varying,
+    description_url character varying,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: amplification_methods_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.amplification_methods_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: amplification_methods_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.amplification_methods_id_seq OWNED BY public.amplification_methods.id;
+
+
+--
 -- Name: ar_internal_metadata; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -409,7 +441,10 @@ CREATE TABLE public.primer_sets (
     organism_id integer NOT NULL,
     created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL,
-    status public.primer_set_status DEFAULT 'pending'::public.primer_set_status
+    status public.primer_set_status DEFAULT 'pending'::public.primer_set_status,
+    citation_url character varying,
+    doi character varying,
+    amplification_method_id bigint
 );
 
 
@@ -585,6 +620,13 @@ ALTER SEQUENCE public.variant_sites_id_seq OWNED BY public.variant_sites.id;
 
 
 --
+-- Name: amplification_methods id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.amplification_methods ALTER COLUMN id SET DEFAULT nextval('public.amplification_methods_id_seq'::regclass);
+
+
+--
 -- Name: blast_hits id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -659,6 +701,14 @@ ALTER TABLE ONLY public.users ALTER COLUMN id SET DEFAULT nextval('public.users_
 --
 
 ALTER TABLE ONLY public.variant_sites ALTER COLUMN id SET DEFAULT nextval('public.variant_sites_id_seq'::regclass);
+
+
+--
+-- Name: amplification_methods amplification_methods_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.amplification_methods
+    ADD CONSTRAINT amplification_methods_pkey PRIMARY KEY (id);
 
 
 --
@@ -892,6 +942,14 @@ CREATE INDEX index_variant_sites_on_fasta_record_id ON public.variant_sites USIN
 
 
 --
+-- Name: primer_sets fk_rails_06b1f0d34e; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.primer_sets
+    ADD CONSTRAINT fk_rails_06b1f0d34e FOREIGN KEY (amplification_method_id) REFERENCES public.amplification_methods(id);
+
+
+--
 -- Name: blast_hits fk_rails_1f04a34db0; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -1023,6 +1081,9 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20210219153745'),
 ('20210219185233'),
 ('20210220203358'),
-('20210220215944');
+('20210220215944'),
+('20210220233440'),
+('20210220234316'),
+('20210220235805');
 
 

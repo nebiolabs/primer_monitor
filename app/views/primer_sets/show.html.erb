@@ -1,12 +1,16 @@
 <h1 class="title">Primer Set: <%= @primer_set.name %> </h1>
 <div class="tile">
   <div class="tile">
-    <strong>Organism:</strong>
+    <strong>Organism: </strong>
     <%= link_to @primer_set.organism, @primer_set.organism %>
+  </div>
+  <div class="tile">
+    <strong>Amplification Method: </strong>
+    <%= @primer_set.amplification_method %>
   </div>
   <% if can?(:confirm, PrimerSet) %>
     <div class="tile">
-      <strong>Status:</strong>
+      <strong>Status: </strong>
       <%= @primer_set.status %>
     </div>
   <% end %>
