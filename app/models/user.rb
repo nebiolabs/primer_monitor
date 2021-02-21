@@ -13,12 +13,14 @@ class User < ApplicationRecord
   before_validation :set_login_from_email
 
   def self.from_omniauth(auth)
-    # Either create a User record or update it based on the provider (Google) and the UID
-    where(provider: auth.provider, uid: auth.uid).first_or_create do |user|
-      user.token = auth.credentials.token
-      user.expires = auth.credentials.expires
-      user.expires_at = auth.credentials.expires_at
-      user.refresh_token = auth.credentials.refresh_token
+    data = auth.info
+    Rails.logger.debug("Attempting to log in via oauth with data: #{data}")
+    User.find_or_create_by(email: data['email']) do |user|
+      Rails.logger.info("Creating new user via oauth: #{data}")
+      user.password = Devise.friendly_token[0, 20]
+      user.first = user['first_name']
+      user.last = user['last_name']
+      user.confirmed = true
     end
   end
 
