@@ -4,6 +4,9 @@ class PrimerSetSubscriptionsController < ApplicationController
   load_and_authorize_resource
 
   def create
+    # if the user is subscribing, they must want email...
+    current_user.send_primer_updates || current_user.update_column(:send_primer_updates, true)
+
     @primer_set_subscription = PrimerSetSubscription.find_or_initialize_by(primer_set_subscription_params)
     respond_to do |format|
       format.js if @primer_set_subscription.save
