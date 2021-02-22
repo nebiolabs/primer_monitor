@@ -107,10 +107,12 @@ def main
   opts = parse_options
   # @log.level = Logger.const_get(opts[:verbose])
 
-  # @log.debug 'checking samtools is installed properly...'
   setup_db_connection
-
-  import_metadata(opts[:metadata_tsv])
-  import_variants(opts[:variants_tsv])
+  ActiveRecord::Base.transaction do
+    import_metadata(opts[:metadata_tsv])
+    import_variants(opts[:variants_tsv])
+    ActiveRecord::Base.connection.execute("REFRESH MATERIALIZED VIEW oligo_variant_overlaps")
+  end
+  
 end
 main if $PROGRAM_NAME.end_with?('upload.rb')
