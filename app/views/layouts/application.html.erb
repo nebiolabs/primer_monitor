@@ -8,14 +8,14 @@
   <%= stylesheet_link_tag 'application', media: 'all', 'data-turbolinks-track': 'reload' %>
   <%= javascript_pack_tag 'application', 'data-turbolinks-track': 'reload' %>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="google-site-verification" content="AWnkeglB0upQ0LFdvIFEDSHkq4LvF1MHm2i1ZEynEXE" />
+  <meta name="google-site-verification" content="AWnkeglB0upQ0LFdvIFEDSHkq4LvF1MHm2i1ZEynEXE"/>
 </head>
 
 <body>
 <nav class="navbar" role="navigation" aria-label="main navigation">
   <div class="navbar-brand">
     <%= link_to root_path, class: "navbar-item" do %>
-      <%= image_tag "appMainLogo.svg", alt: "Primer Monitoring Tool",  height: '30' %>
+      <%= image_tag "appMainLogo.svg", alt: "Primer Monitoring Tool", height: '30' %>
     <% end %>
     <a role="button" class="navbar-burger burger" aria-label="menu" aria-expanded="false" data-target="navMenu">
       <span aria-hidden="true"></span>
@@ -30,21 +30,22 @@
     </small>
     <%= link_to 'https://www.gisaid.org/' do %>
       <%= image_tag 'gisaid.png', alt: 'GISAID logo', height: '10', width: '30' %>
-      <% end %>
+    <% end %>
   </div>
   <% if can? :index, PrimerSet %>
     <%= link_to "Primer Sets", primer_sets_path, class: 'navbar-item' %>
   <% end %>
 
-  <%= link_to 'About', about_path,  class: 'navbar-item' %>
+  <%= link_to 'About', about_path, class: 'navbar-item' %>
 
   <div id="navMenu" class="navbar-menu">
     <div class="navbar-end">
       <div class="navbar-item">
         <div class="buttons is-size-7">
           <% if current_user %>
-            Logged in as: <%= link_to current_user.login, edit_user_registration_path(current_user), class: 'navbar-item' %>
-            <%= link_to 'Log out', destroy_user_session_path, :method => :delete , class: 'button is-link is-small' %>
+            Logged in as:
+            <%= link_to current_user.login, edit_user_registration_path(current_user), class: 'navbar-item' %>
+            <%= link_to 'Log out', destroy_user_session_path, :method => :delete, class: 'button is-link is-small' %>
           <% else %>
             <%= link_to 'Create Account', new_registration_path('user'), class: 'button is-link is-small' %>
             <%= link_to 'Log in', new_user_session_path, class: 'button is-link is-small' %>
