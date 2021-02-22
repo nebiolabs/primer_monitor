@@ -39,7 +39,7 @@ module Users
     #   super
     # end
 
-    # protected
+    protected
 
     def configure_sign_up_params
       devise_parameter_sanitizer.permit(:sign_up, keys: %i[first last send_primer_updates])
@@ -47,6 +47,13 @@ module Users
 
     def configure_account_update_params
       devise_parameter_sanitizer.permit(:account_update, keys: %i[first last send_primer_updates])
+    end
+
+    def update_resource(resource, params)
+      # Require current password only if trying to change password.
+      return super unless params[:password].blank?
+
+      resource.update_without_password(params.except(:current_password))
     end
 
     # The path used after sign up.
