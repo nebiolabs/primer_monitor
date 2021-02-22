@@ -15,12 +15,14 @@ class User < ApplicationRecord
   def self.from_omniauth(auth)
     data = auth.info
     Rails.logger.debug("Attempting to log in via oauth with data: #{data}")
-    User.find_or_create_by(email: data['email']) do |user|
-      Rails.logger.info("Creating new user via oauth: #{data}")
-      user.password = Devise.friendly_token[0, 20]
-      user.first = user['first_name']
-      user.last = user['last_name']
-      user.confirmed = true
+    user_attribs = {
+      email: data['email'], first: data['first_name'],
+      last: data['last_name'],
+      password: Devise.friendly_token[0, 20]
+    }
+    User.create_with(user_attribs).create_or_find_by!(email: data['email']) do |user|
+      Rails.logger.info("Creating new user using : #{user_attribs}")
+      user.skip_confirmation!
     end
   end
 
