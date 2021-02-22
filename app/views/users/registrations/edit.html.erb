@@ -75,7 +75,7 @@
       <%= f.label "Subscribed locations" %>
     </div>
     <div class="control field-body">
-      <%= current_user.geo_locations.map { |loc| link_to loc, loc }.join(', ').html_safe %>
+      <%= current_user.geo_locations.map(&:to_s).join(', ').html_safe %>
     </div>
   </div>
 
