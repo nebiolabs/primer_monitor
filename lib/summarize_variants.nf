@@ -27,7 +27,7 @@ process filter_data {
     // Keeps only new records added since previous run
     cpus 1
     conda "python=3.9"
-    publishDir "output", mode: 'copy', pattern: 'gisaid.full_json', overwrite: true
+    publishDir "/mnt/flash_scratch/seq-shepherd/", mode: 'copy', pattern: 'gisaid.full_json', overwrite: true
 
     input:
         // file(prev_json) from prev_json_path
@@ -86,7 +86,7 @@ process align {
 
 process combine_variants {
     cpus 1
-    publishDir "output", mode: 'copy'
+    publishDir "/mnt/flash_scratch/seq-shepherd/", mode: 'copy'
 
     input:
         file(variants) from split_variants.collect()
