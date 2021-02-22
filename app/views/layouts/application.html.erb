@@ -25,11 +25,10 @@
   </div>
   <div class="navbar-item column is-narrow is-size-7" style='line-height: 1'>
     <small>
-      Enabled by <br/>
-      data from <br/>
+      Enabled by data from<br/>
     </small>
     <%= link_to 'https://www.gisaid.org/' do %>
-      <%= image_tag 'gisaid.png', alt: 'GISAID logo', height: '10', width: '30' %>
+      <%= image_tag 'gisaid.png', alt: 'GISAID logo', height: '20', width: '50' %>
     <% end %>
   </div>
   <% if can? :index, PrimerSet %>
@@ -89,6 +88,7 @@
     </div>
     <div class="tool-footer-copyright">
       <small>&copy; Copyright 2021 New England Biolabs. All Rights Reserved.</small>
+      <br/>
       <small> GISAID data provided on this website are subject to GISAID’s
         <%= link_to 'Terms and Conditions', 'https://www.gisaid.org/registration/terms-of-use/' %>
       </small>
