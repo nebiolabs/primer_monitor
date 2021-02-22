@@ -33,7 +33,12 @@
   <% end %>
 
   <div class="actions">
-    <%= f.submit "Log in", class: 'button is-link'%>
+    <%= f.submit "Log in", class: 'button is-primary'%>
+    <%= link_to omniauth_authorize_path(resource_name, resource_class.omniauth_providers[0]),
+                method: :post, class:'button is-primary' do %>
+      <%= image_tag "btn_google_dark_normal_ios.svg", alt: "Google Login", width: 30  %>
+      &nbsp; Sign in with Google
+    <% end %>
   </div>
 <% end %>
 
