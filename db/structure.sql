@@ -609,7 +609,8 @@ CREATE TABLE public.users (
     unlock_token character varying,
     locked_at timestamp without time zone,
     provider character varying,
-    uid character varying
+    uid character varying,
+    lookback_days integer DEFAULT 30 NOT NULL
 );
 
 
@@ -1169,6 +1170,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20210220233440'),
 ('20210220234316'),
 ('20210220235805'),
-('20210222122744');
+('20210222122744'),
+('20210223192700');
 
 
