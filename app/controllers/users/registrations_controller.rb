@@ -42,11 +42,19 @@ module Users
     protected
 
     def configure_sign_up_params
-      devise_parameter_sanitizer.permit(:sign_up, keys: %i[first last send_primer_updates])
+      devise_parameter_sanitizer.permit(:sign_up) do |user|
+        user.permit(%i[first last send_primer_updates lookback_days variant_fraction_threshold],
+                    primer_set_ids: [],
+                    geo_location_ids: [])
+      end
     end
 
     def configure_account_update_params
-      devise_parameter_sanitizer.permit(:account_update, keys: %i[first last send_primer_updates])
+      devise_parameter_sanitizer.permit(:account_update) do |user|
+        user.permit(%i[first last send_primer_updates lookback_days variant_fraction_threshold],
+                    primer_set_ids: [],
+                    geo_location_ids: [])
+      end
     end
 
     def update_resource(resource, params)

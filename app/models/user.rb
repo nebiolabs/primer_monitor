@@ -14,6 +14,7 @@ class User < ApplicationRecord
   has_many :primer_sets, through: :primer_set_subscriptions
 
   accepts_nested_attributes_for :user_roles, reject_if: :all_blank, allow_destroy: true
+  accepts_nested_attributes_for :subscribed_geo_locations, allow_destroy: true
 
   before_validation :set_login_from_email
 

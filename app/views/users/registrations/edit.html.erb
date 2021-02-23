@@ -1,4 +1,4 @@
-<h2>Edit <%= resource_name.to_s.humanize %></h2>
+<h2 class='title'>User Details</h2>
 
 <%= form_for(resource, as: resource_name, url: registration_path(resource_name), html: { method: :put }) do |f| %>
   <%= render "users/shared/error_messages", resource: resource %>
@@ -52,9 +52,36 @@
     </div>
   </div>
 
+  <div class="actions">
+    <%= f.submit "Update User Details", class: 'button is-link' %>
+  </div>
+<% end %>
+<hr/>
+
+<h2 class="title">Subscriptions</h2>
+
+<% if current_user.primer_sets.length > 0 %>
   <div class="field is-horizontal">
     <div class="field-label">
-      <%= f.label "Send updates about primer variants" %>
+      Subscribed primer sets
+    </div>
+    <div class="control field-body">
+      <% current_user.primer_sets.each do |ps|  %>
+        <%=link_to ps, ps %>
+        <%= render '/primer_sets/primer_set_subscription',
+                   user: current_user,
+                   primer_set: ps,
+                   primer_set_subscription: ps.subscription_for_user(current_user)
+        %>
+      <% end %>
+    </div>
+  </div>
+<% end %>
+<%= form_for(resource, as: resource_name, url: registration_path(resource_name), html: { id: 'subscription_form', method: :put }) do |f| %>
+
+  <div class="field is-horizontal">
+    <div class="field-label">
+      <%= f.label "Email variant updates" %>
     </div>
     <div class="control field-body">
       <%= f.check_box :send_primer_updates %>
@@ -63,26 +90,37 @@
 
   <div class="field is-horizontal">
     <div class="field-label">
-      <%= f.label "Subscribed primer sets" %>
+      Subscribed locations
     </div>
     <div class="control field-body">
-      <%= current_user.primer_sets.map { |ps| h link_to ps, ps }.join(', ').html_safe %>
+      <%= f.collection_select :geo_location_ids,
+                              GeoLocation.all, :id, :to_s,
+                              { allow_blank: 'None', prompt: 'Select Geographic Location' },
+                              { class: 'wide-select2', multiple: 'multiple' }
+      %>
     </div>
   </div>
-
   <div class="field is-horizontal">
     <div class="field-label">
-      <%= f.label "Subscribed locations" %>
+      Notify about variants observed within the last...
     </div>
     <div class="control field-body">
-      <%= current_user.geo_locations.map(&:to_s).join(', ').html_safe %>
+      <%= f.select :lookback_days, { '1 week': 7, '1 month': 30, '3 months': 90, 'all time': 2147483647 },
+                   { prompt: 'Time period' },
+                   { required: true, style: 'width: 120px'}%>
     </div>
   </div>
-
+  <div class="field is-horizontal">
+    <div class="field-label">
+      Notify about variants that rise above this fraction
+    </div>
+    <div class="control field-body">
+      <%= f.number_field :variant_fraction_threshold, in: 0..1, step: 0.01, title: '(num_variants/sequences_in_geo_location)'%>
+    </div>
+  </div>
   <div class="actions">
-    <%= f.submit "Update", class: 'button is-link' %>
+    <%= f.submit "Save Subscription Changes", class: 'button is-link' %>
   </div>
 <% end %>
-
 
 <%= link_to "Back", :back %>

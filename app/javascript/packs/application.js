@@ -9,7 +9,12 @@ require("@rails/activestorage").start()
 require("channels")
 require("@nathanvda/cocoon")
 
+
+
 let $ = require('jquery');
+require('select2')
+import 'select2/dist/css/select2.css';
+
 
 require( 'datatables.net-dt/css/jquery.dataTables.min.css' );
 require( 'datatables.net-dt' );
@@ -23,6 +28,10 @@ require( 'datatables.net-select-dt' );
 import 'datatables.net-dt/css/jquery.dataTables.css'
 
 $(document).on('turbolinks:load', () => {
+    $('select.wide-select2').select2({width: '80%'});
+    $('select.select2').select2();
+
+
     if($('[id^=DataTables_Table]').length == 0) {
         $('table').DataTable({
             dom: 'lfBrtip',

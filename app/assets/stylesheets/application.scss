@@ -37,7 +37,7 @@ $footer-padding:  1rem 1.5rem 1rem;
 
 $navbar-item-img-max-height: 3rem;
 
-  // Update some of Bulma's component variables
+// Update some of Bulma's component variables
 //$body-background-color: $cream;
 //$control-border-width: 2px;
 //$input-border-color: transparent;
@@ -99,4 +99,25 @@ $navbar-item-img-max-height: 3rem;
   font-size: 12pt;
 }
 
+
 @import "bulma";
+@media screen and (min-width: 769px), print {
+  .field-label {
+    flex-grow: 1.5; /* for wider field labels */
+  }
+}
+.field.is-horizontal {
+  .field-body.control {
+    input, select {
+      max-height: 25px;
+    }
+  }
+}
+
+.field .is-horizontal  {
+  .field-body .control {
+
+  }
+}
+
+
