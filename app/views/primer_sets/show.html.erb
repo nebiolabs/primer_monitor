@@ -14,6 +14,13 @@
       <%= @primer_set.status %>
     </div>
   <% end %>
+
+  <div class="tile">
+    <%= render 'primer_set_subscription',
+               user: current_user,
+               primer_set: @primer_set,
+               primer_set_subscription: @primer_set.subscription_for_user(current_user) %>
+  </div>
 </div>
 <hr/>
 <h2 class="title">Primers:</h2>

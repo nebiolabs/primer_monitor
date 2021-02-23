@@ -12,9 +12,11 @@ class PrimerSet < ApplicationRecord
 
   accepts_nested_attributes_for :oligos, reject_if: :all_blank, allow_destroy: true
 
-  def subscribed?(user)
-    return {} unless user
+  def to_s
+    name
+  end
 
-    { id => subscriptions.where(user_id: user.id) }
+  def subscription_for_user(user)
+    subscriptions.where(user_id: user.id).first
   end
 end

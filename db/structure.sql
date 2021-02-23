@@ -508,6 +508,38 @@ CREATE TABLE public.schema_migrations (
 
 
 --
+-- Name: subscribed_geo_locations; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.subscribed_geo_locations (
+    id bigint NOT NULL,
+    user_id bigint NOT NULL,
+    geo_location_id bigint NOT NULL,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: subscribed_geo_locations_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.subscribed_geo_locations_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: subscribed_geo_locations_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.subscribed_geo_locations_id_seq OWNED BY public.subscribed_geo_locations.id;
+
+
+--
 -- Name: user_roles; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -683,6 +715,13 @@ ALTER TABLE ONLY public.roles ALTER COLUMN id SET DEFAULT nextval('public.roles_
 
 
 --
+-- Name: subscribed_geo_locations id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.subscribed_geo_locations ALTER COLUMN id SET DEFAULT nextval('public.subscribed_geo_locations_id_seq'::regclass);
+
+
+--
 -- Name: user_roles id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -792,6 +831,14 @@ ALTER TABLE ONLY public.schema_migrations
 
 
 --
+-- Name: subscribed_geo_locations subscribed_geo_locations_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.subscribed_geo_locations
+    ADD CONSTRAINT subscribed_geo_locations_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: user_roles user_roles_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -883,6 +930,27 @@ CREATE INDEX index_primer_sets_on_organism_id ON public.primer_sets USING btree 
 --
 
 CREATE INDEX index_primer_sets_on_user_id ON public.primer_sets USING btree (user_id);
+
+
+--
+-- Name: index_subscribed_geo_locations_on_geo_location_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_subscribed_geo_locations_on_geo_location_id ON public.subscribed_geo_locations USING btree (geo_location_id);
+
+
+--
+-- Name: index_subscribed_geo_locations_on_user_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_subscribed_geo_locations_on_user_id ON public.subscribed_geo_locations USING btree (user_id);
+
+
+--
+-- Name: index_subscribed_geo_locations_on_user_id_and_geo_location_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_subscribed_geo_locations_on_user_id_and_geo_location_id ON public.subscribed_geo_locations USING btree (user_id, geo_location_id);
 
 
 --
@@ -998,6 +1066,14 @@ ALTER TABLE ONLY public.oligos
 
 
 --
+-- Name: subscribed_geo_locations fk_rails_7745c5f33b; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.subscribed_geo_locations
+    ADD CONSTRAINT fk_rails_7745c5f33b FOREIGN KEY (user_id) REFERENCES public.users(id);
+
+
+--
 -- Name: fasta_records fk_rails_8783be51d9; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -1035,6 +1111,14 @@ ALTER TABLE ONLY public.blast_hits
 
 ALTER TABLE ONLY public.primer_set_subscriptions
     ADD CONSTRAINT fk_rails_e7701775d5 FOREIGN KEY (user_id) REFERENCES public.users(id);
+
+
+--
+-- Name: subscribed_geo_locations fk_rails_f25dffce7e; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.subscribed_geo_locations
+    ADD CONSTRAINT fk_rails_f25dffce7e FOREIGN KEY (geo_location_id) REFERENCES public.geo_locations(id);
 
 
 --
@@ -1084,6 +1168,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20210220215944'),
 ('20210220233440'),
 ('20210220234316'),
-('20210220235805');
+('20210220235805'),
+('20210222122744');
 
 

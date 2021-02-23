@@ -9,7 +9,7 @@
     </div>
     <div class="control field-body">
       <%= f.text_field :first, placeholder: "First"%>
-      <%= f.text_field :last, placeholder: "Last" %>
+      <%= f.text_field :last, placeholder: "Last", size: 30 %>
     </div>
   </div>
 
@@ -18,7 +18,7 @@
       <%= f.label :email %>
     </div>
     <div class="control field-body">
-      <%= f.email_field :email, autofocus: true, autocomplete: 'email' %>
+      <%= f.email_field :email, autofocus: true, autocomplete: 'email', size: 30 %>
     </div>
   </div>
 
@@ -48,6 +48,7 @@
     </div>
     <div class="control field-body">
       <%= f.password_field :current_password, placeholder: 'Current password', autocomplete: 'current-password' %>
+      <i>(required to change password)</i>
     </div>
   </div>
 
@@ -60,6 +61,23 @@
     </div>
   </div>
 
+  <div class="field is-horizontal">
+    <div class="field-label">
+      <%= f.label "Subscribed primer sets" %>
+    </div>
+    <div class="control field-body">
+      <%= current_user.primer_sets.map { |ps| h link_to ps, ps }.join(', ').html_safe %>
+    </div>
+  </div>
+
+  <div class="field is-horizontal">
+    <div class="field-label">
+      <%= f.label "Subscribed locations" %>
+    </div>
+    <div class="control field-body">
+      <%= current_user.geo_locations.map { |loc| link_to loc, loc }.join(', ').html_safe %>
+    </div>
+  </div>
 
   <div class="actions">
     <%= f.submit "Update", class: 'button is-link' %>
