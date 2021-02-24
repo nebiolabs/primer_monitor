@@ -19,8 +19,10 @@ if admin.roles.size == 0
 end
 
 sars = Organism.find_or_create_by!(name: "SARS-CoV-2", ncbi_taxon_id:2697049)
+lamp = AmplificationMethod.find_or_create_by!(name: "LAMP")
+qPCR = AmplificationMethod.find_or_create_by!(name: "qPCR")
 
-lamp_primerset = PrimerSet.find_or_create_by(name: "NEB LAMP (E2019)", organism: sars, user: admin )
+lamp_primerset = PrimerSet.find_or_create_by(name: "NEB LAMP (E2019)", organism: sars, user: admin, amplification_method: lamp )
 
 lamp_primers = {
   'E1-LF': 'CGCTATTAACTATTAACG',
@@ -40,7 +42,7 @@ lamp_primers.each_pair do |name,seq|
   Oligo.find_or_create_by(name: name, sequence: seq, primer_set: lamp_primerset)
 end
 
-luna_primerset = PrimerSet.find_or_create_by(name: "NEB Luna qPCR (E3019)", organism: sars, user: admin )
+luna_primerset = PrimerSet.find_or_create_by(name: "NEB Luna qPCR (E3019)", organism: sars, user: admin, amplification_method: qPCR )
 
 luna_primers = {
   'N1-F': 'GACCCCAAAATCAGCGAAAT',
@@ -55,25 +57,23 @@ luna_primers.each_pair do |name,seq|
   Oligo.find_or_create_by(name: name, sequence: seq, primer_set: luna_primerset)
 end
 
-
-
-features = [['N',28274,29533],
-['ORF10',29558,29674],
-['orf1ab',266,21555],
-['ORF3a',25393,26220],
-['S',21563,25384],
-['M',26523,27191],
-['E',26245,26472],
-['ORF7a',27394,27759],
-['ORF6',27202,27387],
-['ORF8',27894,28259],
-['ORF7b',27756,27887],
-['5\'UTR',1,265],
-['3\'UTR',29675,29903],
+features = [['N', 28274, 29533],
+            ['ORF10', 29558, 29674],
+            ['orf1ab', 266, 21555],
+            ['ORF3a', 25393, 26220],
+            ['S', 21563, 25384],
+            ['M', 26523, 27191],
+            ['E', 26245, 26472],
+            ['ORF7a', 27394, 27759],
+            ['ORF6', 27202, 27387],
+            ['ORF8', 27894, 28259],
+            ['ORF7b', 27756, 27887],
+            ['5\'UTR', 1, 265],
+            ['3\'UTR', 29675, 29903],
 ]
 organism = Organism.find_or_create_by(name: 'SARS-CoV-2')
 features.each do |feature|
-  GenomicFeature.create!(name: feature[0], ref_start: feature[1], ref_end: feature[2], organism_id: organism.id)
+  GenomicFeature.find_or_create_by!(name: feature[0], ref_start: feature[1], ref_end: feature[2], organism_id: organism.id)
 end
 
 
