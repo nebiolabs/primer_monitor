@@ -197,7 +197,7 @@ CREATE TABLE public.fasta_records (
     updated_at timestamp(6) without time zone NOT NULL,
     geo_location_id integer,
     variant_name character varying,
-    detailed_geo_locations_id bigint
+    detailed_geo_location_id bigint
 );
 
 
@@ -1018,10 +1018,10 @@ CREATE INDEX index_blast_hits_on_organism_id ON public.blast_hits USING btree (o
 
 
 --
--- Name: index_fasta_records_on_detailed_geo_locations_id; Type: INDEX; Schema: public; Owner: -
+-- Name: index_fasta_records_on_detailed_geo_location_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_fasta_records_on_detailed_geo_locations_id ON public.fasta_records USING btree (detailed_geo_locations_id);
+CREATE INDEX index_fasta_records_on_detailed_geo_location_id ON public.fasta_records USING btree (detailed_geo_location_id);
 
 
 --
@@ -1256,7 +1256,7 @@ ALTER TABLE ONLY public.subscribed_geo_locations
 --
 
 ALTER TABLE ONLY public.fasta_records
-    ADD CONSTRAINT fk_rails_82e2588d91 FOREIGN KEY (detailed_geo_locations_id) REFERENCES public.detailed_geo_locations(id);
+    ADD CONSTRAINT fk_rails_82e2588d91 FOREIGN KEY (detailed_geo_location_id) REFERENCES public.detailed_geo_locations(id);
 
 
 --
@@ -1359,6 +1359,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20210223192700'),
 ('20210223194128'),
 ('20210224163709'),
-('20210224192126');
+('20210224192126'),
+('20210225212556');
 
 

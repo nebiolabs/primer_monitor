@@ -27,7 +27,7 @@ require_relative "#{__dir__}/app/models/application_record.rb"
 
 # requires all the model files
 Dir["#{__dir__}/app/models/fasta_record.rb", "#{__dir__}/app/models/variant_site.rb",
-    "#{__dir__}/app/models/geo_location.rb"].each do |f|
+    "#{__dir__}/app/models/detailed_geo_location.rb"].each do |f|
   require_relative f
 end
 
