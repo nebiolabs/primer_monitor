@@ -338,13 +338,15 @@ CREATE MATERIALIZED VIEW public.oligo_variant_overlaps AS
             variant_sites.variant,
             variant_sites.ref_start AS variant_start,
             variant_sites.ref_end AS variant_end,
-            geo_locations.region,
-            geo_locations.division,
-            geo_locations.id AS geo_id,
+            detailed_geo_locations.region,
+            detailed_geo_locations.subregion,
+            detailed_geo_locations.division,
+            detailed_geo_locations.subdivision,
+            detailed_geo_locations.id AS detailed_geo_location_id,
             fasta_records.date_collected
            FROM (((public.variant_sites
              JOIN public.fasta_records ON ((variant_sites.fasta_record_id = fasta_records.id)))
-             JOIN public.geo_locations ON ((fasta_records.geo_location_id = geo_locations.id)))
+             JOIN public.detailed_geo_locations ON ((fasta_records.detailed_geo_location_id = detailed_geo_locations.id)))
              JOIN public.oligos ON ((((variant_sites.ref_start >= oligos.ref_start) AND (variant_sites.ref_start <= oligos.ref_end)) OR ((variant_sites.ref_end >= oligos.ref_start) AND (variant_sites.ref_end <= oligos.ref_end)) OR ((variant_sites.ref_start < oligos.ref_start) AND (variant_sites.ref_end > oligos.ref_end)))))
           WHERE ((((variant_sites.variant_type)::text = 'D'::text) OR ((variant_sites.variant_type)::text = 'X'::text)) AND ((variant_sites.variant)::text !~~ '%N%'::text))
         ), insert_query AS (
@@ -357,43 +359,81 @@ CREATE MATERIALIZED VIEW public.oligo_variant_overlaps AS
             variant_sites.variant,
             variant_sites.ref_start AS variant_start,
             variant_sites.ref_end AS variant_end,
-            geo_locations.region,
-            geo_locations.division,
-            geo_locations.id AS geo_id,
+            detailed_geo_locations.region,
+            detailed_geo_locations.subregion,
+            detailed_geo_locations.division,
+            detailed_geo_locations.subdivision,
+            detailed_geo_locations.id AS detailed_geo_location_id,
             fasta_records.date_collected
            FROM (((public.variant_sites
              JOIN public.fasta_records ON ((variant_sites.fasta_record_id = fasta_records.id)))
-             JOIN public.geo_locations ON ((fasta_records.geo_location_id = geo_locations.id)))
+             JOIN public.detailed_geo_locations ON ((fasta_records.detailed_geo_location_id = detailed_geo_locations.id)))
              JOIN public.oligos ON ((((variant_sites.ref_start >= oligos.ref_start) AND (variant_sites.ref_start <= oligos.ref_end)) OR ((variant_sites.ref_end >= oligos.ref_start) AND (variant_sites.ref_end <= oligos.ref_end)) OR ((variant_sites.ref_start < oligos.ref_start) AND (variant_sites.ref_end > oligos.ref_end)))))
           WHERE (((variant_sites.variant_type)::text = 'I'::text) AND ((variant_sites.variant)::text !~~ '%N%'::text))
         ), region_count AS (
          SELECT count(*) AS region_count,
-            geo_locations.region
+            detailed_geo_locations.region
            FROM (public.fasta_records
-             JOIN public.geo_locations ON ((fasta_records.geo_location_id = geo_locations.id)))
-          GROUP BY geo_locations.region
-        ), region_division_count AS (
-         SELECT count(*) AS region_division_count,
-            geo_locations.region,
-            geo_locations.division
+             JOIN public.detailed_geo_locations ON ((fasta_records.detailed_geo_location_id = detailed_geo_locations.id)))
+          GROUP BY detailed_geo_locations.region
+        ), region_subregion_count AS (
+         SELECT count(*) AS region_subregion_count,
+            detailed_geo_locations.region,
+            detailed_geo_locations.subregion
            FROM (public.fasta_records
-             JOIN public.geo_locations ON ((fasta_records.geo_location_id = geo_locations.id)))
-          GROUP BY geo_locations.id, geo_locations.region, geo_locations.division
+             JOIN public.detailed_geo_locations ON ((fasta_records.detailed_geo_location_id = detailed_geo_locations.id)))
+          GROUP BY detailed_geo_locations.region, detailed_geo_locations.subregion
+        ), region_subregion_division_count AS (
+         SELECT count(*) AS region_subregion_division_count,
+            detailed_geo_locations.region,
+            detailed_geo_locations.subregion,
+            detailed_geo_locations.division
+           FROM (public.fasta_records
+             JOIN public.detailed_geo_locations ON ((fasta_records.detailed_geo_location_id = detailed_geo_locations.id)))
+          GROUP BY detailed_geo_locations.region, detailed_geo_locations.subregion, detailed_geo_locations.division
+        ), region_subregion_division_subdivision_count AS (
+         SELECT count(*) AS region_subregion_division_subdivision_count,
+            detailed_geo_locations.region,
+            detailed_geo_locations.subregion,
+            detailed_geo_locations.division,
+            detailed_geo_locations.subdivision
+           FROM (public.fasta_records
+             JOIN public.detailed_geo_locations ON ((fasta_records.detailed_geo_location_id = detailed_geo_locations.id)))
+          GROUP BY detailed_geo_locations.region, detailed_geo_locations.subregion, detailed_geo_locations.division, detailed_geo_locations.subdivision
         ), region_time_count AS (
          SELECT count(*) AS region_time_count,
-            geo_locations.region,
+            detailed_geo_locations.region,
             fasta_records.date_collected
            FROM (public.fasta_records
-             JOIN public.geo_locations ON ((fasta_records.geo_location_id = geo_locations.id)))
-          GROUP BY geo_locations.region, fasta_records.date_collected
-        ), region_division_time_count AS (
-         SELECT count(*) AS region_division_time_count,
-            geo_locations.region,
-            geo_locations.division,
+             JOIN public.detailed_geo_locations ON ((fasta_records.detailed_geo_location_id = detailed_geo_locations.id)))
+          GROUP BY detailed_geo_locations.region, fasta_records.date_collected
+        ), region_subregion_time_count AS (
+         SELECT count(*) AS region_subregion_time_count,
+            detailed_geo_locations.region,
+            detailed_geo_locations.subregion,
             fasta_records.date_collected
            FROM (public.fasta_records
-             JOIN public.geo_locations ON ((fasta_records.geo_location_id = geo_locations.id)))
-          GROUP BY geo_locations.region, geo_locations.division, fasta_records.date_collected
+             JOIN public.detailed_geo_locations ON ((fasta_records.detailed_geo_location_id = detailed_geo_locations.id)))
+          GROUP BY detailed_geo_locations.region, detailed_geo_locations.subregion, fasta_records.date_collected
+        ), region_subregion_division_time_count AS (
+         SELECT count(*) AS region_subregion_division_time_count,
+            detailed_geo_locations.region,
+            detailed_geo_locations.subregion,
+            detailed_geo_locations.division,
+            fasta_records.date_collected
+           FROM (public.fasta_records
+             JOIN public.detailed_geo_locations ON ((fasta_records.detailed_geo_location_id = detailed_geo_locations.id)))
+          GROUP BY detailed_geo_locations.region, detailed_geo_locations.subregion, detailed_geo_locations.division, fasta_records.date_collected
+        ), region_subregion_division_subdivision_time_count AS (
+         SELECT count(*) AS region_subregion_division_subdivision_time_count,
+            detailed_geo_locations.region,
+            detailed_geo_locations.subregion,
+            detailed_geo_locations.division,
+            detailed_geo_locations.subdivision,
+            fasta_records.date_collected
+           FROM (public.fasta_records
+             JOIN public.detailed_geo_locations ON ((fasta_records.detailed_geo_location_id = detailed_geo_locations.id)))
+          GROUP BY detailed_geo_locations.region, detailed_geo_locations.subregion, detailed_geo_locations.division, detailed_geo_locations.subdivision, fasta_records.date_collected
         )
  SELECT big_query.oligo_id,
     big_query.oligo_name,
@@ -405,21 +445,31 @@ CREATE MATERIALIZED VIEW public.oligo_variant_overlaps AS
     big_query.variant_start,
     big_query.variant_end,
     big_query.region,
+    big_query.subregion,
     big_query.division,
-    big_query.geo_id,
+    big_query.subdivision,
+    big_query.detailed_geo_location_id,
     big_query.date_collected,
     region_count.region_count,
-    region_division_count.region_division_count,
+    region_subregion_count.region_subregion_count,
+    region_subregion_division_count.region_subregion_division_count,
+    region_subregion_division_subdivision_count.region_subregion_division_subdivision_count,
     region_time_count.region_time_count,
-    region_division_time_count.region_division_time_count,
+    region_subregion_time_count.region_subregion_time_count,
+    region_subregion_division_time_count.region_subregion_division_time_count,
+    region_subregion_division_subdivision_time_count.region_subregion_division_subdivision_time_count,
     generate_series(lower((numrange((coord_overlaps.oligo_start)::numeric, (coord_overlaps.oligo_end)::numeric) * numrange((coord_overlaps.variant_start)::numeric, (coord_overlaps.variant_end)::numeric))), (upper((numrange((coord_overlaps.oligo_start)::numeric, (coord_overlaps.oligo_end)::numeric) * numrange((coord_overlaps.variant_start)::numeric, (coord_overlaps.variant_end)::numeric))) - (1)::numeric)) AS coords
-   FROM (((((big_query coord_overlaps
+   FROM (((((((((big_query coord_overlaps
      JOIN big_query ON (((coord_overlaps.oligo_id = big_query.oligo_id) AND (coord_overlaps.variant_id = big_query.variant_id))))
      JOIN region_count ON (((region_count.region)::text = (big_query.region)::text)))
-     JOIN region_division_count ON ((((region_division_count.region)::text = (big_query.region)::text) AND ((region_division_count.division)::text = (big_query.division)::text))))
+     JOIN region_subregion_count ON ((((region_subregion_count.region)::text = (big_query.region)::text) AND ((region_subregion_count.subregion)::text = (big_query.subregion)::text))))
+     JOIN region_subregion_division_count ON ((((region_subregion_division_count.region)::text = (big_query.region)::text) AND ((region_subregion_division_count.subregion)::text = (big_query.subregion)::text) AND ((region_subregion_division_count.division)::text = (big_query.division)::text))))
+     JOIN region_subregion_division_subdivision_count ON ((((region_subregion_division_subdivision_count.region)::text = (big_query.region)::text) AND ((region_subregion_division_subdivision_count.subregion)::text = (big_query.subregion)::text) AND ((region_subregion_division_subdivision_count.division)::text = (big_query.division)::text) AND ((region_subregion_division_subdivision_count.subdivision)::text = (big_query.division)::text))))
      JOIN region_time_count ON ((((region_time_count.region)::text = (big_query.region)::text) AND (region_time_count.date_collected = big_query.date_collected))))
-     JOIN region_division_time_count ON ((((region_division_time_count.region)::text = (big_query.region)::text) AND ((region_division_time_count.division)::text = (big_query.division)::text) AND (region_division_time_count.date_collected = big_query.date_collected))))
-UNION
+     JOIN region_subregion_time_count ON ((((region_subregion_time_count.region)::text = (big_query.region)::text) AND ((region_subregion_time_count.subregion)::text = (big_query.subregion)::text) AND (region_subregion_time_count.date_collected = big_query.date_collected))))
+     JOIN region_subregion_division_time_count ON ((((region_subregion_division_time_count.region)::text = (big_query.region)::text) AND ((region_subregion_division_time_count.subregion)::text = (big_query.subregion)::text) AND ((region_subregion_division_time_count.division)::text = (big_query.division)::text) AND (region_subregion_division_time_count.date_collected = big_query.date_collected))))
+     JOIN region_subregion_division_subdivision_time_count ON ((((region_subregion_division_subdivision_time_count.region)::text = (big_query.region)::text) AND ((region_subregion_division_subdivision_time_count.subregion)::text = (big_query.subregion)::text) AND ((region_subregion_division_subdivision_time_count.division)::text = (big_query.division)::text) AND ((region_subregion_division_subdivision_time_count.subdivision)::text = (big_query.division)::text) AND (region_subregion_division_subdivision_time_count.date_collected = big_query.date_collected))))
+UNION ALL
  SELECT insert_query.oligo_id,
     insert_query.oligo_name,
     insert_query.oligo_start,
@@ -430,20 +480,30 @@ UNION
     insert_query.variant_start,
     insert_query.variant_end,
     insert_query.region,
+    insert_query.subregion,
     insert_query.division,
-    insert_query.geo_id,
+    insert_query.subdivision,
+    insert_query.detailed_geo_location_id,
     insert_query.date_collected,
     region_count.region_count,
-    region_division_count.region_division_count,
+    region_subregion_count.region_subregion_count,
+    region_subregion_division_count.region_subregion_division_count,
+    region_subregion_division_subdivision_count.region_subregion_division_subdivision_count,
     region_time_count.region_time_count,
-    region_division_time_count.region_division_time_count,
+    region_subregion_time_count.region_subregion_time_count,
+    region_subregion_division_time_count.region_subregion_division_time_count,
+    region_subregion_division_subdivision_time_count.region_subregion_division_subdivision_time_count,
     insert_query.variant_start AS coords
-   FROM (((((insert_query coord_overlaps
+   FROM (((((((((insert_query coord_overlaps
      JOIN insert_query ON (((coord_overlaps.oligo_id = insert_query.oligo_id) AND (coord_overlaps.variant_id = insert_query.variant_id))))
      JOIN region_count ON (((region_count.region)::text = (insert_query.region)::text)))
-     JOIN region_division_count ON ((((region_division_count.region)::text = (insert_query.region)::text) AND ((region_division_count.division)::text = (insert_query.division)::text))))
+     JOIN region_subregion_count ON ((((region_subregion_count.region)::text = (insert_query.region)::text) AND ((region_subregion_count.subregion)::text = (insert_query.subregion)::text))))
+     JOIN region_subregion_division_count ON ((((region_subregion_division_count.region)::text = (insert_query.region)::text) AND ((region_subregion_division_count.subregion)::text = (insert_query.subregion)::text) AND ((region_subregion_division_count.division)::text = (insert_query.division)::text))))
+     JOIN region_subregion_division_subdivision_count ON ((((region_subregion_division_subdivision_count.region)::text = (insert_query.region)::text) AND ((region_subregion_division_subdivision_count.subregion)::text = (insert_query.subregion)::text) AND ((region_subregion_division_subdivision_count.division)::text = (insert_query.division)::text) AND ((region_subregion_division_subdivision_count.subdivision)::text = (insert_query.division)::text))))
      JOIN region_time_count ON ((((region_time_count.region)::text = (insert_query.region)::text) AND (region_time_count.date_collected = insert_query.date_collected))))
-     JOIN region_division_time_count ON ((((region_division_time_count.region)::text = (insert_query.region)::text) AND ((region_division_time_count.division)::text = (insert_query.division)::text) AND (region_division_time_count.date_collected = insert_query.date_collected))))
+     JOIN region_subregion_time_count ON ((((region_subregion_time_count.region)::text = (insert_query.region)::text) AND ((region_subregion_time_count.subregion)::text = (insert_query.subregion)::text) AND (region_subregion_time_count.date_collected = insert_query.date_collected))))
+     JOIN region_subregion_division_time_count ON ((((region_subregion_division_time_count.region)::text = (insert_query.region)::text) AND ((region_subregion_division_time_count.subregion)::text = (insert_query.subregion)::text) AND ((region_subregion_division_time_count.division)::text = (insert_query.division)::text) AND (region_subregion_division_time_count.date_collected = insert_query.date_collected))))
+     JOIN region_subregion_division_subdivision_time_count ON ((((region_subregion_division_subdivision_time_count.region)::text = (insert_query.region)::text) AND ((region_subregion_division_subdivision_time_count.subregion)::text = (insert_query.subregion)::text) AND ((region_subregion_division_subdivision_time_count.division)::text = (insert_query.division)::text) AND ((region_subregion_division_subdivision_time_count.subdivision)::text = (insert_query.division)::text) AND (region_subregion_division_subdivision_time_count.date_collected = insert_query.date_collected))))
   WITH NO DATA;
 
 
@@ -1360,6 +1420,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20210223194128'),
 ('20210224163709'),
 ('20210224192126'),
-('20210225212556');
+('20210225212556'),
+('20210225225243');
 
 
