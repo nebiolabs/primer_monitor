@@ -27,6 +27,7 @@ class Ability
     can :show, HistoryController
     can :show, Oligo
     can :show, Organism
+    can :index, LineagesController
     can %i[new create], User
     can %i[index read], PrimerSet, status: 'complete'
   end
