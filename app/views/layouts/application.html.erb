@@ -23,20 +23,25 @@
       <span aria-hidden="true"></span>
     </a>
   </div>
-  <div class="navbar-item column is-narrow is-size-7" style='line-height: 1'>
-    <small>
-      Enabled by data from<br/>
-    </small>
-    <%= link_to 'https://www.gisaid.org/' do %>
-      <%= image_tag 'gisaid.png', alt: 'GISAID logo', height: '20', width: '50' %>
-    <% end %>
+  <div id="navbarBasicExample" class="navbar-menu">
+    <div class="navbar-start">
+      <div class="navbar-item column is-narrow is-size-7" style='line-height: 1'>
+        <small>
+          Enabled by data from<br/>
+        </small>
+        <%= link_to 'https://www.gisaid.org/' do %>
+          <%= image_tag 'gisaid.png', alt: 'GISAID logo', height: '20', width: '50' %>
+        <% end %>
+      </div>
+      <% if can? :index, PrimerSet %>
+        <%= link_to "Primer Sets", primer_sets_path, class: 'navbar-item' %>
+      <% end %>
+
+      <%= link_to 'Lineage Variants', lineages_path, class: 'navbar-item' %>
+
+      <%= link_to 'About', about_path, class: 'navbar-item' %>
+    </div>
   </div>
-  <% if can? :index, PrimerSet %>
-    <%= link_to "Primer Sets", primer_sets_path, class: 'navbar-item' %>
-  <% end %>
-
-  <%= link_to 'About', about_path, class: 'navbar-item' %>
-
   <div id="navMenu" class="navbar-menu">
     <div class="navbar-end">
       <div class="navbar-item">

@@ -71,6 +71,7 @@ class OligosController < ApplicationController
 
   # Only allow a list of trusted parameters through.
   def oligo_params
-    params.require(:oligo).permit(:name, :sequence)
+    params.require(:oligo).permit(%i[id primer_set_id name short_name
+                                     locus category sequence])
   end
 end

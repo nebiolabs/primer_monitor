@@ -76,7 +76,8 @@ class PrimerSetsController < ApplicationController
 
   # Only allow a list of trusted parameters through.
   def primer_set_params
-    params.require(:primer_set).permit(:name, :user_id, :organism_id, :status,
-                                       oligos_attributes: %i[id primer_set_id name locus category sequence _destroy])
+    params.require(:primer_set).permit(:name, :user_id, :amplification_method_id, :organism_id, :status,
+                                       oligos_attributes: %i[id primer_set_id name short_name
+                                                             locus category sequence _destroy])
   end
 end

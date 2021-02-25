@@ -221,6 +221,41 @@ ALTER SEQUENCE public.fasta_records_id_seq OWNED BY public.fasta_records.id;
 
 
 --
+-- Name: genomic_features; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.genomic_features (
+    id bigint NOT NULL,
+    name character varying,
+    type character varying,
+    ref_start integer,
+    ref_end integer,
+    organism_id bigint NOT NULL,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: genomic_features_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.genomic_features_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: genomic_features_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.genomic_features_id_seq OWNED BY public.genomic_features.id;
+
+
+--
 -- Name: geo_locations; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -749,6 +784,13 @@ ALTER TABLE ONLY public.fasta_records ALTER COLUMN id SET DEFAULT nextval('publi
 
 
 --
+-- Name: genomic_features id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.genomic_features ALTER COLUMN id SET DEFAULT nextval('public.genomic_features_id_seq'::regclass);
+
+
+--
 -- Name: geo_locations id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -856,6 +898,14 @@ ALTER TABLE ONLY public.detailed_geo_locations
 
 ALTER TABLE ONLY public.fasta_records
     ADD CONSTRAINT fasta_records_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: genomic_features genomic_features_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.genomic_features
+    ADD CONSTRAINT genomic_features_pkey PRIMARY KEY (id);
 
 
 --
@@ -986,6 +1036,13 @@ CREATE INDEX index_fasta_records_on_geo_location_id ON public.fasta_records USIN
 --
 
 CREATE UNIQUE INDEX index_fasta_records_on_strain ON public.fasta_records USING btree (strain);
+
+
+--
+-- Name: index_genomic_features_on_organism_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_genomic_features_on_organism_id ON public.genomic_features USING btree (organism_id);
 
 
 --
@@ -1179,6 +1236,14 @@ ALTER TABLE ONLY public.oligos
 
 
 --
+-- Name: genomic_features fk_rails_65e85371d4; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.genomic_features
+    ADD CONSTRAINT fk_rails_65e85371d4 FOREIGN KEY (organism_id) REFERENCES public.organisms(id);
+
+
+--
 -- Name: subscribed_geo_locations fk_rails_7745c5f33b; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -1294,5 +1359,6 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20210223192700'),
 ('20210223194128'),
 ('20210224163709');
+('20210224192126');
 
 
