@@ -10,6 +10,34 @@ SET client_min_messages = warning;
 SET row_security = off;
 
 --
+-- Name: ltree; Type: EXTENSION; Schema: -; Owner: -
+--
+
+CREATE EXTENSION IF NOT EXISTS ltree WITH SCHEMA public;
+
+
+--
+-- Name: EXTENSION ltree; Type: COMMENT; Schema: -; Owner: -
+--
+
+COMMENT ON EXTENSION ltree IS 'data type for hierarchical tree-like structures';
+
+
+--
+-- Name: unaccent; Type: EXTENSION; Schema: -; Owner: -
+--
+
+CREATE EXTENSION IF NOT EXISTS unaccent WITH SCHEMA public;
+
+
+--
+-- Name: EXTENSION unaccent; Type: COMMENT; Schema: -; Owner: -
+--
+
+COMMENT ON EXTENSION unaccent IS 'text search dictionary that removes accents';
+
+
+--
 -- Name: oligo_category; Type: TYPE; Schema: public; Owner: -
 --
 
@@ -119,44 +147,6 @@ ALTER SEQUENCE public.blast_hits_id_seq OWNED BY public.blast_hits.id;
 
 
 --
--- Name: detailed_geo_locations; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.detailed_geo_locations (
-    id bigint NOT NULL,
-    world character varying NOT NULL,
-    region character varying NOT NULL,
-    subregion character varying,
-    division character varying,
-    subdivision character varying,
-    locality character varying,
-    latitude double precision NOT NULL,
-    longitude double precision NOT NULL,
-    created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL
-);
-
-
---
--- Name: detailed_geo_locations_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE public.detailed_geo_locations_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: detailed_geo_locations_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE public.detailed_geo_locations_id_seq OWNED BY public.detailed_geo_locations.id;
-
-
---
 -- Name: fasta_records; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -169,8 +159,7 @@ CREATE TABLE public.fasta_records (
     created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL,
     geo_location_id integer,
-    variant_name character varying,
-    detailed_geo_locations_id bigint
+    variant_name character varying
 );
 
 
@@ -555,8 +544,7 @@ CREATE TABLE public.subscribed_geo_locations (
     user_id bigint NOT NULL,
     geo_location_id bigint NOT NULL,
     created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL,
-    detailed_geo_locations_id bigint
+    updated_at timestamp(6) without time zone NOT NULL
 );
 
 
@@ -708,13 +696,6 @@ ALTER TABLE ONLY public.blast_hits ALTER COLUMN id SET DEFAULT nextval('public.b
 
 
 --
--- Name: detailed_geo_locations id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.detailed_geo_locations ALTER COLUMN id SET DEFAULT nextval('public.detailed_geo_locations_id_seq'::regclass);
-
-
---
 -- Name: fasta_records id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -816,14 +797,6 @@ ALTER TABLE ONLY public.blast_hits
 
 
 --
--- Name: detailed_geo_locations detailed_geo_locations_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.detailed_geo_locations
-    ADD CONSTRAINT detailed_geo_locations_pkey PRIMARY KEY (id);
-
-
---
 -- Name: fasta_records fasta_records_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -920,13 +893,6 @@ ALTER TABLE ONLY public.variant_sites
 
 
 --
--- Name: full_record; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE UNIQUE INDEX full_record ON public.detailed_geo_locations USING btree (region, subregion, division, subdivision, locality, latitude, longitude);
-
-
---
 -- Name: index_blast_hits_on_oligo_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -938,13 +904,6 @@ CREATE INDEX index_blast_hits_on_oligo_id ON public.blast_hits USING btree (olig
 --
 
 CREATE INDEX index_blast_hits_on_organism_id ON public.blast_hits USING btree (organism_id);
-
-
---
--- Name: index_fasta_records_on_detailed_geo_locations_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_fasta_records_on_detailed_geo_locations_id ON public.fasta_records USING btree (detailed_geo_locations_id);
 
 
 --
@@ -1001,13 +960,6 @@ CREATE INDEX index_primer_sets_on_organism_id ON public.primer_sets USING btree 
 --
 
 CREATE INDEX index_primer_sets_on_user_id ON public.primer_sets USING btree (user_id);
-
-
---
--- Name: index_subscribed_geo_locations_on_detailed_geo_locations_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_subscribed_geo_locations_on_detailed_geo_locations_id ON public.subscribed_geo_locations USING btree (detailed_geo_locations_id);
 
 
 --
@@ -1096,14 +1048,6 @@ ALTER TABLE ONLY public.primer_sets
 
 
 --
--- Name: subscribed_geo_locations fk_rails_089a2b4533; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.subscribed_geo_locations
-    ADD CONSTRAINT fk_rails_089a2b4533 FOREIGN KEY (detailed_geo_locations_id) REFERENCES public.detailed_geo_locations(id);
-
-
---
 -- Name: blast_hits fk_rails_1f04a34db0; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -1157,14 +1101,6 @@ ALTER TABLE ONLY public.oligos
 
 ALTER TABLE ONLY public.subscribed_geo_locations
     ADD CONSTRAINT fk_rails_7745c5f33b FOREIGN KEY (user_id) REFERENCES public.users(id);
-
-
---
--- Name: fasta_records fk_rails_82e2588d91; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.fasta_records
-    ADD CONSTRAINT fk_rails_82e2588d91 FOREIGN KEY (detailed_geo_locations_id) REFERENCES public.detailed_geo_locations(id);
 
 
 --
@@ -1265,7 +1201,6 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20210220235805'),
 ('20210222122744'),
 ('20210223192700'),
-('20210223194128'),
-('20210224163709');
+('20210223194128');
 
 

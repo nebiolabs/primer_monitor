@@ -7,12 +7,11 @@ class AddNewGeolocationsTable < ActiveRecord::Migration[6.1]
       t.string :division
       t.string :subdivision
       t.string :locality
-      t.float :latitude, null: false
-      t.float :longitude, null: false
+      t.string :sublocality
 
       t.timestamps
     end
-    add_index :detailed_geo_locations, [:region, :subregion, :division, :subdivision, :locality, :latitude, :longitude], unique: true, name: 'full_record'
+    add_index :detailed_geo_locations, [:region, :subregion, :division, :subdivision, :locality, :sublocality], unique: true, name: 'full_record'
 
     add_reference :fasta_records, :detailed_geo_locations, foreign_key: true
     add_reference :subscribed_geo_locations, :detailed_geo_locations, foreign_key: true
