@@ -2,7 +2,7 @@ class AddNewGeolocationsTable < ActiveRecord::Migration[6.1]
   def change
     create_table :detailed_geo_locations do |t|
       t.string :world, null: false
-      t.string :region, null: false
+      t.string :region
       t.string :subregion
       t.string :division
       t.string :subdivision
