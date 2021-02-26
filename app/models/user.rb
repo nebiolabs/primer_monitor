@@ -26,7 +26,7 @@ class User < ApplicationRecord
       last: data['last_name'],
       password: Devise.friendly_token[0, 20]
     }
-    User.create_with(user_attribs).create_or_find_by!(email: data['email']) do |user|
+    User.create_with(user_attribs).find_or_create_by!(email: data['email']) do |user|
       Rails.logger.info("Creating new user using : #{user_attribs}")
       user.skip_confirmation!
     end
