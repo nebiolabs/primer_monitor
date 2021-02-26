@@ -799,6 +799,41 @@ ALTER SEQUENCE public.primer_sets_id_seq OWNED BY public.primer_sets.id;
 
 
 --
+-- Name: proposed_notifications; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.proposed_notifications (
+    id bigint NOT NULL,
+    primer_sets_id bigint,
+    oligos_id bigint,
+    verified_notifications_id bigint,
+    coordinate integer,
+    fraction_variant double precision,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: proposed_notifications_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.proposed_notifications_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: proposed_notifications_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.proposed_notifications_id_seq OWNED BY public.proposed_notifications.id;
+
+
+--
 -- Name: roles; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -928,6 +963,39 @@ ALTER SEQUENCE public.variant_sites_id_seq OWNED BY public.variant_sites.id;
 
 
 --
+-- Name: verified_notifications; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.verified_notifications (
+    id bigint NOT NULL,
+    users_id bigint,
+    date_sent date,
+    status character varying,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: verified_notifications_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.verified_notifications_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: verified_notifications_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.verified_notifications_id_seq OWNED BY public.verified_notifications.id;
+
+
+--
 -- Name: amplification_methods id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -1005,6 +1073,13 @@ ALTER TABLE ONLY public.primer_sets ALTER COLUMN id SET DEFAULT nextval('public.
 
 
 --
+-- Name: proposed_notifications id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.proposed_notifications ALTER COLUMN id SET DEFAULT nextval('public.proposed_notifications_id_seq'::regclass);
+
+
+--
 -- Name: roles id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -1037,6 +1112,13 @@ ALTER TABLE ONLY public.users ALTER COLUMN id SET DEFAULT nextval('public.users_
 --
 
 ALTER TABLE ONLY public.variant_sites ALTER COLUMN id SET DEFAULT nextval('public.variant_sites_id_seq'::regclass);
+
+
+--
+-- Name: verified_notifications id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.verified_notifications ALTER COLUMN id SET DEFAULT nextval('public.verified_notifications_id_seq'::regclass);
 
 
 --
@@ -1136,6 +1218,14 @@ ALTER TABLE ONLY public.primer_sets
 
 
 --
+-- Name: proposed_notifications proposed_notifications_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.proposed_notifications
+    ADD CONSTRAINT proposed_notifications_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: roles roles_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -1181,6 +1271,14 @@ ALTER TABLE ONLY public.users
 
 ALTER TABLE ONLY public.variant_sites
     ADD CONSTRAINT variant_sites_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: verified_notifications verified_notifications_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.verified_notifications
+    ADD CONSTRAINT verified_notifications_pkey PRIMARY KEY (id);
 
 
 --
@@ -1289,6 +1387,27 @@ CREATE INDEX index_primer_sets_on_user_id ON public.primer_sets USING btree (use
 
 
 --
+-- Name: index_proposed_notifications_on_oligos_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_proposed_notifications_on_oligos_id ON public.proposed_notifications USING btree (oligos_id);
+
+
+--
+-- Name: index_proposed_notifications_on_primer_sets_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_proposed_notifications_on_primer_sets_id ON public.proposed_notifications USING btree (primer_sets_id);
+
+
+--
+-- Name: index_proposed_notifications_on_verified_notifications_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_proposed_notifications_on_verified_notifications_id ON public.proposed_notifications USING btree (verified_notifications_id);
+
+
+--
 -- Name: index_subscribed_geo_locations_on_detailed_geo_locations_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -1359,6 +1478,13 @@ CREATE INDEX index_variant_sites_on_fasta_record_id ON public.variant_sites USIN
 
 
 --
+-- Name: index_verified_notifications_on_users_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_verified_notifications_on_users_id ON public.verified_notifications USING btree (users_id);
+
+
+--
 -- Name: tmp; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -1406,11 +1532,27 @@ ALTER TABLE ONLY public.user_roles
 
 
 --
+-- Name: proposed_notifications fk_rails_32a2a94275; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.proposed_notifications
+    ADD CONSTRAINT fk_rails_32a2a94275 FOREIGN KEY (primer_sets_id) REFERENCES public.primer_sets(id);
+
+
+--
 -- Name: user_roles fk_rails_3369e0d5fc; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.user_roles
     ADD CONSTRAINT fk_rails_3369e0d5fc FOREIGN KEY (role_id) REFERENCES public.roles(id);
+
+
+--
+-- Name: proposed_notifications fk_rails_39f3a62e67; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.proposed_notifications
+    ADD CONSTRAINT fk_rails_39f3a62e67 FOREIGN KEY (oligos_id) REFERENCES public.oligos(id);
 
 
 --
@@ -1443,6 +1585,22 @@ ALTER TABLE ONLY public.location_alias_join
 
 ALTER TABLE ONLY public.genomic_features
     ADD CONSTRAINT fk_rails_65e85371d4 FOREIGN KEY (organism_id) REFERENCES public.organisms(id);
+
+
+--
+-- Name: verified_notifications fk_rails_660c55653c; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.verified_notifications
+    ADD CONSTRAINT fk_rails_660c55653c FOREIGN KEY (users_id) REFERENCES public.users(id);
+
+
+--
+-- Name: proposed_notifications fk_rails_736e9d2781; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.proposed_notifications
+    ADD CONSTRAINT fk_rails_736e9d2781 FOREIGN KEY (verified_notifications_id) REFERENCES public.verified_notifications(id);
 
 
 --
@@ -1567,6 +1725,8 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20210226173653'),
 ('20210226174141'),
 ('20210226200532'),
-('20210226202745');
+('20210226202745'),
+('20210226203437'),
+('20210226204550');
 
 
