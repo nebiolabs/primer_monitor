@@ -27,6 +27,12 @@ class FastaRecord < ApplicationRecord
     return unless strain && gisaid_epi_isl && genbank_accession && region && country && division && location && date
     return if FastaRecord.exists?(strain: strain)
 
+    # Converts each string to nil if it's empty
+    region = region.presence
+    country = country.presence
+    division = division.presence
+    location = location.presence
+
     # The geo location record needs to exist before the fasta record does
     unless DetailedGeoLocation.exists?(region: region, subregion: country, division: division, subdivision: location)
       DetailedGeoLocation.new(world: 'World', region: region, subregion: country, division: division, subdivision: location).save!
