@@ -147,6 +147,45 @@ ALTER SEQUENCE public.blast_hits_id_seq OWNED BY public.blast_hits.id;
 
 
 --
+-- Name: detailed_geo_location_aliases; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.detailed_geo_location_aliases (
+    id bigint NOT NULL,
+    world character varying,
+    region character varying,
+    subregion character varying,
+    division character varying,
+    subdivision character varying,
+    locality character varying,
+    sublocality character varying,
+    latitude double precision,
+    longitude double precision,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: detailed_geo_location_aliases_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.detailed_geo_location_aliases_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: detailed_geo_location_aliases_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.detailed_geo_location_aliases_id_seq OWNED BY public.detailed_geo_location_aliases.id;
+
+
+--
 -- Name: detailed_geo_locations; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -286,6 +325,38 @@ CREATE SEQUENCE public.geo_locations_id_seq
 --
 
 ALTER SEQUENCE public.geo_locations_id_seq OWNED BY public.geo_locations.id;
+
+
+--
+-- Name: location_alias_join; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.location_alias_join (
+    id bigint NOT NULL,
+    detailed_geo_locations_id bigint,
+    detailed_geo_location_aliases_id bigint,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: location_alias_join_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.location_alias_join_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: location_alias_join_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.location_alias_join_id_seq OWNED BY public.location_alias_join.id;
 
 
 --
@@ -678,7 +749,8 @@ CREATE TABLE public.subscribed_geo_locations (
     geo_location_id bigint NOT NULL,
     created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL,
-    detailed_geo_locations_id bigint
+    detailed_geo_locations_id bigint,
+    detailed_geo_location_alias_id bigint
 );
 
 
@@ -830,6 +902,13 @@ ALTER TABLE ONLY public.blast_hits ALTER COLUMN id SET DEFAULT nextval('public.b
 
 
 --
+-- Name: detailed_geo_location_aliases id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.detailed_geo_location_aliases ALTER COLUMN id SET DEFAULT nextval('public.detailed_geo_location_aliases_id_seq'::regclass);
+
+
+--
 -- Name: detailed_geo_locations id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -855,6 +934,13 @@ ALTER TABLE ONLY public.genomic_features ALTER COLUMN id SET DEFAULT nextval('pu
 --
 
 ALTER TABLE ONLY public.geo_locations ALTER COLUMN id SET DEFAULT nextval('public.geo_locations_id_seq'::regclass);
+
+
+--
+-- Name: location_alias_join id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.location_alias_join ALTER COLUMN id SET DEFAULT nextval('public.location_alias_join_id_seq'::regclass);
 
 
 --
@@ -945,6 +1031,14 @@ ALTER TABLE ONLY public.blast_hits
 
 
 --
+-- Name: detailed_geo_location_aliases detailed_geo_location_aliases_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.detailed_geo_location_aliases
+    ADD CONSTRAINT detailed_geo_location_aliases_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: detailed_geo_locations detailed_geo_locations_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -974,6 +1068,14 @@ ALTER TABLE ONLY public.genomic_features
 
 ALTER TABLE ONLY public.geo_locations
     ADD CONSTRAINT geo_locations_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: location_alias_join location_alias_join_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.location_alias_join
+    ADD CONSTRAINT location_alias_join_pkey PRIMARY KEY (id);
 
 
 --
@@ -1057,6 +1159,20 @@ ALTER TABLE ONLY public.variant_sites
 
 
 --
+-- Name: alias_full_record; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX alias_full_record ON public.detailed_geo_location_aliases USING btree (region, subregion, division, subdivision, locality, sublocality, latitude, longitude);
+
+
+--
+-- Name: alias_join_index; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX alias_join_index ON public.location_alias_join USING btree (detailed_geo_locations_id);
+
+
+--
 -- Name: full_record; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -1103,6 +1219,13 @@ CREATE UNIQUE INDEX index_fasta_records_on_strain ON public.fasta_records USING 
 --
 
 CREATE INDEX index_genomic_features_on_organism_id ON public.genomic_features USING btree (organism_id);
+
+
+--
+-- Name: index_location_alias_join_on_detailed_geo_locations_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_location_alias_join_on_detailed_geo_locations_id ON public.location_alias_join USING btree (detailed_geo_locations_id);
 
 
 --
@@ -1232,6 +1355,13 @@ CREATE INDEX index_variant_sites_on_fasta_record_id ON public.variant_sites USIN
 
 
 --
+-- Name: tmp; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX tmp ON public.subscribed_geo_locations USING btree (detailed_geo_location_alias_id);
+
+
+--
 -- Name: primer_sets fk_rails_06b1f0d34e; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -1296,6 +1426,14 @@ ALTER TABLE ONLY public.oligos
 
 
 --
+-- Name: location_alias_join fk_rails_61222fa2c3; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.location_alias_join
+    ADD CONSTRAINT fk_rails_61222fa2c3 FOREIGN KEY (detailed_geo_locations_id) REFERENCES public.detailed_geo_locations(id);
+
+
+--
 -- Name: genomic_features fk_rails_65e85371d4; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -1309,6 +1447,14 @@ ALTER TABLE ONLY public.genomic_features
 
 ALTER TABLE ONLY public.subscribed_geo_locations
     ADD CONSTRAINT fk_rails_7745c5f33b FOREIGN KEY (user_id) REFERENCES public.users(id);
+
+
+--
+-- Name: subscribed_geo_locations fk_rails_7c2744b62d; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.subscribed_geo_locations
+    ADD CONSTRAINT fk_rails_7c2744b62d FOREIGN KEY (detailed_geo_location_alias_id) REFERENCES public.detailed_geo_location_aliases(id);
 
 
 --
@@ -1349,6 +1495,14 @@ ALTER TABLE ONLY public.primer_sets
 
 ALTER TABLE ONLY public.blast_hits
     ADD CONSTRAINT fk_rails_b63d58c7a5 FOREIGN KEY (oligo_id) REFERENCES public.oligos(id);
+
+
+--
+-- Name: location_alias_join fk_rails_dff9f9948c; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.location_alias_join
+    ADD CONSTRAINT fk_rails_dff9f9948c FOREIGN KEY (detailed_geo_location_aliases_id) REFERENCES public.detailed_geo_location_aliases(id);
 
 
 --
@@ -1421,6 +1575,8 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20210224163709'),
 ('20210224192126'),
 ('20210225212556'),
-('20210225225243');
+('20210225225243'),
+('20210226173653'),
+('20210226174141');
 
 
