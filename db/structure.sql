@@ -10,34 +10,6 @@ SET client_min_messages = warning;
 SET row_security = off;
 
 --
--- Name: ltree; Type: EXTENSION; Schema: -; Owner: -
---
-
-CREATE EXTENSION IF NOT EXISTS ltree WITH SCHEMA public;
-
-
---
--- Name: EXTENSION ltree; Type: COMMENT; Schema: -; Owner: -
---
-
-COMMENT ON EXTENSION ltree IS 'data type for hierarchical tree-like structures';
-
-
---
--- Name: unaccent; Type: EXTENSION; Schema: -; Owner: -
---
-
-CREATE EXTENSION IF NOT EXISTS unaccent WITH SCHEMA public;
-
-
---
--- Name: EXTENSION unaccent; Type: COMMENT; Schema: -; Owner: -
---
-
-COMMENT ON EXTENSION unaccent IS 'text search dictionary that removes accents';
-
-
---
 -- Name: oligo_category; Type: TYPE; Schema: public; Owner: -
 --
 
@@ -302,7 +274,6 @@ CREATE TABLE public.subscribed_geo_locations (
     user_id bigint NOT NULL,
     created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL,
-    detailed_geo_locations_id bigint,
     detailed_geo_location_alias_id bigint
 );
 
@@ -333,15 +304,15 @@ CREATE VIEW public.join_subscribed_location_to_id AS
 
 CREATE TABLE public.oligos (
     id bigint NOT NULL,
-    name character varying,
-    sequence character varying,
-    primer_set_id bigint,
+    name character varying NOT NULL,
+    sequence character varying NOT NULL,
+    primer_set_id bigint NOT NULL,
+    ref_start bigint,
+    ref_end bigint,
     created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL,
     locus character varying,
     category public.oligo_category,
-    ref_start bigint,
-    ref_end bigint,
     short_name character varying
 );
 
@@ -1408,13 +1379,6 @@ CREATE INDEX index_proposed_notifications_on_verified_notifications_id ON public
 
 
 --
--- Name: index_subscribed_geo_locations_on_detailed_geo_locations_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_subscribed_geo_locations_on_detailed_geo_locations_id ON public.subscribed_geo_locations USING btree (detailed_geo_locations_id);
-
-
---
 -- Name: index_subscribed_geo_locations_on_user_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -1497,14 +1461,6 @@ CREATE INDEX tmp ON public.subscribed_geo_locations USING btree (detailed_geo_lo
 
 ALTER TABLE ONLY public.primer_sets
     ADD CONSTRAINT fk_rails_06b1f0d34e FOREIGN KEY (amplification_method_id) REFERENCES public.amplification_methods(id);
-
-
---
--- Name: subscribed_geo_locations fk_rails_089a2b4533; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.subscribed_geo_locations
-    ADD CONSTRAINT fk_rails_089a2b4533 FOREIGN KEY (detailed_geo_locations_id) REFERENCES public.detailed_geo_locations(id);
 
 
 --
@@ -1727,6 +1683,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20210226200532'),
 ('20210226202745'),
 ('20210226203437'),
-('20210226204550');
+('20210226204550'),
+('20210226205517');
 
 
