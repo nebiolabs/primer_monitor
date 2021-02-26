@@ -234,7 +234,6 @@ CREATE TABLE public.fasta_records (
     date_collected date,
     created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL,
-    geo_location_id integer,
     variant_name character varying,
     detailed_geo_location_id bigint
 );
@@ -295,68 +294,37 @@ ALTER SEQUENCE public.genomic_features_id_seq OWNED BY public.genomic_features.i
 
 
 --
--- Name: geo_locations; Type: TABLE; Schema: public; Owner: -
+-- Name: subscribed_geo_locations; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE public.geo_locations (
+CREATE TABLE public.subscribed_geo_locations (
     id bigint NOT NULL,
-    parent_location character varying,
-    region character varying NOT NULL,
-    division character varying NOT NULL,
+    user_id bigint NOT NULL,
     created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL
-);
-
-
---
--- Name: geo_locations_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE public.geo_locations_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: geo_locations_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE public.geo_locations_id_seq OWNED BY public.geo_locations.id;
-
-
---
--- Name: location_alias_join; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.location_alias_join (
-    id bigint NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL,
     detailed_geo_locations_id bigint,
-    detailed_geo_location_aliases_id bigint,
-    created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL
+    detailed_geo_location_alias_id bigint
 );
 
 
 --
--- Name: location_alias_join_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: join_subscribed_location_to_id; Type: VIEW; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE public.location_alias_join_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: location_alias_join_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE public.location_alias_join_id_seq OWNED BY public.location_alias_join.id;
+CREATE VIEW public.join_subscribed_location_to_id AS
+ WITH subscribed_ids AS (
+         SELECT subscribed_geo_locations.user_id,
+            detailed_geo_location_aliases.region,
+            detailed_geo_location_aliases.subregion,
+            detailed_geo_location_aliases.division,
+            detailed_geo_location_aliases.subdivision
+           FROM (public.detailed_geo_location_aliases
+             JOIN public.subscribed_geo_locations ON ((subscribed_geo_locations.detailed_geo_location_alias_id = detailed_geo_location_aliases.id)))
+        )
+ SELECT subscribed_ids.user_id,
+    detailed_geo_locations.id AS detailed_geo_location_id
+   FROM (public.detailed_geo_locations
+     JOIN subscribed_ids ON ((((subscribed_ids.region IS NULL) OR ((subscribed_ids.region)::text = (detailed_geo_locations.region)::text)) AND ((subscribed_ids.subregion IS NULL) OR ((subscribed_ids.subregion)::text = (detailed_geo_locations.subregion)::text)) AND ((subscribed_ids.division IS NULL) OR ((subscribed_ids.division)::text = (detailed_geo_locations.division)::text)) AND ((subscribed_ids.subdivision IS NULL) OR ((subscribed_ids.subdivision)::text = (detailed_geo_locations.subdivision)::text)))));
 
 
 --
@@ -579,6 +547,168 @@ UNION ALL
 
 
 --
+-- Name: primer_set_subscriptions; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.primer_set_subscriptions (
+    id bigint NOT NULL,
+    primer_set_id bigint,
+    user_id bigint,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: primer_sets; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.primer_sets (
+    id bigint NOT NULL,
+    name character varying,
+    user_id bigint,
+    organism_id integer NOT NULL,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL,
+    status public.primer_set_status DEFAULT 'pending'::public.primer_set_status,
+    citation_url character varying,
+    doi character varying,
+    amplification_method_id bigint
+);
+
+
+--
+-- Name: users; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.users (
+    id bigint NOT NULL,
+    first character varying NOT NULL,
+    last character varying NOT NULL,
+    email character varying NOT NULL,
+    activated boolean DEFAULT false NOT NULL,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL,
+    login character varying,
+    encrypted_password character varying,
+    sign_in_count integer DEFAULT 0 NOT NULL,
+    failed_login_count integer DEFAULT 0 NOT NULL,
+    last_request_at timestamp without time zone,
+    current_sign_in_at timestamp without time zone,
+    last_sign_in_at timestamp without time zone,
+    current_sign_in_ip character varying,
+    last_sign_in_ip character varying,
+    active boolean DEFAULT false,
+    approved boolean DEFAULT false,
+    confirmed boolean DEFAULT false,
+    send_primer_updates boolean DEFAULT false NOT NULL,
+    reset_password_token character varying,
+    reset_password_sent_at timestamp without time zone,
+    remember_token character varying,
+    remember_created_at timestamp without time zone,
+    authentication_token character varying,
+    confirmation_token character varying(255),
+    confirmed_at timestamp without time zone,
+    confirmation_sent_at timestamp without time zone,
+    unconfirmed_email character varying,
+    failed_attempts integer DEFAULT 0 NOT NULL,
+    unlock_token character varying,
+    locked_at timestamp without time zone,
+    provider character varying,
+    uid character varying,
+    lookback_days integer DEFAULT 30 NOT NULL,
+    variant_fraction_threshold double precision DEFAULT 0.1 NOT NULL
+);
+
+
+--
+-- Name: identify_primers_for_notification; Type: MATERIALIZED VIEW; Schema: public; Owner: -
+--
+
+CREATE MATERIALIZED VIEW public.identify_primers_for_notification AS
+ WITH first_query AS (
+         SELECT primer_set_subscriptions.user_id,
+            primer_set_subscriptions.primer_set_id,
+            join_subscribed_location_to_id.detailed_geo_location_id,
+            primer_sets.name AS set_name,
+            oligos.name AS primer_name,
+            users.lookback_days,
+            users.variant_fraction_threshold,
+            oligo_variant_overlaps.region,
+            oligo_variant_overlaps.division,
+            oligo_variant_overlaps.detailed_geo_location_id AS unused_id,
+            oligo_variant_overlaps.coords,
+            count(oligo_variant_overlaps.variant_id) AS variant_count
+           FROM (((((public.primer_set_subscriptions
+             JOIN public.primer_sets ON ((primer_sets.id = primer_set_subscriptions.primer_set_id)))
+             JOIN public.join_subscribed_location_to_id ON ((join_subscribed_location_to_id.user_id = primer_set_subscriptions.user_id)))
+             JOIN public.oligos ON ((primer_sets.id = oligos.primer_set_id)))
+             JOIN public.oligo_variant_overlaps ON ((oligo_variant_overlaps.oligo_id = oligos.id)))
+             JOIN public.users ON ((users.id = primer_set_subscriptions.user_id)))
+          WHERE (oligo_variant_overlaps.date_collected >= (CURRENT_DATE - users.lookback_days))
+          GROUP BY primer_set_subscriptions.user_id, primer_set_subscriptions.primer_set_id, primer_sets.name, oligos.name, join_subscribed_location_to_id.detailed_geo_location_id, users.lookback_days, users.variant_fraction_threshold, oligo_variant_overlaps.region, oligo_variant_overlaps.division, oligo_variant_overlaps.coords, oligo_variant_overlaps.detailed_geo_location_id
+        ), second_query AS (
+         SELECT fasta_records.detailed_geo_location_id,
+            count(fasta_records.id) AS records_count,
+            users.lookback_days
+           FROM ((public.fasta_records
+             JOIN public.join_subscribed_location_to_id ON ((join_subscribed_location_to_id.detailed_geo_location_id = fasta_records.detailed_geo_location_id)))
+             JOIN public.users ON ((join_subscribed_location_to_id.user_id = users.id)))
+          WHERE (fasta_records.date_collected >= (CURRENT_DATE - users.lookback_days))
+          GROUP BY fasta_records.detailed_geo_location_id, users.lookback_days
+         HAVING (count(fasta_records.id) >= 20)
+        )
+ SELECT first_query.user_id,
+    first_query.primer_set_id,
+    first_query.set_name,
+    first_query.primer_name,
+    first_query.region,
+    first_query.division,
+    first_query.coords,
+    first_query.variant_count,
+    first_query.variant_fraction_threshold,
+    second_query.detailed_geo_location_id,
+    second_query.records_count,
+    ((first_query.variant_count)::numeric / (second_query.records_count)::numeric) AS fraction_variant
+   FROM (first_query
+     JOIN second_query ON ((second_query.detailed_geo_location_id = first_query.detailed_geo_location_id)))
+  WHERE ((((first_query.variant_count)::numeric / (second_query.records_count)::numeric))::double precision >= first_query.variant_fraction_threshold)
+  WITH NO DATA;
+
+
+--
+-- Name: location_alias_join; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.location_alias_join (
+    id bigint NOT NULL,
+    detailed_geo_locations_id bigint,
+    detailed_geo_location_aliases_id bigint,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: location_alias_join_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.location_alias_join_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: location_alias_join_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.location_alias_join_id_seq OWNED BY public.location_alias_join.id;
+
+
+--
 -- Name: oligos_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
@@ -631,19 +761,6 @@ ALTER SEQUENCE public.organisms_id_seq OWNED BY public.organisms.id;
 
 
 --
--- Name: primer_set_subscriptions; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.primer_set_subscriptions (
-    id bigint NOT NULL,
-    primer_set_id bigint,
-    user_id bigint,
-    created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL
-);
-
-
---
 -- Name: primer_set_subscriptions_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
@@ -660,24 +777,6 @@ CREATE SEQUENCE public.primer_set_subscriptions_id_seq
 --
 
 ALTER SEQUENCE public.primer_set_subscriptions_id_seq OWNED BY public.primer_set_subscriptions.id;
-
-
---
--- Name: primer_sets; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.primer_sets (
-    id bigint NOT NULL,
-    name character varying,
-    user_id bigint,
-    organism_id integer NOT NULL,
-    created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL,
-    status public.primer_set_status DEFAULT 'pending'::public.primer_set_status,
-    citation_url character varying,
-    doi character varying,
-    amplification_method_id bigint
-);
 
 
 --
@@ -740,21 +839,6 @@ CREATE TABLE public.schema_migrations (
 
 
 --
--- Name: subscribed_geo_locations; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.subscribed_geo_locations (
-    id bigint NOT NULL,
-    user_id bigint NOT NULL,
-    geo_location_id bigint NOT NULL,
-    created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL,
-    detailed_geo_locations_id bigint,
-    detailed_geo_location_alias_id bigint
-);
-
-
---
 -- Name: subscribed_geo_locations_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
@@ -803,50 +887,6 @@ CREATE SEQUENCE public.user_roles_id_seq
 --
 
 ALTER SEQUENCE public.user_roles_id_seq OWNED BY public.user_roles.id;
-
-
---
--- Name: users; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.users (
-    id bigint NOT NULL,
-    first character varying NOT NULL,
-    last character varying NOT NULL,
-    email character varying NOT NULL,
-    activated boolean DEFAULT false NOT NULL,
-    created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL,
-    login character varying,
-    encrypted_password character varying,
-    sign_in_count integer DEFAULT 0 NOT NULL,
-    failed_login_count integer DEFAULT 0 NOT NULL,
-    last_request_at timestamp without time zone,
-    current_sign_in_at timestamp without time zone,
-    last_sign_in_at timestamp without time zone,
-    current_sign_in_ip character varying,
-    last_sign_in_ip character varying,
-    active boolean DEFAULT false,
-    approved boolean DEFAULT false,
-    confirmed boolean DEFAULT false,
-    send_primer_updates boolean DEFAULT false NOT NULL,
-    reset_password_token character varying,
-    reset_password_sent_at timestamp without time zone,
-    remember_token character varying,
-    remember_created_at timestamp without time zone,
-    authentication_token character varying,
-    confirmation_token character varying(255),
-    confirmed_at timestamp without time zone,
-    confirmation_sent_at timestamp without time zone,
-    unconfirmed_email character varying,
-    failed_attempts integer DEFAULT 0 NOT NULL,
-    unlock_token character varying,
-    locked_at timestamp without time zone,
-    provider character varying,
-    uid character varying,
-    lookback_days integer DEFAULT 30 NOT NULL,
-    variant_fraction_threshold double precision DEFAULT 0.1 NOT NULL
-);
 
 
 --
@@ -927,13 +967,6 @@ ALTER TABLE ONLY public.fasta_records ALTER COLUMN id SET DEFAULT nextval('publi
 --
 
 ALTER TABLE ONLY public.genomic_features ALTER COLUMN id SET DEFAULT nextval('public.genomic_features_id_seq'::regclass);
-
-
---
--- Name: geo_locations id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.geo_locations ALTER COLUMN id SET DEFAULT nextval('public.geo_locations_id_seq'::regclass);
 
 
 --
@@ -1060,14 +1093,6 @@ ALTER TABLE ONLY public.fasta_records
 
 ALTER TABLE ONLY public.genomic_features
     ADD CONSTRAINT genomic_features_pkey PRIMARY KEY (id);
-
-
---
--- Name: geo_locations geo_locations_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.geo_locations
-    ADD CONSTRAINT geo_locations_pkey PRIMARY KEY (id);
 
 
 --
@@ -1201,13 +1226,6 @@ CREATE INDEX index_fasta_records_on_detailed_geo_location_id ON public.fasta_rec
 
 
 --
--- Name: index_fasta_records_on_geo_location_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_fasta_records_on_geo_location_id ON public.fasta_records USING btree (geo_location_id);
-
-
---
 -- Name: index_fasta_records_on_strain; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -1278,24 +1296,10 @@ CREATE INDEX index_subscribed_geo_locations_on_detailed_geo_locations_id ON publ
 
 
 --
--- Name: index_subscribed_geo_locations_on_geo_location_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_subscribed_geo_locations_on_geo_location_id ON public.subscribed_geo_locations USING btree (geo_location_id);
-
-
---
 -- Name: index_subscribed_geo_locations_on_user_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_subscribed_geo_locations_on_user_id ON public.subscribed_geo_locations USING btree (user_id);
-
-
---
--- Name: index_subscribed_geo_locations_on_user_id_and_geo_location_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE UNIQUE INDEX index_subscribed_geo_locations_on_user_id_and_geo_location_id ON public.subscribed_geo_locations USING btree (user_id, geo_location_id);
 
 
 --
@@ -1466,14 +1470,6 @@ ALTER TABLE ONLY public.fasta_records
 
 
 --
--- Name: fasta_records fk_rails_8783be51d9; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.fasta_records
-    ADD CONSTRAINT fk_rails_8783be51d9 FOREIGN KEY (geo_location_id) REFERENCES public.geo_locations(id);
-
-
---
 -- Name: primer_set_subscriptions fk_rails_99041872f6; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -1511,14 +1507,6 @@ ALTER TABLE ONLY public.location_alias_join
 
 ALTER TABLE ONLY public.primer_set_subscriptions
     ADD CONSTRAINT fk_rails_e7701775d5 FOREIGN KEY (user_id) REFERENCES public.users(id);
-
-
---
--- Name: subscribed_geo_locations fk_rails_f25dffce7e; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.subscribed_geo_locations
-    ADD CONSTRAINT fk_rails_f25dffce7e FOREIGN KEY (geo_location_id) REFERENCES public.geo_locations(id);
 
 
 --
@@ -1577,6 +1565,8 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20210225212556'),
 ('20210225225243'),
 ('20210226173653'),
-('20210226174141');
+('20210226174141'),
+('20210226200532'),
+('20210226202745');
 
 
