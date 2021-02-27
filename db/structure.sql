@@ -10,34 +10,6 @@ SET client_min_messages = warning;
 SET row_security = off;
 
 --
--- Name: ltree; Type: EXTENSION; Schema: -; Owner: -
---
-
-CREATE EXTENSION IF NOT EXISTS ltree WITH SCHEMA public;
-
-
---
--- Name: EXTENSION ltree; Type: COMMENT; Schema: -; Owner: -
---
-
-COMMENT ON EXTENSION ltree IS 'data type for hierarchical tree-like structures';
-
-
---
--- Name: unaccent; Type: EXTENSION; Schema: -; Owner: -
---
-
-CREATE EXTENSION IF NOT EXISTS unaccent WITH SCHEMA public;
-
-
---
--- Name: EXTENSION unaccent; Type: COMMENT; Schema: -; Owner: -
---
-
-COMMENT ON EXTENSION unaccent IS 'text search dictionary that removes accents';
-
-
---
 -- Name: oligo_category; Type: TYPE; Schema: public; Owner: -
 --
 
@@ -147,6 +119,45 @@ ALTER SEQUENCE public.blast_hits_id_seq OWNED BY public.blast_hits.id;
 
 
 --
+-- Name: detailed_geo_location_aliases; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.detailed_geo_location_aliases (
+    id bigint NOT NULL,
+    world character varying,
+    region character varying,
+    subregion character varying,
+    division character varying,
+    subdivision character varying,
+    locality character varying,
+    sublocality character varying,
+    latitude double precision,
+    longitude double precision,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: detailed_geo_location_aliases_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.detailed_geo_location_aliases_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: detailed_geo_location_aliases_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.detailed_geo_location_aliases_id_seq OWNED BY public.detailed_geo_location_aliases.id;
+
+
+--
 -- Name: detailed_geo_locations; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -195,7 +206,6 @@ CREATE TABLE public.fasta_records (
     date_collected date,
     created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL,
-    geo_location_id integer,
     variant_name character varying,
     detailed_geo_location_id bigint
 );
@@ -256,36 +266,36 @@ ALTER SEQUENCE public.genomic_features_id_seq OWNED BY public.genomic_features.i
 
 
 --
--- Name: geo_locations; Type: TABLE; Schema: public; Owner: -
+-- Name: subscribed_geo_locations; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE public.geo_locations (
+CREATE TABLE public.subscribed_geo_locations (
     id bigint NOT NULL,
-    parent_location character varying,
-    region character varying NOT NULL,
-    division character varying NOT NULL,
+    user_id bigint NOT NULL,
     created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL
+    updated_at timestamp(6) without time zone NOT NULL,
+    detailed_geo_location_alias_id bigint
 );
 
 
 --
--- Name: geo_locations_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: join_subscribed_location_to_id; Type: VIEW; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE public.geo_locations_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: geo_locations_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE public.geo_locations_id_seq OWNED BY public.geo_locations.id;
+CREATE VIEW public.join_subscribed_location_to_id AS
+ WITH subscribed_ids AS (
+         SELECT subscribed_geo_locations.user_id,
+            detailed_geo_location_aliases.region,
+            detailed_geo_location_aliases.subregion,
+            detailed_geo_location_aliases.division,
+            detailed_geo_location_aliases.subdivision
+           FROM (public.detailed_geo_location_aliases
+             JOIN public.subscribed_geo_locations ON ((subscribed_geo_locations.detailed_geo_location_alias_id = detailed_geo_location_aliases.id)))
+        )
+ SELECT subscribed_ids.user_id,
+    detailed_geo_locations.id AS detailed_geo_location_id
+   FROM (public.detailed_geo_locations
+     JOIN subscribed_ids ON ((((subscribed_ids.region IS NULL) OR ((subscribed_ids.region)::text = (detailed_geo_locations.region)::text)) AND ((subscribed_ids.subregion IS NULL) OR ((subscribed_ids.subregion)::text = (detailed_geo_locations.subregion)::text)) AND ((subscribed_ids.division IS NULL) OR ((subscribed_ids.division)::text = (detailed_geo_locations.division)::text)) AND ((subscribed_ids.subdivision IS NULL) OR ((subscribed_ids.subdivision)::text = (detailed_geo_locations.subdivision)::text)))));
 
 
 --
@@ -294,15 +304,15 @@ ALTER SEQUENCE public.geo_locations_id_seq OWNED BY public.geo_locations.id;
 
 CREATE TABLE public.oligos (
     id bigint NOT NULL,
-    name character varying,
-    sequence character varying,
-    primer_set_id bigint,
+    name character varying NOT NULL,
+    sequence character varying NOT NULL,
+    primer_set_id bigint NOT NULL,
+    ref_start bigint,
+    ref_end bigint,
     created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL,
     locus character varying,
     category public.oligo_category,
-    ref_start bigint,
-    ref_end bigint,
     short_name character varying
 );
 
@@ -508,6 +518,168 @@ UNION ALL
 
 
 --
+-- Name: primer_set_subscriptions; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.primer_set_subscriptions (
+    id bigint NOT NULL,
+    primer_set_id bigint,
+    user_id bigint,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: primer_sets; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.primer_sets (
+    id bigint NOT NULL,
+    name character varying,
+    user_id bigint,
+    organism_id integer NOT NULL,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL,
+    status public.primer_set_status DEFAULT 'pending'::public.primer_set_status,
+    citation_url character varying,
+    doi character varying,
+    amplification_method_id bigint
+);
+
+
+--
+-- Name: users; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.users (
+    id bigint NOT NULL,
+    first character varying NOT NULL,
+    last character varying NOT NULL,
+    email character varying NOT NULL,
+    activated boolean DEFAULT false NOT NULL,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL,
+    login character varying,
+    encrypted_password character varying,
+    sign_in_count integer DEFAULT 0 NOT NULL,
+    failed_login_count integer DEFAULT 0 NOT NULL,
+    last_request_at timestamp without time zone,
+    current_sign_in_at timestamp without time zone,
+    last_sign_in_at timestamp without time zone,
+    current_sign_in_ip character varying,
+    last_sign_in_ip character varying,
+    active boolean DEFAULT false,
+    approved boolean DEFAULT false,
+    confirmed boolean DEFAULT false,
+    send_primer_updates boolean DEFAULT false NOT NULL,
+    reset_password_token character varying,
+    reset_password_sent_at timestamp without time zone,
+    remember_token character varying,
+    remember_created_at timestamp without time zone,
+    authentication_token character varying,
+    confirmation_token character varying(255),
+    confirmed_at timestamp without time zone,
+    confirmation_sent_at timestamp without time zone,
+    unconfirmed_email character varying,
+    failed_attempts integer DEFAULT 0 NOT NULL,
+    unlock_token character varying,
+    locked_at timestamp without time zone,
+    provider character varying,
+    uid character varying,
+    lookback_days integer DEFAULT 30 NOT NULL,
+    variant_fraction_threshold double precision DEFAULT 0.1 NOT NULL
+);
+
+
+--
+-- Name: identify_primers_for_notification; Type: MATERIALIZED VIEW; Schema: public; Owner: -
+--
+
+CREATE MATERIALIZED VIEW public.identify_primers_for_notification AS
+ WITH first_query AS (
+         SELECT primer_set_subscriptions.user_id,
+            primer_set_subscriptions.primer_set_id,
+            join_subscribed_location_to_id.detailed_geo_location_id,
+            primer_sets.name AS set_name,
+            oligos.name AS primer_name,
+            users.lookback_days,
+            users.variant_fraction_threshold,
+            oligo_variant_overlaps.region,
+            oligo_variant_overlaps.division,
+            oligo_variant_overlaps.detailed_geo_location_id AS unused_id,
+            oligo_variant_overlaps.coords,
+            count(oligo_variant_overlaps.variant_id) AS variant_count
+           FROM (((((public.primer_set_subscriptions
+             JOIN public.primer_sets ON ((primer_sets.id = primer_set_subscriptions.primer_set_id)))
+             JOIN public.join_subscribed_location_to_id ON ((join_subscribed_location_to_id.user_id = primer_set_subscriptions.user_id)))
+             JOIN public.oligos ON ((primer_sets.id = oligos.primer_set_id)))
+             JOIN public.oligo_variant_overlaps ON ((oligo_variant_overlaps.oligo_id = oligos.id)))
+             JOIN public.users ON ((users.id = primer_set_subscriptions.user_id)))
+          WHERE (oligo_variant_overlaps.date_collected >= (CURRENT_DATE - users.lookback_days))
+          GROUP BY primer_set_subscriptions.user_id, primer_set_subscriptions.primer_set_id, primer_sets.name, oligos.name, join_subscribed_location_to_id.detailed_geo_location_id, users.lookback_days, users.variant_fraction_threshold, oligo_variant_overlaps.region, oligo_variant_overlaps.division, oligo_variant_overlaps.coords, oligo_variant_overlaps.detailed_geo_location_id
+        ), second_query AS (
+         SELECT fasta_records.detailed_geo_location_id,
+            count(fasta_records.id) AS records_count,
+            users.lookback_days
+           FROM ((public.fasta_records
+             JOIN public.join_subscribed_location_to_id ON ((join_subscribed_location_to_id.detailed_geo_location_id = fasta_records.detailed_geo_location_id)))
+             JOIN public.users ON ((join_subscribed_location_to_id.user_id = users.id)))
+          WHERE (fasta_records.date_collected >= (CURRENT_DATE - users.lookback_days))
+          GROUP BY fasta_records.detailed_geo_location_id, users.lookback_days
+         HAVING (count(fasta_records.id) >= 20)
+        )
+ SELECT first_query.user_id,
+    first_query.primer_set_id,
+    first_query.set_name,
+    first_query.primer_name,
+    first_query.region,
+    first_query.division,
+    first_query.coords,
+    first_query.variant_count,
+    first_query.variant_fraction_threshold,
+    second_query.detailed_geo_location_id,
+    second_query.records_count,
+    ((first_query.variant_count)::numeric / (second_query.records_count)::numeric) AS fraction_variant
+   FROM (first_query
+     JOIN second_query ON ((second_query.detailed_geo_location_id = first_query.detailed_geo_location_id)))
+  WHERE ((((first_query.variant_count)::numeric / (second_query.records_count)::numeric))::double precision >= first_query.variant_fraction_threshold)
+  WITH NO DATA;
+
+
+--
+-- Name: location_alias_join; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.location_alias_join (
+    id bigint NOT NULL,
+    detailed_geo_locations_id bigint,
+    detailed_geo_location_aliases_id bigint,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: location_alias_join_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.location_alias_join_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: location_alias_join_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.location_alias_join_id_seq OWNED BY public.location_alias_join.id;
+
+
+--
 -- Name: oligos_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
@@ -560,19 +732,6 @@ ALTER SEQUENCE public.organisms_id_seq OWNED BY public.organisms.id;
 
 
 --
--- Name: primer_set_subscriptions; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.primer_set_subscriptions (
-    id bigint NOT NULL,
-    primer_set_id bigint,
-    user_id bigint,
-    created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL
-);
-
-
---
 -- Name: primer_set_subscriptions_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
@@ -592,24 +751,6 @@ ALTER SEQUENCE public.primer_set_subscriptions_id_seq OWNED BY public.primer_set
 
 
 --
--- Name: primer_sets; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.primer_sets (
-    id bigint NOT NULL,
-    name character varying,
-    user_id bigint,
-    organism_id integer NOT NULL,
-    created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL,
-    status public.primer_set_status DEFAULT 'pending'::public.primer_set_status,
-    citation_url character varying,
-    doi character varying,
-    amplification_method_id bigint
-);
-
-
---
 -- Name: primer_sets_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
@@ -626,6 +767,41 @@ CREATE SEQUENCE public.primer_sets_id_seq
 --
 
 ALTER SEQUENCE public.primer_sets_id_seq OWNED BY public.primer_sets.id;
+
+
+--
+-- Name: proposed_notifications; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.proposed_notifications (
+    id bigint NOT NULL,
+    primer_sets_id bigint,
+    oligos_id bigint,
+    verified_notifications_id bigint,
+    coordinate integer,
+    fraction_variant double precision,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: proposed_notifications_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.proposed_notifications_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: proposed_notifications_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.proposed_notifications_id_seq OWNED BY public.proposed_notifications.id;
 
 
 --
@@ -665,20 +841,6 @@ ALTER SEQUENCE public.roles_id_seq OWNED BY public.roles.id;
 
 CREATE TABLE public.schema_migrations (
     version character varying NOT NULL
-);
-
-
---
--- Name: subscribed_geo_locations; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.subscribed_geo_locations (
-    id bigint NOT NULL,
-    user_id bigint NOT NULL,
-    geo_location_id bigint NOT NULL,
-    created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL,
-    detailed_geo_locations_id bigint
 );
 
 
@@ -734,50 +896,6 @@ ALTER SEQUENCE public.user_roles_id_seq OWNED BY public.user_roles.id;
 
 
 --
--- Name: users; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.users (
-    id bigint NOT NULL,
-    first character varying NOT NULL,
-    last character varying NOT NULL,
-    email character varying NOT NULL,
-    activated boolean DEFAULT false NOT NULL,
-    created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL,
-    login character varying,
-    encrypted_password character varying,
-    sign_in_count integer DEFAULT 0 NOT NULL,
-    failed_login_count integer DEFAULT 0 NOT NULL,
-    last_request_at timestamp without time zone,
-    current_sign_in_at timestamp without time zone,
-    last_sign_in_at timestamp without time zone,
-    current_sign_in_ip character varying,
-    last_sign_in_ip character varying,
-    active boolean DEFAULT false,
-    approved boolean DEFAULT false,
-    confirmed boolean DEFAULT false,
-    send_primer_updates boolean DEFAULT false NOT NULL,
-    reset_password_token character varying,
-    reset_password_sent_at timestamp without time zone,
-    remember_token character varying,
-    remember_created_at timestamp without time zone,
-    authentication_token character varying,
-    confirmation_token character varying(255),
-    confirmed_at timestamp without time zone,
-    confirmation_sent_at timestamp without time zone,
-    unconfirmed_email character varying,
-    failed_attempts integer DEFAULT 0 NOT NULL,
-    unlock_token character varying,
-    locked_at timestamp without time zone,
-    provider character varying,
-    uid character varying,
-    lookback_days integer DEFAULT 30 NOT NULL,
-    variant_fraction_threshold double precision DEFAULT 0.1 NOT NULL
-);
-
-
---
 -- Name: users_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
@@ -816,6 +934,39 @@ ALTER SEQUENCE public.variant_sites_id_seq OWNED BY public.variant_sites.id;
 
 
 --
+-- Name: verified_notifications; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.verified_notifications (
+    id bigint NOT NULL,
+    users_id bigint,
+    date_sent date,
+    status character varying,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: verified_notifications_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.verified_notifications_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: verified_notifications_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.verified_notifications_id_seq OWNED BY public.verified_notifications.id;
+
+
+--
 -- Name: amplification_methods id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -827,6 +978,13 @@ ALTER TABLE ONLY public.amplification_methods ALTER COLUMN id SET DEFAULT nextva
 --
 
 ALTER TABLE ONLY public.blast_hits ALTER COLUMN id SET DEFAULT nextval('public.blast_hits_id_seq'::regclass);
+
+
+--
+-- Name: detailed_geo_location_aliases id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.detailed_geo_location_aliases ALTER COLUMN id SET DEFAULT nextval('public.detailed_geo_location_aliases_id_seq'::regclass);
 
 
 --
@@ -851,10 +1009,10 @@ ALTER TABLE ONLY public.genomic_features ALTER COLUMN id SET DEFAULT nextval('pu
 
 
 --
--- Name: geo_locations id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: location_alias_join id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.geo_locations ALTER COLUMN id SET DEFAULT nextval('public.geo_locations_id_seq'::regclass);
+ALTER TABLE ONLY public.location_alias_join ALTER COLUMN id SET DEFAULT nextval('public.location_alias_join_id_seq'::regclass);
 
 
 --
@@ -883,6 +1041,13 @@ ALTER TABLE ONLY public.primer_set_subscriptions ALTER COLUMN id SET DEFAULT nex
 --
 
 ALTER TABLE ONLY public.primer_sets ALTER COLUMN id SET DEFAULT nextval('public.primer_sets_id_seq'::regclass);
+
+
+--
+-- Name: proposed_notifications id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.proposed_notifications ALTER COLUMN id SET DEFAULT nextval('public.proposed_notifications_id_seq'::regclass);
 
 
 --
@@ -921,6 +1086,13 @@ ALTER TABLE ONLY public.variant_sites ALTER COLUMN id SET DEFAULT nextval('publi
 
 
 --
+-- Name: verified_notifications id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.verified_notifications ALTER COLUMN id SET DEFAULT nextval('public.verified_notifications_id_seq'::regclass);
+
+
+--
 -- Name: amplification_methods amplification_methods_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -942,6 +1114,14 @@ ALTER TABLE ONLY public.ar_internal_metadata
 
 ALTER TABLE ONLY public.blast_hits
     ADD CONSTRAINT blast_hits_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: detailed_geo_location_aliases detailed_geo_location_aliases_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.detailed_geo_location_aliases
+    ADD CONSTRAINT detailed_geo_location_aliases_pkey PRIMARY KEY (id);
 
 
 --
@@ -969,11 +1149,11 @@ ALTER TABLE ONLY public.genomic_features
 
 
 --
--- Name: geo_locations geo_locations_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: location_alias_join location_alias_join_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.geo_locations
-    ADD CONSTRAINT geo_locations_pkey PRIMARY KEY (id);
+ALTER TABLE ONLY public.location_alias_join
+    ADD CONSTRAINT location_alias_join_pkey PRIMARY KEY (id);
 
 
 --
@@ -1006,6 +1186,14 @@ ALTER TABLE ONLY public.primer_set_subscriptions
 
 ALTER TABLE ONLY public.primer_sets
     ADD CONSTRAINT primer_sets_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: proposed_notifications proposed_notifications_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.proposed_notifications
+    ADD CONSTRAINT proposed_notifications_pkey PRIMARY KEY (id);
 
 
 --
@@ -1057,6 +1245,28 @@ ALTER TABLE ONLY public.variant_sites
 
 
 --
+-- Name: verified_notifications verified_notifications_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.verified_notifications
+    ADD CONSTRAINT verified_notifications_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: alias_full_record; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX alias_full_record ON public.detailed_geo_location_aliases USING btree (region, subregion, division, subdivision, locality, sublocality, latitude, longitude);
+
+
+--
+-- Name: alias_join_index; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX alias_join_index ON public.location_alias_join USING btree (detailed_geo_locations_id);
+
+
+--
 -- Name: full_record; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -1085,13 +1295,6 @@ CREATE INDEX index_fasta_records_on_detailed_geo_location_id ON public.fasta_rec
 
 
 --
--- Name: index_fasta_records_on_geo_location_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_fasta_records_on_geo_location_id ON public.fasta_records USING btree (geo_location_id);
-
-
---
 -- Name: index_fasta_records_on_strain; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -1103,6 +1306,13 @@ CREATE UNIQUE INDEX index_fasta_records_on_strain ON public.fasta_records USING 
 --
 
 CREATE INDEX index_genomic_features_on_organism_id ON public.genomic_features USING btree (organism_id);
+
+
+--
+-- Name: index_location_alias_join_on_detailed_geo_locations_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_location_alias_join_on_detailed_geo_locations_id ON public.location_alias_join USING btree (detailed_geo_locations_id);
 
 
 --
@@ -1148,17 +1358,24 @@ CREATE INDEX index_primer_sets_on_user_id ON public.primer_sets USING btree (use
 
 
 --
--- Name: index_subscribed_geo_locations_on_detailed_geo_locations_id; Type: INDEX; Schema: public; Owner: -
+-- Name: index_proposed_notifications_on_oligos_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_subscribed_geo_locations_on_detailed_geo_locations_id ON public.subscribed_geo_locations USING btree (detailed_geo_locations_id);
+CREATE INDEX index_proposed_notifications_on_oligos_id ON public.proposed_notifications USING btree (oligos_id);
 
 
 --
--- Name: index_subscribed_geo_locations_on_geo_location_id; Type: INDEX; Schema: public; Owner: -
+-- Name: index_proposed_notifications_on_primer_sets_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_subscribed_geo_locations_on_geo_location_id ON public.subscribed_geo_locations USING btree (geo_location_id);
+CREATE INDEX index_proposed_notifications_on_primer_sets_id ON public.proposed_notifications USING btree (primer_sets_id);
+
+
+--
+-- Name: index_proposed_notifications_on_verified_notifications_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_proposed_notifications_on_verified_notifications_id ON public.proposed_notifications USING btree (verified_notifications_id);
 
 
 --
@@ -1166,13 +1383,6 @@ CREATE INDEX index_subscribed_geo_locations_on_geo_location_id ON public.subscri
 --
 
 CREATE INDEX index_subscribed_geo_locations_on_user_id ON public.subscribed_geo_locations USING btree (user_id);
-
-
---
--- Name: index_subscribed_geo_locations_on_user_id_and_geo_location_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE UNIQUE INDEX index_subscribed_geo_locations_on_user_id_and_geo_location_id ON public.subscribed_geo_locations USING btree (user_id, geo_location_id);
 
 
 --
@@ -1232,19 +1442,25 @@ CREATE INDEX index_variant_sites_on_fasta_record_id ON public.variant_sites USIN
 
 
 --
+-- Name: index_verified_notifications_on_users_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_verified_notifications_on_users_id ON public.verified_notifications USING btree (users_id);
+
+
+--
+-- Name: tmp; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX tmp ON public.subscribed_geo_locations USING btree (detailed_geo_location_alias_id);
+
+
+--
 -- Name: primer_sets fk_rails_06b1f0d34e; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.primer_sets
     ADD CONSTRAINT fk_rails_06b1f0d34e FOREIGN KEY (amplification_method_id) REFERENCES public.amplification_methods(id);
-
-
---
--- Name: subscribed_geo_locations fk_rails_089a2b4533; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.subscribed_geo_locations
-    ADD CONSTRAINT fk_rails_089a2b4533 FOREIGN KEY (detailed_geo_locations_id) REFERENCES public.detailed_geo_locations(id);
 
 
 --
@@ -1272,11 +1488,27 @@ ALTER TABLE ONLY public.user_roles
 
 
 --
+-- Name: proposed_notifications fk_rails_32a2a94275; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.proposed_notifications
+    ADD CONSTRAINT fk_rails_32a2a94275 FOREIGN KEY (primer_sets_id) REFERENCES public.primer_sets(id);
+
+
+--
 -- Name: user_roles fk_rails_3369e0d5fc; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.user_roles
     ADD CONSTRAINT fk_rails_3369e0d5fc FOREIGN KEY (role_id) REFERENCES public.roles(id);
+
+
+--
+-- Name: proposed_notifications fk_rails_39f3a62e67; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.proposed_notifications
+    ADD CONSTRAINT fk_rails_39f3a62e67 FOREIGN KEY (oligos_id) REFERENCES public.oligos(id);
 
 
 --
@@ -1296,11 +1528,35 @@ ALTER TABLE ONLY public.oligos
 
 
 --
+-- Name: location_alias_join fk_rails_61222fa2c3; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.location_alias_join
+    ADD CONSTRAINT fk_rails_61222fa2c3 FOREIGN KEY (detailed_geo_locations_id) REFERENCES public.detailed_geo_locations(id);
+
+
+--
 -- Name: genomic_features fk_rails_65e85371d4; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.genomic_features
     ADD CONSTRAINT fk_rails_65e85371d4 FOREIGN KEY (organism_id) REFERENCES public.organisms(id);
+
+
+--
+-- Name: verified_notifications fk_rails_660c55653c; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.verified_notifications
+    ADD CONSTRAINT fk_rails_660c55653c FOREIGN KEY (users_id) REFERENCES public.users(id);
+
+
+--
+-- Name: proposed_notifications fk_rails_736e9d2781; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.proposed_notifications
+    ADD CONSTRAINT fk_rails_736e9d2781 FOREIGN KEY (verified_notifications_id) REFERENCES public.verified_notifications(id);
 
 
 --
@@ -1312,19 +1568,19 @@ ALTER TABLE ONLY public.subscribed_geo_locations
 
 
 --
+-- Name: subscribed_geo_locations fk_rails_7c2744b62d; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.subscribed_geo_locations
+    ADD CONSTRAINT fk_rails_7c2744b62d FOREIGN KEY (detailed_geo_location_alias_id) REFERENCES public.detailed_geo_location_aliases(id);
+
+
+--
 -- Name: fasta_records fk_rails_82e2588d91; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.fasta_records
     ADD CONSTRAINT fk_rails_82e2588d91 FOREIGN KEY (detailed_geo_location_id) REFERENCES public.detailed_geo_locations(id);
-
-
---
--- Name: fasta_records fk_rails_8783be51d9; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.fasta_records
-    ADD CONSTRAINT fk_rails_8783be51d9 FOREIGN KEY (geo_location_id) REFERENCES public.geo_locations(id);
 
 
 --
@@ -1352,19 +1608,19 @@ ALTER TABLE ONLY public.blast_hits
 
 
 --
+-- Name: location_alias_join fk_rails_dff9f9948c; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.location_alias_join
+    ADD CONSTRAINT fk_rails_dff9f9948c FOREIGN KEY (detailed_geo_location_aliases_id) REFERENCES public.detailed_geo_location_aliases(id);
+
+
+--
 -- Name: primer_set_subscriptions fk_rails_e7701775d5; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.primer_set_subscriptions
     ADD CONSTRAINT fk_rails_e7701775d5 FOREIGN KEY (user_id) REFERENCES public.users(id);
-
-
---
--- Name: subscribed_geo_locations fk_rails_f25dffce7e; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.subscribed_geo_locations
-    ADD CONSTRAINT fk_rails_f25dffce7e FOREIGN KEY (geo_location_id) REFERENCES public.geo_locations(id);
 
 
 --
@@ -1421,6 +1677,13 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20210224163709'),
 ('20210224192126'),
 ('20210225212556'),
-('20210225225243');
+('20210225225243'),
+('20210226173653'),
+('20210226174141'),
+('20210226200532'),
+('20210226202745'),
+('20210226203437'),
+('20210226204550'),
+('20210226205517');
 
 
