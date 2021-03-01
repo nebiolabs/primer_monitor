@@ -26,7 +26,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -43,10 +43,10 @@
      inkscape:window-height="852"
      id="namedview3464"
      showgrid="false"
-     inkscape:zoom="0.412"
+     inkscape:zoom="1.6290957"
      inkscape:cx="168.68932"
      inkscape:cy="194.04855"
-     inkscape:window-x="0"
+     inkscape:window-x="1602"
      inkscape:window-y="23"
      inkscape:window-maximized="0"
      inkscape:current-layer="g3460"
@@ -10194,7 +10194,7 @@
          y="0"
          style="stroke:none"
          clip-path="url(#clipPath159)"
-         id="text2656">NEB Luna qPCR E2019</text>
+         id="text2656">NEB LAMP E2019</text>
     </g>
     <g
        style="font-size:11px;font-family:'Open Sans';text-rendering:geometricPrecision"
@@ -10207,7 +10207,7 @@
          y="0"
          style="stroke:none"
          clip-path="url(#clipPath160)"
-         id="text2660">NEB LAMP E3019</text>
+         id="text2660">NEB Luna qPCR E3019</text>
     </g>
     <g
        style="font-size:11px;font-family:'Open Sans';text-rendering:geometricPrecision"
