@@ -79,7 +79,7 @@
 
   <div class="field is-horizontal">
     <div class="field-label">
-      <%= f.label "Email variant updates (when this feature is completed)" %>
+      <%= f.label "Email variant updates (feature under active development)" %>
     </div>
     <div class="control field-body">
       <%= f.check_box :send_primer_updates %>
@@ -92,11 +92,6 @@
     </div>
     <div class="control field-body">
       Geolocation selection is not yet available, we'll send a notification to subscribed users when it is stable.
-<!--      <%= f.collection_select :geo_location_ids,-->
-<!--                              GeoLocation.all, :id, :to_s,-->
-<!--                              { allow_blank: 'None', prompt: 'Select Geographic Location' },-->
-<!--                              { class: 'wide-select2', multiple: 'multiple', enable }-->
-      %>
     </div>
   </div>
   <div class="field is-horizontal">
