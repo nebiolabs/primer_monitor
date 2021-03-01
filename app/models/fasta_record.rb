@@ -35,10 +35,12 @@ class FastaRecord < ApplicationRecord
 
     # The geo location record needs to exist before the fasta record does
     unless DetailedGeoLocation.exists?(region: region, subregion: country, division: division, subdivision: location)
-      DetailedGeoLocation.new(world: 'World', region: region, subregion: country, division: division, subdivision: location).save!
+      DetailedGeoLocation.new(world: 'World', region: region, subregion: country, division: division,
+                              subdivision: location).save!
     end
 
-    detailed_geo_location_id = DetailedGeoLocation.find_by(region: region, subregion: country, division: division, subdivision: location).id
+    detailed_geo_location_id = DetailedGeoLocation.find_by(region: region, subregion: country, division: division,
+                                                           subdivision: location).id
 
     FastaRecord.new(strain: strain, gisaid_epi_isl: gisaid_epi_isl,
                     genbank_accession: genbank_accession, detailed_geo_location_id: detailed_geo_location_id,

@@ -7,4 +7,3 @@ class DetailedGeoLocation < ApplicationRecord
     "#{region}/#{subregion}/#{division}/#{subdivision}"
   end
 end
-  
