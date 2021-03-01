@@ -474,11 +474,11 @@ CREATE MATERIALIZED VIEW public.oligo_variant_overlaps AS
      JOIN region_count ON (((region_count.region)::text = (big_query.region)::text)))
      JOIN region_subregion_count ON ((((region_subregion_count.region)::text = (big_query.region)::text) AND ((region_subregion_count.subregion)::text = (big_query.subregion)::text))))
      JOIN region_subregion_division_count ON ((((region_subregion_division_count.region)::text = (big_query.region)::text) AND ((region_subregion_division_count.subregion)::text = (big_query.subregion)::text) AND ((region_subregion_division_count.division)::text = (big_query.division)::text))))
-     JOIN region_subregion_division_subdivision_count ON ((((region_subregion_division_subdivision_count.region)::text = (big_query.region)::text) AND ((region_subregion_division_subdivision_count.subregion)::text = (big_query.subregion)::text) AND ((region_subregion_division_subdivision_count.division)::text = (big_query.division)::text) AND ((region_subregion_division_subdivision_count.subdivision)::text = (big_query.division)::text))))
+     JOIN region_subregion_division_subdivision_count ON ((((region_subregion_division_subdivision_count.region)::text = (big_query.region)::text) AND ((region_subregion_division_subdivision_count.subregion)::text = (big_query.subregion)::text) AND ((region_subregion_division_subdivision_count.division)::text = (big_query.division)::text) AND ((region_subregion_division_subdivision_count.subdivision)::text = (big_query.subdivision)::text))))
      JOIN region_time_count ON ((((region_time_count.region)::text = (big_query.region)::text) AND (region_time_count.date_collected = big_query.date_collected))))
      JOIN region_subregion_time_count ON ((((region_subregion_time_count.region)::text = (big_query.region)::text) AND ((region_subregion_time_count.subregion)::text = (big_query.subregion)::text) AND (region_subregion_time_count.date_collected = big_query.date_collected))))
      JOIN region_subregion_division_time_count ON ((((region_subregion_division_time_count.region)::text = (big_query.region)::text) AND ((region_subregion_division_time_count.subregion)::text = (big_query.subregion)::text) AND ((region_subregion_division_time_count.division)::text = (big_query.division)::text) AND (region_subregion_division_time_count.date_collected = big_query.date_collected))))
-     JOIN region_subregion_division_subdivision_time_count ON ((((region_subregion_division_subdivision_time_count.region)::text = (big_query.region)::text) AND ((region_subregion_division_subdivision_time_count.subregion)::text = (big_query.subregion)::text) AND ((region_subregion_division_subdivision_time_count.division)::text = (big_query.division)::text) AND ((region_subregion_division_subdivision_time_count.subdivision)::text = (big_query.division)::text) AND (region_subregion_division_subdivision_time_count.date_collected = big_query.date_collected))))
+     JOIN region_subregion_division_subdivision_time_count ON ((((region_subregion_division_subdivision_time_count.region)::text = (big_query.region)::text) AND ((region_subregion_division_subdivision_time_count.subregion)::text = (big_query.subregion)::text) AND ((region_subregion_division_subdivision_time_count.division)::text = (big_query.division)::text) AND ((region_subregion_division_subdivision_time_count.subdivision)::text = (big_query.subdivision)::text) AND (region_subregion_division_subdivision_time_count.date_collected = big_query.date_collected))))
 UNION ALL
  SELECT insert_query.oligo_id,
     insert_query.oligo_name,
@@ -509,11 +509,11 @@ UNION ALL
      JOIN region_count ON (((region_count.region)::text = (insert_query.region)::text)))
      JOIN region_subregion_count ON ((((region_subregion_count.region)::text = (insert_query.region)::text) AND ((region_subregion_count.subregion)::text = (insert_query.subregion)::text))))
      JOIN region_subregion_division_count ON ((((region_subregion_division_count.region)::text = (insert_query.region)::text) AND ((region_subregion_division_count.subregion)::text = (insert_query.subregion)::text) AND ((region_subregion_division_count.division)::text = (insert_query.division)::text))))
-     JOIN region_subregion_division_subdivision_count ON ((((region_subregion_division_subdivision_count.region)::text = (insert_query.region)::text) AND ((region_subregion_division_subdivision_count.subregion)::text = (insert_query.subregion)::text) AND ((region_subregion_division_subdivision_count.division)::text = (insert_query.division)::text) AND ((region_subregion_division_subdivision_count.subdivision)::text = (insert_query.division)::text))))
+     JOIN region_subregion_division_subdivision_count ON ((((region_subregion_division_subdivision_count.region)::text = (insert_query.region)::text) AND ((region_subregion_division_subdivision_count.subregion)::text = (insert_query.subregion)::text) AND ((region_subregion_division_subdivision_count.division)::text = (insert_query.division)::text) AND ((region_subregion_division_subdivision_count.subdivision)::text = (insert_query.subdivision)::text))))
      JOIN region_time_count ON ((((region_time_count.region)::text = (insert_query.region)::text) AND (region_time_count.date_collected = insert_query.date_collected))))
      JOIN region_subregion_time_count ON ((((region_subregion_time_count.region)::text = (insert_query.region)::text) AND ((region_subregion_time_count.subregion)::text = (insert_query.subregion)::text) AND (region_subregion_time_count.date_collected = insert_query.date_collected))))
      JOIN region_subregion_division_time_count ON ((((region_subregion_division_time_count.region)::text = (insert_query.region)::text) AND ((region_subregion_division_time_count.subregion)::text = (insert_query.subregion)::text) AND ((region_subregion_division_time_count.division)::text = (insert_query.division)::text) AND (region_subregion_division_time_count.date_collected = insert_query.date_collected))))
-     JOIN region_subregion_division_subdivision_time_count ON ((((region_subregion_division_subdivision_time_count.region)::text = (insert_query.region)::text) AND ((region_subregion_division_subdivision_time_count.subregion)::text = (insert_query.subregion)::text) AND ((region_subregion_division_subdivision_time_count.division)::text = (insert_query.division)::text) AND ((region_subregion_division_subdivision_time_count.subdivision)::text = (insert_query.division)::text) AND (region_subregion_division_subdivision_time_count.date_collected = insert_query.date_collected))))
+     JOIN region_subregion_division_subdivision_time_count ON ((((region_subregion_division_subdivision_time_count.region)::text = (insert_query.region)::text) AND ((region_subregion_division_subdivision_time_count.subregion)::text = (insert_query.subregion)::text) AND ((region_subregion_division_subdivision_time_count.division)::text = (insert_query.division)::text) AND ((region_subregion_division_subdivision_time_count.subdivision)::text = (insert_query.subdivision)::text) AND (region_subregion_division_subdivision_time_count.date_collected = insert_query.date_collected))))
   WITH NO DATA;
 
 
@@ -1685,6 +1685,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20210226203437'),
 ('20210226204550'),
 ('20210226205517'),
-('20210301143130');
+('20210301143130'),
+('20210301181827');
 
 
