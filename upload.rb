@@ -112,6 +112,7 @@ def main
     import_metadata(opts[:metadata_tsv])
     import_variants(opts[:variants_tsv])
     ActiveRecord::Base.connection.execute('REFRESH MATERIALIZED VIEW oligo_variant_overlaps')
+    ActiveRecord::Base.connection.execute('REFRESH MATERIALIZED VIEW identify_primers_for_notification')
   end
 end
 main if $PROGRAM_NAME.end_with?('upload.rb')
