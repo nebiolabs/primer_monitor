@@ -109,6 +109,10 @@ def find_new_notifications()
   ProposedNotification.import(new_proposed_notifications, validate: false)
 end
 
+def group_notifications()
+  VerifiedNotification.group_notifications()
+end
+
 def main
   opts = parse_options
   # @log.level = Logger.const_get(opts[:verbose])
@@ -122,6 +126,7 @@ def main
     ActiveRecord::Base.connection.execute('REFRESH MATERIALIZED VIEW identify_primers_for_notification')
 
     find_new_notifications()
+    group_notifications()
 
   end
 end
