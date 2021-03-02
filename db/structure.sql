@@ -606,18 +606,20 @@ CREATE MATERIALIZED VIEW public.identify_primers_for_notification AS
             users.lookback_days,
             users.variant_fraction_threshold,
             oligo_variant_overlaps.region,
+            oligo_variant_overlaps.subregion,
             oligo_variant_overlaps.division,
+            oligo_variant_overlaps.subdivision,
             oligo_variant_overlaps.detailed_geo_location_id AS unused_id,
             oligo_variant_overlaps.coords,
             count(oligo_variant_overlaps.variant_id) AS variant_count
            FROM (((((public.primer_set_subscriptions
              JOIN public.primer_sets ON ((primer_sets.id = primer_set_subscriptions.primer_set_id)))
-             JOIN public.join_subscribed_location_to_id ON ((join_subscribed_location_to_id.user_id = primer_set_subscriptions.user_id)))
              JOIN public.oligos ON ((primer_sets.id = oligos.primer_set_id)))
              JOIN public.oligo_variant_overlaps ON ((oligo_variant_overlaps.oligo_id = oligos.id)))
+             JOIN public.join_subscribed_location_to_id ON (((join_subscribed_location_to_id.user_id = primer_set_subscriptions.user_id) AND (join_subscribed_location_to_id.detailed_geo_location_id = oligo_variant_overlaps.detailed_geo_location_id))))
              JOIN public.users ON ((users.id = primer_set_subscriptions.user_id)))
           WHERE (oligo_variant_overlaps.date_collected >= (CURRENT_DATE - users.lookback_days))
-          GROUP BY primer_set_subscriptions.user_id, primer_set_subscriptions.primer_set_id, primer_sets.name, oligos.name, join_subscribed_location_to_id.detailed_geo_location_id, users.lookback_days, users.variant_fraction_threshold, oligo_variant_overlaps.region, oligo_variant_overlaps.division, oligo_variant_overlaps.coords, oligo_variant_overlaps.detailed_geo_location_id
+          GROUP BY primer_set_subscriptions.user_id, primer_set_subscriptions.primer_set_id, primer_sets.name, oligos.name, join_subscribed_location_to_id.detailed_geo_location_id, users.lookback_days, users.variant_fraction_threshold, oligo_variant_overlaps.region, oligo_variant_overlaps.subregion, oligo_variant_overlaps.division, oligo_variant_overlaps.subdivision, oligo_variant_overlaps.coords, oligo_variant_overlaps.detailed_geo_location_id
         ), second_query AS (
          SELECT fasta_records.detailed_geo_location_id,
             count(fasta_records.id) AS records_count,
@@ -634,7 +636,9 @@ CREATE MATERIALIZED VIEW public.identify_primers_for_notification AS
     first_query.set_name,
     first_query.primer_name,
     first_query.region,
+    first_query.subregion,
     first_query.division,
+    first_query.subdivision,
     first_query.coords,
     first_query.variant_count,
     first_query.variant_fraction_threshold,
@@ -1686,6 +1690,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20210226204550'),
 ('20210226205517'),
 ('20210301143130'),
-('20210301181827');
+('20210301181827'),
+('20210302184915');
 
 
