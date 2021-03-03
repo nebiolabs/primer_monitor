@@ -279,10 +279,10 @@ CREATE TABLE public.subscribed_geo_locations (
 
 
 --
--- Name: join_subscribed_location_to_id; Type: VIEW; Schema: public; Owner: -
+-- Name: join_subscribed_location_to_ids; Type: VIEW; Schema: public; Owner: -
 --
 
-CREATE VIEW public.join_subscribed_location_to_id AS
+CREATE VIEW public.join_subscribed_location_to_ids AS
  WITH subscribed_ids AS (
          SELECT subscribed_geo_locations.user_id,
             detailed_geo_location_aliases.region,
@@ -593,14 +593,14 @@ CREATE TABLE public.users (
 
 
 --
--- Name: identify_primers_for_notification; Type: MATERIALIZED VIEW; Schema: public; Owner: -
+-- Name: identify_primers_for_notifications; Type: MATERIALIZED VIEW; Schema: public; Owner: -
 --
 
-CREATE MATERIALIZED VIEW public.identify_primers_for_notification AS
+CREATE MATERIALIZED VIEW public.identify_primers_for_notifications AS
  WITH first_query AS (
          SELECT primer_set_subscriptions.user_id,
             primer_set_subscriptions.primer_set_id,
-            join_subscribed_location_to_id.detailed_geo_location_id,
+            join_subscribed_location_to_ids.detailed_geo_location_id,
             primer_sets.name AS set_name,
             oligos.name AS primer_name,
             users.lookback_days,
@@ -616,17 +616,17 @@ CREATE MATERIALIZED VIEW public.identify_primers_for_notification AS
              JOIN public.primer_sets ON ((primer_sets.id = primer_set_subscriptions.primer_set_id)))
              JOIN public.oligos ON ((primer_sets.id = oligos.primer_set_id)))
              JOIN public.oligo_variant_overlaps ON ((oligo_variant_overlaps.oligo_id = oligos.id)))
-             JOIN public.join_subscribed_location_to_id ON (((join_subscribed_location_to_id.user_id = primer_set_subscriptions.user_id) AND (join_subscribed_location_to_id.detailed_geo_location_id = oligo_variant_overlaps.detailed_geo_location_id))))
+             JOIN public.join_subscribed_location_to_ids ON (((join_subscribed_location_to_ids.user_id = primer_set_subscriptions.user_id) AND (join_subscribed_location_to_ids.detailed_geo_location_id = oligo_variant_overlaps.detailed_geo_location_id))))
              JOIN public.users ON ((users.id = primer_set_subscriptions.user_id)))
           WHERE (oligo_variant_overlaps.date_collected >= (CURRENT_DATE - users.lookback_days))
-          GROUP BY primer_set_subscriptions.user_id, primer_set_subscriptions.primer_set_id, primer_sets.name, oligos.name, join_subscribed_location_to_id.detailed_geo_location_id, users.lookback_days, users.variant_fraction_threshold, oligo_variant_overlaps.region, oligo_variant_overlaps.subregion, oligo_variant_overlaps.division, oligo_variant_overlaps.subdivision, oligo_variant_overlaps.coords, oligo_variant_overlaps.detailed_geo_location_id
+          GROUP BY primer_set_subscriptions.user_id, primer_set_subscriptions.primer_set_id, primer_sets.name, oligos.name, join_subscribed_location_to_ids.detailed_geo_location_id, users.lookback_days, users.variant_fraction_threshold, oligo_variant_overlaps.region, oligo_variant_overlaps.subregion, oligo_variant_overlaps.division, oligo_variant_overlaps.subdivision, oligo_variant_overlaps.coords, oligo_variant_overlaps.detailed_geo_location_id
         ), second_query AS (
          SELECT fasta_records.detailed_geo_location_id,
             count(fasta_records.id) AS records_count,
             users.lookback_days
            FROM ((public.fasta_records
-             JOIN public.join_subscribed_location_to_id ON ((join_subscribed_location_to_id.detailed_geo_location_id = fasta_records.detailed_geo_location_id)))
-             JOIN public.users ON ((join_subscribed_location_to_id.user_id = users.id)))
+             JOIN public.join_subscribed_location_to_ids ON ((join_subscribed_location_to_ids.detailed_geo_location_id = fasta_records.detailed_geo_location_id)))
+             JOIN public.users ON ((join_subscribed_location_to_ids.user_id = users.id)))
           WHERE (fasta_records.date_collected >= (CURRENT_DATE - users.lookback_days))
           GROUP BY fasta_records.detailed_geo_location_id, users.lookback_days
          HAVING (count(fasta_records.id) >= 20)
@@ -652,23 +652,23 @@ CREATE MATERIALIZED VIEW public.identify_primers_for_notification AS
 
 
 --
--- Name: location_alias_join; Type: TABLE; Schema: public; Owner: -
+-- Name: location_alias_joins; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE public.location_alias_join (
+CREATE TABLE public.location_alias_joins (
     id bigint NOT NULL,
-    detailed_geo_locations_id bigint,
-    detailed_geo_location_aliases_id bigint,
+    detailed_geo_location_id bigint,
+    detailed_geo_location_alias_id bigint,
     created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL
 );
 
 
 --
--- Name: location_alias_join_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: location_alias_joins_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE public.location_alias_join_id_seq
+CREATE SEQUENCE public.location_alias_joins_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -677,10 +677,10 @@ CREATE SEQUENCE public.location_alias_join_id_seq
 
 
 --
--- Name: location_alias_join_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+-- Name: location_alias_joins_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE public.location_alias_join_id_seq OWNED BY public.location_alias_join.id;
+ALTER SEQUENCE public.location_alias_joins_id_seq OWNED BY public.location_alias_joins.id;
 
 
 --
@@ -779,9 +779,9 @@ ALTER SEQUENCE public.primer_sets_id_seq OWNED BY public.primer_sets.id;
 
 CREATE TABLE public.proposed_notifications (
     id bigint NOT NULL,
-    primer_sets_id bigint,
-    oligos_id bigint,
-    verified_notifications_id bigint,
+    primer_set_id bigint,
+    oligo_id bigint,
+    verified_notification_id bigint,
     coordinate integer,
     fraction_variant double precision,
     created_at timestamp(6) without time zone NOT NULL,
@@ -943,7 +943,7 @@ ALTER SEQUENCE public.variant_sites_id_seq OWNED BY public.variant_sites.id;
 
 CREATE TABLE public.verified_notifications (
     id bigint NOT NULL,
-    users_id bigint,
+    user_id bigint,
     date_sent date,
     status character varying,
     created_at timestamp(6) without time zone NOT NULL,
@@ -1013,10 +1013,10 @@ ALTER TABLE ONLY public.genomic_features ALTER COLUMN id SET DEFAULT nextval('pu
 
 
 --
--- Name: location_alias_join id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: location_alias_joins id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.location_alias_join ALTER COLUMN id SET DEFAULT nextval('public.location_alias_join_id_seq'::regclass);
+ALTER TABLE ONLY public.location_alias_joins ALTER COLUMN id SET DEFAULT nextval('public.location_alias_joins_id_seq'::regclass);
 
 
 --
@@ -1153,11 +1153,11 @@ ALTER TABLE ONLY public.genomic_features
 
 
 --
--- Name: location_alias_join location_alias_join_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: location_alias_joins location_alias_joins_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.location_alias_join
-    ADD CONSTRAINT location_alias_join_pkey PRIMARY KEY (id);
+ALTER TABLE ONLY public.location_alias_joins
+    ADD CONSTRAINT location_alias_joins_pkey PRIMARY KEY (id);
 
 
 --
@@ -1267,7 +1267,7 @@ CREATE UNIQUE INDEX alias_full_record ON public.detailed_geo_location_aliases US
 -- Name: alias_join_index; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE UNIQUE INDEX alias_join_index ON public.location_alias_join USING btree (detailed_geo_locations_id);
+CREATE UNIQUE INDEX alias_join_index ON public.location_alias_joins USING btree (detailed_geo_location_id);
 
 
 --
@@ -1313,10 +1313,10 @@ CREATE INDEX index_genomic_features_on_organism_id ON public.genomic_features US
 
 
 --
--- Name: index_location_alias_join_on_detailed_geo_locations_id; Type: INDEX; Schema: public; Owner: -
+-- Name: index_location_alias_joins_on_detailed_geo_location_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_location_alias_join_on_detailed_geo_locations_id ON public.location_alias_join USING btree (detailed_geo_locations_id);
+CREATE INDEX index_location_alias_joins_on_detailed_geo_location_id ON public.location_alias_joins USING btree (detailed_geo_location_id);
 
 
 --
@@ -1362,24 +1362,24 @@ CREATE INDEX index_primer_sets_on_user_id ON public.primer_sets USING btree (use
 
 
 --
--- Name: index_proposed_notifications_on_oligos_id; Type: INDEX; Schema: public; Owner: -
+-- Name: index_proposed_notifications_on_oligo_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_proposed_notifications_on_oligos_id ON public.proposed_notifications USING btree (oligos_id);
-
-
---
--- Name: index_proposed_notifications_on_primer_sets_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_proposed_notifications_on_primer_sets_id ON public.proposed_notifications USING btree (primer_sets_id);
+CREATE INDEX index_proposed_notifications_on_oligo_id ON public.proposed_notifications USING btree (oligo_id);
 
 
 --
--- Name: index_proposed_notifications_on_verified_notifications_id; Type: INDEX; Schema: public; Owner: -
+-- Name: index_proposed_notifications_on_primer_set_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_proposed_notifications_on_verified_notifications_id ON public.proposed_notifications USING btree (verified_notifications_id);
+CREATE INDEX index_proposed_notifications_on_primer_set_id ON public.proposed_notifications USING btree (primer_set_id);
+
+
+--
+-- Name: index_proposed_notifications_on_verified_notification_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_proposed_notifications_on_verified_notification_id ON public.proposed_notifications USING btree (verified_notification_id);
 
 
 --
@@ -1446,10 +1446,10 @@ CREATE INDEX index_variant_sites_on_fasta_record_id ON public.variant_sites USIN
 
 
 --
--- Name: index_verified_notifications_on_users_id; Type: INDEX; Schema: public; Owner: -
+-- Name: index_verified_notifications_on_user_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_verified_notifications_on_users_id ON public.verified_notifications USING btree (users_id);
+CREATE INDEX index_verified_notifications_on_user_id ON public.verified_notifications USING btree (user_id);
 
 
 --
@@ -1496,7 +1496,7 @@ ALTER TABLE ONLY public.user_roles
 --
 
 ALTER TABLE ONLY public.proposed_notifications
-    ADD CONSTRAINT fk_rails_32a2a94275 FOREIGN KEY (primer_sets_id) REFERENCES public.primer_sets(id);
+    ADD CONSTRAINT fk_rails_32a2a94275 FOREIGN KEY (primer_set_id) REFERENCES public.primer_sets(id);
 
 
 --
@@ -1512,7 +1512,7 @@ ALTER TABLE ONLY public.user_roles
 --
 
 ALTER TABLE ONLY public.proposed_notifications
-    ADD CONSTRAINT fk_rails_39f3a62e67 FOREIGN KEY (oligos_id) REFERENCES public.oligos(id);
+    ADD CONSTRAINT fk_rails_39f3a62e67 FOREIGN KEY (oligo_id) REFERENCES public.oligos(id);
 
 
 --
@@ -1532,11 +1532,11 @@ ALTER TABLE ONLY public.oligos
 
 
 --
--- Name: location_alias_join fk_rails_61222fa2c3; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: location_alias_joins fk_rails_61222fa2c3; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.location_alias_join
-    ADD CONSTRAINT fk_rails_61222fa2c3 FOREIGN KEY (detailed_geo_locations_id) REFERENCES public.detailed_geo_locations(id);
+ALTER TABLE ONLY public.location_alias_joins
+    ADD CONSTRAINT fk_rails_61222fa2c3 FOREIGN KEY (detailed_geo_location_id) REFERENCES public.detailed_geo_locations(id);
 
 
 --
@@ -1552,7 +1552,7 @@ ALTER TABLE ONLY public.genomic_features
 --
 
 ALTER TABLE ONLY public.verified_notifications
-    ADD CONSTRAINT fk_rails_660c55653c FOREIGN KEY (users_id) REFERENCES public.users(id);
+    ADD CONSTRAINT fk_rails_660c55653c FOREIGN KEY (user_id) REFERENCES public.users(id);
 
 
 --
@@ -1560,7 +1560,7 @@ ALTER TABLE ONLY public.verified_notifications
 --
 
 ALTER TABLE ONLY public.proposed_notifications
-    ADD CONSTRAINT fk_rails_736e9d2781 FOREIGN KEY (verified_notifications_id) REFERENCES public.verified_notifications(id);
+    ADD CONSTRAINT fk_rails_736e9d2781 FOREIGN KEY (verified_notification_id) REFERENCES public.verified_notifications(id);
 
 
 --
@@ -1612,11 +1612,11 @@ ALTER TABLE ONLY public.blast_hits
 
 
 --
--- Name: location_alias_join fk_rails_dff9f9948c; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: location_alias_joins fk_rails_dff9f9948c; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.location_alias_join
-    ADD CONSTRAINT fk_rails_dff9f9948c FOREIGN KEY (detailed_geo_location_aliases_id) REFERENCES public.detailed_geo_location_aliases(id);
+ALTER TABLE ONLY public.location_alias_joins
+    ADD CONSTRAINT fk_rails_dff9f9948c FOREIGN KEY (detailed_geo_location_alias_id) REFERENCES public.detailed_geo_location_aliases(id);
 
 
 --
@@ -1691,6 +1691,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20210226205517'),
 ('20210301143130'),
 ('20210301181827'),
-('20210302184915');
+('20210302184915'),
+('20210303180741');
 
 
