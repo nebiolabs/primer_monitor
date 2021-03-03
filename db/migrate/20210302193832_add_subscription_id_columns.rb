@@ -5,7 +5,7 @@ class AddSubscriptionIdColumns < ActiveRecord::Migration[6.1]
     change_column_null :proposed_notifications, :coordinate, false
     change_column_null :proposed_notifications, :fraction_variant, false
 
-    add_reference :proposed_notifications, :subscribed_geo_locations, null: false, foreign_key: true
-    add_reference :proposed_notifications, :primer_set_subscriptions, null: false, foreign_key: true
+    add_reference :proposed_notifications, :subscribed_geo_location, null: false, foreign_key: true
+    add_reference :proposed_notifications, :primer_set_subscription, null: false, foreign_key: true
   end
 end
