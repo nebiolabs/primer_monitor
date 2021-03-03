@@ -7,20 +7,21 @@ class ProposedNotification < ApplicationRecord
   belongs_to :primer_set_subscription
   belongs_to :subscribed_geo_location
   
-  def new_proposed_notifications()
+  def self.new_proposed_notifications()
 
     potential_notifications = []
 
-    IdentifyPrimersForNotification.find_each do |record|
-      oligos_id = Oligo.find_by(name: record.name, primer_set_id: record.primer_set_id).id
+    IdentifyPrimersForNotification.all.each do |record|
 
-      subscribed_alias = LocationAliasJoin.find_by(user_id: record.user_id, detailed_geo_location_id: record.detailed_geo_location_id)
+      oligo_id = Oligo.find_by(name: record.primer_name, primer_set_id: record.primer_set_id).id
+
+      subscribed_alias = JoinSubscribedLocationToID.find_by(user_id: record.user_id, detailed_geo_location_id: record.detailed_geo_location_id)
       subscribed_geo_locations_id = SubscribedGeoLocation.find_by(user_id: record.user_id,
-                                                                  detailed_geo_location_alias_id: subscribed_alias.detailed_geo_location_id).id
+                                                                  detailed_geo_location_alias_id: subscribed_alias.detailed_geo_location_alias_id).id
 
       primer_set_subscriptions_id = PrimerSetSubscription.find_by(user_id: record.user_id, primer_set_id: record.primer_set_id).id
 
-      return if ProposedNotification.exists?(primer_sets_id: record.primer_set_id, users_id: record.user_id, oligos_id: oligos_id,
+      return if ProposedNotification.exists?(primer_set_id: record.primer_set_id, user_id: record.user_id, oligo_id: oligo_id,
                                              coordinate: record.coords, subscribed_geo_locations_id: subscribed_geo_locations_id, 
                                              primer_set_subscriptions_id: primer_set_subscriptions_id)
 
@@ -32,5 +33,6 @@ class ProposedNotification < ApplicationRecord
     end
     
     potential_notifications  
+  end
 end
   
