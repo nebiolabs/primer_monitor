@@ -788,8 +788,9 @@ CREATE TABLE public.proposed_notifications (
     fraction_variant double precision NOT NULL,
     created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL,
-    subscribed_geo_location_id bigint NOT NULL,
-    primer_set_subscription_id bigint NOT NULL
+    subscribed_geo_locations_id bigint NOT NULL,
+    primer_set_subscriptions_id bigint NOT NULL,
+    user_id bigint NOT NULL
 );
 
 
@@ -1377,10 +1378,6 @@ CREATE INDEX index_proposed_notifications_on_oligo_id ON public.proposed_notific
 --
 
 CREATE INDEX index_proposed_notifications_on_primer_set_id ON public.proposed_notifications USING btree (primer_set_id);
--- Name: index_proposed_notifications_on_primer_set_subscription_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_proposed_notifications_on_primer_set_subscription_id ON public.proposed_notifications USING btree (primer_set_subscription_id);
 
 
 --
@@ -1391,10 +1388,17 @@ CREATE INDEX index_proposed_notifications_on_primer_set_subscriptions_id ON publ
 
 
 --
--- Name: index_proposed_notifications_on_subscribed_geo_location_id; Type: INDEX; Schema: public; Owner: -
+-- Name: index_proposed_notifications_on_subscribed_geo_locations_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_proposed_notifications_on_subscribed_geo_location_id ON public.proposed_notifications USING btree (subscribed_geo_location_id);
+CREATE INDEX index_proposed_notifications_on_subscribed_geo_locations_id ON public.proposed_notifications USING btree (subscribed_geo_locations_id);
+
+
+--
+-- Name: index_proposed_notifications_on_user_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_proposed_notifications_on_user_id ON public.proposed_notifications USING btree (user_id);
 
 
 --
@@ -1482,14 +1486,6 @@ CREATE INDEX tmp ON public.subscribed_geo_locations USING btree (detailed_geo_lo
 
 
 --
--- Name: proposed_notifications fk_rails_03fe9a3c07; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.proposed_notifications
-    ADD CONSTRAINT fk_rails_03fe9a3c07 FOREIGN KEY (subscribed_geo_location_id) REFERENCES public.subscribed_geo_locations(id);
-
-
---
 -- Name: primer_sets fk_rails_06b1f0d34e; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -1498,11 +1494,27 @@ ALTER TABLE ONLY public.primer_sets
 
 
 --
+-- Name: proposed_notifications fk_rails_07a5b05038; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.proposed_notifications
+    ADD CONSTRAINT fk_rails_07a5b05038 FOREIGN KEY (primer_set_subscriptions_id) REFERENCES public.primer_set_subscriptions(id);
+
+
+--
 -- Name: blast_hits fk_rails_1f04a34db0; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.blast_hits
     ADD CONSTRAINT fk_rails_1f04a34db0 FOREIGN KEY (organism_id) REFERENCES public.organisms(id);
+
+
+--
+-- Name: proposed_notifications fk_rails_2a8ee0a24b; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.proposed_notifications
+    ADD CONSTRAINT fk_rails_2a8ee0a24b FOREIGN KEY (subscribed_geo_locations_id) REFERENCES public.subscribed_geo_locations(id);
 
 
 --
@@ -1642,6 +1654,14 @@ ALTER TABLE ONLY public.blast_hits
 
 
 --
+-- Name: proposed_notifications fk_rails_bfe6da46a3; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.proposed_notifications
+    ADD CONSTRAINT fk_rails_bfe6da46a3 FOREIGN KEY (user_id) REFERENCES public.users(id);
+
+
+--
 -- Name: location_alias_joins fk_rails_dff9f9948c; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -1655,14 +1675,6 @@ ALTER TABLE ONLY public.location_alias_joins
 
 ALTER TABLE ONLY public.primer_set_subscriptions
     ADD CONSTRAINT fk_rails_e7701775d5 FOREIGN KEY (user_id) REFERENCES public.users(id);
-
-
---
--- Name: proposed_notifications fk_rails_f9871ce32b; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.proposed_notifications
-    ADD CONSTRAINT fk_rails_f9871ce32b FOREIGN KEY (primer_set_subscription_id) REFERENCES public.primer_set_subscriptions(id);
 
 
 --
@@ -1732,6 +1744,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20210302184915'),
 ('20210302193440'),
 ('20210302193832'),
-('20210303180741');
+('20210303180741'),
+('20210303211641');
 
 
