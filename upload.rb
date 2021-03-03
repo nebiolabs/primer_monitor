@@ -103,6 +103,16 @@ def import_variants(variants_file)
   VariantSite.import(variant_records, validate: false)
 end
 
+def find_new_notifications()
+  new_proposed_notifications = ProposedNotification.new_proposed_notifications()
+  return if new_proposed_notifications.empty? # is this how this works?
+  ProposedNotification.import(new_proposed_notifications, validate: false)
+end
+
+def group_notifications()
+  VerifiedNotification.group_notifications()
+end
+
 def main
   opts = parse_options
   # @log.level = Logger.const_get(opts[:verbose])
@@ -111,8 +121,13 @@ def main
   ActiveRecord::Base.transaction do
     import_metadata(opts[:metadata_tsv])
     import_variants(opts[:variants_tsv])
+
     ActiveRecord::Base.connection.execute('REFRESH MATERIALIZED VIEW oligo_variant_overlaps')
     ActiveRecord::Base.connection.execute('REFRESH MATERIALIZED VIEW identify_primers_for_notification')
+
+    find_new_notifications()
+    group_notifications()
+
   end
 end
 main if $PROGRAM_NAME.end_with?('upload.rb')

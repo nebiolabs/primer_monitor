@@ -285,6 +285,7 @@ CREATE TABLE public.subscribed_geo_locations (
 CREATE VIEW public.join_subscribed_location_to_ids AS
  WITH subscribed_ids AS (
          SELECT subscribed_geo_locations.user_id,
+            subscribed_geo_locations.detailed_geo_location_alias_id,
             detailed_geo_location_aliases.region,
             detailed_geo_location_aliases.subregion,
             detailed_geo_location_aliases.division,
@@ -293,7 +294,8 @@ CREATE VIEW public.join_subscribed_location_to_ids AS
              JOIN public.subscribed_geo_locations ON ((subscribed_geo_locations.detailed_geo_location_alias_id = detailed_geo_location_aliases.id)))
         )
  SELECT subscribed_ids.user_id,
-    detailed_geo_locations.id AS detailed_geo_location_id
+    detailed_geo_locations.id AS detailed_geo_location_id,
+    subscribed_ids.detailed_geo_location_alias_id
    FROM (public.detailed_geo_locations
      JOIN subscribed_ids ON ((((subscribed_ids.region IS NULL) OR ((subscribed_ids.region)::text = (detailed_geo_locations.region)::text)) AND ((subscribed_ids.subregion IS NULL) OR ((subscribed_ids.subregion)::text = (detailed_geo_locations.subregion)::text)) AND ((subscribed_ids.division IS NULL) OR ((subscribed_ids.division)::text = (detailed_geo_locations.division)::text)) AND ((subscribed_ids.subdivision IS NULL) OR ((subscribed_ids.subdivision)::text = (detailed_geo_locations.subdivision)::text)))));
 
@@ -779,13 +781,15 @@ ALTER SEQUENCE public.primer_sets_id_seq OWNED BY public.primer_sets.id;
 
 CREATE TABLE public.proposed_notifications (
     id bigint NOT NULL,
-    primer_set_id bigint,
-    oligo_id bigint,
+    primer_set_id bigint NOT NULL,
+    oligo_id bigint NOT NULL,
     verified_notification_id bigint,
-    coordinate integer,
-    fraction_variant double precision,
+    coordinate integer NOT NULL,
+    fraction_variant double precision NOT NULL,
     created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL
+    updated_at timestamp(6) without time zone NOT NULL,
+    subscribed_geo_location_id bigint NOT NULL,
+    primer_set_subscription_id bigint NOT NULL
 );
 
 
@@ -1373,6 +1377,24 @@ CREATE INDEX index_proposed_notifications_on_oligo_id ON public.proposed_notific
 --
 
 CREATE INDEX index_proposed_notifications_on_primer_set_id ON public.proposed_notifications USING btree (primer_set_id);
+-- Name: index_proposed_notifications_on_primer_set_subscription_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_proposed_notifications_on_primer_set_subscription_id ON public.proposed_notifications USING btree (primer_set_subscription_id);
+
+
+--
+-- Name: index_proposed_notifications_on_primer_set_subscriptions_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_proposed_notifications_on_primer_set_subscriptions_id ON public.proposed_notifications USING btree (primer_set_subscriptions_id);
+
+
+--
+-- Name: index_proposed_notifications_on_subscribed_geo_location_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_proposed_notifications_on_subscribed_geo_location_id ON public.proposed_notifications USING btree (subscribed_geo_location_id);
 
 
 --
@@ -1457,6 +1479,14 @@ CREATE INDEX index_verified_notifications_on_user_id ON public.verified_notifica
 --
 
 CREATE INDEX tmp ON public.subscribed_geo_locations USING btree (detailed_geo_location_alias_id);
+
+
+--
+-- Name: proposed_notifications fk_rails_03fe9a3c07; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.proposed_notifications
+    ADD CONSTRAINT fk_rails_03fe9a3c07 FOREIGN KEY (subscribed_geo_location_id) REFERENCES public.subscribed_geo_locations(id);
 
 
 --
@@ -1628,6 +1658,14 @@ ALTER TABLE ONLY public.primer_set_subscriptions
 
 
 --
+-- Name: proposed_notifications fk_rails_f9871ce32b; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.proposed_notifications
+    ADD CONSTRAINT fk_rails_f9871ce32b FOREIGN KEY (primer_set_subscription_id) REFERENCES public.primer_set_subscriptions(id);
+
+
+--
 -- PostgreSQL database dump complete
 --
 
@@ -1692,6 +1730,8 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20210301143130'),
 ('20210301181827'),
 ('20210302184915'),
+('20210302193440'),
+('20210302193832'),
 ('20210303180741');
 
 
