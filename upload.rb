@@ -27,7 +27,16 @@ require_relative "#{__dir__}/app/models/application_record.rb"
 
 # requires all the model files
 Dir["#{__dir__}/app/models/fasta_record.rb", "#{__dir__}/app/models/variant_site.rb",
-    "#{__dir__}/app/models/detailed_geo_location.rb"].each do |f|
+    "#{__dir__}/app/models/detailed_geo_location.rb",
+    "#{__dir__}/app/models/identify_primers_for_notification.rb",
+    "#{__dir__}/app/models/join_subscribed_location_to_id.rb",
+    "#{__dir__}/app/models/location_alias_join.rb",
+    "#{__dir__}/app/models/primer_set_subscription.rb",
+    "#{__dir__}/app/models/proposed_notification.rb",
+    "#{__dir__}/app/models/subscribed_geo_location.rb",
+    "#{__dir__}/app/models/oligo.rb",
+    "#{__dir__}/app/models/verified_notification.rb"
+    ].each do |f|
   require_relative f
 end
 
@@ -126,7 +135,7 @@ def main
     ActiveRecord::Base.connection.execute('REFRESH MATERIALIZED VIEW identify_primers_for_notification')
 
     find_new_notifications()
-    group_notifications()
+    # group_notifications()
 
   end
 end

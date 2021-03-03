@@ -12,11 +12,11 @@ class VerifiedNotification < ApplicationRecord
         new_notifications = ProposedNotification.find_by(verified_notifications_id: nil).group(:users_id)
                            
         # I think new_notifications is a hash? So this probably isn't the right syntax
-        new_notifications.each do |notification|
-            user_id = notifications.users_id
-            VerifiedNotification.import(users_id: user_id, status: 'Unsent')
-            notification.update(<new_verified_notification_id>)
-        end
+        # new_notifications.each do |notification|
+        #     user_id = notifications.users_id
+        #     VerifiedNotification.import(users_id: user_id, status: 'Unsent')
+        #     notification.update(<new_verified_notification_id>)
+        # end
 
     end
 end
