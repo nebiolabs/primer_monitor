@@ -112,14 +112,15 @@ def import_variants(variants_file)
   VariantSite.import(variant_records, validate: false)
 end
 
-def find_new_notifications()
+def find_new_notifications
   new_proposed_notifications = ProposedNotification.new_proposed_notifications()
   return if new_proposed_notifications.empty?
+
   ProposedNotification.import(new_proposed_notifications, validate: false)
 end
 
-def group_notifications()
-  VerifiedNotification.group_notifications()
+def group_notifications
+  VerifiedNotification.group_notifications
 end
 
 def main
@@ -134,9 +135,8 @@ def main
     ActiveRecord::Base.connection.execute('REFRESH MATERIALIZED VIEW oligo_variant_overlaps')
     ActiveRecord::Base.connection.execute('REFRESH MATERIALIZED VIEW identify_primers_for_notification')
 
-    find_new_notifications()
-    group_notifications()
-
+    find_new_notifications
+    group_notifications
   end
 end
 main if $PROGRAM_NAME.end_with?('upload.rb')
