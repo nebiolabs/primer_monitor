@@ -6,19 +6,22 @@ prev_json = file(params.prev_json).toAbsolutePath()
 
 ncov_path = '/mnt/home/mcampbell/src/ncov-ingest'
 primer_monitor_path = '/mnt/bioinfo/prg/primer_monitor'
+output_path = '/mnt/flash_scratch/seq-shepherd/'
 
 process download_data {
     // Downloads the full dataset
     cpus 1
     conda "curl"
+    publishDir "${output_path}", mode: 'copy', pattern: '*.full_json', overwrite: true
 
     output:
-        file('gisaid.full_json') into downloaded_data
+        file('*.full_json') into downloaded_data
 
     shell:
     '''
+    date_today=$(date +%Y-%m-%d)
     source !{primer_monitor_path}/.env
-    curl -u $GISAID_USER:$GISAID_PASSWORD https://www.epicov.org/epi3/3p/neb/export/provision.json.xz | xz -d -T8 > gisaid.full_json
+    curl -u $GISAID_USER:$GISAID_PASSWORD https://www.epicov.org/epi3/3p/neb/export/provision.json.xz | xz -d -T8 > ${date_today}.full_json
     '''
 
 }
@@ -27,14 +30,12 @@ process filter_data {
     // Keeps only new records added since previous run
     cpus 1
     conda "python=3.9"
-    publishDir "/mnt/flash_scratch/seq-shepherd/", mode: 'copy', pattern: 'gisaid.full_json', overwrite: true
 
     input:
         // file(prev_json) from prev_json_path
         file(full_json) from downloaded_data
     output:
         file('*.json') into filtered_data
-        file('gisaid.full_json')
 
 
     shell:
@@ -42,6 +43,8 @@ process filter_data {
     date_today=$(date +%Y-%m-%d)
 
     python3 !{primer_monitor_path}/lib/filter_duplicates.py !{prev_json} !{full_json} > ${date_today}.json
+
+    rm -f $(date --date="3 days ago" +%Y-%m-%d).full_json
     '''
 
 }
@@ -86,7 +89,7 @@ process align {
 
 process combine_variants {
     cpus 1
-    publishDir "/mnt/flash_scratch/seq-shepherd/", mode: 'copy'
+    publishDir "${output_path}", mode: 'copy'
 
     input:
         file(variants) from split_variants.collect()
