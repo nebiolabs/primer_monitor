@@ -1,5 +1,4 @@
 # frozen_string_literal: true
 
-class IdentifyPrimersForNotification < ApplicationRecord      
+class IdentifyPrimersForNotification < ApplicationRecord
 end
-    

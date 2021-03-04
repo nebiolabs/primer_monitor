@@ -1,5 +1,4 @@
 # frozen_string_literal: true
 
-class JoinSubscribedLocationToID < ApplicationRecord      
+class JoinSubscribedLocationToId < ApplicationRecord
 end
-    
