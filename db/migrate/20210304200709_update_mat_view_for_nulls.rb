@@ -2,105 +2,133 @@ class UpdateMatViewForNulls < ActiveRecord::Migration[6.1]
   def up
     execute "
       DROP MATERIALIZED VIEW IF EXISTS identify_primers_for_notifications;
-      DROP MATERIALIZED VIEW IF EXISTS oligo_variant_overlaps;
+      DROP MATERIALIZED VIEW IF EXISTS oligo_variant_overlaps;    
 
-      CREATE MATERIALIZED VIEW IF NOT EXISTS oligo_variant_overlaps AS
-      WITH big_query AS (
-        SELECT oligos.id AS oligo_id, oligos.name AS oligo_name, oligos.ref_start AS oligo_start, oligos.ref_end AS oligo_end, oligos.short_name,
-              primer_sets.name AS primer_set_name, primer_sets.id AS primer_set_id,
-              variant_sites.id AS variant_id, variant_sites.variant_type, variant_sites.variant, variant_sites.ref_start AS variant_start, variant_sites.ref_end AS variant_end,
-              COALESCE(detailed_geo_locations.region, '') as region, COALESCE(detailed_geo_locations.subregion, '') as subregion, COALESCE(detailed_geo_locations.division, '') as division, COALESCE(detailed_geo_locations.subdivision, '') as subdivision, detailed_geo_locations.id as detailed_geo_location_id,
-              fasta_records.date_collected FROM variant_sites
-        INNER JOIN fasta_records ON variant_sites.fasta_record_id = fasta_records.id
-        INNER JOIN detailed_geo_locations ON fasta_records.detailed_geo_location_id = detailed_geo_locations.id
-        INNER JOIN oligos ON (variant_sites.ref_start BETWEEN oligos.ref_start AND oligos.ref_end)
-                  OR (variant_sites.ref_end BETWEEN oligos.ref_start AND oligos.ref_end)
-                  OR (variant_sites.ref_start < oligos.ref_start AND variant_sites.ref_end > oligos.ref_end)
-        INNER JOIN primer_sets ON oligos.primer_set_id = primer_sets.id
-        WHERE (variant_type = 'D' OR variant_type = 'X') AND variant NOT LIKE '%N%'
-        ),
-        insert_query as (
-        SELECT oligos.id AS oligo_id, oligos.name AS oligo_name, oligos.ref_start AS oligo_start, oligos.ref_end AS oligo_end, oligos.short_name,
-              primer_sets.name AS primer_set_name, primer_sets.id AS primer_set_id,
-              variant_sites.id AS variant_id, variant_sites.variant_type, variant_sites.variant, variant_sites.ref_start AS variant_start, variant_sites.ref_end AS variant_end,
-              COALESCE(detailed_geo_locations.region, '') as region, COALESCE(detailed_geo_locations.subregion, '') as subregion, COALESCE(detailed_geo_locations.division, '') as division, COALESCE(detailed_geo_locations.subdivision, '') as subdivision, detailed_geo_locations.id as detailed_geo_location_id,
-              fasta_records.date_collected FROM variant_sites
-        INNER JOIN fasta_records ON variant_sites.fasta_record_id = fasta_records.id
-        INNER JOIN detailed_geo_locations ON fasta_records.detailed_geo_location_id = detailed_geo_locations.id
-        INNER JOIN oligos ON (variant_sites.ref_start BETWEEN oligos.ref_start AND oligos.ref_end)
-                  OR (variant_sites.ref_end BETWEEN oligos.ref_start AND oligos.ref_end)
-                  OR (variant_sites.ref_start < oligos.ref_start AND variant_sites.ref_end > oligos.ref_end)
-        INNER JOIN primer_sets ON oligos.primer_set_id = primer_sets.id
-        WHERE variant_type = 'I' AND variant NOT LIKE '%N%'
-        ),
-        region_count AS (
-        SELECT COUNT(*) AS region_count, COALESCE(detailed_geo_locations.region, '') as region FROM fasta_records 
-          INNER JOIN detailed_geo_locations ON fasta_records.detailed_geo_location_id = detailed_geo_locations.id
-          GROUP BY detailed_geo_locations.region       
-        ),
-        region_subregion_count AS (
-        SELECT COUNT(*) AS region_subregion_count, COALESCE(detailed_geo_locations.region, '') as region, COALESCE(detailed_geo_locations.subregion, '') as subregion FROM fasta_records 
-          INNER JOIN detailed_geo_locations ON fasta_records.detailed_geo_location_id = detailed_geo_locations.id
-          GROUP BY detailed_geo_locations.region, detailed_geo_locations.subregion
-        ),
-        region_subregion_division_count AS (
-        SELECT COUNT(*) AS region_subregion_division_count, COALESCE(detailed_geo_locations.region, '') as region, COALESCE(detailed_geo_locations.subregion, '') as subregion, COALESCE(detailed_geo_locations.division, '') as division FROM fasta_records 
-          INNER JOIN detailed_geo_locations ON fasta_records.detailed_geo_location_id = detailed_geo_locations.id
-          GROUP BY detailed_geo_locations.region, detailed_geo_locations.subregion, detailed_geo_locations.division
-        ),
-        region_subregion_division_subdivision_count AS (
-        SELECT COUNT(*) AS region_subregion_division_subdivision_count, COALESCE(detailed_geo_locations.region, '') as region, COALESCE(detailed_geo_locations.subregion, '') as subregion, COALESCE(detailed_geo_locations.division, '') as division, COALESCE(detailed_geo_locations.subdivision, '') as subdivision FROM fasta_records 
-          INNER JOIN detailed_geo_locations ON fasta_records.detailed_geo_location_id = detailed_geo_locations.id
-          GROUP BY detailed_geo_locations.region, detailed_geo_locations.subregion, detailed_geo_locations.division, detailed_geo_locations.subdivision
-        ),
-        region_time_count AS (
-        SELECT COUNT(*) AS region_time_count, COALESCE(detailed_geo_locations.region, '') as region, fasta_records.date_collected FROM fasta_records 
+      CREATE MATERIALIZED VIEW IF NOT EXISTS variant_overlaps AS
+        SELECT oligos.id AS oligo_id,
+          oligos.name AS oligo_name,
+          oligos.ref_start AS oligo_start,
+          oligos.ref_end AS oligo_end,
+          oligos.short_name as oligo_short_name,
+          primer_sets.id as primer_set_id,
+          primer_sets.name as primer_set_name,
+          variant_sites.id AS variant_id,
+          variant_sites.variant_type,
+          variant_sites.variant,
+          variant_sites.ref_start AS variant_start,
+          variant_sites.ref_end AS variant_end,
+          coalesce(detailed_geo_locations.region, '') as region,
+          coalesce(detailed_geo_locations.subregion, '') as subregion,
+          coalesce(detailed_geo_locations.division, '') as division,
+          coalesce(detailed_geo_locations.subdivision, '') as subdivision,
+          detailed_geo_locations.id AS detailed_geo_location_id,
+          coalesce(fasta_records.date_collected, '1900-01-01') as date_collected
+        FROM variant_sites
+        JOIN fasta_records ON variant_sites.fasta_record_id = fasta_records.id
+        JOIN detailed_geo_locations ON fasta_records.detailed_geo_location_id = detailed_geo_locations.id
+        JOIN oligos ON variant_sites.ref_start >= oligos.ref_start AND variant_sites.ref_start <= oligos.ref_end OR variant_sites.ref_end >= oligos.ref_start AND variant_sites.ref_end <= oligos.ref_end OR variant_sites.ref_start < oligos.ref_start AND variant_sites.ref_end > oligos.ref_end
+        JOIN primer_sets on oligos.primer_set_id = primer_sets.id
+        WHERE (variant_sites.variant_type::text = 'D'::text OR variant_sites.variant_type::text = 'X'::text OR variant_sites.variant_type::text = 'I'::text) AND variant_sites.variant::text !~~ '%N%'::text
+      WITH DATA;
+
+      CREATE INDEX ON variant_overlaps(region, subregion, division, subdivision, date_collected);
+
+      CREATE MATERIALIZED VIEW IF NOT EXISTS time_counts AS
+        WITH region_time_count AS (
+          SELECT COUNT(*) AS region_time_count, COALESCE(detailed_geo_locations.region, '') as region, coalesce(fasta_records.date_collected, '1900-01-01') as date_collected FROM fasta_records 
           INNER JOIN detailed_geo_locations ON fasta_records.detailed_geo_location_id = detailed_geo_locations.id
           GROUP BY detailed_geo_locations.region, fasta_records.date_collected     
-        ),
-        region_subregion_time_count AS (
-        SELECT COUNT(*) AS region_subregion_time_count, COALESCE(detailed_geo_locations.region, '') as region, COALESCE(detailed_geo_locations.subregion, '') as subregion, fasta_records.date_collected FROM fasta_records 
+          ),
+          region_subregion_time_count AS (
+          SELECT COUNT(*) AS region_subregion_time_count, COALESCE(detailed_geo_locations.region, '') as region, COALESCE(detailed_geo_locations.subregion, '') as subregion, coalesce(fasta_records.date_collected, '1900-01-01') as date_collected FROM fasta_records 
           INNER JOIN detailed_geo_locations ON fasta_records.detailed_geo_location_id = detailed_geo_locations.id
           GROUP BY detailed_geo_locations.region, detailed_geo_locations.subregion, fasta_records.date_collected
-        ),
-        region_subregion_division_time_count AS (
-        SELECT COUNT(*) AS region_subregion_division_time_count, COALESCE(detailed_geo_locations.region, '') as region, COALESCE(detailed_geo_locations.subregion, '') as subregion, COALESCE(detailed_geo_locations.division, '') as division, fasta_records.date_collected FROM fasta_records 
+          ),
+          region_subregion_division_time_count AS (
+          SELECT COUNT(*) AS region_subregion_division_time_count, COALESCE(detailed_geo_locations.region, '') as region, COALESCE(detailed_geo_locations.subregion, '') as subregion, COALESCE(detailed_geo_locations.division, '') as division, coalesce(fasta_records.date_collected, '1900-01-01') as date_collected FROM fasta_records 
           INNER JOIN detailed_geo_locations ON fasta_records.detailed_geo_location_id = detailed_geo_locations.id
           GROUP BY detailed_geo_locations.region, detailed_geo_locations.subregion, detailed_geo_locations.division, fasta_records.date_collected
-        ),
-        region_subregion_division_subdivision_time_count AS (
-        SELECT COUNT(*) AS region_subregion_division_subdivision_time_count, COALESCE(detailed_geo_locations.region, '') as region, COALESCE(detailed_geo_locations.subregion, '') as subregion, COALESCE(detailed_geo_locations.division, '') as division, COALESCE(detailed_geo_locations.subdivision, '') as subdivision, fasta_records.date_collected FROM fasta_records 
+          ),
+          region_subregion_division_subdivision_time_count AS (
+          SELECT COUNT(*) AS region_subregion_division_subdivision_time_count, COALESCE(detailed_geo_locations.region, '') as region, COALESCE(detailed_geo_locations.subregion, '') as subregion, COALESCE(detailed_geo_locations.division, '') as division, COALESCE(detailed_geo_locations.subdivision, '') as subdivision, coalesce(fasta_records.date_collected, '1900-01-01') as date_collected FROM fasta_records 
           INNER JOIN detailed_geo_locations ON fasta_records.detailed_geo_location_id = detailed_geo_locations.id
           GROUP BY detailed_geo_locations.region, detailed_geo_locations.subregion, detailed_geo_locations.division, detailed_geo_locations.subdivision, fasta_records.date_collected
-        )
-        SELECT big_query.*, region_count.region_count, region_subregion_count.region_subregion_count, region_subregion_division_count.region_subregion_division_count, region_subregion_division_subdivision_count.region_subregion_division_subdivision_count,
-                            region_time_count.region_time_count, region_subregion_time_count.region_subregion_time_count, region_subregion_division_time_count.region_subregion_division_time_count, region_subregion_division_subdivision_time_count.region_subregion_division_subdivision_time_count,
+          )
+        SELECT 
+          region_subregion_division_subdivision_time_count.region, region_subregion_division_subdivision_time_count.subregion, region_subregion_division_subdivision_time_count.division, region_subregion_division_subdivision_time_count.subdivision, region_subregion_division_subdivision_time_count.date_collected,
+          region_time_count.region_time_count, region_subregion_time_count.region_subregion_time_count, region_subregion_division_time_count.region_subregion_division_time_count,  region_subregion_division_subdivision_time_count.region_subregion_division_subdivision_time_count
+        FROM region_subregion_division_subdivision_time_count
+        INNER JOIN region_time_count ON region_time_count.region = region_subregion_division_subdivision_time_count.region and region_time_count.date_collected = region_subregion_division_subdivision_time_count.date_collected
+        INNER JOIN region_subregion_time_count ON region_subregion_time_count.region = region_subregion_division_subdivision_time_count.region AND region_subregion_time_count.subregion = region_subregion_division_subdivision_time_count.subregion and region_subregion_time_count.date_collected = region_subregion_division_subdivision_time_count.date_collected
+        INNER JOIN region_subregion_division_time_count on region_subregion_division_time_count.region = region_subregion_division_subdivision_time_count.region AND region_subregion_division_time_count.subregion = region_subregion_division_subdivision_time_count.subregion and region_subregion_division_time_count.division = region_subregion_division_subdivision_time_count.division and region_subregion_division_time_count.date_collected = region_subregion_division_subdivision_time_count.date_collected
+      WITH DATA;
+
+      CREATE INDEX ON time_counts(region, subregion, division, subdivision, date_collected);
+
+      CREATE MATERIALIZED VIEW IF NOT EXISTS counts AS
+        WITH region_count AS (
+          SELECT COUNT(*) AS region_count, COALESCE(detailed_geo_locations.region, '') as region FROM fasta_records 
+          INNER JOIN detailed_geo_locations ON fasta_records.detailed_geo_location_id = detailed_geo_locations.id
+          GROUP BY detailed_geo_locations.region       
+          ),
+          region_subregion_count AS (
+          SELECT COUNT(*) AS region_subregion_count, COALESCE(detailed_geo_locations.region, '') as region, COALESCE(detailed_geo_locations.subregion, '') as subregion FROM fasta_records 
+          INNER JOIN detailed_geo_locations ON fasta_records.detailed_geo_location_id = detailed_geo_locations.id
+          GROUP BY detailed_geo_locations.region, detailed_geo_locations.subregion
+          ),
+          region_subregion_division_count AS (
+          SELECT COUNT(*) AS region_subregion_division_count, COALESCE(detailed_geo_locations.region, '') as region, COALESCE(detailed_geo_locations.subregion, '') as subregion, COALESCE(detailed_geo_locations.division, '') as division FROM fasta_records 
+          INNER JOIN detailed_geo_locations ON fasta_records.detailed_geo_location_id = detailed_geo_locations.id
+          GROUP BY detailed_geo_locations.region, detailed_geo_locations.subregion, detailed_geo_locations.division
+          ),
+          region_subregion_division_subdivision_count AS (
+          SELECT COUNT(*) AS region_subregion_division_subdivision_count, COALESCE(detailed_geo_locations.region, '') as region, COALESCE(detailed_geo_locations.subregion, '') as subregion, COALESCE(detailed_geo_locations.division, '') as division, COALESCE(detailed_geo_locations.subdivision, '') as subdivision FROM fasta_records 
+          INNER JOIN detailed_geo_locations ON fasta_records.detailed_geo_location_id = detailed_geo_locations.id
+          GROUP BY detailed_geo_locations.region, detailed_geo_locations.subregion, detailed_geo_locations.division, detailed_geo_locations.subdivision
+          )
+        SELECT 
+          region_subregion_division_subdivision_count.region, region_subregion_division_subdivision_count.subregion, region_subregion_division_subdivision_count.division, region_subregion_division_subdivision_count.subdivision,
+          region_count.region_count, region_subregion_count.region_subregion_count, region_subregion_division_count.region_subregion_division_count, region_subregion_division_subdivision_count.region_subregion_division_subdivision_count
+        FROM region_subregion_division_subdivision_count
+        INNER JOIN region_count on region_subregion_division_subdivision_count.region = region_count.region
+        INNER JOIN region_subregion_count ON region_subregion_count.region = region_subregion_division_subdivision_count.region AND region_subregion_count.subregion = region_subregion_division_subdivision_count.subregion
+        INNER JOIN region_subregion_division_count on region_subregion_division_count.region = region_subregion_division_subdivision_count.region AND region_subregion_division_count.subregion = region_subregion_division_subdivision_count.subregion AND region_subregion_division_count.division = region_subregion_division_subdivision_count.division
+      WITH DATA;
+
+      CREATE INDEX ON counts(region, subregion, division, subdivision);
+
+      CREATE MATERIALIZED VIEW IF NOT EXISTS oligo_variant_overlaps AS
+        SELECT variant_overlaps.*, counts.region_count, counts.region_subregion_count, counts.region_subregion_division_count, counts.region_subregion_division_subdivision_count,
+          time_counts.region_time_count, time_counts.region_subregion_time_count, time_counts.region_subregion_division_time_count, time_counts.region_subregion_division_subdivision_time_count,
           GENERATE_SERIES(
-            LOWER(numrange(coord_overlaps.oligo_start, coord_overlaps.oligo_end) * numrange(coord_overlaps.variant_start, coord_overlaps.variant_end)),
-            UPPER(numrange(coord_overlaps.oligo_start, coord_overlaps.oligo_end) * numrange(coord_overlaps.variant_start, coord_overlaps.variant_end)) - 1)
-          AS coords FROM big_query AS coord_overlaps
-        INNER JOIN big_query ON coord_overlaps.oligo_id = big_query.oligo_id AND coord_overlaps.variant_id = big_query.variant_id
-        INNER JOIN region_count ON region_count.region = big_query.region
-        INNER JOIN region_subregion_count ON region_subregion_count.region = big_query.region AND region_subregion_count.subregion = big_query.subregion
-        INNER JOIN region_subregion_division_count on region_subregion_division_count.region = big_query.region AND region_subregion_division_count.subregion = big_query.subregion AND region_subregion_division_count.division = big_query.division
-        INNER JOIN region_subregion_division_subdivision_count on region_subregion_division_subdivision_count.region = big_query.region AND region_subregion_division_subdivision_count.subregion = big_query.subregion AND region_subregion_division_subdivision_count.division = big_query.division AND region_subregion_division_subdivision_count.subdivision = big_query.subdivision
-        INNER JOIN region_time_count ON region_time_count.region = big_query.region and region_time_count.date_collected = big_query.date_collected
-        INNER JOIN region_subregion_time_count ON region_subregion_time_count.region = big_query.region AND region_subregion_time_count.subregion = big_query.subregion and region_subregion_time_count.date_collected = big_query.date_collected
-        INNER JOIN region_subregion_division_time_count on region_subregion_division_time_count.region = big_query.region AND region_subregion_division_time_count.subregion = big_query.subregion and region_subregion_division_time_count.division = big_query.division and region_subregion_division_time_count.date_collected = big_query.date_collected
-        INNER JOIN region_subregion_division_subdivision_time_count on region_subregion_division_subdivision_time_count.region = big_query.region AND region_subregion_division_subdivision_time_count.subregion = big_query.subregion and region_subregion_division_subdivision_time_count.division = big_query.division and region_subregion_division_subdivision_time_count.subdivision = big_query.subdivision AND region_subregion_division_subdivision_time_count.date_collected = big_query.date_collected
-      UNION ALL
-        SELECT insert_query.*, region_count.region_count, region_subregion_count.region_subregion_count, region_subregion_division_count.region_subregion_division_count, region_subregion_division_subdivision_count.region_subregion_division_subdivision_count,
-                               region_time_count.region_time_count, region_subregion_time_count.region_subregion_time_count, region_subregion_division_time_count.region_subregion_division_time_count, region_subregion_division_subdivision_time_count.region_subregion_division_subdivision_time_count,
-          insert_query.variant_start AS coords FROM insert_query AS coord_overlaps
-        INNER JOIN insert_query ON coord_overlaps.oligo_id = insert_query.oligo_id AND coord_overlaps.variant_id = insert_query.variant_id
-        INNER JOIN region_count ON region_count.region = insert_query.region
-        INNER JOIN region_subregion_count ON region_subregion_count.region = insert_query.region AND region_subregion_count.subregion = insert_query.subregion
-        INNER JOIN region_subregion_division_count on region_subregion_division_count.region = insert_query.region AND region_subregion_division_count.subregion = insert_query.subregion and region_subregion_division_count.division = insert_query.division
-        INNER JOIN region_subregion_division_subdivision_count on region_subregion_division_subdivision_count.region = insert_query.region AND region_subregion_division_subdivision_count.subregion = insert_query.subregion and region_subregion_division_subdivision_count.division = insert_query.division and region_subregion_division_subdivision_count.subdivision = insert_query.subdivision
-        INNER JOIN region_time_count ON region_time_count.region = insert_query.region and region_time_count.date_collected = insert_query.date_collected
-        INNER JOIN region_subregion_time_count ON region_subregion_time_count.region = insert_query.region AND region_subregion_time_count.subregion = insert_query.subregion and region_subregion_time_count.date_collected = insert_query.date_collected
-        INNER JOIN region_subregion_division_time_count on region_subregion_division_time_count.region = insert_query.region AND region_subregion_division_time_count.subregion = insert_query.subregion and region_subregion_division_time_count.division = insert_query.division and region_subregion_division_time_count.date_collected = insert_query.date_collected
-        INNER JOIN region_subregion_division_subdivision_time_count on region_subregion_division_subdivision_time_count.region = insert_query.region AND region_subregion_division_subdivision_time_count.subregion = insert_query.subregion and region_subregion_division_subdivision_time_count.division = insert_query.division and region_subregion_division_subdivision_time_count.subdivision = insert_query.subdivision and region_subregion_division_subdivision_time_count.date_collected = insert_query.date_collected
+          LOWER(numrange(variant_overlaps.oligo_start, variant_overlaps.oligo_end) * numrange(variant_overlaps.variant_start, variant_overlaps.variant_end)),
+          UPPER(numrange(variant_overlaps.oligo_start, variant_overlaps.oligo_end) * numrange(variant_overlaps.variant_start, variant_overlaps.variant_end)) - 1)
+        AS coords FROM variant_overlaps AS variant_overlaps
+        INNER JOIN counts on counts.region = variant_overlaps.region
+          AND counts.subregion = variant_overlaps.subregion
+          AND counts.division = variant_overlaps.division
+          AND counts.subdivision = variant_overlaps.subdivision
+        INNER JOIN time_counts on time_counts.region = variant_overlaps.region
+          AND time_counts.subregion = variant_overlaps.subregion
+          AND time_counts.division = variant_overlaps.division
+          AND time_counts.subdivision = variant_overlaps.subdivision
+          AND time_counts.date_collected = variant_overlaps.date_collected
+        WHERE variant_type <> 'I'
+        UNION ALL
+        SELECT variant_overlaps.*, counts.region_count, counts.region_subregion_count, counts.region_subregion_division_count, counts.region_subregion_division_subdivision_count,
+          time_counts.region_time_count, time_counts.region_subregion_time_count, time_counts.region_subregion_division_time_count, time_counts.region_subregion_division_subdivision_time_count,
+          variant_overlaps.variant_start as coords
+        FROM variant_overlaps
+        INNER JOIN counts on counts.region = variant_overlaps.region
+          AND counts.subregion = variant_overlaps.subregion
+          AND counts.division = variant_overlaps.division
+          AND counts.subdivision = variant_overlaps.subdivision
+        INNER JOIN time_counts on time_counts.region = variant_overlaps.region
+          AND time_counts.subregion = variant_overlaps.subregion
+          AND time_counts.division = variant_overlaps.division
+          AND time_counts.subdivision = variant_overlaps.subdivision
+          AND time_counts.date_collected = variant_overlaps.date_collected
+        WHERE variant_type = 'I'
       WITH DATA;
 
       CREATE MATERIALIZED VIEW IF NOT EXISTS identify_primers_for_notifications AS
@@ -166,6 +194,9 @@ class UpdateMatViewForNulls < ActiveRecord::Migration[6.1]
     execute <<-SQL
     DROP MATERIALIZED VIEW IF EXISTS identify_primers_for_notifications;
     DROP MATERIALIZED VIEW IF EXISTS oligo_variant_overlaps;
+    DROP MATERIALIZED VIEW IF EXISTS variant_overlaps;
+    DROP MATERIALIZED VIEW IF EXISTS time_counts;
+    DROP MATERIALIZED VIEW IF EXISTS counts;
     SQL
   end
 end
