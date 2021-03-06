@@ -19,7 +19,7 @@ class FastaRecord < ApplicationRecord
   end
 
   def existing_fasta_strain_ids
-    @existing_fasta_strain_ids ||= Hash(FastaRecord.pluck(:id, :strain))
+    @existing_fasta_strain_ids ||= Hash[FastaRecord.pluck(:id, :strain)]
   end
 
   def self.build_fasta_record(line)
