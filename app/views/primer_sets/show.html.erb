@@ -12,16 +12,11 @@
     <%= link_to @primer_set.amplification_method, @primer_set.amplification_method.description_url %>
     </div>
   </div>
-  <% unless @primer_set.citation_url.blank? && @primer_set.citation_url.blank? %>
+  <% if @primer_set.display_url %>
     <div class="tile is-parent">
       <div class="tile box is-child">
-
       <strong> Source: </strong>
-        <% if @primer_set.citation_url %>
-          <%= link_to @primer_set.citation_url, @primer_set.citation_url %>
-        <% elsif @primer_set.doi   %>
-          <%= link_to @primer_set.doi, @primer_set.doi_url %>
-        <% end %>
+          <%= link_to @primer_set.display_url, @primer_set.display_url %>
       </div>
     </div>
   <% end %>

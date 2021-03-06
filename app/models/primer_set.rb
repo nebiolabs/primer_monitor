@@ -16,8 +16,12 @@ class PrimerSet < ApplicationRecord
     name
   end
 
+  def display_url
+    citation_url || doi_url
+  end
+
   def doi_url
-    "https://doi.org/#{self.doi}"
+    "https://doi.org/#{doi}" unless doi.blank?
   end
 
   def subscription_for_user(user)
