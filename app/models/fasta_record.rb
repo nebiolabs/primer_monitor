@@ -18,6 +18,10 @@ class FastaRecord < ApplicationRecord
     metadata
   end
 
+  def existing_fasta_strain_ids
+    @existing_fasta_strain_ids ||= Hash(FastaRecord.pluck(:id, :strain))
+  end
+
   def self.build_fasta_record(line)
     (strain, _virus, gisaid_epi_isl, genbank_accession, date, region, country, division, location,
       _region_exposure, _country_exposure, _division_exposure, _segment, _length, _host, _age, _sex,
@@ -25,7 +29,7 @@ class FastaRecord < ApplicationRecord
       _paper_url, _date_submitted, variant_name) = line.chomp.split("\t")
 
     return unless strain && gisaid_epi_isl && genbank_accession && region && country && division && location && date
-    return if FastaRecord.exists?(strain: strain)
+    return if existing_fasta_strain_ids.key?(strain)
 
     # Converts each string to nil if it's empty
     region = region.presence
