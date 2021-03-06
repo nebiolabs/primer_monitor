@@ -18,7 +18,7 @@ class FastaRecord < ApplicationRecord
     metadata
   end
 
-  def existing_fasta_strain_ids
+  def self.existing_fasta_strain_ids
     @existing_fasta_strain_ids ||= Hash[FastaRecord.pluck(:strain, :id)]
   end
 
