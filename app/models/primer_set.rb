@@ -16,6 +16,10 @@ class PrimerSet < ApplicationRecord
     name
   end
 
+  def doi_url
+    "https://doi.org/#{self.doi}"
+  end
+
   def subscription_for_user(user)
     subscriptions.where(user_id: user.id).first
   end

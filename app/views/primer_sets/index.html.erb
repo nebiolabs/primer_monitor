@@ -3,16 +3,18 @@
 <table>
   <thead>
     <tr>
+      <th data-priority="2">Amp. Method</th>
       <th data-priority="1">Set Name</th>
       <th data-priority="3">Organism</th>
       <th data-priority="2">Oligos</th>
-      <th data-priority="1">Subscribed?</th>
+      <th data-priority="1">Subscription</th>
     </tr>
   </thead>
 
   <tbody>
     <% @primer_sets.each do |primer_set| %>
       <tr>
+        <td><%= link_to primer_set.amplification_method, primer_set.amplification_method.description_url %></td>
         <td><%= link_to primer_set.name, primer_set %></td>
         <td><%= link_to primer_set.organism, primer_set.organism %></td>
         <td><%= primer_set.oligos.join(", ") %></td>

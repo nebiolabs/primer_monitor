@@ -1,25 +1,46 @@
 <h1 class="title">Primer Set: <%= @primer_set.name %> </h1>
 <div class="tile">
-  <div class="tile">
+  <div class="tile is-parent">
+    <div class="tile box is-child">
     <strong>Organism: </strong>
     <%= link_to @primer_set.organism, @primer_set.organism %>
+    </div>
   </div>
-  <div class="tile">
-    <strong>Amplification Method: </strong>
-    <%= @primer_set.amplification_method %>
+  <div class="tile is-parent">
+    <div class="tile box is-child">
+    <strong>Amp. Method: </strong>
+    <%= link_to @primer_set.amplification_method, @primer_set.amplification_method.description_url %>
+    </div>
   </div>
+  <% unless @primer_set.citation_url.blank? && @primer_set.citation_url.blank? %>
+    <div class="tile is-parent">
+      <div class="tile box is-child">
+
+      <strong> Source: </strong>
+        <% if @primer_set.citation_url %>
+          <%= link_to @primer_set.citation_url, @primer_set.citation_url %>
+        <% elsif @primer_set.doi   %>
+          <%= link_to @primer_set.doi, @primer_set.doi_url %>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
   <% if can?(:confirm, PrimerSet) %>
-    <div class="tile">
+    <div class="tile is-parent">
+      <div class="tile box is-child">
       <strong>Status: </strong>
       <%= @primer_set.status %>
+      </div>
     </div>
   <% end %>
 
-  <div class="tile">
+  <div class="tile is-parent">
+    <div class="tile  is-child">
     <%= render 'primer_set_subscription',
                user: current_user,
                primer_set: @primer_set,
                primer_set_subscription: @primer_set.subscription_for_user(current_user) %>
+    </div>
   </div>
 </div>
 <hr/>
