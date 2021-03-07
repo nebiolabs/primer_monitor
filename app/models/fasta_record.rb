@@ -45,6 +45,7 @@ class FastaRecord < ApplicationRecord
 
     # dg_id was not found in the database, add the new record so it will be saved during import
     fa.detailed_geo_location = dg unless dg_id
+    fa
   end
 
   def self.get_dg(country, division, location, region)
