@@ -21,6 +21,7 @@ require 'slop'
 # Use 'safe' in order to prevent rails from failing due to monkey
 # patching Enumerable:
 # require 'descriptive_statistics/safe'
+@log = ActiveRecord::Base.logger = Logger.new($stderr)
 
 # need application record first since others depend on it
 require_relative "#{__dir__}/app/models/application_record.rb"
@@ -124,7 +125,7 @@ end
 
 def main
   opts = parse_options
-  # @log.level = Logger.const_get(opts[:verbose])
+  @log.level = Logger.const_get(opts[:verbose])
 
   setup_db_connection
   ActiveRecord::Base.transaction do
