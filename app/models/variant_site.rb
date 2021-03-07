@@ -10,10 +10,10 @@ class VariantSite < ApplicationRecord
     File.readlines(variants_tsv).each do |line|
       parsed_fields = line.chomp.split("\t")
       (strain, ref_pos, variant_type, variant) = parsed_fields
+      next unless strain && ref_pos && variant_type && variant
+
       fasta_record_id = FastaRecord.existing_fasta_strain_ids[strain]
       raise "Failed to find fasta record for stain #{strain}" unless fasta_record_id
-
-      next unless strain && ref_pos && variant_type && variant
 
       ref_end = Integer(ref_pos) + Integer(variant.length.to_s)
       variant = "#{variant.length}-" if variant_type.include? 'D'
