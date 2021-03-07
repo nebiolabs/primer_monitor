@@ -11,6 +11,7 @@ class VariantSite < ApplicationRecord
       next if line.blank?
 
       strain, ref_pos, variant_type, variant = line.chomp.split("\t")
+      next if variant.nil? # big insertions can push a variant off the end of the genome e.g. USA/VA-SU-SC_65/2021
 
       fasta_record_id = FastaRecord.existing_fasta_strain_ids[strain]
       raise "Failed to find fasta record for stain #{strain}" unless fasta_record_id
