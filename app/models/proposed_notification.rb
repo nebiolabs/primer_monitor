@@ -23,7 +23,8 @@ class ProposedNotification < ApplicationRecord
 
       oligo_id = Oligo.find_by(name: record.primer_name, primer_set_id: record.primer_set_id).id
 
-      subscribed_alias = JoinSubscribedLocationToID.find_by(user_id: record.user_id, detailed_geo_location_id: record.detailed_geo_location_id)
+      subscribed_alias = JoinSubscribedLocationToId.find_by(user_id: record.user_id,
+                                                            detailed_geo_location_id: record.detailed_geo_location_id)
       subscribed_geo_location_id = SubscribedGeoLocation.find_by(user_id: record.user_id,
                                                                   detailed_geo_location_alias_id: subscribed_alias.detailed_geo_location_alias_id).id
 
