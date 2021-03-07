@@ -12,7 +12,7 @@ class FastaRecord < ApplicationRecord
       record = build_fasta_record(line)
       metadata << record if record
     end
-
+    @existing_fasta_strain_ids = nil # invalidates cache since any new records would not be present
     raise "Unable to parse any records from #{metadata_tsv}" if record_count.zero?
 
     metadata
