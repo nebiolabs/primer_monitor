@@ -34,7 +34,7 @@ class FastaRecord < ApplicationRecord
     return unless strain && gisaid_epi_isl && genbank_accession && region && country && division && location && date
     return if existing_fasta_strain_ids.key?(strain)
 
-    Rails.logger.info("New fasta record: #{strain}")
+    ActiveRecord::Base.logger.info("New fasta record: #{strain}")
 
     # Converts each string to nil if it's empty
     region = region.presence
