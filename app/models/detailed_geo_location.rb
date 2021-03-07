@@ -8,7 +8,7 @@ class DetailedGeoLocation < ApplicationRecord
   end
 
   def cache_key
-    unique_fields.map { |f| send(f) }.join
+    DetailedGeoLocation.unique_fields.map { |f| send(f) }.join
   end
 
   def self.existing_geo_location_ids_by_unique_fields
