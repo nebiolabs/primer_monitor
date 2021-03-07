@@ -14,7 +14,7 @@ class VariantSite < ApplicationRecord
       next if variant.nil? # big insertions can push a variant off the end of the genome e.g. USA/VA-SU-SC_65/2021
 
       fasta_record_id = FastaRecord.existing_fasta_strain_ids[strain]
-      raise "Failed to find fasta record for stain #{strain}" unless fasta_record_id
+      raise "Failed to find fasta record for strain: #{strain}" unless fasta_record_id
 
       ref_end = Integer(ref_pos) + variant.length
       variant = "#{variant.length}-" if variant_type.include? 'D'
