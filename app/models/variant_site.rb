@@ -8,14 +8,14 @@ class VariantSite < ApplicationRecord
 
     # ActiveRecord::Base.logger.debug "Processing variants_tsv #{variants_tsv}"
     File.readlines(variants_tsv).each do |line|
-      parsed_fields = line.chomp.split("\t")
-      (strain, ref_pos, variant_type, variant) = parsed_fields
-      next unless strain && ref_pos && variant_type && variant
+      next if line.blank?
+
+      strain, ref_pos, variant_type, variant = line.chomp.split("\t")
 
       fasta_record_id = FastaRecord.existing_fasta_strain_ids[strain]
       raise "Failed to find fasta record for stain #{strain}" unless fasta_record_id
 
-      ref_end = Integer(ref_pos) + Integer(variant.length.to_s)
+      ref_end = Integer(ref_pos) + variant.length
       variant = "#{variant.length}-" if variant_type.include? 'D'
       variant = "#{variant.length}N" if variant.include? 'N'
       variants << VariantSite.new(ref_start: ref_pos, ref_end: ref_end, variant_type: variant_type,
