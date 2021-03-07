@@ -12,8 +12,10 @@ class DetailedGeoLocation < ApplicationRecord
   end
 
   def self.existing_geo_location_ids_by_unique_fields
-    @existing_geo_location_ids_by_unique_fields ||= Hash[DetailedGeoLocation.pluck([:id] + unique_fields)
-                                                                            .map { |dg| [dg[1..], dg[0]] }.join]
+    @existing_geo_location_ids_by_unique_fields ||= DetailedGeoLocation.pluck(:id, unique_fields.join(','))
+                                                                       .each_with_object({}) do |dg_fields, h|
+      h[dg_fields[1..]] = dg_fields[0]
+    end
   end
 
   def to_s

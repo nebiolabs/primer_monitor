@@ -11,7 +11,8 @@ class ProposedNotification < ApplicationRecord
                      subscribed_geo_location_id primer_set_subscription_id].freeze
 
   def self.existing_notifications
-    @existing_notifications ||= ProposedNotification.pluck([:id] + UNIQUE_FIELDS).each_with_object({}) do |pn_fields, h|
+    @existing_notifications ||= ProposedNotification.pluck(:id, UNIQUE_FIELDS.join(','))
+                                                    .each_with_object({}) do |pn_fields, h|
       h[pn_fields[1..].join] = pn_fields[0]
     end
   end
