@@ -357,15 +357,15 @@ CREATE VIEW public.join_subscribed_location_to_ids AS
 
 CREATE TABLE public.oligos (
     id bigint NOT NULL,
-    name character varying NOT NULL,
-    sequence character varying NOT NULL,
-    primer_set_id bigint NOT NULL,
-    ref_start bigint,
-    ref_end bigint,
+    name character varying,
+    sequence character varying,
+    primer_set_id bigint,
     created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL,
     locus character varying,
     category public.oligo_category,
+    ref_start bigint,
+    ref_end bigint,
     short_name character varying
 );
 
@@ -631,6 +631,7 @@ CREATE MATERIALIZED VIEW public.identify_primers_for_notifications AS
             join_subscribed_location_to_ids.detailed_geo_location_id,
             primer_sets.name AS set_name,
             oligos.name AS primer_name,
+            oligos.id AS oligo_id,
             users.lookback_days,
             users.variant_fraction_threshold,
             oligo_variant_overlaps.region,
@@ -647,7 +648,7 @@ CREATE MATERIALIZED VIEW public.identify_primers_for_notifications AS
              JOIN public.join_subscribed_location_to_ids ON (((join_subscribed_location_to_ids.user_id = primer_set_subscriptions.user_id) AND (join_subscribed_location_to_ids.detailed_geo_location_id = oligo_variant_overlaps.detailed_geo_location_id))))
              JOIN public.users ON ((users.id = primer_set_subscriptions.user_id)))
           WHERE (oligo_variant_overlaps.date_collected >= (CURRENT_DATE - users.lookback_days))
-          GROUP BY primer_set_subscriptions.user_id, primer_set_subscriptions.primer_set_id, primer_sets.name, oligos.name, join_subscribed_location_to_ids.detailed_geo_location_id, users.lookback_days, users.variant_fraction_threshold, oligo_variant_overlaps.region, oligo_variant_overlaps.subregion, oligo_variant_overlaps.division, oligo_variant_overlaps.subdivision, oligo_variant_overlaps.coords, oligo_variant_overlaps.detailed_geo_location_id
+          GROUP BY primer_set_subscriptions.user_id, primer_set_subscriptions.primer_set_id, primer_sets.name, oligos.id, oligos.name, join_subscribed_location_to_ids.detailed_geo_location_id, users.lookback_days, users.variant_fraction_threshold, oligo_variant_overlaps.region, oligo_variant_overlaps.subregion, oligo_variant_overlaps.division, oligo_variant_overlaps.subdivision, oligo_variant_overlaps.coords, oligo_variant_overlaps.detailed_geo_location_id
         ), second_query AS (
          SELECT fasta_records.detailed_geo_location_id,
             count(fasta_records.id) AS records_count,
@@ -662,6 +663,7 @@ CREATE MATERIALIZED VIEW public.identify_primers_for_notifications AS
  SELECT first_query.user_id,
     first_query.primer_set_id,
     first_query.set_name,
+    first_query.oligo_id,
     first_query.primer_name,
     first_query.region,
     first_query.subregion,
@@ -814,8 +816,8 @@ CREATE TABLE public.proposed_notifications (
     fraction_variant double precision NOT NULL,
     created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL,
-    subscribed_geo_locations_id bigint NOT NULL,
-    primer_set_subscriptions_id bigint NOT NULL,
+    subscribed_geo_location_id bigint NOT NULL,
+    primer_set_subscription_id bigint NOT NULL,
     user_id bigint NOT NULL
 );
 
@@ -1414,17 +1416,17 @@ CREATE INDEX index_proposed_notifications_on_primer_set_id ON public.proposed_no
 
 
 --
--- Name: index_proposed_notifications_on_primer_set_subscriptions_id; Type: INDEX; Schema: public; Owner: -
+-- Name: index_proposed_notifications_on_primer_set_subscription_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_proposed_notifications_on_primer_set_subscriptions_id ON public.proposed_notifications USING btree (primer_set_subscriptions_id);
+CREATE INDEX index_proposed_notifications_on_primer_set_subscription_id ON public.proposed_notifications USING btree (primer_set_subscription_id);
 
 
 --
--- Name: index_proposed_notifications_on_subscribed_geo_locations_id; Type: INDEX; Schema: public; Owner: -
+-- Name: index_proposed_notifications_on_subscribed_geo_location_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_proposed_notifications_on_subscribed_geo_locations_id ON public.proposed_notifications USING btree (subscribed_geo_locations_id);
+CREATE INDEX index_proposed_notifications_on_subscribed_geo_location_id ON public.proposed_notifications USING btree (subscribed_geo_location_id);
 
 
 --
@@ -1533,6 +1535,14 @@ CREATE INDEX variant_overlaps_region_subregion_division_subdivision_date_idx ON 
 
 
 --
+-- Name: proposed_notifications fk_rails_03fe9a3c07; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.proposed_notifications
+    ADD CONSTRAINT fk_rails_03fe9a3c07 FOREIGN KEY (subscribed_geo_location_id) REFERENCES public.subscribed_geo_locations(id);
+
+
+--
 -- Name: primer_sets fk_rails_06b1f0d34e; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -1541,27 +1551,11 @@ ALTER TABLE ONLY public.primer_sets
 
 
 --
--- Name: proposed_notifications fk_rails_07a5b05038; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.proposed_notifications
-    ADD CONSTRAINT fk_rails_07a5b05038 FOREIGN KEY (primer_set_subscriptions_id) REFERENCES public.primer_set_subscriptions(id);
-
-
---
 -- Name: blast_hits fk_rails_1f04a34db0; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.blast_hits
     ADD CONSTRAINT fk_rails_1f04a34db0 FOREIGN KEY (organism_id) REFERENCES public.organisms(id);
-
-
---
--- Name: proposed_notifications fk_rails_2a8ee0a24b; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.proposed_notifications
-    ADD CONSTRAINT fk_rails_2a8ee0a24b FOREIGN KEY (subscribed_geo_locations_id) REFERENCES public.subscribed_geo_locations(id);
 
 
 --
@@ -1725,6 +1719,14 @@ ALTER TABLE ONLY public.primer_set_subscriptions
 
 
 --
+-- Name: proposed_notifications fk_rails_f9871ce32b; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.proposed_notifications
+    ADD CONSTRAINT fk_rails_f9871ce32b FOREIGN KEY (primer_set_subscription_id) REFERENCES public.primer_set_subscriptions(id);
+
+
+--
 -- PostgreSQL database dump complete
 --
 
@@ -1793,6 +1795,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20210302193832'),
 ('20210303180741'),
 ('20210303211641'),
-('20210304200709');
+('20210304200709'),
+('20210307125905');
 
 

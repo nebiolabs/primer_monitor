@@ -10,9 +10,13 @@ class ProposedNotification < ApplicationRecord
   UNIQUE_FIELDS = %i[primer_set_id user_id oligo_id coordinate
                      subscribed_geo_location_id primer_set_subscription_id].freeze
 
-  def self.existing_notifications
-    @existing_notifications ||= ProposedNotification.pluck(:id, UNIQUE_FIELDS.join(','))
-                                                    .each_with_object({}) do |pn_fields, h|
+  def cache_key
+    UNIQUE_FIELDS.map { |f| send f }.join
+  end
+
+  def self.existing_notification_cache
+    @existing_notification_cache ||= ProposedNotification.pluck(:id, UNIQUE_FIELDS.join(','))
+                                                         .each_with_object({}) do |pn_fields, h|
       h[pn_fields[1..].join] = pn_fields[0]
     end
   end
@@ -21,26 +25,25 @@ class ProposedNotification < ApplicationRecord
     potential_notifications = []
 
     IdentifyPrimersForNotification.all.each do |record|
-
-      oligo_id = Oligo.find_by(name: record.primer_name, primer_set_id: record.primer_set_id).id
-
       subscribed_alias = JoinSubscribedLocationToId.find_by(user_id: record.user_id,
-                                                            detailed_geo_location_id: record.detailed_geo_location_id)
+                                                            detailed_geo_location_id:
+                                                              record.detailed_geo_location_id)
       subscribed_geo_location_id = SubscribedGeoLocation.find_by(user_id: record.user_id,
-                                                                  detailed_geo_location_alias_id: subscribed_alias.detailed_geo_location_alias_id).id
+                                                                 detailed_geo_location_alias_id:
+                                                                   subscribed_alias.detailed_geo_location_alias_id).id
 
-      primer_set_subscription_id = PrimerSetSubscription.find_by(user_id: record.user_id, primer_set_id: record.primer_set_id).id
+      primer_set_subscription_id = PrimerSetSubscription.find_by(user_id: record.user_id,
+                                                                 primer_set_id: record.primer_set_id).id
 
-      next if existing_notifications.key?(UNIQUE_FIELDS.map { |f| record.send f }.join)
+      pn = ProposedNotification.new(primer_set_id: record.primer_set_id, user_id: record.user_id,
+                                    oligo_id: record.oligo_id, coordinate: record.coords,
+                                    subscribed_geo_location_id: subscribed_geo_location_id,
+                                    primer_set_subscription_id: primer_set_subscription_id,
+                                    fraction_variant: record.fraction_variant)
 
-      potential_notifications << ProposedNotification.new(primer_set_id: record.primer_set_id, user_id: record.user_id, oligo_id: oligo_id,
-                                                          coordinate: record.coords, subscribed_geo_location_id: subscribed_geo_location_id, 
-                                                          primer_set_subscription_id: primer_set_subscription_id,
-                                                          fraction_variant: record.fraction_variant)
-                      
+      potential_notifications << pn unless existing_notification_cache.key?(pn.cache_key)
     end
-    
-    potential_notifications  
+
+    potential_notifications
   end
 end
-  
