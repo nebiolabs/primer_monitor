@@ -97,8 +97,9 @@ end
 def import_metadata(metadata_file)
   return unless metadata_file
 
-  metadata_records = FastaRecord.parse(metadata_file)
-  FastaRecord.import(metadata_records, validate: false)
+  fasta_records = FastaRecord.parse(metadata_file)
+  result = FastaRecord.import(fasta_records, validate: false, recursive: true)
+  result.failed_instances.each { |rec| @log.error("Failed to insert #{rec}") }
 end
 
 def import_variants(variants_file)
