@@ -1,16 +1,23 @@
 <h1 class="title">SARS-CoV-2 Lineage Variant Summary</h1>
 
-<%= image_tag 'lineage_primer_summary.svg' %>
+<%= image_tag 'lineage_primer_summary_20210307.svg' %>
+<hr/>
 Nucleotide variants related to lineages of concern are indicated in yellow above a schematic SARS-CoV-2 genome.
-Primer pairs that do not overlap with variants associated with these lineages are shown in green. Pairs tha do overlap are indicated in orange.
-ARTIC v3 amplicons 74 and 76 overlap with a variant associated with B.1.351.
-The China CDC N gene qPCR amplicon overlaps with variants in all 4 lineages.
+Primer pairs that do not overlap with variants associated with these lineages are shown in green.
+Pairs that do overlap are indicated in orange.
+ARTIC v3 amplicons 74, 76 overlap with variants associated with B.1.351.
+ARTIC v3 amplicon 96 overlaps with variants associated with B.1.429.
+ARTIC v3 amplicon 54 overlaps with variants associated with B.1.526.
+The China CDC N gene qPCR amplicon overlaps with variants in all 5 lineages.
 <hr>
 <h2 class="title">N Gene Variants</h2>
-<%= image_tag 'lineage_primer_summary_N.svg' %>
+<%= image_tag 'lineage_primer_summary_N_20210307.svg' %>
 <hr>
 <h2 class="title">S Gene Variants</h2>
-<%= image_tag 'lineage_primer_summary_S.svg' %>
+<%= image_tag 'lineage_primer_summary_S_20210307.svg' %>
+<hr>
+<h2 class="title">Orf1 Gene (16.5kb) Variants</h2>
+<%= image_tag 'lineage_primer_summary_Orf1-16500_20210307.svg' %>
 <hr>
 <h2 class="title">Methods:</h2>
 <p>
@@ -38,6 +45,11 @@ evaluated for overlap with primer regions (bedtools) and displayed (Geneious Pri
 <p>Zhang, Wenjuan, Brian D. Davis, Stephanie S. Chen, Jorge M. Sincuir Martinez, Jasmine T. Plummer, and Eric Vail.
   “Emergence of a Novel SARS-CoV-2 Strain in Southern California, USA.” MedRxiv, January 20, 2021,
   2021.01.18.21249786. <%= link_to 'https://doi.org/10.1101/2021.01.18.21249786', 'https://doi.org/10.1101/2021.01.18.21249786' %>.
+</p>
+<p>
+  West, Anthony P., Christopher O. Barnes, Zhi Yang, and Pamela J. Bjorkman.
+  “SARS-CoV-2 Lineage B.1.526 Emerging in the New York Region Detected by Software Utility Created to Query the Spike Mutational Landscape.”
+  BioRxiv, February 23, 2021, 2021.02.14.431043. <%= link_to 'https://doi.org/10.1101/2021.02.14.431043', 'https://doi.org/10.1101/2021.02.14.431043' %>.
 </p>
 <hr/>
 <h3 class='title'>Tools</h3>
