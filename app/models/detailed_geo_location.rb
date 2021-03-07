@@ -7,8 +7,8 @@ class DetailedGeoLocation < ApplicationRecord
     %i[region subregion division subdivision]
   end
 
-  def self.cache_key(detailed_geo_location)
-    DetailedGeoLocation.unique_fields.map { |f| detailed_geo_location.send(f) }.join
+  def cache_key
+    unique_fields.map { |f| send(f) }.join
   end
 
   def self.existing_geo_location_ids_by_unique_fields

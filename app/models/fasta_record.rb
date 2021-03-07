@@ -8,6 +8,7 @@ class FastaRecord < ApplicationRecord
 
     metadata = []
     record_count = 0
+    @new_locations = {}
 
     File.readlines(metadata_tsv).each do |line|
       record_count += 1
@@ -33,17 +34,24 @@ class FastaRecord < ApplicationRecord
     return unless strain && gisaid_epi_isl && genbank_accession && region && country && division && location && date
     return if existing_fasta_strain_ids.key?(strain)
 
+    Rails.logger.info("New fasta record: #{strain}")
+
     # Converts each string to nil if it's empty
     region = region.presence
     country = country.presence
     division = division.presence
     location = location.presence
 
-    dg = DetailedGeoLocation.new(world: 'World', region: region, subregion: country, division: division,
-                                 subdivision: location)
+    new_dg = DetailedGeoLocation.new(world: 'World', region: region, subregion: country,
+                                     division: division, subdivision: location)
 
     # fetches dg_id from the cache if it already exists in the database, no harm if it's nil
-    dg_id = DetailedGeoLocation.existing_geo_location_ids_by_unique_fields[DetailedGeoLocation.cache_key(dg)]
+    dg_id = DetailedGeoLocation.existing_geo_location_ids_by_unique_fields[new_dg.cache_key]
+    dg = @new_locations[new_dg.cache_key] # re-use new locations
+    unless dg
+      @new_locations[new_dg.cache_key] = dg = new_dg
+      ActiveRecord::Base.logger.info("New location: #{new_dg.cache_key}")
+    end
 
     fa = FastaRecord.new(strain: strain, gisaid_epi_isl: gisaid_epi_isl,
                          genbank_accession: genbank_accession, detailed_geo_location_id: dg_id,
