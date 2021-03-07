@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class FastaRecord < ApplicationRecord
+  belongs_to :detailed_geo_location
+
   def self.parse(metadata_tsv)
     raise "Unable to find counts file #{metadata_tsv}" unless File.exist?(metadata_tsv)
 
