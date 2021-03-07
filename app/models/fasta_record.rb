@@ -37,17 +37,17 @@ class FastaRecord < ApplicationRecord
     division = division.presence
     location = location.presence
 
-    # The geo location record needs to exist before the fasta record does
-    unless DetailedGeoLocation.exists?(region: region, subregion: country, division: division, subdivision: location)
-      DetailedGeoLocation.new(world: 'World', region: region, subregion: country, division: division,
-                              subdivision: location).save!
-    end
+    dg = DetailedGeoLocation.new(world: 'World', region: region, subregion: country, division: division,
+                                 subdivision: location)
 
-    detailed_geo_location_id = DetailedGeoLocation.find_by(region: region, subregion: country, division: division,
-                                                           subdivision: location).id
+    # fetches dg_id from the cache if it already exists in the database, no harm if it's nil
+    dg_id = DetailedGeoLocation.existing_geo_location_ids_by_unique_fields[DetailedGeoLocation.cache_key(dg)]
 
-    FastaRecord.new(strain: strain, gisaid_epi_isl: gisaid_epi_isl,
-                    genbank_accession: genbank_accession, detailed_geo_location_id: detailed_geo_location_id,
-                    date_collected: date, variant_name: variant_name)
+    fa = FastaRecord.new(strain: strain, gisaid_epi_isl: gisaid_epi_isl,
+                         genbank_accession: genbank_accession, detailed_geo_location_id: dg_id,
+                         date_collected: date, variant_name: variant_name)
+
+    # dg_id was not found in the database, add the new record so it will be saved during import
+    fa.detailed_geo_location = dg unless dg_id
   end
 end
