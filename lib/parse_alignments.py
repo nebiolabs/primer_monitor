@@ -24,7 +24,11 @@ for line in sys.stdin:
         type = item[len(item)-1:]
 
         if type != "=":
-            print("{}\t{}\t{}\t{}".format(query_name, ref_start, type, query_seq[query_start : query_start + length]))
+            if type == "I":
+                print("{}\t{}\t{}\t{}".format(query_name, ref_start, type, query_seq[query_start : query_start + 1]))
+            else:
+                print("{}\t{}\t{}\t{}".format(query_name, ref_start, type, query_seq[query_start : query_start + length]))
+                
 
         query_start += length
         ref_start += length
