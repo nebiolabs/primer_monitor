@@ -25,6 +25,8 @@ class PrimerSet < ApplicationRecord
   end
 
   def subscription_for_user(user)
+    return unless user
+
     subscriptions.where(user_id: user.id).first
   end
 end
