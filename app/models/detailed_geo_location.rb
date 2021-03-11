@@ -1,7 +1,8 @@
 # frozen_string_literal: true
 
 class DetailedGeoLocation < ApplicationRecord
-  has_many :subscribed_geo_locations
+  has_many :fasta_records
+  has_one :location_alias_joins
 
   def self.unique_fields
     %i[region subregion division subdivision]

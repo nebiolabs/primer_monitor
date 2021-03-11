@@ -36,19 +36,17 @@ class FastaRecord < ApplicationRecord
 
     ActiveRecord::Base.logger.info("New fasta record: #{strain}")
 
-    # Converts each string to nil if it's empty
     dg, dg_id = get_dg(country, division, location, region)
 
     fa = FastaRecord.new(strain: strain, gisaid_epi_isl: gisaid_epi_isl,
                          genbank_accession: genbank_accession, detailed_geo_location_id: dg_id,
                          date_collected: date, variant_name: variant_name)
 
-    # dg_id was not found in the database, add the new record so it will be saved during import
-    fa.detailed_geo_location = dg unless dg_id
     fa
   end
 
   def self.get_dg(country, division, location, region)
+    # .presence converts each string to nil if it's empty
     new_dg = DetailedGeoLocation.new(world: 'World', region: region.presence, subregion: country.presence,
                                      division: division.presence, subdivision: location.presence)
 
@@ -58,6 +56,12 @@ class FastaRecord < ApplicationRecord
     unless dg
       @new_locations[new_dg.cache_key] = dg = new_dg
       ActiveRecord::Base.logger.info("New location: #{new_dg.cache_key}")
+      new_dg.save!
+      new_dga = DetailedGeoLocationAlias.new(world: 'World', region: region.presence, subregion: country.presence,
+                                             division: division.presence, subdivision: location.presence)
+      new_dga.save!
+      dg_id = new_dg.id
+      LocationAliasJoin.new(detailed_geo_location_id: dg_id, detailed_geo_location_alias_id: new_dga.id).save!
     end
     [dg, dg_id]
   end
