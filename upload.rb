@@ -91,7 +91,7 @@ def import_metadata(metadata_file)
   return unless metadata_file
 
   fasta_records = FastaRecord.parse(metadata_file)
-  result = FastaRecord.import(fasta_records, validate: false, recursive: true)
+  result = FastaRecord.import(fasta_records, validate: false)
   result.failed_instances.each { |rec| @log.error("Failed to insert #{rec}") }
   @log.debug("Loaded #{result.ids.size}/#{fasta_records.size} new fasta records")
 end
