@@ -72,6 +72,7 @@ process transform_data {
 process align {
     cpus 16
     conda "minimap2=2.17 sed python=3.9 samtools=1.11"
+    publishDir "${output_path}", mode: 'copy', pattern: '*.bam', overwrite: true
 
     input:
         file(fasta) from transformed_fasta.splitFasta(file: true, by: 10000)
@@ -80,9 +81,12 @@ process align {
 
     shell:
     '''
+        date_today=$(date +%Y-%m-%d)
+
         sed -E 's/ /_/g' !{fasta} \
         | minimap2 -t !{task.cpus} --eqx -x map-ont -a !{ref} /dev/stdin \
         | samtools view -F 2304 /dev/stdin \
+        | tee ${date_today}.$(basename $PWD).bam \
         | python3 !{primer_monitor_path}/lib/parse_alignments.py > $(basename $PWD).tsv
 
     '''
