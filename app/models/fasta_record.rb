@@ -55,8 +55,8 @@ class FastaRecord < ApplicationRecord
     dg = @new_locations[new_dg.cache_key] # re-use new locations
     unless dg
       @new_locations[new_dg.cache_key] = dg = new_dg
-      ActiveRecord::Base.logger.info("New location: #{new_dg.cache_key}")
       new_dg.save!
+      ActiveRecord::Base.logger.info("New location: #{new_dg.cache_key}, id: #{new_dg.ig}")
       new_dga = DetailedGeoLocationAlias.new(world: 'World', region: region.presence, subregion: country.presence,
                                              division: division.presence, subdivision: location.presence)
       new_dga.save!
