@@ -486,9 +486,34 @@ CREATE MATERIALIZED VIEW public.variant_overlaps AS
    FROM ((((public.variant_sites
      JOIN public.fasta_records ON ((variant_sites.fasta_record_id = fasta_records.id)))
      JOIN public.detailed_geo_locations ON ((fasta_records.detailed_geo_location_id = detailed_geo_locations.id)))
-     JOIN public.oligos ON ((((variant_sites.ref_start >= oligos.ref_start) AND (variant_sites.ref_start <= oligos.ref_end)) OR ((variant_sites.ref_end >= oligos.ref_start) AND (variant_sites.ref_end <= oligos.ref_end)) OR ((variant_sites.ref_start < oligos.ref_start) AND (variant_sites.ref_end > oligos.ref_end)))))
+     JOIN public.oligos ON ((((variant_sites.ref_start >= oligos.ref_start) AND (variant_sites.ref_start < oligos.ref_end)) OR ((variant_sites.ref_end > oligos.ref_start) AND (variant_sites.ref_end <= oligos.ref_end)) OR ((variant_sites.ref_start < oligos.ref_start) AND (variant_sites.ref_end > oligos.ref_end)))))
      JOIN public.primer_sets ON ((oligos.primer_set_id = primer_sets.id)))
-  WHERE ((((variant_sites.variant_type)::text = 'D'::text) OR ((variant_sites.variant_type)::text = 'X'::text) OR ((variant_sites.variant_type)::text = 'I'::text)) AND ((variant_sites.variant)::text !~~ '%N%'::text))
+  WHERE ((((variant_sites.variant_type)::text = 'D'::text) OR ((variant_sites.variant_type)::text = 'X'::text)) AND ((variant_sites.variant)::text !~~ '%N%'::text))
+UNION ALL
+ SELECT oligos.id AS oligo_id,
+    oligos.name AS oligo_name,
+    oligos.ref_start AS oligo_start,
+    oligos.ref_end AS oligo_end,
+    oligos.short_name AS oligo_short_name,
+    primer_sets.id AS primer_set_id,
+    primer_sets.name AS primer_set_name,
+    variant_sites.id AS variant_id,
+    variant_sites.variant_type,
+    variant_sites.variant,
+    variant_sites.ref_start AS variant_start,
+    variant_sites.ref_end AS variant_end,
+    COALESCE(detailed_geo_locations.region, ''::character varying) AS region,
+    COALESCE(detailed_geo_locations.subregion, ''::character varying) AS subregion,
+    COALESCE(detailed_geo_locations.division, ''::character varying) AS division,
+    COALESCE(detailed_geo_locations.subdivision, ''::character varying) AS subdivision,
+    detailed_geo_locations.id AS detailed_geo_location_id,
+    COALESCE(fasta_records.date_collected, '1900-01-01'::date) AS date_collected
+   FROM ((((public.variant_sites
+     JOIN public.fasta_records ON ((variant_sites.fasta_record_id = fasta_records.id)))
+     JOIN public.detailed_geo_locations ON ((fasta_records.detailed_geo_location_id = detailed_geo_locations.id)))
+     JOIN public.oligos ON (((variant_sites.ref_start > oligos.ref_start) AND (variant_sites.ref_start <= oligos.ref_end))))
+     JOIN public.primer_sets ON ((oligos.primer_set_id = primer_sets.id)))
+  WHERE (((variant_sites.variant_type)::text = 'I'::text) AND ((variant_sites.variant)::text !~~ '%N%'::text))
   WITH NO DATA;
 
 
@@ -631,7 +656,6 @@ CREATE MATERIALIZED VIEW public.identify_primers_for_notifications AS
             join_subscribed_location_to_ids.detailed_geo_location_id,
             primer_sets.name AS set_name,
             oligos.name AS primer_name,
-            oligos.id AS oligo_id,
             users.lookback_days,
             users.variant_fraction_threshold,
             oligo_variant_overlaps.region,
@@ -648,7 +672,7 @@ CREATE MATERIALIZED VIEW public.identify_primers_for_notifications AS
              JOIN public.join_subscribed_location_to_ids ON (((join_subscribed_location_to_ids.user_id = primer_set_subscriptions.user_id) AND (join_subscribed_location_to_ids.detailed_geo_location_id = oligo_variant_overlaps.detailed_geo_location_id))))
              JOIN public.users ON ((users.id = primer_set_subscriptions.user_id)))
           WHERE (oligo_variant_overlaps.date_collected >= (CURRENT_DATE - users.lookback_days))
-          GROUP BY primer_set_subscriptions.user_id, primer_set_subscriptions.primer_set_id, primer_sets.name, oligos.id, oligos.name, join_subscribed_location_to_ids.detailed_geo_location_id, users.lookback_days, users.variant_fraction_threshold, oligo_variant_overlaps.region, oligo_variant_overlaps.subregion, oligo_variant_overlaps.division, oligo_variant_overlaps.subdivision, oligo_variant_overlaps.coords, oligo_variant_overlaps.detailed_geo_location_id
+          GROUP BY primer_set_subscriptions.user_id, primer_set_subscriptions.primer_set_id, primer_sets.name, oligos.name, join_subscribed_location_to_ids.detailed_geo_location_id, users.lookback_days, users.variant_fraction_threshold, oligo_variant_overlaps.region, oligo_variant_overlaps.subregion, oligo_variant_overlaps.division, oligo_variant_overlaps.subdivision, oligo_variant_overlaps.coords, oligo_variant_overlaps.detailed_geo_location_id
         ), second_query AS (
          SELECT fasta_records.detailed_geo_location_id,
             count(fasta_records.id) AS records_count,
@@ -663,7 +687,6 @@ CREATE MATERIALIZED VIEW public.identify_primers_for_notifications AS
  SELECT first_query.user_id,
     first_query.primer_set_id,
     first_query.set_name,
-    first_query.oligo_id,
     first_query.primer_name,
     first_query.region,
     first_query.subregion,
@@ -1797,6 +1820,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20210303211641'),
 ('20210304200709'),
 ('20210307125905'),
-('20210312143921');
+('20210312143921'),
+('20210312185232');
 
 
