@@ -30,9 +30,10 @@ gem 'jbuilder', '~> 2.7'
 # Reduces boot times through caching; required in config/boot.rb
 gem 'bootsnap', '>= 1.4.2', require: false
 
+# for error reporting
+gem 'airbrake'
 gem 'cancancan', '~> 3.2.1'
 gem 'devise', github: 'heartcombo/devise', branch: 'master'
-gem 'airbrake'
 gem 'omniauth-google-oauth2'
 gem 'omniauth-rails_csrf_protection', '~> 1.0'
 
@@ -57,10 +58,11 @@ group :development do
   gem 'rubocop-performance', require: false
   gem 'rubocop-rails', require: false
   gem 'web-console', '>= 3.3.0'
+  # for generating a search engine sitemap
+  gem 'sitemap_generator'
   # Spring speeds up development by keeping your application running in the background. Read more: https://github.com/rails/spring
   gem 'spring'
   gem 'spring-watcher-listen', '~> 2.0.0'
-  gem 'sitemap_generator'
 end
 
 group :test do
