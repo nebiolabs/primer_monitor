@@ -142,14 +142,14 @@ CREATE TABLE public.detailed_geo_locations (
 
 CREATE TABLE public.fasta_records (
     id bigint NOT NULL,
-    strain character varying,
+    strain character varying NOT NULL,
     genbank_accession character varying,
     gisaid_epi_isl character varying,
     date_collected date,
     created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL,
     variant_name character varying,
-    detailed_geo_location_id bigint
+    detailed_geo_location_id bigint NOT NULL
 );
 
 
@@ -210,7 +210,7 @@ CREATE MATERIALIZED VIEW public.counts AS
 
 CREATE TABLE public.detailed_geo_location_aliases (
     id bigint NOT NULL,
-    world character varying,
+    world character varying NOT NULL,
     region character varying,
     subregion character varying,
     division character varying,
@@ -325,7 +325,7 @@ CREATE TABLE public.subscribed_geo_locations (
     user_id bigint NOT NULL,
     created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL,
-    detailed_geo_location_alias_id bigint
+    detailed_geo_location_alias_id bigint NOT NULL
 );
 
 
@@ -450,13 +450,13 @@ CREATE MATERIALIZED VIEW public.time_counts AS
 
 CREATE TABLE public.variant_sites (
     id bigint NOT NULL,
-    ref_start integer,
-    variant_type character varying,
-    variant character varying,
-    fasta_record_id bigint,
+    ref_start integer NOT NULL,
+    variant_type character varying NOT NULL,
+    variant character varying NOT NULL,
+    fasta_record_id bigint NOT NULL,
     created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL,
-    ref_end integer
+    ref_end integer NOT NULL
 );
 
 
@@ -569,8 +569,8 @@ UNION ALL
 
 CREATE TABLE public.primer_set_subscriptions (
     id bigint NOT NULL,
-    primer_set_id bigint,
-    user_id bigint,
+    primer_set_id bigint NOT NULL,
+    user_id bigint NOT NULL,
     created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL
 );
@@ -687,8 +687,8 @@ CREATE MATERIALIZED VIEW public.identify_primers_for_notifications AS
 
 CREATE TABLE public.location_alias_joins (
     id bigint NOT NULL,
-    detailed_geo_location_id bigint,
-    detailed_geo_location_alias_id bigint,
+    detailed_geo_location_id bigint NOT NULL,
+    detailed_geo_location_alias_id bigint NOT NULL,
     created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL
 );
@@ -976,9 +976,9 @@ ALTER SEQUENCE public.variant_sites_id_seq OWNED BY public.variant_sites.id;
 
 CREATE TABLE public.verified_notifications (
     id bigint NOT NULL,
-    user_id bigint,
+    user_id bigint NOT NULL,
     date_sent date,
-    status character varying,
+    status character varying NOT NULL,
     created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL
 );
@@ -1796,6 +1796,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20210303180741'),
 ('20210303211641'),
 ('20210304200709'),
-('20210307125905');
+('20210307125905'),
+('20210312143921');
 
 
