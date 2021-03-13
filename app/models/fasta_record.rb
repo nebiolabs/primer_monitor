@@ -54,8 +54,8 @@ class FastaRecord < ApplicationRecord
     dg_id = DetailedGeoLocation.existing_geo_location_ids_by_unique_fields[new_dg.cache_key]
     dg = @new_locations[new_dg.cache_key] # re-use new locations
     unless dg
-      @new_locations[new_dg.cache_key] = dg = new_dg
       new_dg.save!
+      @new_locations[new_dg.cache_key] = new_dg # update new location with one that has an id
       ActiveRecord::Base.logger.info("New location: #{new_dg.cache_key}, id: #{new_dg.id}")
       new_dga = DetailedGeoLocationAlias.new(world: 'World', region: region.presence, subregion: country.presence,
                                              division: division.presence, subdivision: location.presence)
@@ -63,6 +63,11 @@ class FastaRecord < ApplicationRecord
       dg_id = new_dg.id
       LocationAliasJoin.new(detailed_geo_location_id: dg_id, detailed_geo_location_alias_id: new_dga.id).save!
     end
+
+    if dg_id.nil? # For the 2nd+ instance of records that weren't previously in the db
+      dg_id = dg.id
+    end
+
     [dg, dg_id]
   end
 end
