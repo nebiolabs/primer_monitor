@@ -53,7 +53,8 @@ class FastaRecord < ApplicationRecord
     # fetches dg_id from the cache if it already exists in the database, no harm if it's nil
     dg_id = DetailedGeoLocation.existing_geo_location_ids_by_unique_fields[new_dg.cache_key]
     dg = @new_locations[new_dg.cache_key] # re-use new locations
-    unless dg
+
+    if !dg_id && !dg
       new_dg.save!
       @new_locations[new_dg.cache_key] = new_dg # update new location with one that has an id
       ActiveRecord::Base.logger.info("New location: #{new_dg.cache_key}, id: #{new_dg.id}")
