@@ -2,14 +2,14 @@
 
 class DetailedGeoLocation < ApplicationRecord
   has_many :fasta_records
-  has_one :location_alias_joins
+  has_many :location_alias_joins
 
   def self.unique_fields
     %i[region subregion division subdivision]
   end
 
   def cache_key
-    DetailedGeoLocation.unique_fields.map { |f| send(f) }.join
+    DetailedGeoLocation.unique_fields.map { |f| send(f) }.join('/')
   end
 
   def self.existing_geo_location_ids_by_unique_fields

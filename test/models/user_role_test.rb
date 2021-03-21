@@ -4,6 +4,6 @@ require 'test_helper'
 
 class UserRoleTest < ActiveSupport::TestCase
   test 'user_role instantiation' do
-    UserRole.new
+    assert_not_nil UserRole.new
   end
 end

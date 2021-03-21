@@ -2,8 +2,7 @@
 
 class SubscribedGeoLocation < ApplicationRecord
   belongs_to :user
-  belongs_to :geo_location
-  belongs_to :detailed_geo_location
+  belongs_to :detailed_geo_location_alias
 
-  validates_uniqueness_of :user_id, scope: :geo_location_id
+  validates_uniqueness_of :user_id, scope: :detailed_geo_location_alias_id
 end
