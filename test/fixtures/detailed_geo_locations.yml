@@ -1,0 +1,28 @@
+
+darwin:
+  world: World
+  region: Oceania
+  subregion: Australia
+  division: Northern Territory
+  subdivision: Darwin
+
+warumungu:
+  world: World
+  region: Oceania
+  subregion: Australia
+  division: Northern Territory
+  subdivision: Warumungu
+
+misspelled_warumungu:
+  world: World
+  region: Oceania
+  subregion: Australia
+  division: Northern Territory
+  subdivision: Misspelled Warumungu
+
+missing_subdiv:
+  world: World
+  region: Oceania
+  subregion: Australia
+  division: Northern Territory
+  subdivision:

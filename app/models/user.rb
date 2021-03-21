@@ -9,7 +9,7 @@ class User < ApplicationRecord
   has_many :user_roles, dependent: :destroy
   has_many :roles, through: :user_roles
   has_many :subscribed_geo_locations, dependent: :destroy
-  has_many :geo_locations, through: :subscribed_geo_locations
+  has_many :detailed_geo_location_aliases, through: :subscribed_geo_locations
   has_many :primer_set_subscriptions, dependent: :destroy
   has_many :primer_sets, through: :primer_set_subscriptions
 

@@ -3,7 +3,7 @@
 require 'test_helper'
 
 class OrganismTest < ActiveSupport::TestCase
-  # test "the truth" do
-  #   assert true
-  # end
+  test 'instantiation' do
+    assert_not_nil Organism.new
+  end
 end

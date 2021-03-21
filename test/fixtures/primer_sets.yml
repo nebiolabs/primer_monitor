@@ -1,7 +1,9 @@
 # Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
 one:
-  name: MyString
+  name: Charité
+  organism: sars_cov_2
 
 two:
-  name: MyString
+  name: CDC
+  organism_id: sars_cov_2
