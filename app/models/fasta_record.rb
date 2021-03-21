@@ -36,13 +36,11 @@ class FastaRecord < ApplicationRecord
 
     ActiveRecord::Base.logger.info("New fasta record: #{strain}")
 
-    dg, dg_id = get_dg(country, division, location, region)
+    dg = get_dg(country, division, location, region)
 
-    fa = FastaRecord.new(strain: strain, gisaid_epi_isl: gisaid_epi_isl,
-                         genbank_accession: genbank_accession, detailed_geo_location_id: dg_id,
-                         date_collected: date, variant_name: variant_name)
-
-    fa
+    FastaRecord.new(strain: strain, gisaid_epi_isl: gisaid_epi_isl,
+                    genbank_accession: genbank_accession, detailed_geo_location: dg,
+                    date_collected: date, variant_name: variant_name)
   end
 
   def self.get_dg(country, division, location, region)
@@ -50,25 +48,22 @@ class FastaRecord < ApplicationRecord
     new_dg = DetailedGeoLocation.new(world: 'World', region: region.presence, subregion: country.presence,
                                      division: division.presence, subdivision: location.presence)
 
-    # fetches dg_id from the cache if it already exists in the database, no harm if it's nil
-    dg_id = DetailedGeoLocation.existing_geo_location_ids_by_unique_fields[new_dg.cache_key]
+    # fetches dg_ids from the cache if it already exists in the database, no harm if it's nil
+    dg_ids = DetailedGeoLocation.existing_geo_location_ids_by_unique_fields[new_dg.cache_key]
     dg = @new_locations[new_dg.cache_key] # re-use new locations
 
-    if !dg_id && !dg
+    if dg_ids.empty? && !dg
+      # did not find an existing geolocation (dg_id) or a recently cached one (dg)
       new_dg.save!
       @new_locations[new_dg.cache_key] = new_dg # update new location with one that has an id
       ActiveRecord::Base.logger.info("New location: #{new_dg.cache_key}, id: #{new_dg.id}")
-      new_dga = DetailedGeoLocationAlias.new(world: 'World', region: region.presence, subregion: country.presence,
-                                             division: division.presence, subdivision: location.presence)
+
+      new_dga = DetailedGeoLocationAlias.new_from_detailed_geolocation(new_dg)
       new_dga.save!
-      dg_id = new_dg.id
-      LocationAliasJoin.new(detailed_geo_location_id: dg_id, detailed_geo_location_alias_id: new_dga.id).save!
+      LocationAliasJoin.new(detailed_geo_location_id: new_dg.id, detailed_geo_location_alias_id: new_dga.id).save!
+      dg = new_dg
     end
 
-    if dg_id.nil? # For the 2nd+ instance of records that weren't previously in the db
-      dg_id = dg.id
-    end
-
-    [dg, dg_id]
+    dg
   end
 end
