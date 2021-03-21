@@ -6,4 +6,4 @@ one:
 
 two:
   name: CDC
-  organism_id: sars_cov_2
+  organism: sars_cov_2
