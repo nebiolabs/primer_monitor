@@ -44,9 +44,9 @@ module Users
     def configure_sign_up_params
       devise_parameter_sanitizer.permit(:sign_up) do |user|
         user.permit(%i[first last email password password_confirmation send_primer_updates
-                       lookback_days variant_fraction_threshold],
+                       lookback_days variant_fraction_threshold ],
                     primer_set_ids: [],
-                    geo_location_ids: [])
+                    subscribed_detailed_geo_location_alias_ids: [])
       end
     end
 
@@ -55,7 +55,8 @@ module Users
         user.permit(%i[first last email password password_confirmation send_primer_updates
                        lookback_days variant_fraction_threshold],
                     primer_set_ids: [],
-                    geo_location_ids: [])
+                    subscribed_detailed_geo_location_alias_ids: []
+        )
       end
     end
 

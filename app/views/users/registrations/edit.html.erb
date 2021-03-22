@@ -91,9 +91,15 @@
       Subscribed locations
     </div>
     <div class="control field-body">
-      Geolocation selection is not yet available, we'll send a notification to subscribed users when it is stable.
+      <%=f.select :subscribed_detailed_geo_location_alias_ids,
+                  options_from_collection_for_select(DetailedGeoLocationAlias.subscribable,
+                                                     :id, :name, current_user.subscribed_detailed_geo_location_alias_ids),
+                  {include_blank: true} ,
+                  class: 'select2', style: 'width: 300px;', multiple: true
+      %>
     </div>
   </div>
+
   <div class="field is-horizontal">
     <div class="field-label">
       Notify about variants observed within the last...
