@@ -708,6 +708,30 @@ CREATE MATERIALIZED VIEW public.identify_primers_for_notifications AS
 
 
 --
+-- Name: join_subscribed_location_to_id; Type: VIEW; Schema: public; Owner: -
+--
+
+CREATE VIEW public.join_subscribed_location_to_id AS
+ WITH subscribed_ids AS (
+         SELECT subscribed_geo_locations.user_id,
+            subscribed_geo_locations.detailed_geo_location_alias_id,
+            detailed_geo_location_aliases_1.region,
+            detailed_geo_location_aliases_1.subregion,
+            detailed_geo_location_aliases_1.division,
+            detailed_geo_location_aliases_1.subdivision
+           FROM (public.detailed_geo_location_aliases detailed_geo_location_aliases_1
+             JOIN public.subscribed_geo_locations ON ((subscribed_geo_locations.detailed_geo_location_alias_id = detailed_geo_location_aliases_1.id)))
+        )
+ SELECT subscribed_ids.user_id,
+    subscribed_ids.detailed_geo_location_alias_id AS subscribed_id,
+    detailed_geo_location_aliases.id AS detailed_geo_location_alias_id,
+    detailed_geo_locations.id AS detailed_geo_location_id
+   FROM ((public.detailed_geo_location_aliases
+     JOIN subscribed_ids ON ((((subscribed_ids.region IS NULL) OR ((subscribed_ids.region)::text = (detailed_geo_location_aliases.region)::text)) AND ((subscribed_ids.subregion IS NULL) OR ((subscribed_ids.subregion)::text = (detailed_geo_location_aliases.subregion)::text)) AND ((subscribed_ids.division IS NULL) OR ((subscribed_ids.division)::text = (detailed_geo_location_aliases.division)::text)) AND ((subscribed_ids.subdivision IS NULL) OR ((subscribed_ids.subdivision)::text = (detailed_geo_location_aliases.subdivision)::text)))))
+     JOIN public.detailed_geo_locations ON ((detailed_geo_locations.detailed_geo_location_alias_id = detailed_geo_location_aliases.id)));
+
+
+--
 -- Name: oligos_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
@@ -1765,6 +1789,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20210312185232'),
 ('20210313180917'),
 ('20210318204840'),
-('20210321204308');
+('20210321204308'),
+('20210323205921');
 
 
