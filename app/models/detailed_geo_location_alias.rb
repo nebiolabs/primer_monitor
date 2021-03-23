@@ -22,7 +22,7 @@ class DetailedGeoLocationAlias < ApplicationRecord
   end
 
   def to_s
-    "#{region}/#{subregion}/#{division}/#{subdivision}"
+    [region, subregion, division, subdivision].compact.join('/')
   end
 
   def name
