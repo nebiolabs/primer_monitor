@@ -2,6 +2,7 @@
 
 class FastaRecord < ApplicationRecord
   belongs_to :detailed_geo_location
+  has_many :location_alias_joins, foreign_key: :detailed_geo_location_id
 
   def self.parse(metadata_tsv)
     raise "Unable to find counts file #{metadata_tsv}" unless File.exist?(metadata_tsv)
@@ -56,7 +57,8 @@ class FastaRecord < ApplicationRecord
 
     if !dg_id && !dg
       # did not find an existing geolocation (dg_id) or a recently cached one (dg)
-      new_dg.detailed_geo_location_alias = DetailedGeoLocationAlias.new_from_detailed_geolocation(new_dg)
+      new_dga = DetailedGeoLocationAlias.new_from_detailed_geolocation(new_dg)
+      new_dg.location_alias_joins.build(detailed_geo_location_alias: new_dga)
       new_dg.save!
       @new_locations[new_dg.cache_key] = new_dg # update new location with one that has an id
       ActiveRecord::Base.logger.info("New location: #{new_dg.cache_key}, id: #{new_dg.id}")

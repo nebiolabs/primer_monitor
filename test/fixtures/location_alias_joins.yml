@@ -1,0 +1,11 @@
+darwin:
+  detailed_geo_location: darwin
+  detailed_geo_location_alias: darwin
+
+warumungu:
+  detailed_geo_location: warumungu
+  detailed_geo_location_alias: warumungu
+
+misspelled_warumungu:
+  detailed_geo_location: misspelled_warumungu
+  detailed_geo_location_alias: warumungu
