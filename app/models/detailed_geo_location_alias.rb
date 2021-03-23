@@ -10,6 +10,8 @@ class DetailedGeoLocationAlias < ApplicationRecord
     joins(detailed_geo_locations: :fasta_records)
       .group('detailed_geo_location_aliases.id')
       .having("count(fasta_records.id) >= #{MIN_SEQUENCES_FOR_GEOLOCATION}")
+      .order('world, region NULLS FIRST, subregion NULLS FIRST,
+              subdivision NULLS FIRST, locality NULLS FIRST, sublocality NULLS FIRST')
   }
 
   def self.new_from_detailed_geolocation(detailed_geolocation)
