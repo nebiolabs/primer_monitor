@@ -5,6 +5,7 @@ darwin:
   subregion: Australia
   division: Northern Territory
   subdivision: Darwin
+  detailed_geo_location_alias: darwin
 
 warumungu:
   world: World
@@ -12,6 +13,7 @@ warumungu:
   subregion: Australia
   division: Northern Territory
   subdivision: Warumungu
+  detailed_geo_location_alias: warumungu
 
 misspelled_warumungu:
   world: World
@@ -19,6 +21,7 @@ misspelled_warumungu:
   subregion: Australia
   division: Northern Territory
   subdivision: Misspelled Warumungu
+  detailed_geo_location_alias: warumungu
 
 missing_subdiv:
   world: World
@@ -26,3 +29,4 @@ missing_subdiv:
   subregion: Australia
   division: Northern Territory
   subdivision:
+  detailed_geo_location_alias: darwin

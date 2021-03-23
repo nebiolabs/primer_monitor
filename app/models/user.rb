@@ -8,13 +8,12 @@ class User < ApplicationRecord
   has_many :primer_sets
   has_many :user_roles, dependent: :destroy
   has_many :roles, through: :user_roles
-  has_many :subscribed_geo_locations, dependent: :destroy
+  has_many :subscribed_geo_locations, dependent: :destroy, inverse_of: :user
   has_many :detailed_geo_location_aliases, through: :subscribed_geo_locations
   has_many :primer_set_subscriptions, dependent: :destroy
   has_many :primer_sets, through: :primer_set_subscriptions
 
   accepts_nested_attributes_for :user_roles, reject_if: :all_blank, allow_destroy: true
-  accepts_nested_attributes_for :subscribed_geo_locations, allow_destroy: true
 
   before_validation :set_login_from_email
 
@@ -30,6 +29,20 @@ class User < ApplicationRecord
       Rails.logger.info("Creating new user using : #{user_attribs}")
       user.skip_confirmation!
     end
+  end
+
+  def subscribed_detailed_geo_location_alias_ids
+    subscribed_geo_locations.map &:detailed_geo_location_alias_id
+  end
+
+  def subscribed_detailed_geo_location_alias_ids=(dga_ids)
+    recs = []
+    dga_ids.each do |dga_id|
+      next if dga_id.blank?
+
+      recs << SubscribedGeoLocation.new(user_id: self.id, detailed_geo_location_alias_id: dga_id)
+    end
+    self.subscribed_geo_locations = recs
   end
 
   def to_s

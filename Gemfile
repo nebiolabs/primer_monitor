@@ -58,6 +58,8 @@ group :development do
   gem 'rubocop-performance', require: false
   gem 'rubocop-rails', require: false
   gem 'web-console', '>= 3.3.0'
+  # for measuring test coverage
+  gem 'simplecov'
   # for generating a search engine sitemap
   gem 'sitemap_generator'
   # Spring speeds up development by keeping your application running in the background. Read more: https://github.com/rails/spring

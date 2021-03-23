@@ -2,7 +2,7 @@
 
 class DetailedGeoLocation < ApplicationRecord
   has_many :fasta_records
-  has_many :location_alias_joins
+  belongs_to :detailed_geo_location_alias
 
   def self.unique_fields
     %i[region subregion division subdivision]
