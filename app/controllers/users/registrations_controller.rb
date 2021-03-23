@@ -55,8 +55,7 @@ module Users
         user.permit(%i[first last email password password_confirmation send_primer_updates
                        lookback_days variant_fraction_threshold],
                     primer_set_ids: [],
-                    subscribed_detailed_geo_location_alias_ids: []
-        )
+                    subscribed_detailed_geo_location_alias_ids: [])
       end
     end
 

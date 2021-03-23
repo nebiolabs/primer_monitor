@@ -32,7 +32,7 @@ class User < ApplicationRecord
   end
 
   def subscribed_detailed_geo_location_alias_ids
-    subscribed_geo_locations.map &:detailed_geo_location_alias_id
+    subscribed_geo_locations.map(&:detailed_geo_location_alias_id)
   end
 
   def subscribed_detailed_geo_location_alias_ids=(dga_ids)
@@ -40,7 +40,7 @@ class User < ApplicationRecord
     dga_ids.each do |dga_id|
       next if dga_id.blank?
 
-      recs << SubscribedGeoLocation.new(user_id: self.id, detailed_geo_location_alias_id: dga_id)
+      recs << SubscribedGeoLocation.new(user_id: id, detailed_geo_location_alias_id: dga_id)
     end
     self.subscribed_geo_locations = recs
   end

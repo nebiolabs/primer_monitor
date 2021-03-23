@@ -26,5 +26,4 @@ class DetailedGeoLocationAlias < ApplicationRecord
   def name
     to_s
   end
-
 end
