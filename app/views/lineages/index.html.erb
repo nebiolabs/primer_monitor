@@ -5,10 +5,13 @@
 Nucleotide variants related to lineages of concern are indicated in yellow above a schematic SARS-CoV-2 genome.
 Primer pairs that do not overlap with variants associated with these lineages are shown in green.
 Pairs that do overlap are indicated in orange.
-ARTIC v3 amplicons 74, 76 overlap with variants associated with B.1.351.
-ARTIC v3 amplicon 96 overlaps with variants associated with B.1.429.
-ARTIC v3 amplicon 54 overlaps with variants associated with B.1.526.
-The China CDC N gene qPCR amplicon overlaps with variants in all 5 lineages.
+Affected primers:
+<ul>
+  <li>The China CDC N gene qPCR amplicon overlaps with variants in all 5 lineages.</li>
+  <li>ARTIC v3 amplicons 74, 76 overlap with variants associated with B.1.351.</li>
+  <li>ARTIC v3 amplicons 72, 96 overlaps with variants associated with B.1.429.</li>
+  <li>ARTIC v3 amplicon 54 overlaps with variants associated with B.1.526.</li>
+</ul>
 <hr>
 <h2 class="title">N Gene Variants</h2>
 <%= image_tag 'lineage_primer_summary_N_20210307.svg' %>
@@ -21,44 +24,58 @@ The China CDC N gene qPCR amplicon overlaps with variants in all 5 lineages.
 <hr>
 <h2 class="title">Methods:</h2>
 <p>
-Sequences reported in <%= link_to 'Sequence Sources', '#sequence_sources' %> for each lineage were aligned to the NC_045512.2 reference sequence (minimap2). Variants > 20% frequency (freebayes) were
-evaluated for overlap with primer regions (bedtools) and displayed (Geneious Prime 2021.0.3).
+  Sequences reported in <%= link_to 'Sequence Sources', '#sequence_sources' %> for each lineage were aligned to the
+  NC_045512.2 reference sequence (minimap2). Variants > 20% frequency (freebayes) were
+  evaluated for overlap with primer regions (bedtools) and displayed (Geneious Prime 2021.0.3).
 </p>
 <hr>
 <h3 id='sequence_sources' class="title">Sequence Sources:</h3>
 <p>Virological. “Preliminary Genomic Characterisation of an Emergent SARS-CoV-2 Lineage in the UK Defined by a Novel Set
   of Spike Mutations - SARS-CoV-2 Coronavirus / NCoV-2019 Genomic Epidemiology,” December 18,
   2020. <%= link_to 'https://virological.org/t/preliminary-genomic-characterisation-of-an-emergent-sars-cov-2-lineage-in-the-uk-defined-by-a-novel-set-of-spike-mutations/563',
-                    'https://virological.org/t/preliminary-genomic-characterisation-of-an-emergent-sars-cov-2-lineage-in-the-uk-defined-by-a-novel-set-of-spike-mutations/563'%>.
+                    'https://virological.org/t/preliminary-genomic-characterisation-of-an-emergent-sars-cov-2-lineage-in-the-uk-defined-by-a-novel-set-of-spike-mutations/563' %>
+  .
 </p>
 <p>Virological. “SARS-CoV-2 Reinfection by the New Variant of Concern (VOC) P.1 in Amazonas, Brazil - SARS-CoV-2
   Coronavirus / NCoV-2019 Genomic Epidemiology,” January 18,
   2021. <%= link_to 'https://virological.org/t/sars-cov-2-reinfection-by-the-new-variant-of-concern-voc-p-1-in-amazonas-brazil/596',
-            'https://virological.org/t/sars-cov-2-reinfection-by-the-new-variant-of-concern-voc-p-1-in-amazonas-brazil/596'%>.
+                    'https://virological.org/t/sars-cov-2-reinfection-by-the-new-variant-of-concern-voc-p-1-in-amazonas-brazil/596' %>
+  .
 </p>
 <p>
   Tegally, Houriiyah, Eduan Wilkinson, Marta Giovanetti, Arash Iranzadeh, Vagner Fonseca, Jennifer Giandhari, Deelan
   Doolabh, et al. “Emergence and Rapid Spread of a New Severe Acute Respiratory Syndrome-Related Coronavirus 2
   (SARS-CoV-2) Lineage with Multiple Spike Mutations in South Africa.” MedRxiv, December 22, 2020,
-  2020.12.21.20248640. <%= link_to 'https://doi.org/10.1101/2020.12.21.20248640','https://doi.org/10.1101/2020.12.21.20248640' %>.
+  2020.12.21.20248640. <%= link_to 'https://doi.org/10.1101/2020.12.21.20248640', 'https://doi.org/10.1101/2020.12.21.20248640' %>
+  .
 </p>
 <p>Zhang, Wenjuan, Brian D. Davis, Stephanie S. Chen, Jorge M. Sincuir Martinez, Jasmine T. Plummer, and Eric Vail.
   “Emergence of a Novel SARS-CoV-2 Strain in Southern California, USA.” MedRxiv, January 20, 2021,
-  2021.01.18.21249786. <%= link_to 'https://doi.org/10.1101/2021.01.18.21249786', 'https://doi.org/10.1101/2021.01.18.21249786' %>.
+  2021.01.18.21249786. <%= link_to 'https://doi.org/10.1101/2021.01.18.21249786', 'https://doi.org/10.1101/2021.01.18.21249786' %>
+  .
 </p>
 <p>
   West, Anthony P., Christopher O. Barnes, Zhi Yang, and Pamela J. Bjorkman.
-  “SARS-CoV-2 Lineage B.1.526 Emerging in the New York Region Detected by Software Utility Created to Query the Spike Mutational Landscape.”
-  BioRxiv, February 23, 2021, 2021.02.14.431043. <%= link_to 'https://doi.org/10.1101/2021.02.14.431043', 'https://doi.org/10.1101/2021.02.14.431043' %>.
+  “SARS-CoV-2 Lineage B.1.526 Emerging in the New York Region Detected by Software Utility Created to Query the Spike
+  Mutational Landscape.”
+  BioRxiv, February 23, 2021,
+  2021.02.14.431043. <%= link_to 'https://doi.org/10.1101/2021.02.14.431043', 'https://doi.org/10.1101/2021.02.14.431043' %>
+  .
 </p>
 <hr/>
 <h3 class='title'>Tools</h3>
 <p>
-  Li, Heng. “Minimap2: Pairwise Alignment for Nucleotide Sequences.” Bioinformatics 34, no. 18 (September 15, 2018): 3094–3100. <%= link_to 'https://doi.org/10.1093/bioinformatics/bty191', '>https://doi.org/10.1093/bioinformatics/bty191' %>.
+  Li, Heng. “Minimap2: Pairwise Alignment for Nucleotide Sequences.” Bioinformatics 34, no. 18 (September 15, 2018):
+  3094–3100. <%= link_to 'https://doi.org/10.1093/bioinformatics/bty191', '>https://doi.org/10.1093/bioinformatics/bty191' %>
+  .
 </p>
 <p>
-  Garrison, Erik, and Gabor Marth. “Haplotype-Based Variant Detection from Short-Read Sequencing.” ArXiv:1207.3907 [q-Bio], July 20, 2012. <%= link_to 'http://arxiv.org/abs/1207.3907', 'http://arxiv.org/abs/1207.3907' %>.
+  Garrison, Erik, and Gabor Marth. “Haplotype-Based Variant Detection from Short-Read Sequencing.” ArXiv:1207.3907
+  [q-Bio], July 20, 2012. <%= link_to 'http://arxiv.org/abs/1207.3907', 'http://arxiv.org/abs/1207.3907' %>.
 </p>
 <p>
-Quinlan, Aaron R, and Ira M Hall. “BEDTools: A Flexible Suite of Utilities for Comparing Genomic Features.” Bioinformatics (Oxford, England) 26 (2010): 841–42. <%= link_to 'https://doi.org/10.1093/bioinformatics/btq033','https://doi.org/10.1093/bioinformatics/btq033' %>.
+  Quinlan, Aaron R, and Ira M Hall. “BEDTools: A Flexible Suite of Utilities for Comparing Genomic Features.”
+  Bioinformatics (Oxford, England) 26 (2010):
+  841–42. <%= link_to 'https://doi.org/10.1093/bioinformatics/btq033', 'https://doi.org/10.1093/bioinformatics/btq033' %>
+  .
 </p>
