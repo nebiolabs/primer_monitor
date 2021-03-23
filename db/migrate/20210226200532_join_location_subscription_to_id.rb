@@ -10,7 +10,7 @@ class JoinLocationSubscriptionToId < ActiveRecord::Migration[6.1]
         INNER JOIN subscribed_ids ON (subscribed_ids.region IS NULL OR subscribed_ids.region = detailed_geo_locations.region) AND 
             (subscribed_ids.subregion IS NULL OR subscribed_ids.subregion = detailed_geo_locations.subregion) AND 
             (subscribed_ids.division IS NULL OR subscribed_ids.division = detailed_geo_locations.division) AND
-            (subscribed_ids.subdivision IS NULL OR subscribed_ids.subdivision = detailed_geo_locations.subdivision) 
+            (subscribed_ids.subdivision IS NULL OR subscribed_ids.subdivision = detailed_geo_locations.subdivision)
     "
   end
 
