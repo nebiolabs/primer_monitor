@@ -2,23 +2,26 @@
 
 class FastaRecord < ApplicationRecord
   belongs_to :detailed_geo_location
+  has_many :location_alias_joins, foreign_key: :detailed_geo_location_id
 
   def self.parse(metadata_tsv)
     raise "Unable to find counts file #{metadata_tsv}" unless File.exist?(metadata_tsv)
 
-    metadata = []
+    new_fasta_records = []
     record_count = 0
     @new_locations = {}
 
     File.readlines(metadata_tsv).each do |line|
+      next if line.start_with?("strain\t")
+
       record_count += 1
       record = build_fasta_record(line)
-      metadata << record if record
+      new_fasta_records << record if record
     end
     @existing_fasta_strain_ids = nil # invalidates cache since any new records would not be present
     raise "Unable to parse any records from #{metadata_tsv}" if record_count.zero?
 
-    metadata
+    new_fasta_records
   end
 
   def self.existing_fasta_strain_ids
@@ -36,13 +39,11 @@ class FastaRecord < ApplicationRecord
 
     ActiveRecord::Base.logger.info("New fasta record: #{strain}")
 
-    dg, dg_id = get_dg(country, division, location, region)
+    dg = get_dg(country, division, location, region)
 
-    fa = FastaRecord.new(strain: strain, gisaid_epi_isl: gisaid_epi_isl,
-                         genbank_accession: genbank_accession, detailed_geo_location_id: dg_id,
-                         date_collected: date, variant_name: variant_name)
-
-    fa
+    FastaRecord.new(strain: strain, gisaid_epi_isl: gisaid_epi_isl,
+                    genbank_accession: genbank_accession, detailed_geo_location: dg,
+                    date_collected: date, variant_name: variant_name)
   end
 
   def self.get_dg(country, division, location, region)
@@ -50,25 +51,20 @@ class FastaRecord < ApplicationRecord
     new_dg = DetailedGeoLocation.new(world: 'World', region: region.presence, subregion: country.presence,
                                      division: division.presence, subdivision: location.presence)
 
-    # fetches dg_id from the cache if it already exists in the database, no harm if it's nil
+    # fetches dg_ids from the cache if it already exists in the database, no harm if it's nil
     dg_id = DetailedGeoLocation.existing_geo_location_ids_by_unique_fields[new_dg.cache_key]
     dg = @new_locations[new_dg.cache_key] # re-use new locations
 
     if !dg_id && !dg
+      # did not find an existing geolocation (dg_id) or a recently cached one (dg)
+      new_dga = DetailedGeoLocationAlias.new_from_detailed_geolocation(new_dg)
+      new_dg.location_alias_joins.build(detailed_geo_location_alias: new_dga)
       new_dg.save!
       @new_locations[new_dg.cache_key] = new_dg # update new location with one that has an id
       ActiveRecord::Base.logger.info("New location: #{new_dg.cache_key}, id: #{new_dg.id}")
-      new_dga = DetailedGeoLocationAlias.new(world: 'World', region: region.presence, subregion: country.presence,
-                                             division: division.presence, subdivision: location.presence)
-      new_dga.save!
-      dg_id = new_dg.id
-      LocationAliasJoin.new(detailed_geo_location_id: dg_id, detailed_geo_location_alias_id: new_dga.id).save!
+      dg = new_dg
     end
 
-    if dg_id.nil? # For the 2nd+ instance of records that weren't previously in the db
-      dg_id = dg.id
-    end
-
-    [dg, dg_id]
+    dg
   end
 end

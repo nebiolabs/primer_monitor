@@ -1,0 +1,18 @@
+
+darwin:
+  world: World
+  region: Oceania
+  subregion: Australia
+  division: Northern Territory
+  subdivision: Darwin
+  latitude: -12.383908323651692
+  longitude: 130.85546829204216
+
+warumungu:
+  world: World
+  region: Oceania
+  subregion: Australia
+  division: Northern Territory
+  subdivision: Warumungu
+  latitude: -19.30702781197558
+  longitude: 134.214265888717

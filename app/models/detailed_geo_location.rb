@@ -2,21 +2,21 @@
 
 class DetailedGeoLocation < ApplicationRecord
   has_many :fasta_records
-  has_one :location_alias_joins
+  has_many :location_alias_joins
 
   def self.unique_fields
     %i[region subregion division subdivision]
   end
 
   def cache_key
-    DetailedGeoLocation.unique_fields.map { |f| send(f) }.join
+    DetailedGeoLocation.unique_fields.map { |f| send(f) }.join('/')
   end
 
   def self.existing_geo_location_ids_by_unique_fields
-    @existing_geo_location_ids_by_unique_fields ||= DetailedGeoLocation.pluck(:id, unique_fields.join(','))
-                                                                       .each_with_object({}) do |dg_fields, h|
-      h[dg_fields[1..].join] = dg_fields[0]
-    end
+    @existing_geo_location_ids_by_unique_fields ||=
+      DetailedGeoLocation.pluck(:id, unique_fields.join(',')).each_with_object({}) do |dg_fields, h|
+        h[dg_fields[1..].join] = dg_fields[0]
+      end
   end
 
   def to_s

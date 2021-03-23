@@ -1,0 +1,20 @@
+one:
+  id: 1
+  strain: AUS/NT03/2020
+  gisaid_epi_isl: '?'
+  variant_name: Chungo
+  detailed_geo_location: darwin
+
+two:
+  id: 2
+  strain: AUS/NT01/2020
+  gisaid_epi_isl: '?'
+  variant_name: Grueso
+  detailed_geo_location: warumungu
+
+three:
+  id: 3
+  strain: AUS/NT02/2020
+  gisaid_epi_isl: '?'
+  variant_name: Machacado
+  detailed_geo_location: misspelled_warumungu

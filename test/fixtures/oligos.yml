@@ -2,8 +2,8 @@
 
 one:
   name: MyString
-  sequence: MyString
+  sequence: GCAATTTATATACATATA
 
 two:
   name: MyString
-  sequence: MyString
+  sequence: CCCCATATACTATATATA
