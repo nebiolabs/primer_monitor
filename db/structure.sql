@@ -367,7 +367,8 @@ CREATE TABLE public.oligos (
     category public.oligo_category,
     ref_start bigint,
     ref_end bigint,
-    short_name character varying
+    short_name character varying,
+    strand character varying
 );
 
 
@@ -1790,6 +1791,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20210313180917'),
 ('20210318204840'),
 ('20210321204308'),
-('20210323205921');
+('20210323205921'),
+('20210325203319');
 
 
