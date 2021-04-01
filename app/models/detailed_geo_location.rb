@@ -15,7 +15,7 @@ class DetailedGeoLocation < ApplicationRecord
   def self.existing_geo_location_ids_by_unique_fields
     @existing_geo_location_ids_by_unique_fields ||=
       DetailedGeoLocation.pluck(:id, unique_fields.join(',')).each_with_object({}) do |dg_fields, h|
-        h[dg_fields[1..].join] = dg_fields[0]
+        h[dg_fields[1..].join('/')] = dg_fields[0]
       end
   end
 

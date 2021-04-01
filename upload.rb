@@ -91,9 +91,9 @@ def import_metadata(metadata_file)
   return unless metadata_file
 
   fasta_records = FastaRecord.parse(metadata_file)
-  result = FastaRecord.import(fasta_records, validate: false)
-  result.failed_instances.each { |rec| @log.error("Failed to insert #{rec}") }
-  @log.debug("Loaded #{result.ids.size}/#{fasta_records.size} new fasta records")
+  # result = FastaRecord.import(fasta_records, validate: false)
+  # result.failed_instances.each { |rec| @log.error("Failed to insert #{rec}") }
+  # @log.debug("Loaded #{result.ids.size}/#{fasta_records.size} new fasta records")
 end
 
 def import_variants(variants_file)
@@ -123,16 +123,16 @@ def main
   setup_db_connection
   ActiveRecord::Base.transaction do
     import_metadata(opts[:metadata_tsv])
-    import_variants(opts[:variants_tsv])
+    # import_variants(opts[:variants_tsv])
 
-    ActiveRecord::Base.connection.execute('REFRESH MATERIALIZED VIEW variant_overlaps')
-    ActiveRecord::Base.connection.execute('REFRESH MATERIALIZED VIEW counts')
-    ActiveRecord::Base.connection.execute('REFRESH MATERIALIZED VIEW time_counts')
-    ActiveRecord::Base.connection.execute('REFRESH MATERIALIZED VIEW oligo_variant_overlaps')
-    ActiveRecord::Base.connection.execute('REFRESH MATERIALIZED VIEW identify_primers_for_notifications')
+    # ActiveRecord::Base.connection.execute('REFRESH MATERIALIZED VIEW variant_overlaps')
+    # ActiveRecord::Base.connection.execute('REFRESH MATERIALIZED VIEW counts')
+    # ActiveRecord::Base.connection.execute('REFRESH MATERIALIZED VIEW time_counts')
+    # ActiveRecord::Base.connection.execute('REFRESH MATERIALIZED VIEW oligo_variant_overlaps')
+    # ActiveRecord::Base.connection.execute('REFRESH MATERIALIZED VIEW identify_primers_for_notifications')
 
-    find_new_notifications
-    group_notifications
+    # find_new_notifications
+    # group_notifications
   end
 end
 main if $PROGRAM_NAME.end_with?('upload.rb')

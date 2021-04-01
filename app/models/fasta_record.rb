@@ -34,7 +34,7 @@ class FastaRecord < ApplicationRecord
       _paper_url, _date_submitted, variant_name) = line.chomp.split("\t")
 
     return unless strain && gisaid_epi_isl && genbank_accession && region && country && division && location && date
-    return if existing_fasta_strain_ids.key?(strain)
+    # return if existing_fasta_strain_ids.key?(strain)
 
     ActiveRecord::Base.logger.info("New fasta record: #{strain}")
 
@@ -52,15 +52,21 @@ class FastaRecord < ApplicationRecord
 
     # fetches dg_ids from the cache if it already exists in the database, no harm if it's nil
     dg_id = DetailedGeoLocation.existing_geo_location_ids_by_unique_fields[new_dg.cache_key]
-    dg = @new_locations[new_dg.cache_key] # re-use new locations
+    dg = DetailedGeoLocation.find_by(id: dg_id)
+    
+    if !dg
+      dg = @new_locations[new_dg.cache_key] # re-use new locations
+    end
 
-    if !dg_id && !dg
+    if !dg
       # did not find an existing geolocation (dg_id) or a recently cached one (dg)
       new_dg.detailed_geo_location_alias = DetailedGeoLocationAlias.new_from_detailed_geolocation(new_dg)
+      # new_dg.save!
       @new_locations[new_dg.cache_key] = new_dg # update new location with one that has an id
       ActiveRecord::Base.logger.info("New location: #{new_dg.cache_key}, id: #{new_dg.id}")
       dg = new_dg
     end
+    ActiveRecord::Base.logger.info("to enter: #{dg}")
 
     dg
   end
