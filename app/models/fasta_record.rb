@@ -34,7 +34,7 @@ class FastaRecord < ApplicationRecord
       _paper_url, _date_submitted, variant_name) = line.chomp.split("\t")
 
     return unless strain && gisaid_epi_isl && genbank_accession && region && country && division && location && date
-    # return if existing_fasta_strain_ids.key?(strain)
+    return if existing_fasta_strain_ids.key?(strain)
 
     ActiveRecord::Base.logger.info("New fasta record: #{strain}")
 
