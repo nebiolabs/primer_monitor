@@ -45,23 +45,6 @@ def setup_db_connection
 end
 
 def parse_options
-  # ADDING A NEW OPTION? TODO CHECKLIST:
-
-  # Does the option specify an input file? Add it to input_file_params
-  # hash/method.
-
-  # Is the option required for read_group (library)? Add it to
-  # required_read_group_params hash/method, otherwise to
-  # optional_read_group_params.
-
-  # Does the option processing change the data for the view in
-  # dna_production_quality_metrics (the view is in Tableau for DNA
-  # production QC table)? See, for example,
-  # db/migrate/20190530213731_chg_dna_production_quality_metrics_to_matviews.rb. Add
-  # to matview_for_option_str multiline string/table both the option
-  # and the corresponding materialized view(s) to be refreshed when
-  # the option is processed.
-
   begin
     slop_opts = Slop.parse(ARGV.map(&:strip)) do |o|
       o.string '--metadata_tsv', 'Tsv file containing metadata information'
@@ -89,11 +72,11 @@ end
 
 def import_metadata(metadata_file)
   return unless metadata_file
-
+  
   fasta_records = FastaRecord.parse(metadata_file)
-  # result = FastaRecord.import(fasta_records, validate: false)
-  # result.failed_instances.each { |rec| @log.error("Failed to insert #{rec}") }
-  # @log.debug("Loaded #{result.ids.size}/#{fasta_records.size} new fasta records")
+  result = FastaRecord.import(fasta_records, validate: false)
+  result.failed_instances.each { |rec| @log.error("Failed to insert #{rec}") }
+  @log.debug("Loaded #{result.ids.size}/#{fasta_records.size} new fasta records")
 end
 
 def import_variants(variants_file)
@@ -123,16 +106,16 @@ def main
   setup_db_connection
   ActiveRecord::Base.transaction do
     import_metadata(opts[:metadata_tsv])
-    # import_variants(opts[:variants_tsv])
+    import_variants(opts[:variants_tsv])
 
-    # ActiveRecord::Base.connection.execute('REFRESH MATERIALIZED VIEW variant_overlaps')
-    # ActiveRecord::Base.connection.execute('REFRESH MATERIALIZED VIEW counts')
-    # ActiveRecord::Base.connection.execute('REFRESH MATERIALIZED VIEW time_counts')
-    # ActiveRecord::Base.connection.execute('REFRESH MATERIALIZED VIEW oligo_variant_overlaps')
-    # ActiveRecord::Base.connection.execute('REFRESH MATERIALIZED VIEW identify_primers_for_notifications')
+    ActiveRecord::Base.connection.execute('REFRESH MATERIALIZED VIEW variant_overlaps')
+    ActiveRecord::Base.connection.execute('REFRESH MATERIALIZED VIEW counts')
+    ActiveRecord::Base.connection.execute('REFRESH MATERIALIZED VIEW time_counts')
+    ActiveRecord::Base.connection.execute('REFRESH MATERIALIZED VIEW oligo_variant_overlaps')
+    ActiveRecord::Base.connection.execute('REFRESH MATERIALIZED VIEW identify_primers_for_notifications')
 
-    # find_new_notifications
-    # group_notifications
+    find_new_notifications
+    group_notifications
   end
 end
 main if $PROGRAM_NAME.end_with?('upload.rb')

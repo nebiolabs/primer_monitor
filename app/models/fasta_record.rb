@@ -38,11 +38,17 @@ class FastaRecord < ApplicationRecord
 
     ActiveRecord::Base.logger.info("New fasta record: #{strain}")
 
-    dg = get_dg(country, division, location, region)
+    dg, dg_id = get_dg(country, division, location, region)
 
-    FastaRecord.new(strain: strain, gisaid_epi_isl: gisaid_epi_isl,
-                    genbank_accession: genbank_accession, detailed_geo_location: dg,
-                    date_collected: date, variant_name: variant_name)
+    if dg_id # If dg_id exists, geolocation was already in the db, so just use its ID
+      FastaRecord.new(strain: strain, gisaid_epi_isl: gisaid_epi_isl,
+                      genbank_accession: genbank_accession, detailed_geo_location_id: dg_id,
+                      date_collected: date, variant_name: variant_name)
+    else # It's a new geolocation, so use the new geolocation record
+      FastaRecord.new(strain: strain, gisaid_epi_isl: gisaid_epi_isl,
+                      genbank_accession: genbank_accession, detailed_geo_location: dg,
+                      date_collected: date, variant_name: variant_name)
+    end
   end
 
   def self.get_dg(country, division, location, region)
@@ -52,22 +58,18 @@ class FastaRecord < ApplicationRecord
 
     # fetches dg_ids from the cache if it already exists in the database, no harm if it's nil
     dg_id = DetailedGeoLocation.existing_geo_location_ids_by_unique_fields[new_dg.cache_key]
-    dg = DetailedGeoLocation.find_by(id: dg_id)
-    
-    if !dg
-      dg = @new_locations[new_dg.cache_key] # re-use new locations
-    end
 
-    if !dg
+    dg = @new_locations[new_dg.cache_key] # re-use new locations
+
+    if !dg_id && !dg
       # did not find an existing geolocation (dg_id) or a recently cached one (dg)
       new_dg.detailed_geo_location_alias = DetailedGeoLocationAlias.new_from_detailed_geolocation(new_dg)
-      # new_dg.save!
+      new_dg.save!
       @new_locations[new_dg.cache_key] = new_dg # update new location with one that has an id
       ActiveRecord::Base.logger.info("New location: #{new_dg.cache_key}, id: #{new_dg.id}")
       dg = new_dg
     end
-    ActiveRecord::Base.logger.info("to enter: #{dg}")
 
-    dg
+    [dg, dg_id]
   end
 end
