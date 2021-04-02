@@ -57,6 +57,7 @@ class FastaRecord < ApplicationRecord
     if !dg_id && !dg
       # did not find an existing geolocation (dg_id) or a recently cached one (dg)
       new_dg.detailed_geo_location_alias = DetailedGeoLocationAlias.new_from_detailed_geolocation(new_dg)
+      new_dg.save!
       @new_locations[new_dg.cache_key] = new_dg # update new location with one that has an id
       ActiveRecord::Base.logger.info("New location: #{new_dg.cache_key}, id: #{new_dg.id}")
       dg = new_dg

@@ -21,7 +21,7 @@ process download_data {
     '''
     date_today=$(date +%Y-%m-%d)
     source !{primer_monitor_path}/.env
-    curl -u $GISAID_USER:$GISAID_PASSWORD https://www.epicov.org/epi3/3p/neb/export/provision.json.xz | xz -d -T8 > ${date_today}.full_json
+    curl -u $USER:$PASSWORD $URL | xz -d -T8 > ${date_today}.full_json
     '''
 
 }
