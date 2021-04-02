@@ -45,23 +45,6 @@ def setup_db_connection
 end
 
 def parse_options
-  # ADDING A NEW OPTION? TODO CHECKLIST:
-
-  # Does the option specify an input file? Add it to input_file_params
-  # hash/method.
-
-  # Is the option required for read_group (library)? Add it to
-  # required_read_group_params hash/method, otherwise to
-  # optional_read_group_params.
-
-  # Does the option processing change the data for the view in
-  # dna_production_quality_metrics (the view is in Tableau for DNA
-  # production QC table)? See, for example,
-  # db/migrate/20190530213731_chg_dna_production_quality_metrics_to_matviews.rb. Add
-  # to matview_for_option_str multiline string/table both the option
-  # and the corresponding materialized view(s) to be refreshed when
-  # the option is processed.
-
   begin
     slop_opts = Slop.parse(ARGV.map(&:strip)) do |o|
       o.string '--metadata_tsv', 'Tsv file containing metadata information'
