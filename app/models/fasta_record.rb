@@ -55,7 +55,10 @@ class FastaRecord < ApplicationRecord
     dg_id = DetailedGeoLocation.existing_geo_location_ids_by_unique_fields[new_dg.cache_key]
 
     if !dg_id
-      dg_id = @new_locations[new_dg.cache_key].id # re-use new locations
+      dg = @new_locations[new_dg.cache_key] # re-use new locations
+      if dg
+        dg_id = dg.id
+      end
     end
 
     if !dg_id
