@@ -206,6 +206,18 @@ CREATE MATERIALIZED VIEW public.counts AS
 
 
 --
+-- Name: date_counts; Type: VIEW; Schema: public; Owner: -
+--
+
+CREATE VIEW public.date_counts AS
+ SELECT count(*) AS total_count,
+    fr.detailed_geo_location_id,
+    fr.date_collected
+   FROM public.fasta_records fr
+  GROUP BY fr.detailed_geo_location_id, fr.date_collected;
+
+
+--
 -- Name: detailed_geo_location_aliases; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -705,6 +717,52 @@ CREATE MATERIALIZED VIEW public.identify_primers_for_notifications AS
    FROM (first_query
      JOIN second_query ON ((second_query.detailed_geo_location_id = first_query.detailed_geo_location_id)))
   WHERE ((((first_query.variant_count)::numeric / (second_query.records_count)::numeric))::double precision >= first_query.variant_fraction_threshold)
+  WITH NO DATA;
+
+
+--
+-- Name: initial_score; Type: MATERIALIZED VIEW; Schema: public; Owner: -
+--
+
+CREATE MATERIALIZED VIEW public.initial_score AS
+ WITH all_combos AS (
+         SELECT oligos_1.oligo_name,
+            oligos_1.locus,
+            oligos_1.primer_set_id,
+            fa_1.detailed_geo_location_id,
+            fa_1.date_collected
+           FROM (( SELECT DISTINCT oligos.name AS oligo_name,
+                    oligos.locus,
+                    oligos.primer_set_id
+                   FROM public.oligos) oligos_1
+             CROSS JOIN ( SELECT DISTINCT fasta_records.detailed_geo_location_id,
+                    fasta_records.date_collected
+                   FROM public.fasta_records
+                  WHERE (fasta_records.date_collected >= '2020-01-01'::date)) fa_1)
+        ), variants AS (
+         SELECT count(variant_sites.fasta_record_id) AS observed_count,
+            ovo.detailed_geo_location_id,
+            ((count(*))::double precision / ((5)::double precision * (count(variant_sites.fasta_record_id))::double precision)) AS three_p_score,
+            oligos.locus,
+            ovo.primer_set_id,
+            ovo.oligo_name,
+            ovo.date_collected
+           FROM (((public.oligo_variant_overlaps ovo
+             JOIN public.variant_sites ON ((variant_sites.id = ovo.variant_id)))
+             JOIN public.fasta_records ON ((fasta_records.id = variant_sites.fasta_record_id)))
+             JOIN public.oligos ON (((oligos.primer_set_id = ovo.primer_set_id) AND ((oligos.name)::text = (ovo.oligo_name)::text))))
+          WHERE (((ovo.oligo_end)::numeric - ovo.coords) <= (5)::numeric)
+          GROUP BY ovo.detailed_geo_location_id, oligos.locus, ovo.primer_set_id, ovo.oligo_name, ovo.date_collected
+        )
+ SELECT all_combos.date_collected,
+    all_combos.detailed_geo_location_id,
+    COALESCE(variants.observed_count, (0)::bigint) AS observed_count,
+    COALESCE(variants.three_p_score, (0)::double precision) AS three_p_score,
+    all_combos.locus,
+    all_combos.primer_set_id,
+    all_combos.oligo_name
+   FROM (all_combos
+     LEFT JOIN variants ON (((all_combos.date_collected = variants.date_collected) AND (all_combos.primer_set_id = variants.primer_set_id) AND ((all_combos.oligo_name)::text = (variants.oligo_name)::text) AND (all_combos.detailed_geo_location_id = variants.detailed_geo_location_id))))
   WITH NO DATA;
 
 
@@ -1793,6 +1851,8 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20210321204308'),
 ('20210323205921'),
 ('20210325203319'),
-('20210405161255');
+('20210405161255'),
+('20210413164024'),
+('20210413164039');
 
 
