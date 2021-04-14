@@ -113,6 +113,7 @@ def main
     ActiveRecord::Base.connection.execute('REFRESH MATERIALIZED VIEW time_counts')
     ActiveRecord::Base.connection.execute('REFRESH MATERIALIZED VIEW oligo_variant_overlaps')
     ActiveRecord::Base.connection.execute('REFRESH MATERIALIZED VIEW identify_primers_for_notifications')
+    ActiveRecord::Base.connection.execute('REFRESH MATERIALIZED VIEW initial_score')
 
     find_new_notifications
     group_notifications
