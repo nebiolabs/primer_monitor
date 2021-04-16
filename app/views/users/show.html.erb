@@ -18,3 +18,21 @@
   <strong>Send Primer Updates?:</strong>
   <%= @user.send_primer_updates %>
 </p>
+
+<h1>Subscriptions:</h1>
+<table>
+  <thead>
+    <th>Primer Set</th>
+    <th>Geo Locations</th>
+    <th>Variant Fraction Threshold</th>
+  </thead>
+  <tbody>
+  <% @user.primer_set_subscriptions.each do |pss| %>
+  <tr>
+    <td><%= pss.primer_set %></td>
+    <td><%= @user.subscribed_geo_locations.map(&:to_s).join(', ') %></td>
+    <td><%= @user.variant_fraction_threshold %></td>
+  </tr>
+  <% end %>
+  </tbody>
+</table>
