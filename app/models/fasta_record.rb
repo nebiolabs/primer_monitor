@@ -43,7 +43,6 @@ class FastaRecord < ApplicationRecord
     FastaRecord.new(strain: strain, gisaid_epi_isl: gisaid_epi_isl,
                     genbank_accession: genbank_accession, detailed_geo_location_id: dg_id,
                     date_collected: date, variant_name: variant_name)
-
   end
 
   def self.get_dg_id(country, division, location, region)
@@ -54,14 +53,12 @@ class FastaRecord < ApplicationRecord
     # fetches dg_ids from the cache if it already exists in the database, no harm if it's nil
     dg_id = DetailedGeoLocation.existing_geo_location_ids_by_unique_fields[new_dg.cache_key]
 
-    if !dg_id
+    unless dg_id
       dg = @new_locations[new_dg.cache_key] # re-use new locations
-      if dg
-        dg_id = dg.id
-      end
+      dg_id = dg.id if dg
     end
 
-    if !dg_id
+    unless dg_id
       # did not find an existing geolocation (dg_id)
       new_dg.detailed_geo_location_alias = DetailedGeoLocationAlias.new_from_detailed_geolocation(new_dg)
       new_dg.save!
