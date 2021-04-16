@@ -3,10 +3,10 @@
   "private": true,
   "dependencies": {
     "@nathanvda/cocoon": "^1.2.14",
-    "@rails/actioncable": "^6.0.0",
-    "@rails/activestorage": "^6.0.0",
-    "@rails/ujs": "^6.0.0",
-    "@rails/webpacker": "4.2.2",
+    "@rails/actioncable": "^6.1.3",
+    "@rails/activestorage": "^6.1.3",
+    "@rails/ujs": "^6.1.3",
+    "@rails/webpacker": "^6.0.0-beta.6",
     "datatables.net-buttons-dt": "^1.6.5",
     "datatables.net-dt": "^1.10.23",
     "datatables.net-responsive": "^2.2.7",
@@ -17,6 +17,6 @@
   },
   "version": "0.1.0",
   "devDependencies": {
-    "webpack-dev-server": "^3.11.0"
+    "webpack-dev-server": "^3.11.2"
   }
 }
