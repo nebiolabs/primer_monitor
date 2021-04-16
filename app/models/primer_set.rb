@@ -12,6 +12,8 @@ class PrimerSet < ApplicationRecord
 
   accepts_nested_attributes_for :oligos, reject_if: :all_blank, allow_destroy: true
 
+  after_save :notify_admins_about_primer_set_update
+
   def to_s
     name
   end
@@ -28,5 +30,9 @@ class PrimerSet < ApplicationRecord
     return unless user
 
     subscriptions.where(user_id: user.id).first
+  end
+
+  def notify_admins_about_primer_set_update
+    PrimerSetMailer.updated_primer_set_email('primer-monitor@neb.com', self).deliver_later
   end
 end
