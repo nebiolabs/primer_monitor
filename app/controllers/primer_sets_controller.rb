@@ -7,7 +7,7 @@ class PrimerSetsController < ApplicationController
   # GET /primer_sets
   # GET /primer_sets.json
   def index
-    @primer_sets = PrimerSet.includes(:organism, :oligos).where(status: :complete)
+    @primer_sets = PrimerSet.includes(:organism, :oligos).accessible_by(current_ability)
     @subscriptions = PrimerSetSubscription.subscriptions_for_user_by_primer_set(current_user)
   end
 
