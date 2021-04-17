@@ -36,3 +36,7 @@
   <% end %>
   </tbody>
 </table>
+
+<% if can? :edit, @user %>
+  <%= link_to "Edit", edit_user_registration_path(@user) %>
+<% end %>

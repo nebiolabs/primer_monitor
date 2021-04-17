@@ -4,21 +4,18 @@
 <table>
   <thead>
     <tr>
-      <th>First</th>
-      <th>Last</th>
+      <th>Name</th>
       <th>Email</th>
-      <th colspan="2"></th>
+      <th>Subscriptions</th>
     </tr>
   </thead>
 
   <tbody>
     <% @users.each do |user| %>
       <tr>
-        <td><%= user.first %></td>
-        <td><%= user.last %></td>
+        <td><%= link_to "#{user.first} #{user.last}", user %></td>
         <td><%= user.email %></td>
-        <td><%= link_to 'Show', user %></td>
-        <td><%= link_to 'Edit', edit_user_registration_path(user) %></td>
+        <td><%= user.primer_set_subscriptions.size %></td>
       </tr>
     <% end %>
   </tbody>
