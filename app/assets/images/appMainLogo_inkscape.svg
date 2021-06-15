@@ -13,7 +13,7 @@
    version="1.1"
    id="svg8"
    sodipodi:docname="appMainLogo_inkscape.svg"
-   inkscape:version="1.0.1 (c497b03c, 2020-09-10)"
+   inkscape:version="1.0.2 (e86c8708, 2021-01-15)"
    inkscape:export-filename="/Users/langhorst/src/primer_monitor/app/assets/images/appMainLogo_square.png"
    inkscape:export-xdpi="96"
    inkscape:export-ydpi="96">
@@ -91,9 +91,9 @@
      inkscape:document-rotation="0"
      showgrid="false"
      inkscape:window-width="1488"
-     inkscape:window-height="853"
+     inkscape:window-height="844"
      inkscape:window-x="0"
-     inkscape:window-y="23"
+     inkscape:window-y="25"
      inkscape:window-maximized="0"
      fit-margin-top="5"
      fit-margin-left="5"
@@ -108,7 +108,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -262,13 +262,13 @@
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:17.6389px;line-height:1.25;font-family:Helvetica;-inkscape-font-specification:'Helvetica, Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#4556ba;fill-opacity:1;stroke:none;stroke-width:0.264583"
-       x="15.678315"
+       x="20.969986"
        y="187.02547"
        id="text1661-6"><tspan
          sodipodi:role="line"
          id="tspan1659-2"
-         x="15.678315"
+         x="20.969986"
          y="187.02547"
-         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:17.6389px;font-family:Helvetica;-inkscape-font-specification:'Helvetica, Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#4556ba;fill-opacity:1;stroke-width:0.264583">Primer Monitoring Tool</tspan></text>
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:17.6389px;font-family:Helvetica;-inkscape-font-specification:'Helvetica, Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#4556ba;fill-opacity:1;stroke-width:0.264583">Primer Monitor Tool</tspan></text>
   </g>
 </svg>
