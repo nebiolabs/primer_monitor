@@ -28,6 +28,15 @@
       </div>
     </div>
   <% end %>
+  <% if can?(:edit, @primer_set.user) %>
+    <div class="tile is-parent">
+      <div class="tile box is-child">
+        <strong>Creator: </strong>
+        <%= @primer_set.user %>
+      </div>
+    </div>
+  <% end %>
+
 
   <div class="tile is-parent">
     <div class="tile  is-child">
