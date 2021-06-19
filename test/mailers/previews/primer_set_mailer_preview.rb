@@ -5,5 +5,4 @@ class PrimerSetMailerPreview < ActionMailer::Preview
   def updated_primer_set_email
     PrimerSetMailer.updated_primer_set_email('me@example.com', PrimerSet.first)
   end
-
 end
