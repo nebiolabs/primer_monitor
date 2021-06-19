@@ -37,15 +37,19 @@ class FastaRecord < ApplicationRecord
     return if existing_fasta_strain_ids.key?(strain)
 
     ActiveRecord::Base.logger.info("New fasta record: #{strain}")
-
-    dg_id = get_dg_id(country, division, location, region)
+    # ensure that higher level locations also exist so users can select these for subscriptions
+    find_or_create_dg_id(country, nil, nil, nil)
+    find_or_create_dg_id(country, division, nil, nil)
+    find_or_create_dg_id(country, division, location, nil)
+    dg_id = find_or_create_dg_id(country, division, location, region)
 
     FastaRecord.new(strain: strain, gisaid_epi_isl: gisaid_epi_isl,
                     genbank_accession: genbank_accession, detailed_geo_location_id: dg_id,
                     date_collected: date, variant_name: variant_name)
   end
 
-  def self.get_dg_id(country, division, location, region)
+  # fetches detailed geolocation record for the specified parameters, creates if necessary
+  def self.find_or_create_dg_id(country, division, location, region)
     # .presence converts each string to nil if it's empty
     new_dg = DetailedGeoLocation.new(world: 'World', region: region.presence, subregion: country.presence,
                                      division: division.presence, subdivision: location.presence)
