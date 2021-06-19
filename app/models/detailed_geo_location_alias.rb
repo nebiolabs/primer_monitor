@@ -15,11 +15,13 @@ class DetailedGeoLocationAlias < ApplicationRecord
   }
   # we are interested in locations that are named, but where there there is no
   # precision below these as well  e.g. United States (not but a specific state)
+  scope :world, -> { where(region: nil) }
   scope :regions, -> { where(subregion: nil).where.not(region: nil) }
   scope :subregions, -> { where(division: nil).where.not(subregion: nil) }
 
   def self.subscribable
-    DetailedGeoLocationAlias.regions +
+    DetailedGeoLocationAlias.world +
+      DetailedGeoLocationAlias.regions +
       DetailedGeoLocationAlias.subregions +
       DetailedGeoLocationAlias.with_enough_sequences
   end
