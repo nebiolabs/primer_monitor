@@ -6,13 +6,23 @@ class DetailedGeoLocationAlias < ApplicationRecord
   has_many :fasta_records, through: :detailed_geo_locations
 
   MIN_SEQUENCES_FOR_GEOLOCATION = 20
-  scope :subscribable, lambda {
+  scope :with_enough_sequences, lambda {
     joins(detailed_geo_locations: :fasta_records)
       .group('detailed_geo_location_aliases.id')
       .having("count(fasta_records.id) >= #{MIN_SEQUENCES_FOR_GEOLOCATION}")
-      .order('world, region NULLS FIRST, subregion NULLS FIRST,
+      .order('world, region NULLS FIRST, subregion NULLS FIRST, division NULLS FIRST,
               subdivision NULLS FIRST, locality NULLS FIRST, sublocality NULLS FIRST')
   }
+  # we are interested in locations that are named, but where there there is no
+  # precision below these as well  e.g. United States (not but a specific state)
+  scope :regions, -> { where(subregion: nil).where.not(region: nil) }
+  scope :subregions, -> { where(division: nil).where.not(subregion: nil) }
+
+  def self.subscribable
+    DetailedGeoLocationAlias.regions +
+      DetailedGeoLocationAlias.subregions +
+      DetailedGeoLocationAlias.with_enough_sequences
+  end
 
   def self.new_from_detailed_geolocation(detailed_geolocation)
     DetailedGeoLocationAlias.new(world: 'World', region: detailed_geolocation.region,
