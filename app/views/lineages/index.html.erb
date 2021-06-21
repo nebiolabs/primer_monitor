@@ -8,11 +8,12 @@ Primers that do overlap are indicated in orange.
 
 <h2>Overlapping amplicons:</h2>
 <ul>
-  <li>The NEB LAMP E2019 E gene amplicon overlaps with a variant observed in the AY.1 lineage. </li>
-  <li>The NEB qPCR E3019 / US CDC amplicons no not overlap with variants observed in these lineages.</li>
+  <li>The NEB LAMP E2019 E gene amplicon overlaps with a variant observed in the AY.1 lineage.</li>
+  <li>The NEB LAMP E2019 N gene amplicon overlaps with a variant observed in the C.37 lineage.</li>
+  <li>The NEB qPCR E3019 / US CDC N1 probe overlaps with a variant observed in C.37.</li>
   <li>The China CDC N gene qPCR amplicon overlaps with variants in all lineages.</li>
   <li>The Charité Orf1ab amplicon overlaps with variants in B.1.617.2 and AY.1.</li>
-  <li>The Charité E amplicon overlaps with a variant observed in AY.1 </li>
+  <li>The Charité E amplicon overlaps with a variant observed in AY.1</li>
   <li>ARTIC v3 and Midnight 1200 bp amplicons overlap with multiple variants:<li>
      <table>
        <tr>
@@ -32,6 +33,16 @@ Primers that do overlap are indicated in orange.
          <td>ARTIC v3</td>
          <td>17</td>
          <td>B.1.617.1</td>
+       </tr>
+       <tr>
+         <td>ARTIC v3</td>
+         <td>32</td>
+         <td>C.37</td>
+       </tr>
+       <tr>
+         <td>ARTIC v3</td>
+         <td>34</td>
+         <td>C.37</td>
        </tr>
        <tr>
          <td>ARTIC v3</td>
@@ -79,6 +90,11 @@ Primers that do overlap are indicated in orange.
          <td>B.1.351</td>
        </tr>
        <tr>
+         <td>ARTIC v3</td>
+         <td>88</td>
+         <td>C.37</td>
+       </tr>
+       <tr>
          <td>Midnight 1200 bp</td>
          <td>27</td>
          <td>B.1.617.2, AY.1</td>
@@ -88,24 +104,37 @@ Primers that do overlap are indicated in orange.
          <td>93</td>
          <td>B.1.617.2, AY.1</td>
        </tr>
+       <tr>
+         <td>ARTIC v3</td>
+         <td>97</td>
+         <td>C.37</td>
+       </tr>
+       <tr>
+         <td>ARTIC v3</td>
+         <td>98</td>
+         <td>C.37</td>
+       </tr>
      </table>
 </ul>
-<hr>
-<h2 class="title">N Gene Variants</h2>
-<%= image_tag 'lineage_primer_summary_N_20210620.svg' %>
-<hr>
-<h2 class="title">S Gene Variants</h2>
-<%= image_tag 'lineage_primer_summary_S_20210620.svg' %>
+
 <hr>
 <h2 class="title">Orf1 Gene (1.5 kb) Variants</h2>
 <%= image_tag 'lineage_primer_summary_Orf1-1500_20210620.svg' %>
 <hr>
+<h2 class="title">Orf1 Gene (10 kb) Variants</h2>
+<%= image_tag 'lineage_primer_summary_Orf1-10000_20210620.svg' %>
+<hr>
 <h2 class="title">Orf1 Gene (14 kb) Variants</h2>
 <%= image_tag 'lineage_primer_summary_Orf1-14000_20210620.svg' %>
 <hr>
+<h2 class="title">S Gene Variants</h2>
+<%= image_tag 'lineage_primer_summary_S_20210620.svg' %>
+<hr>
 <h2 class="title">Orf3a-Orf7a Gene Variants</h2>
 <%= image_tag 'lineage_primer_summary_Orf3a-Orf7a_20210620.svg' %>
-
+<hr>
+<h2 class="title">N Gene Variants</h2>
+<%= image_tag 'lineage_primer_summary_N_20210620.svg' %>
 <hr>
 <h2 class="title">Methods:</h2>
 <p>
@@ -154,6 +183,10 @@ Primers that do overlap are indicated in orange.
 <p>
  <b>AY.1</b>:
   GitHub. “B.1.617.2 Sublineage with K417N · Issue #95 · Cov-Lineages/Pango-Designation.” Accessed June 20, 2021. <a href="https://github.com/cov-lineages/pango-designation/issues/95">https://github.com/cov-lineages/pango-designation/issues/95</a>.
+</p>
+<p>
+  <b>C.37</b>:
+  GitHub. “Subclade of B.1.1.1 (Resulting from a Discrete Evolutionary Sprint in December/January?) Widespread in Chile · Issue #52 · Cov-Lineages/Pango-Designation.” Accessed June 21, 2021. <a href='https://github.com/cov-lineages/pango-designation/issues/52'>https://github.com/cov-lineages/pango-designation/issues/52</a>.
 </p>
 <hr/>
 <h3 class="title">Amplicon Designs:</h3>
