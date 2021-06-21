@@ -79,7 +79,8 @@
 
   <div class="field is-horizontal">
     <div class="field-label">
-      <%= f.label "Email variant updates (feature under active development)" %>
+      Email variant updates
+      <span class="tag">(feature under active development)</span>
     </div>
     <div class="control field-body">
       <%= f.check_box :send_primer_updates %>
@@ -89,6 +90,7 @@
   <div class="field is-horizontal">
     <div class="field-label">
       Subscribed locations
+      <span class="tag">(including all more-specific locations)</span>
     </div>
     <div class="control field-body">
       <%=f.select :subscribed_detailed_geo_location_alias_ids,
