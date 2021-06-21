@@ -34,7 +34,11 @@ class DetailedGeoLocationAlias < ApplicationRecord
   end
 
   def to_s
-    [region, subregion, division, subdivision].compact.join('/')
+    if region.nil?
+      world
+    else
+      [region, subregion, division, subdivision].compact.join('/')
+    end
   end
 
   def name
