@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 class VariantSite < ApplicationRecord
+  self.ignored_columns = %w[usable_del_or_snp usable_insertion]
   def self.parse(variants_tsv)
     raise "Unable to find counts file #{variants_tsv}" unless File.exist?(variants_tsv)
 
