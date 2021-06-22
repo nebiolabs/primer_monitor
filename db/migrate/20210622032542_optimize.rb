@@ -6,12 +6,15 @@ class Optimize < ActiveRecord::Migration[6.1]
         ( (variant_sites.variant_type::text = 'D'::text OR variant_sites.variant_type::text = 'X'::text)
           AND variant_sites.variant::text !~~ '%N%'::text
         ) STORED;
-          
+      CREATE INDEX ON variant_sites(usable_del_or_snp);
+
       alter table variant_sites 
       add column usable_insertion bool GENERATED ALWAYS AS 
         ( (variant_sites.variant_type::text = 'I'::text) 
           AND variant_sites.variant::text !~~ '%N%'::text
         ) STORED;
+      CREATE INDEX ON variant_sites(usable_insertion);
+
 
       DROP MATERIALIZED VIEW IF EXISTS identify_primers_for_notifications;
       DROP MATERIALIZED VIEW IF EXISTS initial_score;

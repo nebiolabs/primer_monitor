@@ -1590,6 +1590,20 @@ CREATE INDEX variant_overlaps_region_subregion_division_subdivision_date_idx ON 
 
 
 --
+-- Name: variant_sites_usable_del_or_snp_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX variant_sites_usable_del_or_snp_idx ON public.variant_sites USING btree (usable_del_or_snp);
+
+
+--
+-- Name: variant_sites_usable_insertion_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX variant_sites_usable_insertion_idx ON public.variant_sites USING btree (usable_insertion);
+
+
+--
 -- Name: proposed_notifications fk_rails_03fe9a3c07; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
