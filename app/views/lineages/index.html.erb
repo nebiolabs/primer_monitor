@@ -14,7 +14,7 @@ Primers that do overlap are indicated in orange.
   <li>The China CDC N gene qPCR amplicon overlaps with variants in all lineages.</li>
   <li>The Charité Orf1ab amplicon overlaps with variants in B.1.617.2 and AY.1.</li>
   <li>The Charité E amplicon overlaps with a variant observed in AY.1</li>
-  <li>ARTIC v3 and Midnight 1200 bp amplicons overlap with multiple variants:<li>
+  <li>ARTIC v3, v4 and Midnight 1200 bp amplicons overlap with multiple variants:<li>
      <table>
        <tr>
          <th>Primer Set</th><th>Amplicon</th><th>Lineage</th>
@@ -23,6 +23,11 @@ Primers that do overlap are indicated in orange.
          <td>ARTIC v3</td>
          <td>12</td>
          <td>P.1</td>
+       </tr>
+       <tr>
+         <td>ARTIC v4</td>
+         <td>14</td>
+         <td>C.37</td>
        </tr>
        <tr>
          <td>Midnight 1200 bp</td>
@@ -35,7 +40,17 @@ Primers that do overlap are indicated in orange.
          <td>B.1.617.1</td>
        </tr>
        <tr>
+         <td>ARTIC v4</td>
+         <td>23</td>
+         <td>B.1.617.2, AY.1, C.37</td>
+       </tr>
+       <tr>
          <td>ARTIC v3</td>
+         <td>32</td>
+         <td>C.37</td>
+       </tr>
+       <tr>
+         <td>ARTIC v4</td>
          <td>32</td>
          <td>C.37</td>
        </tr>
@@ -45,7 +60,17 @@ Primers that do overlap are indicated in orange.
          <td>C.37</td>
        </tr>
        <tr>
+         <td>ARTIC v4</td>
+         <td>34</td>
+         <td>C.37</td>
+       </tr>
+       <tr>
          <td>ARTIC v3</td>
+         <td>54</td>
+         <td>B.1.526</td>
+       </tr>
+       <tr>
+         <td>ARTIC v4</td>
          <td>54</td>
          <td>B.1.526</td>
        </tr>
@@ -53,6 +78,11 @@ Primers that do overlap are indicated in orange.
          <td>ARTIC v3</td>
          <td>64</td>
          <td>B.1.617.2, AY.1</td>
+       </tr>
+       <tr>
+         <td>ARTIC v4</td>
+         <td>68</td>
+         <td>B.1.617.1</td>
        </tr>
        <tr>
          <td>Midnight 1200 bp</td>
@@ -80,14 +110,34 @@ Primers that do overlap are indicated in orange.
          <td>B.1.351, P.1, AY.1</td>
        </tr>
        <tr>
+         <td>ARTIC v4</td>
+         <td>78</td>
+         <td>AY.1</td>
+       </tr>
+       <tr>
+         <td>Midnight</td>
+         <td>24</td>
+         <td>P.1</td>
+       </tr>
+       <tr>
          <td>ARTIC v3</td>
          <td>81</td>
          <td>B.1.617.1, B.1.617.2, AY.1</td>
        </tr>
        <tr>
+         <td>Midnight</td>
+         <td>25</td>
+         <td>P.1</td>
+       </tr>
+       <tr>
          <td>ARTIC v3</td>
          <td>86</td>
          <td>B.1.351</td>
+       </tr>
+       <tr>
+         <td>ARTIC v4</td>
+         <td>90</td>
+         <td>C.37</td>
        </tr>
        <tr>
          <td>ARTIC v3</td>
@@ -106,35 +156,53 @@ Primers that do overlap are indicated in orange.
        </tr>
        <tr>
          <td>ARTIC v3</td>
-         <td>97</td>
+         <td>96</td>
          <td>C.37</td>
        </tr>
        <tr>
          <td>ARTIC v3</td>
-         <td>98</td>
+         <td>97</td>
          <td>C.37</td>
+       </tr>
+       <tr>
+         <td>ARTIC v4</td>
+         <td>96</td>
+         <td>AY.1</td>
+       </tr>
+       <tr>
+         <td>ARTIC v4</td>
+         <td>97</td>
+         <td>AY.1</td>
+       </tr>
+       <tr>
+         <td>ARTIC v4</td>
+         <td>99</td>
+         <td>P.1</td>
        </tr>
      </table>
 </ul>
 
 <hr>
 <h2 class="title">Orf1 Gene (1.5 kb) Variants</h2>
-<%= image_tag 'lineage_primer_summary_Orf1-1500_20210620.svg' %>
+<%= image_tag 'lineage_primer_summary_Orf1-1500_20210624.svg' %>
 <hr>
 <h2 class="title">Orf1 Gene (10 kb) Variants</h2>
-<%= image_tag 'lineage_primer_summary_Orf1-10000_20210620.svg' %>
+<%= image_tag 'lineage_primer_summary_Orf1-10000_20210624.svg' %>
 <hr>
 <h2 class="title">Orf1 Gene (14 kb) Variants</h2>
-<%= image_tag 'lineage_primer_summary_Orf1-14000_20210620.svg' %>
+<%= image_tag 'lineage_primer_summary_Orf1-14000_20210624.svg' %>
+<hr>
+<h2 class="title">Orf1 Gene (19 kb) Variants</h2>
+<%= image_tag 'lineage_primer_summary_Orf1-19000_20210624.svg' %>
 <hr>
 <h2 class="title">S Gene Variants</h2>
-<%= image_tag 'lineage_primer_summary_S_20210620.svg' %>
+<%= image_tag 'lineage_primer_summary_S_20210624.svg' %>
 <hr>
 <h2 class="title">Orf3a-Orf7a Gene Variants</h2>
-<%= image_tag 'lineage_primer_summary_Orf3a-Orf7a_20210620.svg' %>
+<%= image_tag 'lineage_primer_summary_Orf3a-Orf7a_20210624.svg' %>
 <hr>
 <h2 class="title">N Gene Variants</h2>
-<%= image_tag 'lineage_primer_summary_N_20210620.svg' %>
+<%= image_tag 'lineage_primer_summary_N_20210624.svg' %>
 <hr>
 <h2 class="title">Methods:</h2>
 <p>
@@ -210,6 +278,10 @@ Primers that do overlap are indicated in orange.
   <b>Midnight 1200 bp</b>:
   Freed, Nikki E., Markéta Vlková, Muhammad B. Faisal, and Olin K. Silander. “Rapid and Inexpensive Whole-Genome Sequencing of SARS-CoV-2 Using 1200 Bp Tiled Amplicons and Oxford Nanopore Rapid Barcoding.” Biology Methods & Protocols 5, no. 1 (2020): bpaa014. <a href="https://doi.org/10.1093/biomethods/bpaa014">https://doi.org/10.1093/biomethods/bpaa014</a>.
 </p>
+<p>
+  <b>ARTIC v4</b>:
+  ARTIC Real-time Genomic Surveillance. “SARS-CoV-2 Version 4 Scheme Release - Laboratory,” June 24, 2021. https://community.artic.network/t/sars-cov-2-version-4-scheme-release/312.
+</p>
 <hr/>
 <h3 class='title'>Software Tools:</h3>
 <p>
@@ -229,4 +301,10 @@ Primers that do overlap are indicated in orange.
 </p>
 <p>
   Geneious version 2021.1 created by Biomatters. Available from https://www.geneious.com
+</p>
+
+<h3 class='title'>History:</h3>
+<p>
+  2021-06-20: Updated to currently relevant variants of concerns.
+  2021-06-24: Added ARTICv4
 </p>
