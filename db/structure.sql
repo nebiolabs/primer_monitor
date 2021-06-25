@@ -486,6 +486,8 @@ CREATE MATERIALIZED VIEW public.variant_overlaps AS
     oligos.ref_start AS oligo_start,
     oligos.ref_end AS oligo_end,
     oligos.short_name AS oligo_short_name,
+    oligos.locus AS oligo_locus_name,
+    oligos.category AS oligo_primer_type,
     primer_sets.id AS primer_set_id,
     primer_sets.name AS primer_set_name,
     variant_sites.id AS variant_id,
@@ -511,6 +513,8 @@ UNION ALL
     oligos.ref_start AS oligo_start,
     oligos.ref_end AS oligo_end,
     oligos.short_name AS oligo_short_name,
+    oligos.locus AS oligo_locus_name,
+    oligos.category AS oligo_primer_type,
     primer_sets.id AS primer_set_id,
     primer_sets.name AS primer_set_name,
     variant_sites.id AS variant_id,
@@ -543,6 +547,8 @@ CREATE MATERIALIZED VIEW public.oligo_variant_overlaps AS
     variant_overlaps.oligo_start,
     variant_overlaps.oligo_end,
     variant_overlaps.oligo_short_name,
+    variant_overlaps.oligo_locus_name,
+    variant_overlaps.oligo_primer_type,
     variant_overlaps.primer_set_id,
     variant_overlaps.primer_set_name,
     variant_overlaps.variant_id,
@@ -575,6 +581,8 @@ UNION ALL
     variant_overlaps.oligo_start,
     variant_overlaps.oligo_end,
     variant_overlaps.oligo_short_name,
+    variant_overlaps.oligo_locus_name,
+    variant_overlaps.oligo_primer_type,
     variant_overlaps.primer_set_id,
     variant_overlaps.primer_set_name,
     variant_overlaps.variant_id,
@@ -672,6 +680,7 @@ CREATE MATERIALIZED VIEW public.identify_primers_for_notifications AS
             join_subscribed_location_to_ids.detailed_geo_location_id,
             primer_sets.name AS set_name,
             oligos.name AS primer_name,
+            oligos.id AS oligo_id,
             users.lookback_days,
             users.variant_fraction_threshold,
             oligo_variant_overlaps.region,
@@ -688,7 +697,7 @@ CREATE MATERIALIZED VIEW public.identify_primers_for_notifications AS
              JOIN public.join_subscribed_location_to_ids ON (((join_subscribed_location_to_ids.user_id = primer_set_subscriptions.user_id) AND (join_subscribed_location_to_ids.detailed_geo_location_id = oligo_variant_overlaps.detailed_geo_location_id))))
              JOIN public.users ON ((users.id = primer_set_subscriptions.user_id)))
           WHERE (oligo_variant_overlaps.date_collected >= (CURRENT_DATE - users.lookback_days))
-          GROUP BY primer_set_subscriptions.user_id, primer_set_subscriptions.primer_set_id, primer_sets.name, oligos.name, join_subscribed_location_to_ids.detailed_geo_location_id, users.lookback_days, users.variant_fraction_threshold, oligo_variant_overlaps.region, oligo_variant_overlaps.subregion, oligo_variant_overlaps.division, oligo_variant_overlaps.subdivision, oligo_variant_overlaps.coords, oligo_variant_overlaps.detailed_geo_location_id
+          GROUP BY primer_set_subscriptions.user_id, primer_set_subscriptions.primer_set_id, primer_sets.name, oligos.id, oligos.name, join_subscribed_location_to_ids.detailed_geo_location_id, users.lookback_days, users.variant_fraction_threshold, oligo_variant_overlaps.region, oligo_variant_overlaps.subregion, oligo_variant_overlaps.division, oligo_variant_overlaps.subdivision, oligo_variant_overlaps.coords, oligo_variant_overlaps.detailed_geo_location_id
         ), second_query AS (
          SELECT fasta_records.detailed_geo_location_id,
             count(fasta_records.id) AS records_count,
@@ -703,6 +712,7 @@ CREATE MATERIALIZED VIEW public.identify_primers_for_notifications AS
  SELECT first_query.user_id,
     first_query.primer_set_id,
     first_query.set_name,
+    first_query.oligo_id,
     first_query.primer_name,
     first_query.region,
     first_query.subregion,
@@ -1569,6 +1579,20 @@ CREATE INDEX index_verified_notifications_on_user_id ON public.verified_notifica
 
 
 --
+-- Name: oligo_variant_overlaps_primer_set_name_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX oligo_variant_overlaps_primer_set_name_idx ON public.oligo_variant_overlaps USING btree (primer_set_name);
+
+
+--
+-- Name: oligo_variant_overlaps_region_subregion_division_subdivisio_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX oligo_variant_overlaps_region_subregion_division_subdivisio_idx ON public.oligo_variant_overlaps USING btree (region, subregion, division, subdivision, date_collected);
+
+
+--
 -- Name: time_counts_region_subregion_division_subdivision_date_coll_idx; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -1871,6 +1895,9 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20210619121250'),
 ('20210619220014'),
 ('20210621161928'),
-('20210622032542');
+('20210622032542'),
+('20210622124604'),
+('20210622215629'),
+('20210622230211');
 
 
