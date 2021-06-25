@@ -24,7 +24,7 @@ for line in sys.stdin:
         type = item[len(item)-1:]
 
         if type == "S":
-            continue
+            None # Don't do anything, but still add the length to query_start below
         elif type != "=":
             if type == "I":
                 print("{}\t{}\t{}\t{}".format(query_name, ref_start, type, query_seq[query_start : query_start + 1]))
