@@ -1,10 +1,10 @@
 # frozen_string_literal: true
+
 # This file should contain all the record creation needed to seed the database with its default values.
 # The data can then be loaded with the rails db:seed command (or created alongside the database with db:setup).
 
-
-#password should be changed...
-admin = User.create_with(first: 'Admin', last:'User',
+# password should be changed...
+admin = User.create_with(first: 'Admin', last: 'User',
                          password: Rails.application.credentials.admin_password,
                          password_confirmation: Rails.application.credentials.admin_password,
                          active: true, approved: true, confirmed: true)
@@ -14,15 +14,14 @@ admin = User.create_with(first: 'Admin', last:'User',
   Role.find_or_create_by!(name: role_name)
 end
 
-if admin.roles.size == 0
-  admin.roles << Role.find_by(name: 'administrator')
-end
+admin.roles << Role.find_by(name: 'administrator') if admin.roles.size.zero?
 
-sars = Organism.find_or_create_by!(name: "SARS-CoV-2", ncbi_taxon_id:2697049)
-lamp = AmplificationMethod.find_or_create_by!(name: "LAMP")
-qPCR = AmplificationMethod.find_or_create_by!(name: "qPCR")
+sars = Organism.find_or_create_by!(name: 'SARS-CoV-2', ncbi_taxon_id: 2_697_049)
+lamp = AmplificationMethod.find_or_create_by!(name: 'LAMP')
+qpcr = AmplificationMethod.find_or_create_by!(name: 'qPCR')
 
-lamp_primerset = PrimerSet.find_or_create_by(name: "NEB LAMP (E2019)", organism: sars, user: admin, amplification_method: lamp )
+lamp_primerset = PrimerSet.find_or_create_by(name: 'NEB LAMP (E2019)', organism: sars, user: admin,
+                                             amplification_method: lamp)
 
 lamp_primers = {
   'E1-LF': 'CGCTATTAACTATTAACG',
@@ -36,13 +35,14 @@ lamp_primers = {
   'N2-FIP': 'TTCCGAAGAACGCTGAAGCGGAACTGATTACAAACATTGGCC',
   'N2-BIP': 'CGCATTGGCATGGAAGTCACAATTTGATGGCACCTGTGTA',
   'N2-LF': 'GGGGGCAAATTGTGCAATTTG',
-  'N2-LB': 'CTTCGGGAACGTGGTTGACC',
+  'N2-LB': 'CTTCGGGAACGTGGTTGACC'
 }
-lamp_primers.each_pair do |name,seq|
+lamp_primers.each_pair do |name, seq|
   Oligo.find_or_create_by(name: name, sequence: seq, primer_set: lamp_primerset)
 end
 
-luna_primerset = PrimerSet.find_or_create_by(name: "NEB Luna qPCR (E3019)", organism: sars, user: admin, amplification_method: qPCR )
+luna_primerset = PrimerSet.find_or_create_by(name: 'NEB Luna qPCR (E3019)', organism: sars, user: admin,
+                                             amplification_method: qpcr)
 
 luna_primers = {
   'N1-F': 'GACCCCAAAATCAGCGAAAT',
@@ -53,28 +53,60 @@ luna_primers = {
   'N1-Probe': 'ACCCCGCATTACGTTTGGTGGACC'
 }
 
-luna_primers.each_pair do |name,seq|
+luna_primers.each_pair do |name, seq|
   Oligo.find_or_create_by(name: name, sequence: seq, primer_set: luna_primerset)
 end
 
-features = [['N', 28274, 29533],
-            ['ORF10', 29558, 29674],
-            ['orf1ab', 266, 21555],
-            ['ORF3a', 25393, 26220],
-            ['S', 21563, 25384],
-            ['M', 26523, 27191],
-            ['E', 26245, 26472],
-            ['ORF7a', 27394, 27759],
-            ['ORF6', 27202, 27387],
-            ['ORF8', 27894, 28259],
-            ['ORF7b', 27756, 27887],
+features = [['N', 28_274, 29_533],
+            ['ORF10', 29_558, 29_674],
+            ['orf1ab', 266, 21_555],
+            ['ORF3a', 25_393, 26_220],
+            ['S', 21_563, 25_384],
+            ['M', 26_523, 27_191],
+            ['E', 26_245, 26_472],
+            ['ORF7a', 27_394, 27_759],
+            ['ORF6', 27_202, 27_387],
+            ['ORF8', 27_894, 28_259],
+            ['ORF7b', 27_756, 27_887],
             ['5\'UTR', 1, 265],
-            ['3\'UTR', 29675, 29903],
-]
+            ['3\'UTR', 29_675, 29_903]]
 organism = Organism.find_or_create_by(name: 'SARS-CoV-2')
 features.each do |feature|
-  GenomicFeature.find_or_create_by!(name: feature[0], ref_start: feature[1], ref_end: feature[2], organism_id: organism.id)
+  GenomicFeature.find_or_create_by!(name: feature[0], ref_start: feature[1], ref_end: feature[2],
+                                    organism_id: organism.id)
 end
 
+# Creates a list of views to operate on (views/*.sql). Order is defined by numeric prefix to view name
+view_files = Dir["#{__dir__}/views/*.sql"].sort
 
+view_defs = view_files.each_with_object({}) do |view_file, h| # depends on hash being ordered
+  view_def = File.readlines(view_file)
+  mat_view_matches = view_def.grep(/CREATE/)[0].match(/CREATE MATERIALIZED VIEW ([\w.]+) AS/)
+  view_name_matches = view_def.grep(/CREATE/)[0].match(/CREATE VIEW ([\w.]+) AS/)
+  if mat_view_matches
+    h[mat_view_matches[1]] = { mat_view: view_def }
+  elsif view_name_matches
+    h[view_name_matches[1]] = { view: view_def }
+  else
+    raise "Expected VIEW or MATERIALIZED VIEW in #{view_file}"
+  end
+end
+# puts view_defs.keys
+conn = ActiveRecord::Base.connection
+# drops all views in views directory, reversed to deal with view interdependencies
+view_defs.keys.reverse.each do |v|
+  Rails.logger.info("dropping #{v}")
+  conn.execute(
+    view_defs[v][:view] && "drop view if exists #{v};" ||
+      view_defs[v][:mat_view] && "drop materialized view if exists #{v};"
+  )
+end
 
+# creates all views
+view_defs.each_key do |v|
+  Rails.logger.info("Creating #{v}")
+  conn.execute(
+    view_defs[v][:view] && view_defs[v][:view].join.to_s ||
+      view_defs[v][:mat_view] && view_defs[v][:mat_view].join.to_s
+  )
+end
