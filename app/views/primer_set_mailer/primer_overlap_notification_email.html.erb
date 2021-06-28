@@ -1,0 +1,26 @@
+<html>
+<head>
+  <meta content='text/html; charset=UTF-8' http-equiv='Content-Type' />
+</head>
+<body>
+<h1>Variants Observed in Subscribed Primer Sets</h1>
+<table>
+  <tr>
+    <th>Primer Set</th><th>Locus</th><th>Primer</th><th>Geographic Region</th><th>Frequency</th>
+  </tr>
+  <% @proposed_notifications.each do |notification|  %>
+    <tr>
+      <td><%= link_to notification.primer_set, notification.primer_set %></td>
+      <td><%= notification.oligo&.locus  %></td>
+      <td><%= notification.oligo&.category %></td>
+      <td><%= notification.subscribed_geo_location %></td>
+      <td><%= notification.fraction_variant %></td>
+    </tr>
+  <% end %>
+</table>
+<footer>
+  You are receiving this message because you subscribed to be notified about variants overlapping primer sets.
+  You can <a href="https://primer-monitor.neb.com/users/edit">modify your subscription preferences</a> at any time.
+</footer>
+</body>
+</html>
