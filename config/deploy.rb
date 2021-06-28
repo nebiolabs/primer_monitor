@@ -9,8 +9,6 @@ set :puma_service_name, 'puma'
 # only migrate if there are migrations pending
 set :conditionally_migrate, true
 
-before 'deploy:assets:precompile', 'deploy:yarn_install'
-
 # Avoid recompiling all the assets on every deploy
 # from https://coderwall.com/p/aridag/only-precompile-assets-when-necessary-rails-4-capistrano-3
 # set the locations that we will look for changed assets to determine whether to precompile
@@ -121,4 +119,6 @@ namespace :deploy do
   end
 
   after :published, :restart
+  after 'deploy:restart_services', 'deploy:seed'
+
 end
