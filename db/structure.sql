@@ -905,7 +905,8 @@ CREATE TABLE public.proposed_notifications (
     updated_at timestamp(6) without time zone NOT NULL,
     subscribed_geo_location_id bigint NOT NULL,
     primer_set_subscription_id bigint NOT NULL,
-    user_id bigint NOT NULL
+    user_id bigint NOT NULL,
+    detailed_geo_location_alias_id bigint
 );
 
 
@@ -1467,6 +1468,13 @@ CREATE INDEX index_primer_sets_on_user_id ON public.primer_sets USING btree (use
 
 
 --
+-- Name: index_proposed_notifications_on_detailed_geo_location_alias_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_proposed_notifications_on_detailed_geo_location_alias_id ON public.proposed_notifications USING btree (detailed_geo_location_alias_id);
+
+
+--
 -- Name: index_proposed_notifications_on_oligo_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -1803,6 +1811,14 @@ ALTER TABLE ONLY public.proposed_notifications
 
 
 --
+-- Name: proposed_notifications fk_rails_d380313e75; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.proposed_notifications
+    ADD CONSTRAINT fk_rails_d380313e75 FOREIGN KEY (detailed_geo_location_alias_id) REFERENCES public.detailed_geo_location_aliases(id);
+
+
+--
 -- Name: primer_set_subscriptions fk_rails_e7701775d5; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -1906,6 +1922,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20210622124604'),
 ('20210622215629'),
 ('20210622230211'),
-('20210628001136');
+('20210628001136'),
+('20210628202244');
 
 
