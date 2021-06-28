@@ -301,7 +301,7 @@ ALTER SEQUENCE public.fasta_records_id_seq OWNED BY public.fasta_records.id;
 CREATE TABLE public.genomic_features (
     id bigint NOT NULL,
     name character varying,
-    type character varying,
+    feature_type character varying,
     ref_start integer,
     ref_end integer,
     organism_id bigint NOT NULL,
@@ -1372,7 +1372,7 @@ CREATE UNIQUE INDEX alias_full_record ON public.detailed_geo_location_aliases US
 -- Name: counts_region_subregion_division_subdivision_idx; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX counts_region_subregion_division_subdivision_idx ON public.counts USING btree (region, subregion, division, subdivision);
+CREATE UNIQUE INDEX counts_region_subregion_division_subdivision_idx ON public.counts USING btree (region, subregion, division, subdivision);
 
 
 --
@@ -1579,24 +1579,31 @@ CREATE INDEX index_verified_notifications_on_user_id ON public.verified_notifica
 
 
 --
--- Name: oligo_variant_overlaps_primer_set_name_idx; Type: INDEX; Schema: public; Owner: -
+-- Name: oligo_variant_overlaps_date_collected_idx; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX oligo_variant_overlaps_primer_set_name_idx ON public.oligo_variant_overlaps USING btree (primer_set_name);
+CREATE INDEX oligo_variant_overlaps_date_collected_idx ON public.oligo_variant_overlaps USING btree (date_collected);
 
 
 --
--- Name: oligo_variant_overlaps_region_subregion_division_subdivisio_idx; Type: INDEX; Schema: public; Owner: -
+-- Name: oligo_variant_overlaps_detailed_geo_location_id_idx; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX oligo_variant_overlaps_region_subregion_division_subdivisio_idx ON public.oligo_variant_overlaps USING btree (region, subregion, division, subdivision, date_collected);
+CREATE INDEX oligo_variant_overlaps_detailed_geo_location_id_idx ON public.oligo_variant_overlaps USING btree (detailed_geo_location_id);
+
+
+--
+-- Name: oligo_variant_overlaps_oligo_id_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX oligo_variant_overlaps_oligo_id_idx ON public.oligo_variant_overlaps USING btree (oligo_id);
 
 
 --
 -- Name: time_counts_region_subregion_division_subdivision_date_coll_idx; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX time_counts_region_subregion_division_subdivision_date_coll_idx ON public.time_counts USING btree (region, subregion, division, subdivision, date_collected);
+CREATE UNIQUE INDEX time_counts_region_subregion_division_subdivision_date_coll_idx ON public.time_counts USING btree (region, subregion, division, subdivision, date_collected);
 
 
 --
@@ -1607,10 +1614,10 @@ CREATE INDEX tmp ON public.subscribed_geo_locations USING btree (detailed_geo_lo
 
 
 --
--- Name: variant_overlaps_region_subregion_division_subdivision_date_idx; Type: INDEX; Schema: public; Owner: -
+-- Name: variant_overlaps_variant_type_idx; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX variant_overlaps_region_subregion_division_subdivision_date_idx ON public.variant_overlaps USING btree (region, subregion, division, subdivision, date_collected);
+CREATE INDEX variant_overlaps_variant_type_idx ON public.variant_overlaps USING btree (variant_type);
 
 
 --
@@ -1898,6 +1905,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20210622032542'),
 ('20210622124604'),
 ('20210622215629'),
-('20210622230211');
+('20210622230211'),
+('20210628001136');
 
 
