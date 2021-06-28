@@ -69,4 +69,10 @@ class User < ApplicationRecord
                        end
     !(role_to_test_ary & role_symbols).empty?
   end
+
+  def formatted_email
+    m = Mail::Address.new email
+    m.display_name = "#{first.capitalize} #{last.capitalize}"
+    m.format
+  end
 end

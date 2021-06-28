@@ -88,15 +88,23 @@ def import_variants(variants_file)
   VariantSite.import(variant_records, validate: false)
 end
 
-def find_new_notifications
+def create_new_notifications!
   new_proposed_notifications = ProposedNotification.new_proposed_notifications()
   return if new_proposed_notifications.empty?
 
   ProposedNotification.import(new_proposed_notifications, validate: false)
 end
 
-def group_notifications
-  VerifiedNotification.group_notifications
+# sends messages and records successful delivery
+def send_notifications(verified_notifications)
+
+  verified_notifications.each do |vn|
+    next unless vn.user_id == 3 # temporarily only emails only brad
+    @log.info("Sending notification to #{vn.user.formatted_email}")
+    PrimerSetMailer.primer_overlap_notification_email(vn.user_id, vn.proposed_notifications).deliver_now
+    vn.status = 'Sent'
+    vn.save!
+  end
 end
 
 def main
@@ -115,8 +123,8 @@ def main
     ActiveRecord::Base.connection.execute('REFRESH MATERIALIZED VIEW identify_primers_for_notifications')
     ActiveRecord::Base.connection.execute('REFRESH MATERIALIZED VIEW initial_score')
 
-    find_new_notifications
-    group_notifications
+    create_new_notifications!
+    send_notifications(VerifiedNotification.find_or_create_verified_notifications!)
   end
 end
 main if $PROGRAM_NAME.end_with?('upload.rb')

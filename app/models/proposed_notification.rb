@@ -46,4 +46,8 @@ class ProposedNotification < ApplicationRecord
 
     potential_notifications
   end
+
+  def update_status!
+
+  end
 end
