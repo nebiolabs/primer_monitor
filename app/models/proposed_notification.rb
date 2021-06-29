@@ -32,6 +32,8 @@ class ProposedNotification < ApplicationRecord
                                                                  detailed_geo_location_alias_id:
                                                                    subscribed_alias.detailed_geo_location_alias_id).id
 
+      detailed_geo_location_alias_id = DetailedGeoLocation.find_by(id: record.detailed_geo_location_id).detailed_geo_location_alias_id
+
       primer_set_subscription_id = PrimerSetSubscription.find_by(user_id: record.user_id,
                                                                  primer_set_id: record.primer_set_id).id
 
@@ -39,6 +41,7 @@ class ProposedNotification < ApplicationRecord
                                     oligo_id: record.oligo_id, coordinate: record.coords,
                                     subscribed_geo_location_id: subscribed_geo_location_id,
                                     primer_set_subscription_id: primer_set_subscription_id,
+                                    detailed_geo_location_alias_id: detailed_geo_location_alias_id,
                                     fraction_variant: record.fraction_variant)
 
       potential_notifications << pn unless existing_notification_cache.key?(pn.cache_key)
