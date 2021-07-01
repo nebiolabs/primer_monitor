@@ -12,7 +12,7 @@ class VerifiedNotification < ApplicationRecord
 
     new_vns = new_notifications.map do |notification|
       vn = VerifiedNotification.find_or_create_by!(user_id: notification.user_id, status: 'Unsent')
-      vn.proposed_notifications += ProposedNotification.where(user_id: user_id)
+      vn.proposed_notifications += ProposedNotification.where(user_id: notification.user_id)
                                                        .where(verified_notification_id: nil)
       vn
     end
@@ -20,5 +20,4 @@ class VerifiedNotification < ApplicationRecord
                                        .where(status: 'Unsent')
     existing_vns + new_vns
   end
-
 end

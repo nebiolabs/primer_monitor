@@ -6,6 +6,8 @@ class ProposedNotification < ApplicationRecord
   belongs_to :primer_set
   belongs_to :primer_set_subscription
   belongs_to :subscribed_geo_location
+  belongs_to :verified_notification
+  belongs_to :detailed_geo_location_alias
 
   UNIQUE_FIELDS = %i[primer_set_id user_id oligo_id coordinate
                      subscribed_geo_location_id primer_set_subscription_id].freeze
@@ -24,25 +26,8 @@ class ProposedNotification < ApplicationRecord
   def self.new_proposed_notifications
     potential_notifications = []
 
-    IdentifyPrimersForNotification.all.each do |record|
-      subscribed_alias = JoinSubscribedLocationToId.find_by(user_id: record.user_id,
-                                                            detailed_geo_location_id:
-                                                              record.detailed_geo_location_id)
-      subscribed_geo_location_id = SubscribedGeoLocation.find_by(user_id: record.user_id,
-                                                                 detailed_geo_location_alias_id:
-                                                                   subscribed_alias.detailed_geo_location_alias_id).id
-
-      detailed_geo_location_alias_id = DetailedGeoLocation.find_by(id: record.detailed_geo_location_id).detailed_geo_location_alias_id
-
-      primer_set_subscription_id = PrimerSetSubscription.find_by(user_id: record.user_id,
-                                                                 primer_set_id: record.primer_set_id).id
-
-      pn = ProposedNotification.new(primer_set_id: record.primer_set_id, user_id: record.user_id,
-                                    oligo_id: record.oligo_id, coordinate: record.coords,
-                                    subscribed_geo_location_id: subscribed_geo_location_id,
-                                    primer_set_subscription_id: primer_set_subscription_id,
-                                    detailed_geo_location_alias_id: detailed_geo_location_alias_id,
-                                    fraction_variant: record.fraction_variant)
+    IdentifyPrimersForNotification.includes(:detailed_geo_location).all.each do |primer_record|
+      pn = construct_notification_record(primer_record)
 
       potential_notifications << pn unless existing_notification_cache.key?(pn.cache_key)
     end
@@ -50,7 +35,23 @@ class ProposedNotification < ApplicationRecord
     potential_notifications
   end
 
-  def update_status!
+  def self.construct_notification_record(primer_record)
+    subscribed_alias = JoinSubscribedLocationToId.find_by(user_id: primer_record.user_id,
+                                                          detailed_geo_location_id:
+                                                            primer_record.detailed_geo_location_id)
+    subscribed_geo_location_id = SubscribedGeoLocation.find_by(user_id: primer_record.user_id,
+                                                               detailed_geo_location_alias_id:
+                                                                 subscribed_alias.detailed_geo_location_alias_id).id
 
+    primer_set_subscription_id = PrimerSetSubscription.find_by(user_id: primer_record.user_id,
+                                                               primer_set_id: primer_record.primer_set_id).id
+
+    ProposedNotification.new(primer_set_id: primer_record.primer_set_id, user_id: primer_record.user_id,
+                             oligo_id: primer_record.oligo_id, coordinate: primer_record.coords,
+                             subscribed_geo_location_id: subscribed_geo_location_id,
+                             primer_set_subscription_id: primer_set_subscription_id,
+                             detailed_geo_location_alias_id: primer_record.detailed_geo_location
+                                                                   .detailed_geo_location_alias_id,
+                             fraction_variant: primer_record.fraction_variant)
   end
 end
