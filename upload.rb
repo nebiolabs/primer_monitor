@@ -27,8 +27,9 @@ require 'slop'
 require_relative "#{__dir__}/app/models/application_record.rb"
 
 # requires all the model files
+SKIP_DEVISE = true
 Dir["#{__dir__}/app/models/**/*.rb"].each do |f|
-  next if %w[user ability].any? { |skip| f.include? skip }
+  next if %w[ability].any? { |skip| f.include? skip }
 
   require_relative f
 end
