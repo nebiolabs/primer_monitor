@@ -4,6 +4,7 @@
 </head>
 <body>
 <h1>Variants Observed in Subscribed Primer Sets</h1>
+<h3>since <%= Date.today - @user.lookback_days %> above <%= @user.variant_fraction_threshold %></h3>
 <table>
   <tr>
     <th>Primer Set</th><th>Locus</th><th>Primer</th><th>Geographic Region</th><th>Frequency</th>
@@ -13,9 +14,8 @@
       <td><%= link_to notification.primer_set, notification.primer_set %></td>
       <td><%= notification.oligo&.locus  %></td>
       <td><%= notification.oligo&.category %></td>
-      <td><%= notification.subscribed_geo_location %></td>
       <td><%= notification.detailed_geo_location_alias %></td>
-      <td><%= notification.fraction_variant %></td>
+      <td><%= notification.fraction_variant.round(2) %></td>
     </tr>
   <% end %>
 </table>
