@@ -116,7 +116,7 @@ process load_to_db {
 
     shell:
     '''
-    ruby !{primer_monitor_path}/upload.rb --metadata_tsv !{metadata} --variants_tsv !{variants}
+    RAILS_ENV=production ruby !{primer_monitor_path}/upload.rb --metadata_tsv !{metadata} --variants_tsv !{variants}
     '''
 
 }
