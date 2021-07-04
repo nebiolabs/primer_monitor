@@ -1,39 +1,11 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
+require_relative 'config/environment' # loads rails env, models, etc.
+
 # aggregates results from the passed files and stores them in the configured database
-require 'rubygems'
-require 'bundler/setup'
-require 'active_record'
-require 'activerecord-import'
-require 'active_record/associations'
-require 'logger'
-require 'pg'
-require 'yaml'
-require 'pp'
-require 'slop'
-require 'mail'
-# require 'digest/md5'
-# require 'date'
-# require 'tempfile'
-# require 'tmpdir'
-# require 'csv'
 
-# Use 'safe' in order to prevent rails from failing due to monkey
-# patching Enumerable:
-# require 'descriptive_statistics/safe'
 @log = ActiveRecord::Base.logger = Logger.new($stderr)
-
-# need application record first since others depend on it
-require_relative "#{__dir__}/app/models/application_record.rb"
-
-# requires all the model files
-SKIP_DEVISE = true
-Dir["#{__dir__}/app/models/**/*.rb"].each do |f|
-  next if %w[ability].any? { |skip| f.include? skip }
-
-  require_relative f
-end
 
 def setup_db_connection
   db_config = YAML.safe_load(

@@ -2,10 +2,8 @@
 
 # stores information about users of this system (including submitters and administrators)
 class User < ApplicationRecord
-  unless SKIP_DEVISE
-    devise :database_authenticatable, :registerable, :recoverable, :rememberable,
-           :validatable, :confirmable, :omniauthable, omniauth_providers: [:google_oauth2]
-  end
+  devise :database_authenticatable, :registerable, :recoverable, :rememberable,
+         :validatable, :confirmable, :omniauthable, omniauth_providers: [:google_oauth2]
 
   has_many :primer_sets
   has_many :user_roles, dependent: :destroy
