@@ -8,6 +8,7 @@ class PrimerSetSubscriptionsController < ApplicationController
     current_user.send_primer_updates || current_user.update_column(:send_primer_updates, true)
 
     @primer_set_subscription = PrimerSetSubscription.find_or_initialize_by(primer_set_subscription_params)
+    @primer_set_subscription.active = true
     respond_to do |format|
       format.js if @primer_set_subscription.save
     end
@@ -16,7 +17,7 @@ class PrimerSetSubscriptionsController < ApplicationController
   def destroy
     primer_set_subscription = PrimerSetSubscription.find(params[:id])
     @primer_set_id = primer_set_subscription.primer_set_id
-    primer_set_subscription.destroy
+    primer_set_subscription.update_column(:active, false)
     respond_to do |format|
       format.js
     end

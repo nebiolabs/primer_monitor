@@ -24,6 +24,7 @@ CREATE MATERIALIZED VIEW public.identify_primers_for_notifications AS
              JOIN public.join_subscribed_location_to_ids ON (((join_subscribed_location_to_ids.user_id = primer_set_subscriptions.user_id) AND (join_subscribed_location_to_ids.detailed_geo_location_id = oligo_variant_overlaps.detailed_geo_location_id))))
              JOIN public.users ON ((users.id = primer_set_subscriptions.user_id)))
           WHERE (oligo_variant_overlaps.date_collected >= (CURRENT_DATE - users.lookback_days))
+          AND primer_set_subscriptions.active = true
           GROUP BY primer_set_subscriptions.user_id, primer_set_subscriptions.primer_set_id, primer_sets.name, oligos.id, oligos.name, join_subscribed_location_to_ids.detailed_geo_location_id, users.lookback_days, users.variant_fraction_threshold, oligo_variant_overlaps.region, oligo_variant_overlaps.subregion, oligo_variant_overlaps.division, oligo_variant_overlaps.subdivision, oligo_variant_overlaps.coords, oligo_variant_overlaps.detailed_geo_location_id
         ), second_query AS (
          SELECT fasta_records.detailed_geo_location_id,

@@ -621,7 +621,8 @@ CREATE TABLE public.primer_set_subscriptions (
     primer_set_id bigint NOT NULL,
     user_id bigint NOT NULL,
     created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL
+    updated_at timestamp(6) without time zone NOT NULL,
+    active boolean DEFAULT true NOT NULL
 );
 
 
@@ -1923,6 +1924,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20210622215629'),
 ('20210622230211'),
 ('20210628001136'),
-('20210628202244');
+('20210628202244'),
+('20210705151710');
 
 
