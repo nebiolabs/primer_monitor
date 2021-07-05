@@ -1,6 +1,6 @@
 <span class='px-2'>
   <% if user %>
-    <% if primer_set_subscription %>
+    <% if primer_set_subscription&.active? %>
       <%= button_to "Unsubscribe", primer_set_subscription_path(primer_set_subscription),
                     remote: true, method: :delete, class: "button is-link is-small primer_set_#{primer_set.id}",
                     title: 'You are currently subscribed, click to unsubscribe'
