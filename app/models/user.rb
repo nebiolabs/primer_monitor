@@ -5,7 +5,6 @@ class User < ApplicationRecord
   devise :database_authenticatable, :registerable, :recoverable, :rememberable,
          :validatable, :confirmable, :omniauthable, omniauth_providers: [:google_oauth2]
 
-  has_many :primer_sets
   has_many :user_roles, dependent: :destroy
   has_many :roles, through: :user_roles
   has_many :subscribed_geo_locations, dependent: :destroy, inverse_of: :user
