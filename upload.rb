@@ -72,7 +72,6 @@ end
 # sends messages and records successful delivery
 def send_notifications(verified_notifications)
   verified_notifications.each do |vn|
-
     @log.info("Sending notification to #{vn.user.formatted_email}")
     pns = ProposedNotification.where(verified_notification_id: vn.id)
                               .includes(:oligo, :primer_set,
