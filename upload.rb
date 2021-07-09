@@ -78,7 +78,7 @@ def send_notifications(verified_notifications)
     pns = ProposedNotification.where(verified_notification_id: vn.id)
                               .includes(:oligo, :primer_set,
                                         :subscribed_geo_location, :detailed_geo_location_alias)
-                              .reorder('primer_sets.name, oligos.locus, oligos.category,' +
+                              .reorder('primer_sets.name, oligos.locus, oligos.category,' \
                                          'region, subregion, division, subdivision')
     PrimerSetMailer.primer_overlap_notification_email(vn.user_id, pns).deliver_now
     vn.status = 'Sent'
