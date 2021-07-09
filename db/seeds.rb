@@ -81,8 +81,8 @@ view_files = Dir["#{__dir__}/views/*.sql"].sort
 
 view_defs = view_files.each_with_object({}) do |view_file, h| # depends on hash being ordered
   view_def = File.readlines(view_file)
-  mat_view_matches = view_def.grep(/CREATE/)[0].match(/CREATE MATERIALIZED VIEW ([\w.]+) AS/)
-  view_name_matches = view_def.grep(/CREATE/)[0].match(/CREATE VIEW ([\w.]+) AS/)
+  mat_view_matches = view_def.grep(/CREATE/)[0]&.match(/CREATE MATERIALIZED VIEW ([\w.]+) AS/)
+  view_name_matches = view_def.grep(/CREATE/)[0]&.match(/CREATE VIEW ([\w.]+) AS/)
   if mat_view_matches
     h[mat_view_matches[1]] = { mat_view: view_def }
   elsif view_name_matches
