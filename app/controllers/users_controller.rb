@@ -18,6 +18,8 @@ class UsersController < ApplicationController
   # GET /users/new
   def new
     @user = User.new
+    @user.subscribed_geo_locations << DetailedGeoLocationAlias.world
+    @user.variant_fraction_threshold = 0.5
   end
 
   # GET /users/1/edit
