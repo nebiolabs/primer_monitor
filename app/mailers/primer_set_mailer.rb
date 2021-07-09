@@ -12,6 +12,6 @@ class PrimerSetMailer < ApplicationMailer
     @user = User.find(user_id)
     @proposed_notifications = proposed_notifications
     mail(to: @user.formatted_email,
-         subject: "#{@proposed_notifications.size} overlaps reported in your subscribed primer sets.")
+         subject: "#{@proposed_notifications.size} variants observed in your subscribed primer sets.")
   end
 end

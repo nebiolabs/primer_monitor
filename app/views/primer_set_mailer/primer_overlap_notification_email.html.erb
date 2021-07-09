@@ -4,7 +4,7 @@
 </head>
 <body>
 <h1>Variants Observed in Subscribed Primer Sets</h1>
-<h3><%= @user.variant_fraction_threshold*100 %>% of sequences since <%= (Date.today - @user.lookback_days).strftime("%Y/%m/%d") %> </h3>
+<h3> reporting criteria: >= <%= (@user.variant_fraction_threshold*100).round(0) %>% of sequences since <%= (Date.today - @user.lookback_days).strftime("%Y/%m/%d") %> </h3>
 <table>
   <tr>
     <th>Primer Set</th><th>Locus</th><th>Primer</th><th>Geographic Region</th><th>Frequency</th>
