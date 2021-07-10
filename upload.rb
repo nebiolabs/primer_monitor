@@ -69,21 +69,6 @@ def create_new_notifications!
   ProposedNotification.import(new_proposed_notifications, validate: false)
 end
 
-# sends messages and records successful delivery
-def send_notifications(verified_notifications)
-  verified_notifications.each do |vn|
-    @log.info("Sending notification to #{vn.user.formatted_email}")
-    pns = ProposedNotification.where(verified_notification_id: vn.id)
-                              .includes(:oligo, :primer_set,
-                                        :subscribed_geo_location, :detailed_geo_location_alias)
-                              .reorder('primer_sets.name, oligos.locus, oligos.category,' \
-                                         'region, subregion, division, subdivision')
-    PrimerSetMailer.primer_overlap_notification_email(vn.user_id, pns).deliver_now
-    vn.status = 'Sent'
-    vn.save!
-  end
-end
-
 def main
   opts = parse_options
   @log.level = Logger.const_get(opts[:verbose])
@@ -101,7 +86,7 @@ def main
     ActiveRecord::Base.connection.execute('REFRESH MATERIALIZED VIEW initial_score')
 
     create_new_notifications!
-    send_notifications(VerifiedNotification.find_or_create_verified_notifications!)
+    # cannot send notifications here since this may be running on a cluster node.
   end
 end
 main if $PROGRAM_NAME.end_with?('upload.rb')

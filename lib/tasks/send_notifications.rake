@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-namespace :send_notifications do
+namespace :notifications do
   # sends messages and records successful delivery
   def send_notifications(verified_notifications)
     verified_notifications.each do |vn|
@@ -17,7 +17,7 @@ namespace :send_notifications do
   end
 
   desc 'sends notifications about '
-  task :send_notifications do
+  task :send do
     send_notifications(VerifiedNotification.find_or_create_verified_notifications!)
   end
 end
