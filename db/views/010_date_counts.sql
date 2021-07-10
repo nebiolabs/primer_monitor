@@ -6,3 +6,4 @@ CREATE VIEW public.date_counts AS
    FROM public.fasta_records fr
   GROUP BY fr.detailed_geo_location_id, fr.date_collected;
 
+GRANT SELECT on date_counts to primer_monitor_ro;

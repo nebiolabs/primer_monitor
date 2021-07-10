@@ -55,3 +55,4 @@ UNION ALL
   WHERE (variant_sites.usable_insertion = true)
 ;
 CREATE index on variant_overlaps(variant_type);
+GRANT SELECT on variant_overlaps to primer_monitor_ro;

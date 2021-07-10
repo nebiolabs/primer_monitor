@@ -40,3 +40,4 @@ CREATE MATERIALIZED VIEW public.initial_score AS
      LEFT JOIN variants ON (((all_combos.date_collected = variants.date_collected) AND (all_combos.primer_set_id = variants.primer_set_id) AND ((all_combos.oligo_name)::text = (variants.oligo_name)::text) AND (all_combos.detailed_geo_location_id = variants.detailed_geo_location_id))))
 ;
 
+GRANT SELECT on initial_score to primer_monitor_ro;

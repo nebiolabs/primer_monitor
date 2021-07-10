@@ -57,3 +57,4 @@ CREATE MATERIALIZED VIEW public.identify_primers_for_notifications AS
   WHERE ((((first_query.variant_count)::numeric / (second_query.records_count)::numeric))::double precision >= first_query.variant_fraction_threshold)
   ;
 
+GRANT SELECT on identify_primers_for_notifications to primer_monitor_ro;

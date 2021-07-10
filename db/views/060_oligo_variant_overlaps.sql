@@ -72,6 +72,7 @@ UNION ALL
 CREATE INDEX ON oligo_variant_overlaps(oligo_id);
 CREATE INDEX ON oligo_variant_overlaps(date_collected);
 CREATE INDEX ON oligo_variant_overlaps(detailed_geo_location_id);
+GRANT SELECT on oligo_variant_overlaps to primer_monitor_ro;
 
 
 

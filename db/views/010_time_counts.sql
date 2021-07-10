@@ -52,3 +52,4 @@ CREATE MATERIALIZED VIEW public.time_counts AS
 
 CREATE UNIQUE INDEX ON time_counts(region, subregion, division, subdivision, date_collected);
 
+GRANT SELECT on time_counts to primer_monitor_ro;

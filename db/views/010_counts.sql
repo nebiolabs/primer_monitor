@@ -45,3 +45,4 @@ CREATE MATERIALIZED VIEW public.counts AS
      JOIN region_subregion_division_count ON ((((region_subregion_division_count.region)::text = (region_subregion_division_subdivision_count.region)::text) AND ((region_subregion_division_count.subregion)::text = (region_subregion_division_subdivision_count.subregion)::text) AND ((region_subregion_division_count.division)::text = (region_subregion_division_subdivision_count.division)::text))))
 ;
 CREATE UNIQUE INDEX ON counts(region, subregion, division, subdivision);
+GRANT SELECT on counts to primer_monitor_ro;
