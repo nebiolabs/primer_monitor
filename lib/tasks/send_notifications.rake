@@ -16,7 +16,7 @@ namespace :notifications do
     end
   end
 
-  desc 'sends notifications about '
+  desc 'sends notifications about primer overlaps'
   task :send do
     send_notifications(VerifiedNotification.find_or_create_verified_notifications!)
   end
