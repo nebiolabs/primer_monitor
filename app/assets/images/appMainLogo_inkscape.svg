@@ -14,9 +14,9 @@
    id="svg8"
    sodipodi:docname="appMainLogo_inkscape.svg"
    inkscape:version="1.0.2 (e86c8708, 2021-01-15)"
-   inkscape:export-filename="/Users/langhorst/src/primer_monitor/app/assets/images/appMainLogo_square.png"
-   inkscape:export-xdpi="96"
-   inkscape:export-ydpi="96">
+   inkscape:export-filename="/Users/langhorst/src/primer_monitor/app/assets/images/appMainLogo.png"
+   inkscape:export-xdpi="115.26742"
+   inkscape:export-ydpi="115.26742">
   <defs
      id="defs2">
     <marker
@@ -81,11 +81,11 @@
      pagecolor="#ffffff"
      bordercolor="#666666"
      borderopacity="1.0"
-     inkscape:pageopacity="0.0"
+     inkscape:pageopacity="1"
      inkscape:pageshadow="2"
      inkscape:zoom="0.73267562"
      inkscape:cx="481.96249"
-     inkscape:cy="365.60252"
+     inkscape:cy="306.91352"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
      inkscape:document-rotation="0"
@@ -108,7 +108,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title />
+        <dc:title></dc:title>
       </cc:Work>
     </rdf:RDF>
   </metadata>
