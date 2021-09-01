@@ -3,8 +3,11 @@
 require 'test_helper'
 
 class OligosControllerTest < ActionDispatch::IntegrationTest
+  include Devise::Test::IntegrationHelpers
+
   setup do
     @oligo = oligos(:one)
+    sign_in(users(:admin_user))
   end
 
   test 'should get show' do

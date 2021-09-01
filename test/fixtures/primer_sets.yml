@@ -3,7 +3,9 @@
 one:
   name: Charité
   organism: sars_cov_2
+  user: one
 
 two:
   name: CDC
   organism: sars_cov_2
+  user: one

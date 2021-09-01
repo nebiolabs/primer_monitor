@@ -4,8 +4,22 @@ one:
   first: Frank
   last: Gehry
   email: frank@contemporary.example.org
+  confirmed: true
+  active: true
 
 two:
   first: Mies
   last: van der Rohe
   email: mies@modernist.example.org
+  confirmed: true
+  active: true
+
+admin_user:
+  first: Admin
+  last: User
+  email: admin_user@example.org
+  confirmed: true
+  active: true
+  approved: true
+
+
