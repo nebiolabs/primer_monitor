@@ -28,9 +28,6 @@ append :linked_dirs,  'log', 'tmp/pids', 'tmp/cache', 'tmp/sockets', 'public/sys
 
 set :keep_releases, 10
 
-set :whenever_command, "bundle exec whenever"
-require "whenever/capistrano"
-
 namespace :deploy do
   desc 'Restart application'
   task :restart do
