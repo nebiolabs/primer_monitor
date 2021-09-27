@@ -45,6 +45,7 @@ process filter_data {
     python3 !{primer_monitor_path}/lib/filter_duplicates.py !{prev_json} !{full_json} > ${date_today}.json
 
     rm -f !{output_path}$(date --date="3 days ago" +%Y-%m-%d).full_json
+    rm $(readlink -f !{full_json})
     '''
 
 }
