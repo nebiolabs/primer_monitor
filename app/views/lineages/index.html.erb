@@ -1,113 +1,111 @@
 <h1 class="title">SARS-CoV-2 Lineage Variant Summary</h1>
 
-<%= image_tag 'lineage_primer_summary_20210624.svg' %>
+<%= image_tag 'lineage_primer_summary_20210930.svg' %>
 <hr/>
-Nucleotide variants related to lineages of concern and observed in > 20% of sequences are indicated in yellow above a schematic SARS-CoV-2 genome.
-Primers that do not overlap with variants associated with these lineages at are shown in green.
-Primers that do overlap are indicated in orange.
+Nucleotide variants related to lineages of concern and observed in > 10% of sequences are indicated in yellow above a schematic SARS-CoV-2 genome.
+Primers that do not overlap with variants associated with these lineages are shown in blue.
+Overlapping primers are indicated in orange.
 
 <h2>Overlapping amplicons:</h2>
 <ul>
   <li>The NEB LAMP E2019 E gene amplicon overlaps with a variant observed in the AY.1 lineage.</li>
-  <li>The NEB LAMP E2019 N gene amplicon overlaps with a variant observed in the C.37 lineage.</li>
-  <li>The NEB qPCR E3019 / US CDC N1 probe overlaps with a variant observed in C.37.</li>
+  <li>The NEB LAMP E2019 N gene amplicon overlaps with a variant observed in the AY.5 lineage (LB primer)</li>
   <li>The China CDC N gene qPCR amplicon overlaps with variants in all lineages.</li>
-  <li>The Charité Orf1ab amplicon overlaps with variants in B.1.617.2 and AY.1.</li>
   <li>The Charité E amplicon overlaps with a variant observed in AY.1</li>
-  <li>ARTIC v3, v4 and Midnight 1200 bp amplicons overlap with multiple variants:<li>
+  <li>ARTIC v3, v4, VarSkip, and Midnight 1200 bp amplicons overlap with multiple variants:<li>
      <table>
        <tr>
          <th>Primer Set</th><th>Amplicon</th><th>Lineage</th>
        </tr>
        <tr>
          <td>ARTIC v3</td>
-         <td>12</td>
-         <td>P.1</td>
+         <td>4</td>
+         <td>AY.1</td>
        </tr>
        <tr>
          <td>ARTIC v4</td>
-         <td>14</td>
-         <td>C.37</td>
+         <td>4</td>
+         <td>AY.1</td>
+       </tr>
+       <tr>
+         <td>ARTIC v4</td>
+         <td>8</td>
+         <td>AY.25</td>
+       </tr>
+       <tr>
+         <td>ARTIC v4</td>
+         <td>8</td>
+         <td>AY.25</td>
+       </tr>
+       <tr>
+         <td>ARTIC v4</td>
+         <td>13</td>
+         <td>AY.1</td>
        </tr>
        <tr>
          <td>Midnight 1200 bp</td>
          <td>5</td>
-         <td>B.1.617.2, AY.1</td>
+         <td>B.1.617.2, AY.1, AY.4, AY.5, AY.6, AY.25</td>
        </tr>
        <tr>
-         <td>ARTIC v3</td>
+         <td>ARTIC v4</td>
          <td>17</td>
-         <td>B.1.617.1</td>
+         <td>AY.6</td>
        </tr>
        <tr>
          <td>ARTIC v4</td>
          <td>23</td>
-         <td>B.1.617.2, AY.1, C.37</td>
+         <td>B.1.617.2, AY.1, AY.4, AY.5, AY.6, AY.25</td>
+       </tr>
+       <tr>
+         <td>VarSkip</td>
+         <td>20</td>
+         <td>AY.1, AY.4</td>
        </tr>
        <tr>
          <td>ARTIC v3</td>
-         <td>32</td>
-         <td>C.37</td>
-       </tr>
-       <tr>
-         <td>ARTIC v4</td>
-         <td>32</td>
-         <td>C.37</td>
+         <td>39</td>
+         <td>AY.25</td>
        </tr>
        <tr>
          <td>ARTIC v3</td>
-         <td>34</td>
-         <td>C.37</td>
+         <td>42</td>
+         <td>AY.25</td>
        </tr>
        <tr>
          <td>ARTIC v4</td>
-         <td>34</td>
-         <td>C.37</td>
-       </tr>
-       <tr>
-         <td>ARTIC v3</td>
-         <td>54</td>
-         <td>B.1.526</td>
-       </tr>
-       <tr>
-         <td>ARTIC v4</td>
-         <td>54</td>
-         <td>B.1.526</td>
+         <td>58</td>
+         <td>AY.6</td>
        </tr>
        <tr>
          <td>ARTIC v3</td>
          <td>64</td>
-         <td>B.1.617.2, AY.1</td>
+         <td>B.1.617.2, AY.1, AY.4, AY.5, AY.6, AY.25</td>
        </tr>
        <tr>
-         <td>ARTIC v4</td>
+         <td>ARTIC v3</td>
          <td>68</td>
-         <td>B.1.617.1</td>
-       </tr>
-       <tr>
-         <td>Midnight 1200 bp</td>
-         <td>21</td>
-         <td>P.1</td>
+         <td>AY.1</td>
        </tr>
        <tr>
          <td>ARTIC v3</td>
          <td>72</td>
-         <td>B.1.617.1, B.1.617.2, AY.1</td>
+         <td>B.1.617.2, AY.1, AY.4, AY.5, AY.6, AY.25</td>
        </tr>
        <tr>
          <td>ARTIC v3</td>
-         <td>73</td>
-         <td>P.1, B.1.617.1, B.1.617.2, AY.1</td>
-       </tr>
-       <tr>
-         <td>ARTIC v3</td>
-         <td>74</td>
-         <td>B.1.351</td>
+         <td>72</td>
+         <td>B.1.617.2, AY.1, AY.4, AY.5, AY.6, AY.25</td>
        </tr>
        <tr>
          <td>ARTIC v3</td>
          <td>76</td>
-         <td>B.1.351, P.1, AY.1</td>
+         <td>AY.1, AY.25</td>
+       </tr>
+       <tr>
+         <td>ARTIC v4</td>
+         <td>75</td>
+         <td>AY.25</td>
        </tr>
        <tr>
          <td>ARTIC v4</td>
@@ -115,146 +113,101 @@ Primers that do overlap are indicated in orange.
          <td>AY.1</td>
        </tr>
        <tr>
-         <td>Midnight</td>
-         <td>24</td>
-         <td>P.1</td>
-       </tr>
-       <tr>
          <td>ARTIC v3</td>
          <td>81</td>
-         <td>B.1.617.1, B.1.617.2, AY.1</td>
+         <td>B.1.617.2, AY.1, AY.4, AY.5, AY.6, AY.25</td>
        </tr>
        <tr>
-         <td>Midnight</td>
-         <td>25</td>
-         <td>P.1</td>
+         <td>VarSkip</td>
+         <td>61</td>
+         <td>AY.5</td>
+       </tr>
+       <tr>
+         <td>VarSkip</td>
+         <td>61</td>
+         <td>AY.5</td>
        </tr>
        <tr>
          <td>ARTIC v3</td>
-         <td>86</td>
-         <td>B.1.351</td>
+         <td>91</td>
+         <td>AY.1</td>
        </tr>
        <tr>
          <td>ARTIC v4</td>
-         <td>90</td>
-         <td>C.37</td>
+         <td>92</td>
+         <td>AY.1</td>
        </tr>
        <tr>
-         <td>ARTIC v3</td>
-         <td>88</td>
-         <td>C.37</td>
+         <td>VarSkip</td>
+         <td>69</td>
+         <td>AY.25</td>
        </tr>
        <tr>
-         <td>Midnight 1200 bp</td>
+         <td>Midnight 1200</td>
          <td>27</td>
-         <td>B.1.617.2, AY.1</td>
+         <td>B.1.617.2, AY.1, AY.4, AY.5, AY.6, AY.25</td>
+       </tr>
+       <tr>
+         <td>Midnight 1200</td>
+         <td>27</td>
+         <td>B.1.617.2, AY.1, AY.4, AY.5, AY.6, AY.25</td>
        </tr>
        <tr>
          <td>ARTIC v3</td>
          <td>93</td>
-         <td>B.1.617.2, AY.1</td>
+         <td>B.1.617.2, AY.1, AY.4, AY.5, AY.6, AY.25</td>
        </tr>
        <tr>
-         <td>ARTIC v3</td>
-         <td>96</td>
-         <td>C.37</td>
-       </tr>
-       <tr>
-         <td>ARTIC v3</td>
-         <td>97</td>
-         <td>C.37</td>
-       </tr>
-       <tr>
-         <td>ARTIC v4</td>
-         <td>96</td>
+         <td>Midnight 1200</td>
+         <td>29</td>
          <td>AY.1</td>
-       </tr>
-       <tr>
-         <td>ARTIC v4</td>
-         <td>97</td>
-         <td>AY.1</td>
-       </tr>
-       <tr>
-         <td>ARTIC v4</td>
-         <td>99</td>
-         <td>P.1</td>
        </tr>
      </table>
 </ul>
 
 <hr>
 <h2 class="title">Orf1 Gene (1.5 kb) Variants</h2>
-<%= image_tag 'lineage_primer_summary_Orf1-1500_20210624.svg' %>
+<%= image_tag 'lineage_primer_summary_Orf1-1500_20210930.svg' %>
 <hr>
-<h2 class="title">Orf1 Gene (10 kb) Variants</h2>
-<%= image_tag 'lineage_primer_summary_Orf1-10000_20210624.svg' %>
+<h2 class="title">Orf1 Gene (6 kb) Variants</h2>
+<%= image_tag 'lineage_primer_summary_Orf1-6000_20210930.svg' %>
 <hr>
-<h2 class="title">Orf1 Gene (14 kb) Variants</h2>
-<%= image_tag 'lineage_primer_summary_Orf1-14000_20210624.svg' %>
+<h2 class="title">Orf1 Gene (12 kb) Variants</h2>
+<%= image_tag 'lineage_primer_summary_Orf1-12000_20210930.svg' %>
 <hr>
-<h2 class="title">Orf1 Gene (19 kb) Variants</h2>
-<%= image_tag 'lineage_primer_summary_Orf1-19000_20210624.svg' %>
+<h2 class="title">Orf1 Gene (17 kb) Variants</h2>
+<%= image_tag 'lineage_primer_summary_Orf1-17000_20210930.svg' %>
 <hr>
 <h2 class="title">S Gene Variants</h2>
-<%= image_tag 'lineage_primer_summary_S_20210624.svg' %>
+<%= image_tag 'lineage_primer_summary_S_20210930.svg' %>
 <hr>
-<h2 class="title">Orf3a-Orf7a Gene Variants</h2>
-<%= image_tag 'lineage_primer_summary_Orf3a-Orf7a_20210624.svg' %>
-<hr>
-<h2 class="title">N Gene Variants</h2>
-<%= image_tag 'lineage_primer_summary_N_20210624.svg' %>
+<h2 class="title">Orf7-N Gene Variants</h2>
+<%= image_tag 'lineage_primer_summary_orf7-N_20210930.svg' %>
 <hr>
 <h2 class="title">Methods:</h2>
 <p>
   Sequences reported in <%= link_to 'Sequence Sources', '#sequence_sources' %> for each lineage were aligned to the
-  NC_045512.2 reference sequence (minimap2). Variants > 20% frequency (freebayes) were
+  NC_045512.2 reference sequence (minimap2). Variants > 10% frequency (freebayes) were
   evaluated for overlap with primer regions (bedtools) and displayed (Geneious Prime 2021.0.3).
 </p>
 <hr>
 <h3 id='sequence_sources' class="title">Sequence Sources:</h3>
-<p>
-  <b>B.1.117</b>:
-  Virological. “Preliminary Genomic Characterisation of an Emergent SARS-CoV-2 Lineage in the UK Defined by a Novel Set
-  of Spike Mutations - SARS-CoV-2 Coronavirus / NCoV-2019 Genomic Epidemiology,” December 18,
-  2020. <%= link_to 'https://virological.org/t/preliminary-genomic-characterisation-of-an-emergent-sars-cov-2-lineage-in-the-uk-defined-by-a-novel-set-of-spike-mutations/563',
-                    'https://virological.org/t/preliminary-genomic-characterisation-of-an-emergent-sars-cov-2-lineage-in-the-uk-defined-by-a-novel-set-of-spike-mutations/563' %>
-  .
-</p>
-<p>
-  <b>B.1.351</b>:
-  Tegally, Houriiyah, Eduan Wilkinson, Marta Giovanetti, Arash Iranzadeh, Vagner Fonseca, Jennifer Giandhari, Deelan
-  Doolabh, et al. “Emergence and Rapid Spread of a New Severe Acute Respiratory Syndrome-Related Coronavirus 2
-  (SARS-CoV-2) Lineage with Multiple Spike Mutations in South Africa.” MedRxiv, December 22, 2020,
-  2020.12.21.20248640. <%= link_to 'https://doi.org/10.1101/2020.12.21.20248640', 'https://doi.org/10.1101/2020.12.21.20248640' %>
-  .
-</p>
-<p>
-  <b>P.1</b>:
-  Virological. “SARS-CoV-2 Reinfection by the New Variant of Concern (VOC) P.1 in Amazonas, Brazil - SARS-CoV-2
-  Coronavirus / NCoV-2019 Genomic Epidemiology,” January 18,
-  2021. <%= link_to 'https://virological.org/t/sars-cov-2-reinfection-by-the-new-variant-of-concern-voc-p-1-in-amazonas-brazil/596',
-                    'https://virological.org/t/sars-cov-2-reinfection-by-the-new-variant-of-concern-voc-p-1-in-amazonas-brazil/596' %>
-  .
-</p>
-<p>
-  <b>B.1.526</b>:
-  West, Anthony P., Joel O. Wertheim, Jade C. Wang, Tetyana I. Vasylyeva, Jennifer L. Havens, Moinuddin A. Chowdhury, Edimarlyn Gonzalez, et al. “Detection and Characterization of the SARS-CoV-2 Lineage B.1.526 in New York.” BioRxiv, April 22, 2021, 2021.02.14.431043. <a href="https://doi.org/10.1101/2021.02.14.431043">https://doi.org/10.1101/2021.02.14.431043</a>.
-</p>
-<p>
-  <b>B.1.617.1</b>:
-  GitHub. “Possible New Emerging Sub-Lineage under Recently Designated Lineage B.1.617 · Issue #55 · Cov-Lineages/Pango-Designation.” Accessed June 20, 2021. <a href='https://github.com/cov-lineages/pango-designation/issues/55'>https://github.com/cov-lineages/pango-designation/issues/55</a>.
-</p>
+
 <p>
   <b>B.1.617.2</b>:
   GitHub. “Potential Sequences That Should Be Included in B.1.617 · Issue #49 · Cov-Lineages/Pango-Designation.” Accessed June 20, 2021. <a href="https://github.com/cov-lineages/pango-designation/issues/49">https://github.com/cov-lineages/pango-designation/issues/49</a>.
 </p>
 <p>
- <b>AY.1</b>:
-  GitHub. “B.1.617.2 Sublineage with K417N · Issue #95 · Cov-Lineages/Pango-Designation.” Accessed June 20, 2021. <a href="https://github.com/cov-lineages/pango-designation/issues/95">https://github.com/cov-lineages/pango-designation/issues/95</a>.
+  <b>AY.1</b>:
+  GitHub. “Proposal for New Sub-Lineage of AY with C5239T and T5514C (ORF1ab:V1750A) in Japan · Issue #208 · Cov-Lineages/Pango-Designation.” Accessed October 1, 2021. <a href="https://github.com/cov-lineages/pango-designation/issues/208">https://github.com/cov-lineages/pango-designation/issues/208</a>.
 </p>
 <p>
-  <b>C.37</b>:
-  GitHub. “Subclade of B.1.1.1 (Resulting from a Discrete Evolutionary Sprint in December/January?) Widespread in Chile · Issue #52 · Cov-Lineages/Pango-Designation.” Accessed June 21, 2021. <a href='https://github.com/cov-lineages/pango-designation/issues/52'>https://github.com/cov-lineages/pango-designation/issues/52</a>.
+  <b>AY.4, AY.5, AY.6</b>:
+  GitHub. “Proposal for Sub-Lineages within B.1.617.2 · Issue #180 · Cov-Lineages/Pango-Designation.” Accessed October 1, 2021. <a href="https://github.com/cov-lineages/pango-designation/issues/180">https://github.com/cov-lineages/pango-designation/issues/180</a>.
+</p>
+<p>
+  <b>AY.25</b>:
+  GitHub. “B.1.617.2 Sublineage with Expansion in Cape Cod, Massachusetts, USA in July 2021 · Issue #181 · Cov-Lineages/Pango-Designation.” Accessed October 1, 2021. <a href="https://github.com/cov-lineages/pango-designation/issues/181">https://github.com/cov-lineages/pango-designation/issues/181</a>.
 </p>
 <hr/>
 <h3 class="title">Amplicon Designs:</h3>
@@ -282,6 +235,10 @@ Primers that do overlap are indicated in orange.
   <b>ARTIC v4</b>:
   ARTIC Real-time Genomic Surveillance. “SARS-CoV-2 Version 4 Scheme Release - Laboratory,” June 24, 2021. https://community.artic.network/t/sars-cov-2-version-4-scheme-release/312.
 </p>
+<p>
+  <b>VarSkip</b>:
+  VarSkip Multiplex PCR Designs for SARS-CoV-2 Sequencing. 2021. Reprint, New England Biolabs Inc., 2021. https://github.com/nebiolabs/VarSkip.
+</p>
 <hr/>
 <h3 class='title'>Software Tools:</h3>
 <p>
@@ -306,8 +263,11 @@ Primers that do overlap are indicated in orange.
 <hr/>
 <h3 class='title'>History:</h3>
 <p>
-  2021-06-20: Updated to currently relevant variants of concerns.
+  2021-09-29: Added VarSkip, removed new <a href='https://www.cdc.gov/coronavirus/2019-ncov/variants/variant-info.html#anchor_1632150752495'>VBM lineages</a>
 </p>
 <p>
   2021-06-24: Added ARTICv4
+</p>
+<p>
+  2021-06-20: Updated to currently relevant variants of concerns.
 </p>
