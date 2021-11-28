@@ -18,7 +18,7 @@
 # end
 
 # Learn more: http://github.com/javan/whenever
-set :output, "/var/www/primer-monitor/shared/logs/cron.log"
-every 1.day, at: ['4:00 am'] do
+set :output, "/var/www/primer-monitor/shared/log/cron.log"
+every 1.day, at: ['7:00 am'] do
   rake 'notifications:send'
 end
