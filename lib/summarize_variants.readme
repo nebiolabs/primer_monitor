@@ -1,0 +1,7 @@
+To add a lineage:
+ - align representative sequences from a new lineage
+ - call variants
+ - prepare bed file containing variants and primers in tracks for each lineage
+ - split bed into individual bed files by track (split_bed_by_track.sh)
+ - intersect lineage bed files with primer bed files (calc_intersects.sh)
+ - update visualization and publish to tableau public
