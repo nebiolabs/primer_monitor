@@ -3,7 +3,7 @@ designs="ARTIC_v3.bed ARTIC_v4.bed VarSkip_1a.bed Varskip1_Long.bed Midnight_120
 #  bedtools intersect -a $f -b voc_variants.sort.bed > $f.overlaps
 #done
 
-for var in {AY.,B.,C.,P.,R.,1000,4000}*.bed ; do 
+for var in {AY.,B.,BA.,C.,P.,R.,1000,4000}*.bed ; do 
   for design in $designs; do
     bedtools intersect -a $design -b $var  > ${design}_vs_${var}.overlaps
   done
