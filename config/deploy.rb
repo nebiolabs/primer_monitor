@@ -119,6 +119,6 @@ namespace :deploy do
   end
 
   after :published, :restart
-  after 'deploy:restart_services', 'deploy:seed'
+  #after 'deploy:restart_services', 'deploy:seed'
 
 end
