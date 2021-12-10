@@ -1,4 +1,4 @@
-designs="ARTIC_v3.bed ARTIC_v4.bed VarSkip_1a.bed Varskip1_Long.bed Midnight_1200.bed"
+designs="ARTIC_v3.bed ARTIC_v4.bed ARTIC_v4.1.bed VarSkip_1a.bed VarSkip_1a_supplements.bed Varskip1_Long.bed Midnight_1200.bed Resende.bed Swift.bed UNZA.bed USydney.bed"
 #for f in $designs; do 
 #  bedtools intersect -a $f -b voc_variants.sort.bed > $f.overlaps
 #done
