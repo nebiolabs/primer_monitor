@@ -24,7 +24,7 @@ CREATE MATERIALIZED VIEW public.variant_overlaps AS
      JOIN public.fasta_records ON ((variant_sites.fasta_record_id = fasta_records.id)))
      JOIN public.detailed_geo_locations ON ((fasta_records.detailed_geo_location_id = detailed_geo_locations.id)))
      JOIN public.oligos ON ((NOT ((oligos.ref_start >= variant_sites.ref_end) OR (oligos.ref_end <= variant_sites.ref_start)))))
-     JOIN public.primer_sets ON ((oligos.primer_set_id = primer_sets.id)))
+     JOIN public.primer_sets ON ((oligos.primer_set_id = primer_sets.id)) AND primer_sets.status = 'complete')
   WHERE (variant_sites.usable_del_or_snp = true)
 UNION ALL
  SELECT oligos.id AS oligo_id,
@@ -51,7 +51,7 @@ UNION ALL
      JOIN public.fasta_records ON ((variant_sites.fasta_record_id = fasta_records.id)))
      JOIN public.detailed_geo_locations ON ((fasta_records.detailed_geo_location_id = detailed_geo_locations.id)))
      JOIN public.oligos ON (((variant_sites.ref_start > oligos.ref_start) AND (variant_sites.ref_start <= oligos.ref_end))))
-     JOIN public.primer_sets ON ((oligos.primer_set_id = primer_sets.id)))
+     JOIN public.primer_sets ON ((oligos.primer_set_id = primer_sets.id)) AND primer_sets.status = 'complete')
   WHERE (variant_sites.usable_insertion = true)
 ;
 CREATE index on variant_overlaps(variant_type);
