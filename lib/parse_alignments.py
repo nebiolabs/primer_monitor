@@ -19,8 +19,8 @@ for line in sys.stdin:
 
     # print(parsed_cigar)
     query_start = 0
-    read_consuming_ops = ("M", "I", "S", "=", "X", "H")
-    ref_consuming_ops = ("M", "D", "I", "N", "=", "X")
+    read_consuming_ops = ("M", "I", "S", "=", "X")
+    ref_consuming_ops = ("M", "D", "N", "=", "X")
     for item in parsed_cigar:
         length = int(item[:-1])
         type = item[len(item)-1:]
@@ -32,6 +32,5 @@ for line in sys.stdin:
             print(f"{query_name}\t{ref_start}\t{type}\t{output}")
         if type in read_consuming_ops:
             query_start += length
-        if type in ref_consuming_ops:
-            ref_start += length
+        ref_start += length
         
