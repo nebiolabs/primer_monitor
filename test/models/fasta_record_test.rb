@@ -13,4 +13,12 @@ class FastaRecordTest < ActiveSupport::TestCase
            new_records[0].detailed_geo_location
                          .detailed_geo_location_alias.errors.full_messages)
   end
+
+  test 'python_sam_parser' do
+    input_sam = Rails.root.join('test/fixtures/complex_cigar.sam')
+    parser = Rails.root.join('lib/parse_alignments.py')
+    output = `python #{parser} < #{input_sam}`
+    assert_equal "hCoV-19/England/MILK-31C5A2D/2022|EPI_ISL_8755092|2022-01-07\t28371\tD\t---------",
+                 output.split("\n")[-1]
+  end
 end

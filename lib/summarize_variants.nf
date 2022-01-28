@@ -85,9 +85,9 @@ process align {
         date_today=$(date +%Y-%m-%d)
 
         sed -E 's/ /_/g' !{fasta} \
-        | minimap2 -t !{task.cpus} --eqx -x map-ont -a !{ref} /dev/stdin \
+        | minimap2 -r 10000 --score-N=0 -t !{task.cpus} --eqx -x map-ont -a !{ref} /dev/stdin \
         | samtools view -F 2304 /dev/stdin \
-        | tee ${date_today}.$(basename $PWD).bam \
+        | tee >(samtools view -b -o ${date_today}.$(basename $PWD).bam /dev/stdin) \
         | python3 !{primer_monitor_path}/lib/parse_alignments.py > $(basename $PWD).tsv
 
     '''
