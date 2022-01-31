@@ -5,7 +5,7 @@ ref = file(ref).toAbsolutePath()
 prev_json = file(params.prev_json).toAbsolutePath()
 
 ncov_path = '/mnt/home/mcampbell/src/ncov-ingest'
-primer_monitor_path = '/mnt/bioinfo/prg/primer_monitor'
+primer_monitor_path = '/mnt/bioinfo/prg/primer_monitor_dev'
 output_path = '/mnt/flash_scratch/seq-shepherd/'
 
 process download_data {
@@ -86,7 +86,7 @@ process align {
 
         sed -E 's/ /_/g' !{fasta} \
         | minimap2 -r 10000 --score-N=0 -t !{task.cpus} --eqx -x map-ont -a !{ref} /dev/stdin \
-        | samtools view -F 2304 /dev/stdin \
+        | samtools view -h -F 2304 /dev/stdin \
         | tee >(samtools view -b -o ${date_today}.$(basename $PWD).bam /dev/stdin) \
         | python3 !{primer_monitor_path}/lib/parse_alignments.py > $(basename $PWD).tsv
 
