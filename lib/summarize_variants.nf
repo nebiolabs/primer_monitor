@@ -1,7 +1,6 @@
 ref = params.ref 
 ref = file(ref).toAbsolutePath()
 
-// prev_json_path = Channel.fromPath(params.prev_json)
 prev_json = file(params.prev_json).toAbsolutePath()
 
 ncov_path = '/mnt/home/mcampbell/src/ncov-ingest'
@@ -47,7 +46,7 @@ process filter_data {
     rm -f !{output_path}$(date --date="3 days ago" +%Y-%m-%d).full_json
     rm $(readlink -f !{full_json})
     '''
-
+ 
 }
 
 process transform_data {
@@ -55,17 +54,16 @@ process transform_data {
     conda "regex fsspec pandas typing"
 
     input:
-        file(gisaid_json) from filtered_data
+        file(gisaid_json) from filtered_data.splitText(file: true, by: 10000)
     output:
-        file('*.metadata') into transformed_metadata
-        file('*.fasta') into transformed_fasta
+        tuple file('*.metadata'), file('*.fasta') into transformed_data
 
 
     shell:
     '''
     date_today=$(date +%Y-%m-%d)
 
-    !{ncov_path}/bin/transform-gisaid --output-metadata ${date_today}.metadata --output-fasta ${date_today}.fasta --output-additional-info ${date_today}.info ${date_today}.json 
+    !{ncov_path}/bin/transform-gisaid --output-metadata ${date_today}.metadata --output-fasta ${date_today}.fasta --output-additional-info ${date_today}.info ${date_today}.*.json 
     '''
 
 }
@@ -76,9 +74,9 @@ process align {
     publishDir "${output_path}", mode: 'copy', pattern: '*.bam', overwrite: true
 
     input:
-        file(fasta) from transformed_fasta.splitFasta(file: true, by: 10000)
+        tuple file(metadata), file(fasta) from transformed_data
     output:
-        file('*.tsv') into split_variants
+        tuple file('*.metadata'), file('*.tsv') into metadata_plus_variants
 
     shell:
     '''
@@ -90,34 +88,27 @@ process align {
         | tee >(samtools view -b -o ${date_today}.$(basename $PWD).bam /dev/stdin) \
         | python3 !{primer_monitor_path}/lib/parse_alignments.py > $(basename $PWD).tsv
 
+        mv !{metadata} $(basename $PWD).metadata
+
     '''
 }
-
-process combine_variants {
-    cpus 1
-    publishDir "${output_path}", mode: 'copy'
-
-    input:
-        file(variants) from split_variants.collect()
-    output:
-        file("combined_variants.tsv") into combined_variants
-
-    shell:
-    '''
-    cat !{variants} >> combined_variants.tsv
-    '''
-}
-
 
 process load_to_db {
     cpus 1
-
+    publishDir "${output_path}", mode: 'copy'
+    errorStrategy 'retry' 
+    maxRetries 10
+    maxForks 1
     input:
-        tuple file(metadata), file(variants) from transformed_metadata.concat(combined_variants).collect()
+        file(everything) from metadata_plus_variants
 
     shell:
     '''
-    RAILS_ENV=production ruby !{primer_monitor_path}/upload.rb --metadata_tsv !{metadata} --variants_tsv !{variants}
+    for file in *.metadata; do
+      base=$(basename $file .metadata;)
+      echo -n "processing $base..."
+      RAILS_ENV=production ruby /mnt/bioinfo/prg/primer_monitor_dev/upload.rb --metadata_tsv ${base}.metadata --variants_tsv ${base}.tsv && mv ${base}.metadata ${base}.metadata.complete
+      echo 'complete'
+    done 
     '''
-
 }
