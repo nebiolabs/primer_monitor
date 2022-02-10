@@ -4,7 +4,7 @@ ref = file(ref).toAbsolutePath()
 prev_json = file(params.prev_json).toAbsolutePath()
 
 ncov_path = '/mnt/home/mcampbell/src/ncov-ingest'
-primer_monitor_path = '/mnt/bioinfo/prg/primer_monitor_dev'
+primer_monitor_path = '/mnt/bioinfo/prg/primer_monitor'
 output_path = '/mnt/flash_scratch/seq-shepherd/'
 
 process download_data {
