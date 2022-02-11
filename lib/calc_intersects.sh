@@ -1,11 +1,11 @@
-designs="ARTIC_v3.bed ARTIC_v4.bed ARTIC_v4.1.bed VarSkip_1a.bed VarSkip_1a_supplements.bed Varskip1_Long.bed Midnight_1200.bed Resende.bed Swift.bed UNZA.bed USydney.bed"
+designs="ARTIC_v3.bed ARTIC_v4.bed ARTIC_v4.1.bed ARTIC_v4.1_(alts_only).bed ARTIC_v4.1_(spiked_alts).bed VarSkip_1a.bed VarSkip_2a.bed Varskip_Long_1a.bed Midnight_1200.bed Resende.bed Swift.bed UNZA.bed USydney.bed"
 #for f in $designs; do 
 #  bedtools intersect -a $f -b voc_variants.sort.bed > $f.overlaps
 #done
 
 for var in {AY.,B.,BA.,C.,P.,R.,1000,4000}*.bed ; do 
   for design in $designs; do
-    bedtools intersect -a $design -b $var  > ${design}_vs_${var}.overlaps
+    bedtools intersect -wb -a $design -b $var  > ${design}_vs_${var}.overlaps
   done
 done
 
