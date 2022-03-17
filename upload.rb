@@ -58,7 +58,7 @@ def import_variants(variants_file)
 
   variant_records = VariantSite.parse(variants_file)
   fasta_ids = variant_records.map(&:fasta_record_id).uniq
-  VariantSite.where(fasta_record_id: fasta_ids).delete_all
+  #VariantSite.where(fasta_record_id: fasta_ids).delete_all
   VariantSite.import(variant_records, validate: false)
 end
 
