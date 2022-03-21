@@ -13,8 +13,7 @@ def setup_db_connection
       File.join(
         File.dirname(__FILE__), 'config', 'database.yml'
       )
-    )
-  )[ENV['DATABASE_ENV'] || 'production']
+    ), aliases: true)[ENV['DATABASE_ENV'] || 'production']
   ActiveRecord::Base.establish_connection(db_config)
 end
 
@@ -23,13 +22,15 @@ def parse_options
     slop_opts = Slop.parse(ARGV.map(&:strip)) do |o|
       o.string '--metadata_tsv', 'Tsv file containing metadata information'
       o.string '--variants_tsv', 'Tsv file containing variants information'
+      o.bool '--skip_data_import', 'Performs the data import steps', default: false
+      o.bool '--skip_view_rebuild', 'Rebuilds materialized views', default: false
 
       # The available log levels are: :debug, :info, :warn, :error, and
       # :fatal, corresponding to the log level numbers from 0 up to 4
       # respectively. See rails docs.
       o.string '--verbose', 'Verbosity level of ActiveRecord logger', default: 'INFO'
 
-      o.on '--help' do
+      o.on '--help', '-h' do
         puts o
         exit
       end
@@ -75,18 +76,21 @@ def main
 
   setup_db_connection
   ActiveRecord::Base.transaction do
-    import_metadata(opts[:metadata_tsv])
-    import_variants(opts[:variants_tsv])
-
-    ActiveRecord::Base.connection.execute('REFRESH MATERIALIZED VIEW variant_overlaps')
-    ActiveRecord::Base.connection.execute('REFRESH MATERIALIZED VIEW counts')
-    ActiveRecord::Base.connection.execute('REFRESH MATERIALIZED VIEW time_counts')
-    ActiveRecord::Base.connection.execute('REFRESH MATERIALIZED VIEW oligo_variant_overlaps')
-    ActiveRecord::Base.connection.execute('REFRESH MATERIALIZED VIEW identify_primers_for_notifications')
-    ActiveRecord::Base.connection.execute('REFRESH MATERIALIZED VIEW initial_score')
-
-    create_new_notifications!
-    # cannot send notifications here since this may be running on a cluster node.
+    unless opts[:skip_data_import]
+      import_metadata(opts[:metadata_tsv])
+      import_variants(opts[:variants_tsv])
+    end
+    if opts[:skip_view_rebuild]
+      ActiveRecord::Base.connection.execute('REFRESH MATERIALIZED VIEW variant_overlaps')
+      ActiveRecord::Base.connection.execute('REFRESH MATERIALIZED VIEW counts')
+      ActiveRecord::Base.connection.execute('REFRESH MATERIALIZED VIEW time_counts')
+      ActiveRecord::Base.connection.execute('REFRESH MATERIALIZED VIEW oligo_variant_overlaps')
+      ActiveRecord::Base.connection.execute('REFRESH MATERIALIZED VIEW identify_primers_for_notifications')
+      ActiveRecord::Base.connection.execute('REFRESH MATERIALIZED VIEW initial_score')
+    
+      create_new_notifications!
+      # cannot send notifications here since this may be running on a cluster node.
+    end
   end
 end
 main if $PROGRAM_NAME.end_with?('upload.rb')

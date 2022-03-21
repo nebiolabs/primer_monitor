@@ -104,11 +104,14 @@ process load_to_db {
 
     shell:
     '''
+    base=''
     for file in *.metadata; do
       base=$(basename $file .metadata;)
       echo -n "processing $base..."
-      RAILS_ENV=production ruby /mnt/bioinfo/prg/primer_monitor/upload.rb --metadata_tsv ${base}.metadata --variants_tsv ${base}.tsv && mv ${base}.metadata ${base}.metadata.complete
+      RAILS_ENV=production ruby /mnt/bioinfo/prg/primer_monitor/upload.rb --skip_view_rebuild --metadata_tsv ${base}.metadata --variants_tsv ${base}.tsv && mv ${base}.metadata ${base}.metadata.complete
       echo 'complete'
     done 
+    # recalculate all the views at the end to save time
+    RAILS_ENV=production ruby /mnt/bioinfo/prg/primer_monitor/upload.rb --skip_data_import --metadata_tsv ${base}.metadata --variants_tsv ${base}.tsv && touch refresh_complete.txt
     '''
 }
