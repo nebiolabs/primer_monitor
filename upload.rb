@@ -80,7 +80,7 @@ def main
       import_metadata(opts[:metadata_tsv])
       import_variants(opts[:variants_tsv])
     end
-    if opts[:skip_view_rebuild]
+    unless opts[:skip_view_rebuild]
       ActiveRecord::Base.connection.execute('REFRESH MATERIALIZED VIEW variant_overlaps')
       ActiveRecord::Base.connection.execute('REFRESH MATERIALIZED VIEW counts')
       ActiveRecord::Base.connection.execute('REFRESH MATERIALIZED VIEW time_counts')
