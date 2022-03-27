@@ -25,7 +25,7 @@ process download_data {
 
 }
 
-process filter_data {
+process extract_new_records {
     // Keeps only new records added since previous run
     cpus 1
     conda "python=3.9"
