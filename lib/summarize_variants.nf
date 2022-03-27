@@ -100,18 +100,30 @@ process load_to_db {
     maxRetries 10
     maxForks 1
     input:
-        file(everything) from metadata_plus_variants
-
+        file(metadata_file) from metadata_plus_variants
+    output:
+        file('*.complete') into complete_metadata_files
     shell:
     '''
-    base=''
-    for file in *.metadata; do
-      base=$(basename $file .metadata;)
-      echo -n "processing $base..."
-      RAILS_ENV=production ruby /mnt/bioinfo/prg/primer_monitor/upload.rb --skip_view_rebuild --metadata_tsv ${base}.metadata --variants_tsv ${base}.tsv && mv ${base}.metadata ${base}.metadata.complete
-      echo 'complete'
-    done 
+    base=$(basename !{metadata_file} .metadata;)
+    RAILS_ENV=production ruby /mnt/bioinfo/prg/primer_monitor/upload.rb \
+        --skip_view_rebuild \
+        --metadata_tsv ${base}.metadata \
+        --variants_tsv ${base}.tsv \
+        && mv ${base}.metadata ${base}.metadata.complete
+    '''
+}
+
+process recalculate_database_views {
+    cpus 1
+    publishDir "${output_path}", mode: 'copy'
+    errorStrategy 'retry' 
+    maxRetries 2
+    input:
+        file(everything) from complete_metadata_files.collect()
+    shell:
+    '''
     # recalculate all the views at the end to save time
-    RAILS_ENV=production ruby /mnt/bioinfo/prg/primer_monitor/upload.rb --skip_data_import --metadata_tsv ${base}.metadata --variants_tsv ${base}.tsv && touch refresh_complete.txt
+    RAILS_ENV=production ruby /mnt/bioinfo/prg/primer_monitor/upload.rb --skip_data_import && touch refresh_complete.txt
     '''
 }
