@@ -13,7 +13,7 @@ process download_data {
     conda "curl xz zstd"
     errorStrategy 'retry' 
     maxRetries 2
-    publishDir "${output_path}", mode: 'copy', pattern: '*.full_json', overwrite: true
+    publishDir "${output_path}", mode: 'copy', pattern: '*.full_json.zst', overwrite: true
 
     output:
         file('*.full_json.zst') into downloaded_data
