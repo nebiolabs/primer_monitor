@@ -33,7 +33,6 @@ process extract_new_records {
     conda "python=3.9 zstd"
 
     input:
-        // file(prev_json) from prev_json_path
         file(full_json) from downloaded_data
     output:
         file('*.json') into filtered_data
@@ -45,7 +44,7 @@ process extract_new_records {
 
     python3 !{primer_monitor_path}/lib/filter_duplicates.py <(zstd -d --long=30 < !{prev_json}) <(zstd -d --long=30 < !{full_json}) > ${date_today}.json
 
-    rm -f !{output_path}$(date --date="3 days ago" +%Y-%m-%d).full_json.zst
+    find !{output_path} -maxdepth 1 -mtime +3 -type f -name "*.full_json*"  -delete
     rm $(readlink -f !{full_json})
     '''
  
