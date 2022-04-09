@@ -14,13 +14,13 @@ process download_data {
     publishDir "${output_path}", mode: 'copy', pattern: '*.full_json', overwrite: true
 
     output:
-        file('*.full_json') into downloaded_data
+        file('*.full_json.zst') into downloaded_data
 
     shell:
     '''
     date_today=$(date +%Y-%m-%d)
     source !{primer_monitor_path}/.env
-    curl -u $USER:$PASSWORD $URL | xz -d -T8 > ${date_today}.full_json
+    curl -u $USER:$PASSWORD $URL | xz -d | zstd --long=30 --ultra -22 -T !{task.cpus}> ${date_today}.full_json.zst
     '''
 
 }
@@ -28,7 +28,7 @@ process download_data {
 process extract_new_records {
     // Keeps only new records added since previous run
     cpus 1
-    conda "python=3.9"
+    conda "python=3.9 zstd"
 
     input:
         // file(prev_json) from prev_json_path
@@ -41,9 +41,9 @@ process extract_new_records {
     '''
     date_today=$(date +%Y-%m-%d)
 
-    python3 !{primer_monitor_path}/lib/filter_duplicates.py !{prev_json} !{full_json} > ${date_today}.json
+    python3 !{primer_monitor_path}/lib/filter_duplicates.py <(zstd -d --long=30 < !{prev_json}) <(zstd -d --long=30 < !{full_json}) > ${date_today}.json
 
-    rm -f !{output_path}$(date --date="3 days ago" +%Y-%m-%d).full_json
+    rm -f !{output_path}$(date --date="3 days ago" +%Y-%m-%d).full_json.zst
     rm $(readlink -f !{full_json})
     '''
  
