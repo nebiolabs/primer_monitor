@@ -9,8 +9,10 @@ output_path = '/mnt/flash_scratch/seq-shepherd/'
 
 process download_data {
     // Downloads the full dataset
-    cpus 1
-    conda "curl xz"
+    cpus 8
+    conda "curl xz zstd"
+    errorStrategy 'retry' 
+    maxRetries 2
     publishDir "${output_path}", mode: 'copy', pattern: '*.full_json', overwrite: true
 
     output:
