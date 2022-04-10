@@ -101,17 +101,16 @@ process load_to_db {
     maxRetries 10
     maxForks 1
     input:
-        file(metadata_file) from metadata_plus_variants
+        tuple file(metadata), file(tsv) from metadata_plus_variants
     output:
         file('*.complete') into complete_metadata_files
     shell:
     '''
-    base=$(basename !{metadata_file} .metadata;)
     RAILS_ENV=production ruby /mnt/bioinfo/prg/primer_monitor/upload.rb \
         --skip_view_rebuild \
-        --metadata_tsv ${base}.metadata \
-        --variants_tsv ${base}.tsv \
-        && mv ${base}.metadata ${base}.metadata.complete
+        --metadata_tsv !{metadata} \
+        --variants_tsv !{tsv} \
+        && mv !{metadata} !{metadata}.complete
     '''
 }
 
