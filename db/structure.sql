@@ -1406,6 +1406,13 @@ CREATE INDEX index_detailed_geo_locations_on_detailed_geo_location_alias_id ON p
 
 
 --
+-- Name: index_fasta_records_on_created_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_fasta_records_on_created_at ON public.fasta_records USING btree (created_at);
+
+
+--
 -- Name: index_fasta_records_on_detailed_geo_location_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -1925,6 +1932,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20210622230211'),
 ('20210628001136'),
 ('20210628202244'),
-('20210705151710');
+('20210705151710'),
+('20220425010902');
 
 
