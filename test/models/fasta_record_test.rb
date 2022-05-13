@@ -18,7 +18,15 @@ class FastaRecordTest < ActiveSupport::TestCase
     input_sam = Rails.root.join('test/fixtures/complex_cigar.sam')
     parser = Rails.root.join('lib/parse_alignments.py')
     output = `python #{parser} < #{input_sam}`
-    assert_equal "hCoV-19/England/MILK-31C5A2D/2022|EPI_ISL_8755092|2022-01-07\t28371\tD\t---------",
+    assert_equal "hCoV-19/England/MILK-31C5A2D/2022|EPI_ISL_8755092|2022-01-07\t28362\tD\t---------",
+                 output.split("\n")[-1]
+  end
+
+  test 'soft clips' do
+    input_sam = Rails.root.join('test/fixtures/soft_clip_cigar.sam')
+    parser = Rails.root.join('lib/parse_alignments.py')
+    output = `python #{parser} < #{input_sam}`
+    assert_equal "hCoV-19/USA/CO-CDPHE-2100422558/2021\t29197\tX\tT",
                  output.split("\n")[-1]
   end
 end

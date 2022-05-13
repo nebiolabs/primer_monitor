@@ -32,5 +32,6 @@ for line in sys.stdin:
             print(f"{query_name}\t{ref_start}\t{type}\t{output}")
         if type in read_consuming_ops:
             query_start += length
-        ref_start += length
+        if type in ref_consuming_ops:
+            ref_start += length
         
