@@ -5,7 +5,7 @@ prev_json = file(params.prev_json).toAbsolutePath()
 
 ncov_path = '/mnt/home/mcampbell/src/ncov-ingest'
 primer_monitor_path = '/mnt/bioinfo/prg/primer_monitor'
-output_path = '/mnt/flash_scratch/seq-shepherd/'
+output_path = '/mnt/hpc_scratch/primer_monitor'
 
 process download_data {
     // Downloads the full dataset
