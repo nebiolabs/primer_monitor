@@ -13,7 +13,8 @@ def setup_db_connection
       File.join(
         File.dirname(__FILE__), 'config', 'database.yml'
       )
-    ), aliases: true)[ENV['DATABASE_ENV'] || 'production']
+    ), aliases: true
+  )[ENV['DATABASE_ENV'] || 'production']
   ActiveRecord::Base.establish_connection(db_config)
 end
 
