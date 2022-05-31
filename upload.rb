@@ -18,24 +18,29 @@ def setup_db_connection
   ActiveRecord::Base.establish_connection(db_config)
 end
 
+def define_options
+  Slop.parse(ARGV.map(&:strip)) do |o|
+    o.string '--metadata_tsv', 'TSV file containing metadata information'
+    o.string '--variants_tsv', 'TSV file containing variants information'
+      o.string '--variants_tsv', 'Tsv file containing variants information'
+    o.bool '--skip_data_import', 'Performs the data import steps', default: false
+    o.bool '--skip_view_rebuild', 'Rebuilds materialized views', default: false
+
+    # The available log levels are: :debug, :info, :warn, :error, and
+    # :fatal, corresponding to the log level numbers from 0 up to 4
+    # respectively. See rails docs.
+    o.string '--verbose', 'Verbosity level of ActiveRecord logger', default: 'INFO'
+
+    o.on '--help', '-h' do
+      puts o
+      exit
+    end
+  end
+end
+
 def parse_options
   begin
-    slop_opts = Slop.parse(ARGV.map(&:strip)) do |o|
-      o.string '--metadata_tsv', 'Tsv file containing metadata information'
-      o.string '--variants_tsv', 'Tsv file containing variants information'
-      o.bool '--skip_data_import', 'Performs the data import steps', default: false
-      o.bool '--skip_view_rebuild', 'Rebuilds materialized views', default: false
-
-      # The available log levels are: :debug, :info, :warn, :error, and
-      # :fatal, corresponding to the log level numbers from 0 up to 4
-      # respectively. See rails docs.
-      o.string '--verbose', 'Verbosity level of ActiveRecord logger', default: 'INFO'
-
-      o.on '--help', '-h' do
-        puts o
-        exit
-      end
-    end
+    slop_opts = define_options
   rescue Slop::MissingArgument => e
     @log.error "fatal: #{e}"
     exit(1)
