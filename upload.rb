@@ -81,13 +81,11 @@ def main
       import_variants(opts[:variants_tsv])
     end
     unless opts[:skip_view_rebuild]
-      ActiveRecord::Base.connection.execute('REFRESH MATERIALIZED VIEW variant_overlaps')
-      ActiveRecord::Base.connection.execute('REFRESH MATERIALIZED VIEW counts')
-      ActiveRecord::Base.connection.execute('REFRESH MATERIALIZED VIEW time_counts')
-      ActiveRecord::Base.connection.execute('REFRESH MATERIALIZED VIEW oligo_variant_overlaps')
-      ActiveRecord::Base.connection.execute('REFRESH MATERIALIZED VIEW identify_primers_for_notifications')
-      ActiveRecord::Base.connection.execute('REFRESH MATERIALIZED VIEW initial_score')
-    
+      %w[variant_overlaps counts time_counts oligo_variant_overlaps
+         identify_primers_for_notifications initial_score].each do |view|
+        ActiveRecord::Base.connection.execute("REFRESH MATERIALIZED VIEW #{view}")
+        Logger.info("refreshing #{view}")
+      end
       create_new_notifications!
       # cannot send notifications here since this may be running on a cluster node.
     end
