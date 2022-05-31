@@ -22,7 +22,9 @@ process download_data {
     '''
     date_today=$(date +%Y-%m-%d)
     source !{primer_monitor_path}/.env
-    curl -u $USER:$PASSWORD $URL | xz -d | zstd --long=30 --ultra -22 -T!{task.cpus} > ${date_today}.full_json.zst
+    curl -u $USER:$PASSWORD $URL > tmp.json.xz
+    xz -d < tmp.json.xz | zstd --long=30 --ultra -22 -T!{task.cpus} > ${date_today}.full_json.zst
+    rm tmp.json.xz
     '''
 
 }
