@@ -22,7 +22,6 @@ def define_options
   Slop.parse(ARGV.map(&:strip)) do |o|
     o.string '--metadata_tsv', 'TSV file containing metadata information'
     o.string '--variants_tsv', 'TSV file containing variants information'
-      o.string '--variants_tsv', 'Tsv file containing variants information'
     o.bool '--skip_data_import', 'Performs the data import steps', default: false
     o.bool '--skip_view_rebuild', 'Rebuilds materialized views', default: false
 
