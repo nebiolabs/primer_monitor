@@ -34,7 +34,7 @@ gem 'bootsnap', '>= 1.4.2', require: false
 # for error reporting
 gem 'airbrake'
 gem 'cancancan', '~> 3.2.1'
-gem 'devise', github: 'heartcombo/devise', branch: 'master'
+gem 'devise', '~>4.8.1'
 gem 'omniauth-google-oauth2'
 gem 'omniauth-rails_csrf_protection', '~> 1.0'
 
