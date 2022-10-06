@@ -9,7 +9,7 @@ output_path = '/mnt/hpc_scratch/primer_monitor'
 
 process download_data {
     // Downloads the full dataset
-    cpus 8
+    cpus 16
     conda "curl xz zstd"
     errorStrategy 'retry' 
     maxRetries 2
