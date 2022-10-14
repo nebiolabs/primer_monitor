@@ -53,6 +53,8 @@ end
 def import_metadata(metadata_file)
   return unless metadata_file
 
+  @log.debug("starting import: #{metadata_file}: ")
+
   fasta_records = FastaRecord.parse(metadata_file)
   result = FastaRecord.import(fasta_records, validate: false)
   result.failed_instances.each { |rec| @log.error("Failed to insert #{rec}") }
@@ -89,7 +91,7 @@ def main
       %w[variant_overlaps counts time_counts oligo_variant_overlaps
          identify_primers_for_notifications initial_score].each do |view|
         ActiveRecord::Base.connection.execute("REFRESH MATERIALIZED VIEW #{view}")
-        Logger.info("refreshing #{view}")
+        @log.info("refreshing #{view}")
       end
       create_new_notifications!
       # cannot send notifications here since this may be running on a cluster node.
