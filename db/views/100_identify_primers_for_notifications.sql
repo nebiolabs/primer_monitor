@@ -63,6 +63,9 @@ CREATE MATERIALIZED VIEW public.identify_primers_for_notifications AS
          )
      )
   WHERE ((((first_query.variant_count)::numeric / (total_sequences_for_denominator.records_count)::numeric))::double precision >= first_query.variant_fraction_threshold)
+WITH NO DATA
 ;
 
 GRANT SELECT on identify_primers_for_notifications to primer_monitor_ro;
+
+ALTER MATERIALIZED VIEW identify_primers_for_notifications owner to primer_monitor;

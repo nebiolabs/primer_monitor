@@ -86,12 +86,15 @@ FROM ((public.variant_overlaps
                                       ((time_counts.subdivision)::text = (variant_overlaps.subdivision)::text) AND
                                       (time_counts.date_collected = variant_overlaps.date_collected))))
 WHERE ((variant_overlaps.variant_type)::text = 'I'::text)
+WITH NO DATA
 ;
 
 CREATE INDEX ON oligo_variant_overlaps (oligo_id);
 CREATE INDEX ON oligo_variant_overlaps (date_collected);
 CREATE INDEX ON oligo_variant_overlaps (detailed_geo_location_id);
 GRANT SELECT on oligo_variant_overlaps to primer_monitor_ro;
+
+ALTER MATERIALIZED VIEW oligo_variant_overlaps owner to primer_monitor;
 
 
 

@@ -60,6 +60,8 @@ FROM ((((public.variant_sites
                             (variant_sites.ref_start <= oligos.ref_end))))
     JOIN public.primer_sets ON ((oligos.primer_set_id = primer_sets.id)) AND primer_sets.status = 'complete'))
 WHERE (variant_sites.usable_insertion = true)
+WITH NO DATA
 ;
 CREATE index on variant_overlaps (variant_type);
 GRANT SELECT on variant_overlaps to primer_monitor_ro;
+ALTER MATERIALIZED VIEW variant_overlaps owner to primer_monitor;

@@ -48,8 +48,11 @@ CREATE MATERIALIZED VIEW public.time_counts AS
      JOIN region_time_count ON ((((region_time_count.region)::text = (region_subregion_division_subdivision_time_count.region)::text) AND (region_time_count.date_collected = region_subregion_division_subdivision_time_count.date_collected))))
      JOIN region_subregion_time_count ON ((((region_subregion_time_count.region)::text = (region_subregion_division_subdivision_time_count.region)::text) AND ((region_subregion_time_count.subregion)::text = (region_subregion_division_subdivision_time_count.subregion)::text) AND (region_subregion_time_count.date_collected = region_subregion_division_subdivision_time_count.date_collected))))
      JOIN region_subregion_division_time_count ON ((((region_subregion_division_time_count.region)::text = (region_subregion_division_subdivision_time_count.region)::text) AND ((region_subregion_division_time_count.subregion)::text = (region_subregion_division_subdivision_time_count.subregion)::text) AND ((region_subregion_division_time_count.division)::text = (region_subregion_division_subdivision_time_count.division)::text) AND (region_subregion_division_time_count.date_collected = region_subregion_division_subdivision_time_count.date_collected))))
+WITH NO DATA
  ;
 
 CREATE UNIQUE INDEX ON time_counts(region, subregion, division, subdivision, date_collected);
 
 GRANT SELECT on time_counts to primer_monitor_ro;
+
+ALTER MATERIALIZED VIEW time_counts owner to primer_monitor;

@@ -97,8 +97,8 @@ conn = ActiveRecord::Base.connection
 view_defs.keys.reverse.each do |v|
   Rails.logger.info("dropping #{v}")
   conn.execute(
-    view_defs[v][:view] && "drop view if exists #{v};" ||
-      view_defs[v][:mat_view] && "drop materialized view if exists #{v};"
+    view_defs[v][:view] && "drop view if exists #{v} CASCADE;" ||
+      view_defs[v][:mat_view] && "drop materialized view if exists #{v} CASCADE;"
   )
 end
 
