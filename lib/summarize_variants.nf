@@ -1,7 +1,8 @@
 ref = params.ref 
 ref = file(ref).toAbsolutePath()
+params.prev_json=
 
-prev_json = file(params.prev_json, checkIfExists=true).toAbsolutePath()
+prev_json = file(params.prev_json, checkIfExists: true).toAbsolutePath()
 
 
 
