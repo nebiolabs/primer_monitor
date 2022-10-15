@@ -1,7 +1,9 @@
 ref = params.ref 
 ref = file(ref).toAbsolutePath()
 
-prev_json = file(params.prev_json).toAbsolutePath()
+prev_json = file(params.prev_json, checkIfExists=true).toAbsolutePath()
+
+
 
 ncov_path = '/mnt/home/mcampbell/src/ncov-ingest'
 primer_monitor_path = '/mnt/bioinfo/prg/primer_monitor'
