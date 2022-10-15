@@ -15,7 +15,8 @@ process download_data {
     conda "curl xz zstd"
     errorStrategy 'retry' 
     maxRetries 2
-    publishDir "${output_path}", mode: 'copy', pattern: '*.full_json.zst', overwrite: true
+    publishDir "${output_path}", mode: 'link', pattern: '*.full_json.zst', overwrite: true
+    // mode "link" assumes that the output path is on the same disk as the work directory, switch to copy if not
 
     output:
         file('*.full_json.zst') into downloaded_data
@@ -49,7 +50,6 @@ process extract_new_records {
     python3 !{primer_monitor_path}/lib/filter_duplicates.py <(zstd -d --long=30 < !{prev_json}) <(zstd -d --long=30 < !{full_json}) > ${date_today}.json
 
     find !{output_path} -maxdepth 1 -mtime +5 -type f -name "*.full_json*"  -delete
-    rm $(readlink -f !{full_json})
     '''
  
 }
