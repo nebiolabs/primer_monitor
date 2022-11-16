@@ -151,7 +151,7 @@ CREATE TABLE public.fasta_records (
     updated_at timestamp(6) without time zone NOT NULL,
     variant_name character varying,
     detailed_geo_location_id bigint NOT NULL,
-    submitted_date date NOT NULL
+    date_submitted date NOT NULL
 );
 
 
@@ -1945,6 +1945,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20220425010902'),
 ('20221116101600'),
 ('20221116130745'),
-('20221116134820');
+('20221116134820'),
+('20221116151610');
 
 
