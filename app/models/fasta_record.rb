@@ -31,7 +31,7 @@ class FastaRecord < ApplicationRecord
     (strain, _virus, gisaid_epi_isl, genbank_accession, date, region, country, division, location,
       _region_exposure, _country_exposure, _division_exposure, _segment, _length, _host, _age, _sex,
       _pangolin_lineage, _gisaid_clade, _originating_lab, _submitting_lab, _authors, _url, _title,
-      _paper_url, _date_submitted, variant_name) = line.chomp.split("\t")
+      _paper_url, date_submitted, variant_name) = line.chomp.split("\t")
 
     return unless strain && gisaid_epi_isl && genbank_accession && region && country && division && location && date
     return if existing_fasta_strain_ids.key?(strain)
@@ -45,7 +45,7 @@ class FastaRecord < ApplicationRecord
 
     FastaRecord.new(strain: strain, gisaid_epi_isl: gisaid_epi_isl,
                     genbank_accession: genbank_accession, detailed_geo_location_id: dg_id,
-                    date_collected: date, variant_name: variant_name)
+                    date_collected: date, variant_name: variant_name, date_submitted: date_submitted)
   end
 
   # fetches detailed geolocation record for the specified parameters, creates if necessary
