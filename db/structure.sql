@@ -150,7 +150,8 @@ CREATE TABLE public.fasta_records (
     created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL,
     variant_name character varying,
-    detailed_geo_location_id bigint NOT NULL
+    detailed_geo_location_id bigint NOT NULL,
+    submitted_date date NOT NULL
 );
 
 
@@ -1252,6 +1253,14 @@ ALTER TABLE ONLY public.detailed_geo_locations
 
 
 --
+-- Name: variant_sites ensure_variant_unique; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.variant_sites
+    ADD CONSTRAINT ensure_variant_unique UNIQUE (ref_start, fasta_record_id);
+
+
+--
 -- Name: fasta_records fasta_records_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -1933,6 +1942,9 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20210628001136'),
 ('20210628202244'),
 ('20210705151710'),
-('20220425010902');
+('20220425010902'),
+('20221116101600'),
+('20221116130745'),
+('20221116134820');
 
 
