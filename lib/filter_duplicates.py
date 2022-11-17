@@ -5,8 +5,8 @@ import re
 # Usage: ./filter_duplicates.py <old data> <new data> > <output>
 
 def get_strain(line):
-        regex = re.search('\"covv_virus_name\": \"(.*?)\",', line)
-        return regex.group(1)
+    regex = re.search('\"covv_virus_name\": \"(.*?)\",', line)
+    return regex.group(1)
 
 old_set = set([])
 with open(sys.argv[1], "r") as old_records:
