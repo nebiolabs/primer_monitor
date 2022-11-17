@@ -17,7 +17,8 @@ with open(sys.argv[1], "r") as old_records:
 
 with open(sys.argv[2], "r") as new_records:
     for line in new_records:
-        if line.strip() != "": # skip blank lines
+        line_stripped = line.strip() # so line.strip() isn't called twice
+        if line_stripped != "": # skip blank lines
             strain = get_strain(line)
             if strain not in old_set:
-                print(line.strip())
+                print(line_stripped)
