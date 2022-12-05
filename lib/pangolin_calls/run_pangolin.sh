@@ -3,5 +3,5 @@ if (($# < 6)); then
     exit 1;
 fi
 
-PATH=$PATH:$5/bin $5/bin/pangolin $1 -t $6 -o $4 --outfile $2;
-touch $3;
+PATH=$PATH:$5/bin $5/bin/pangolin $1 -t $6 -o $4 --outfile $2; # run pangolin
+touch $3; # create file to indicate this is done
