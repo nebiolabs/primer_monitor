@@ -2,7 +2,11 @@ import sys
 import subprocess
 import os
 
-groupsize = int(sys.argv[1])
+if len(sys.argv) < 4:
+    sys.stderr.write("usage: python batch_seqs.py <batch size> <pangolin path> <pangolin threads>")
+    sys.exit(1)
+
+groupsize = int(sys.argv[1])/2 # divided by 2 because a seq is 2 lines
 
 procs = []
 
