@@ -4,11 +4,15 @@ params.prev_json=
 
 prev_json = file(params.prev_json, checkIfExists: true).toAbsolutePath()
 
+params.pangolin_path=
+
+pangolin_path = file(params.pangolin_path).toAbsolutePath()
 
 
 ncov_path = '/mnt/home/mcampbell/src/ncov-ingest'
 primer_monitor_path = '/mnt/bioinfo/prg/primer_monitor'
 output_path = '/mnt/hpc_scratch/primer_monitor'
+pangolin_path = 
 
 process download_data {
     // Downloads the full dataset
@@ -63,6 +67,7 @@ process transform_data {
         file(gisaid_json) from filtered_data.splitText(file: true, by: 10000)
     output:
         tuple file('*.metadata'), file('*.fasta') into transformed_data
+        file('*.fasta') into transformed_data_for_pangolin
 
 
     shell:
@@ -109,6 +114,7 @@ process load_to_db {
         tuple file(metadata), file(tsv) from metadata_plus_variants
     output:
         file('*.complete') into complete_metadata_files
+        file('*.complete') into complete_metadata_files_pangolin
     shell:
     '''
     RAILS_ENV=production ruby /mnt/bioinfo/prg/primer_monitor/upload.rb \
@@ -116,6 +122,19 @@ process load_to_db {
         --metadata_tsv !{metadata} \
         --variants_tsv !{tsv} \
         && mv !{metadata} !{metadata}.complete
+    '''
+}
+
+process pangolin_calls {
+    cpus 1
+    //the actual pangolin runs are qsubbed separately, this 1 cpu is for the main process
+    input:
+        file(fasta) from transformed_data_for_pangolin
+    output:
+        // nothing
+    shell:
+    '''
+    !{primer_monitor_path}/lib/pangolin_calls/batch_seqs.py 10000 !{pangolin_path} 8
     '''
 }
 
