@@ -6,7 +6,11 @@ import re
 
 def get_strain(line):
     regex = re.search('\"covv_virus_name\": \"(.*?)\",', line)
-    return regex.group(1)
+    strain_name = regex.group(1)
+    # do the same transformations ncov-ingest will do to ensure they don't create undetected dups
+    strain_name = re.sub("\s", "", strain_name)
+    strain_name = re.sub("^[nh]CoV-19/", "", strain_name)
+    return strain_name
 
 record_set = set([])
 with open(sys.argv[1], "r") as old_records:
