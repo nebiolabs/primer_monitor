@@ -8,6 +8,8 @@ params.pangolin_path=
 
 pangolin_path = file(params.pangolin_path).toAbsolutePath()
 
+threads = 8
+
 
 ncov_path = '/mnt/home/mcampbell/src/ncov-ingest'
 primer_monitor_path = '/mnt/bioinfo/prg/primer_monitor'
@@ -131,10 +133,24 @@ process pangolin_calls {
     input:
         file(fasta) from transformed_data_for_pangolin
     output:
-        // nothing
+        file("*.csv") into pangolin_lineage_data
     shell:
     '''
-    !{primer_monitor_path}/lib/pangolin_calls/batch_seqs.py 10000 !{pangolin_path} 8
+    !{primer_monitor_path}/lib/pangolin_calls/qsub_pangolin_nobatch.sh !{fasta} !{pangolin_path} !{threads}
+    '''
+}
+
+process load_pangolin_data {
+    cpus 1
+    input:
+        file(csv) from pangolin_lineage_data
+        file(complete) from complete_metadata_files_pangolin
+        //the .complete is only here to make sure this happens *after* the main DB load
+    output:
+        file('*.complete') into complete_files_pangolin
+    shell:
+    '''
+    !{primer_monitor_path}/lib/pangolin_calls/update_fasta_records.sh !{csv}
     '''
 }
 
@@ -145,6 +161,7 @@ process recalculate_database_views {
     maxRetries 2
     input:
         file(everything) from complete_metadata_files.collect()
+        file(everything_pangolin) from complete_files_pangolin.collect()
     shell:
     '''
     # recalculate all the views at the end to save time
