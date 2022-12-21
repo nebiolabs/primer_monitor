@@ -136,7 +136,7 @@ process pangolin_calls {
         file("*.csv") into pangolin_lineage_data
     shell:
     '''
-    !{primer_monitor_path}/lib/pangolin_calls/qsub_pangolin_nobatch.sh !{fasta} !{pangolin_path} !{threads}
+    !{primer_monitor_path}/lib/pangolin_calls/qsub_pangolin.sh !{fasta} !{pangolin_path} !{threads}
     '''
 }
 

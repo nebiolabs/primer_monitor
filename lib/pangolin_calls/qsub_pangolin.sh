@@ -1,8 +1,9 @@
-if (($# < 7)); then
-    echo "usage: ./qsub_pangolin.sh <batch number> <working dir> <input file name> <output file name> <done file name> <pangolin path> <threads>" >&2;
+if (($# < 3)); then
+    echo "usage: ./qsub_pangolin.sh <input file name> <pangolin path> <threads>" >&2;
     exit 1;
 fi
 
-qsub -S /bin/bash -pe smp $7 -N pango_batch$1 $2/run_pangolin.sh $2/$3 $4 $2/$5 $2 $6 $7 > $2/pango_batch$1.log 2> $2/pango_batch$1.err # qsub pangolin task
+$pwd=`pwd`;
 
+qsub -S /bin/bash -pe smp $3 -N run_pangolin $pwd/run_pangolin.sh $pwd/$1 pangolin_calls.csv $pwd/pangolin_calls.done $pwd $2 $3 > $pwd/run_pangolin.log 2> $pwd/run_pangolin.err # qsub pangolin task
 
