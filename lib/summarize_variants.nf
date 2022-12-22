@@ -19,6 +19,7 @@ pangolin_path =
 process download_data {
     // Downloads the full dataset
     cpus 16
+    pe 'smp'
     conda "curl xz zstd"
     errorStrategy 'retry' 
     maxRetries 2
@@ -42,6 +43,7 @@ process download_data {
 process extract_new_records {
     // Keeps only new records added since previous run
     cpus 1
+    pe 'smp'
     conda "python=3.9 zstd"
 
     input:
@@ -63,7 +65,8 @@ process extract_new_records {
 
 process transform_data {
     cpus 1
-    conda "regex fsspec pandas typing"
+    pe 'smp'
+    conda "python=3.9 regex fsspec pandas typing"
 
     input:
         file(gisaid_json) from filtered_data.splitText(file: true, by: 10000)
@@ -83,6 +86,7 @@ process transform_data {
 
 process align {
     cpus 16
+    pe 'smp'
     conda "minimap2=2.17 sed python=3.9 samtools=1.11"
     publishDir "${output_path}", mode: 'copy', pattern: '*.bam', overwrite: true
 
@@ -108,6 +112,7 @@ process align {
 
 process load_to_db {
     cpus 1
+    pe 'smp'
     publishDir "${output_path}", mode: 'copy'
     errorStrategy 'retry' 
     maxRetries 10
@@ -128,20 +133,22 @@ process load_to_db {
 }
 
 process pangolin_calls {
-    cpus 1
-    //the actual pangolin runs are qsubbed separately, this 1 cpu is for the main process
+    cpus 8
+    pe 'smp'
+    conda "pangolin"
     input:
         file(fasta) from transformed_data_for_pangolin
     output:
         file("*.csv") into pangolin_lineage_data
     shell:
     '''
-    !{primer_monitor_path}/lib/pangolin_calls/qsub_pangolin.sh !{fasta} !{pangolin_path} !{threads}
+    !{primer_monitor_path}/lib/pangolin_calls/run_pangolin.sh !{fasta} 8
     '''
 }
 
 process load_pangolin_data {
     cpus 1
+    pe 'smp'
     input:
         file(csv) from pangolin_lineage_data
         file(complete) from complete_metadata_files_pangolin
@@ -156,6 +163,7 @@ process load_pangolin_data {
 
 process recalculate_database_views {
     cpus 1
+    pe 'smp'
     publishDir "${output_path}", mode: 'copy'
     errorStrategy 'retry' 
     maxRetries 2
