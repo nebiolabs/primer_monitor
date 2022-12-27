@@ -1,3 +1,5 @@
+nextflow.enable.dsl=2
+
 ref = params.ref 
 ref = file(ref).toAbsolutePath()
 params.prev_json=
@@ -8,9 +10,6 @@ params.pangolin_path=
 
 pangolin_path = file(params.pangolin_path).toAbsolutePath()
 
-threads = 8
-
-
 ncov_path = '/mnt/home/mcampbell/src/ncov-ingest'
 primer_monitor_path = '/mnt/bioinfo/prg/primer_monitor'
 output_path = '/mnt/hpc_scratch/primer_monitor'
@@ -19,7 +18,7 @@ pangolin_path =
 process download_data {
     // Downloads the full dataset
     cpus 16
-    pe 'smp'
+    penv 'smp'
     conda "curl xz zstd"
     errorStrategy 'retry' 
     maxRetries 2
@@ -43,14 +42,11 @@ process download_data {
 process extract_new_records {
     // Keeps only new records added since previous run
     cpus 1
-    pe 'smp'
+    penv 'smp'
     conda "python=3.9 zstd"
 
-    input:
-        file(full_json) from downloaded_data
     output:
-        file('*.json') into filtered_data
-
+    file '*.json'
 
     shell:
     '''
@@ -65,15 +61,14 @@ process extract_new_records {
 
 process transform_data {
     cpus 1
-    pe 'smp'
+    penv 'smp'
     conda "python=3.9 regex fsspec pandas typing"
 
     input:
-        file(gisaid_json) from filtered_data.splitText(file: true, by: 10000)
-    output:
-        tuple file('*.metadata'), file('*.fasta') into transformed_data
-        file('*.fasta') into transformed_data_for_pangolin
+    file gisaid_json
 
+    output:
+    tuple file('*.metadata'), file('*.fasta')
 
     shell:
     '''
@@ -86,14 +81,15 @@ process transform_data {
 
 process align {
     cpus 16
-    pe 'smp'
+    penv 'smp'
     conda "minimap2=2.17 sed python=3.9 samtools=1.11"
     publishDir "${output_path}", mode: 'copy', pattern: '*.bam', overwrite: true
 
     input:
-        tuple file(metadata), file(fasta) from transformed_data
+    tuple file(metadata), file(fasta)
+
     output:
-        tuple file('*.metadata'), file('*.tsv') into metadata_plus_variants
+    tuple file('*.metadata'), file('*.tsv')
 
     shell:
     '''
@@ -112,16 +108,15 @@ process align {
 
 process load_to_db {
     cpus 1
-    pe 'smp'
+    penv 'smp'
     publishDir "${output_path}", mode: 'copy'
     errorStrategy 'retry' 
     maxRetries 10
     maxForks 1
     input:
-        tuple file(metadata), file(tsv) from metadata_plus_variants
+        tuple file(metadata), file(tsv)
     output:
-        file('*.complete') into complete_metadata_files
-        file('*.complete') into complete_metadata_files_pangolin
+        file '*.complete'
     shell:
     '''
     RAILS_ENV=production ruby /mnt/bioinfo/prg/primer_monitor/upload.rb \
@@ -134,12 +129,12 @@ process load_to_db {
 
 process pangolin_calls {
     cpus 8
-    pe 'smp'
+    penv 'smp'
     conda "pangolin"
     input:
-        file(fasta) from transformed_data_for_pangolin
+        tuple file(metadata), file(fasta)
     output:
-        file("*.csv") into pangolin_lineage_data
+        file "*.csv"
     shell:
     '''
     !{primer_monitor_path}/lib/pangolin_calls/run_pangolin.sh !{fasta} 8
@@ -148,13 +143,13 @@ process pangolin_calls {
 
 process load_pangolin_data {
     cpus 1
-    pe 'smp'
+    penv 'smp'
     input:
-        file(csv) from pangolin_lineage_data
-        file(complete) from complete_metadata_files_pangolin
+        file csv
+        file complete
         //the .complete is only here to make sure this happens *after* the main DB load
     output:
-        file('*.complete') into complete_files_pangolin
+        file '*.complete'
     shell:
     '''
     !{primer_monitor_path}/lib/pangolin_calls/update_fasta_records.sh !{csv}
@@ -163,16 +158,26 @@ process load_pangolin_data {
 
 process recalculate_database_views {
     cpus 1
-    pe 'smp'
+    penv 'smp'
     publishDir "${output_path}", mode: 'copy'
     errorStrategy 'retry' 
     maxRetries 2
     input:
-        file(everything) from complete_metadata_files.collect()
-        file(everything_pangolin) from complete_files_pangolin.collect()
+        file everything
+        file everything_pangolin
     shell:
     '''
     # recalculate all the views at the end to save time
     RAILS_ENV=production ruby /mnt/bioinfo/prg/primer_monitor/upload.rb --skip_data_import && touch refresh_complete.txt
     '''
+}
+
+workflow {
+    extract_new_records()
+    transform_data(extract_new_records.out.splitText(file: true, by: 10000))
+    align(transform_data.out)
+    load_to_db(align.out)
+    pangolin_calls(transform_data.out)
+    load_pangolin_data(pangolin_calls.out, load_to_db.out)
+    recalculate_database_views(load_to_db.out.collect(), load_pangolin_data.out.collect())
 }
