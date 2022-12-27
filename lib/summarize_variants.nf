@@ -1,3 +1,5 @@
+nextflow.enable.dsl = 1
+
 ref = params.ref 
 ref = file(ref).toAbsolutePath()
 params.prev_json=
