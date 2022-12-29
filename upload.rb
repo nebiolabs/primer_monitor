@@ -56,7 +56,7 @@ def import_metadata(metadata_file)
   @log.debug("starting import: #{metadata_file}: ")
 
   fasta_records = FastaRecord.parse(metadata_file)
-  result = FastaRecord.import(fasta_records, validate: false)
+  result = FastaRecord.import(fasta_records, validate: false, on_duplicate_key_ignore: true)
   result.failed_instances.each { |rec| @log.error("Failed to insert #{rec}") }
   @log.debug("Loaded #{result.ids.size}/#{fasta_records.size} new fasta records")
 end
@@ -65,9 +65,9 @@ def import_variants(variants_file)
   return unless variants_file
 
   variant_records = VariantSite.parse(variants_file)
-  fasta_ids = variant_records.map(&:fasta_record_id).uniq
-  #VariantSite.where(fasta_record_id: fasta_ids).delete_all
-  VariantSite.import(variant_records, validate: false)
+  # fasta_ids = variant_records.map(&:fasta_record_id).uniq
+  # VariantSite.where(fasta_record_id: fasta_ids).delete_all
+  VariantSite.import(variant_records, validate: false, on_duplicate_key_ignore: true)
 end
 
 def create_new_notifications!
