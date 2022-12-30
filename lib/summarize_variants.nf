@@ -13,7 +13,6 @@ output_path = '/mnt/hpc_scratch/primer_monitor'
 process download_data {
     // Downloads the full dataset
     cpus 16
-    penv 'smp'
     conda "curl xz zstd"
     errorStrategy 'retry' 
     maxRetries 2
@@ -37,7 +36,6 @@ process download_data {
 process extract_new_records {
     // Keeps only new records added since previous run
     cpus 1
-    penv 'smp'
     conda "python=3.9 zstd"
 
     input:
@@ -59,7 +57,6 @@ process extract_new_records {
 
 process transform_data {
     cpus 1
-    penv 'smp'
     conda "python=3.9 regex fsspec pandas typing"
 
     input:
@@ -79,7 +76,6 @@ process transform_data {
 
 process align {
     cpus 16
-    penv 'smp'
     conda "minimap2=2.17 sed python=3.9 samtools=1.11"
     publishDir "${output_path}", mode: 'copy', pattern: '*.bam', overwrite: true
 
@@ -105,7 +101,6 @@ process align {
 
 process load_to_db {
     cpus 1
-    penv 'smp'
     publishDir "${output_path}", mode: 'copy'
     errorStrategy 'retry' 
     maxRetries 10
@@ -126,7 +121,6 @@ process load_to_db {
 
 process recalculate_database_views {
     cpus 1
-    penv 'smp'
     publishDir "${output_path}", mode: 'copy'
     errorStrategy 'retry' 
     maxRetries 2
