@@ -59,7 +59,7 @@ process extract_new_records {
 
 process transform_data {
     cpus 1
-    conda "regex fsspec pandas typing"
+    conda "python=3.9 regex fsspec pandas typing"
 
     input:
         file(gisaid_json) from filtered_data.splitText(file: true, by: 10000)
