@@ -31,11 +31,11 @@ class PrimerSetsController < ApplicationController
 
     respond_to do |format|
       if @primer_set.save
+        # start align script in the background
+        bt2_index_path = 'lib/cov_index/NC_045512.2'
+        pid = Process.spawn(Shellwords.join(['bash', 'lib/update_primers.sh', bt2_index_path, @primer_set.id]))
+        Process.detach pid # prevent zombie process
         format.html do
-          # start align script in the background
-          bt2_index_path = 'lib/cov_index/NC_045512.2'
-          pid = Process.spawn(Shellwords.escape("bash lib/update_primers.sh #{bt2_index_path} #{@primer_set.id}"))
-          Process.detach pid # prevent zombie process
           redirect_to @primer_set,
                       notice: 'Primer set was successfully added. It will be visible after processing and review.'
         end
