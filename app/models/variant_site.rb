@@ -17,6 +17,8 @@ class VariantSite < ApplicationRecord
       fasta_record_id = FastaRecord.existing_fasta_strain_ids[strain]
       raise "Failed to find fasta record for strain: #{strain}" unless fasta_record_id
 
+      ref_pos = (Integer(ref_pos) - 1).to_s # convert 1-based to 0-based
+
       ref_end = Integer(ref_pos) + variant.length
       variant = "#{variant.length}-" if variant_type.include? 'D'
       variant = "#{variant.length}N" if variant.include? 'N'
