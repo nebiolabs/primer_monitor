@@ -1,0 +1,2 @@
+# example pgpass file
+localhost:5432:primer_monitor_dev:example:password

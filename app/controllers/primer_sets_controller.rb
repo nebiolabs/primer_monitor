@@ -32,9 +32,9 @@ class PrimerSetsController < ApplicationController
     respond_to do |format|
       if @primer_set.save
         # start align script in the background
-        # TODO: pass DB credentials to the shell script
-        bt2_index_path = 'lib/cov_index/NC_045512.2'
-        pid = Process.spawn(Shellwords.join(['bash', 'lib/update_primers.sh', bt2_index_path, @primer_set.id]))
+        pid = Process.spawn({ 'PGPASSFILE' => '../config/pgpass' },
+                            Shellwords.join(['bash', 'lib/update_primers.sh', 'lib/cov_index/NC_045512.2',
+                                             @primer_set.id]))
         Process.detach pid # prevent zombie process
         format.html do
           redirect_to @primer_set,
