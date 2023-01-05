@@ -22,12 +22,12 @@ do
     echo "Processing $id..." >&2
 
     psql -h "$DB_HOST" -d "$DB_NAME" -U "$DB_USER" -c "SELECT id, sequence FROM oligos WHERE primer_set_id=$id;" --csv -t | \
-    tr "," "\t" | awk '{print ">" $1 "\n" $2}' | \
+    awk 'BEGIN { FS="," }; {print ">" $1 "\n" $2}' | \
     bowtie2 -f --end-to-end --score-min L,-0.6,-1.5 -L 8 -x "$bt2_index" -U - | \
     samtools view -b | bedtools bamtobed -i - | awk '{print $4 "," $2 "," $3}' >> "$db_csv"
 
 done
-psql -h "$DB_HOST" -d "$DB_NAME" -U "$DB_USER" <<CMDS
+psql -h "$DB_HOST" -d "$DB_NAME" -U "$DB_USER" >&2 <<CMDS
 create temporary table tmp_oligo_positions (seq_id integer, ref_start integer, ref_end integer);
 \copy tmp_oligo_positions from '$db_csv' with (format csv);
 update oligos set ref_start=top.ref_start, ref_end=top.ref_end from tmp_oligo_positions top where oligos_test.id=top.seq_id;
