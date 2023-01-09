@@ -149,7 +149,7 @@ process load_pangolin_data {
         file(complete) from complete_metadata_files_pangolin
         //the .complete is only here to make sure this happens *after* the main DB load
     output:
-        file('*.complete') into complete_files_pangolin
+        file('*.complete_pangolin') into complete_files_pangolin
     shell:
     '''
     !{primer_monitor_path}/lib/pangolin_calls/update_fasta_records.sh !{csv}
