@@ -1,9 +1,11 @@
+#!/usr/bin/env bash
+
 mkfifo $$_variants_new; # make named pipe
 
 if (($# == 4)); then # if N variants file provided
-    python3 filter_by_date.py $5 $3 > $$_variants_new & # filter it by date
+    python3 filter_by_date.py "$5" "$3" > $$_variants_new & # filter it by date
 elif (($# == 3)); then # otherwise, query for N variants
-    ./extract_ns.sh $3 > $$_variants_new &
+    ./extract_ns.sh "$3" > $$_variants_new &
 else # if anything else, error and print usage
     echo "usage: ns_by_pos.sh <primer BED> <primer set name> <date cutoff> [N variants file]" >&2;
     rm $$_variants_new; # clean up named pipe before exiting
