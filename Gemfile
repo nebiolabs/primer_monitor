@@ -6,6 +6,8 @@ git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 ruby '2.7.3'
 gem 'activerecord-import'
 
+gem 'dotenv-rails'
+
 gem 'slop'
 
 gem 'rails', '~> 6.1.1'
