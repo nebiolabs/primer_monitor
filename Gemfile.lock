@@ -114,6 +114,10 @@ GEM
       responders
       warden (~> 1.2.3)
     docile (1.4.0)
+    dotenv (2.8.1)
+    dotenv-rails (2.8.1)
+      dotenv (= 2.8.1)
+      railties (>= 3.2)
     erubi (1.11.0)
     faraday (2.6.0)
       faraday-net_http (>= 2.0, < 3.1)
@@ -341,6 +345,7 @@ DEPENDENCIES
   capybara (>= 2.15)
   cocoon
   devise (~> 4.8.1)
+  dotenv-rails
   jbuilder (~> 2.7)
   listen (~> 3.2)
   omniauth-google-oauth2
@@ -369,4 +374,4 @@ RUBY VERSION
    ruby 2.7.3p183
 
 BUNDLED WITH
-   2.1.4
+   2.3.22
