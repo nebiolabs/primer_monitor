@@ -31,6 +31,8 @@ class PrimerSetsController < ApplicationController
 
     respond_to do |format|
       if @primer_set.save
+        # start align script in the background
+        @primer_set.align_primers
         format.html do
           redirect_to @primer_set,
                       notice: 'Primer set was successfully added. It will be visible after processing and review.'
@@ -48,6 +50,7 @@ class PrimerSetsController < ApplicationController
   def update
     respond_to do |format|
       if @primer_set.update(primer_set_params)
+        @primer_set.align_primers
         format.html { redirect_to @primer_set, notice: 'Primer set was successfully updated.' }
         format.json { render :show, status: :ok, location: @primer_set }
       else

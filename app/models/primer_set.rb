@@ -33,6 +33,14 @@ class PrimerSet < ApplicationRecord
   end
 
   def notify_admins_about_primer_set_update
-    PrimerSetMailer.updated_primer_set_email('primer-monitor@neb.com', self).deliver_later
+    PrimerSetMailer.updated_primer_set_email('ckumar@neb.com', self).deliver_later
+  end
+
+  def align_primers
+    pid = Process.spawn({ 'DB_HOST' => ENV['DB_HOST'], 'DB_NAME' => ENV['DB_NAME'], 'DB_USER' => ENV['DB_USER'] },
+                        Shellwords.join(['bash', 'lib/update_primers.sh', 'lib/cov_index/NC_045512.2',
+                                         id]))
+    Process.detach pid # prevent zombie process
+    pid
   end
 end
