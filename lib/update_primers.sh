@@ -21,7 +21,7 @@ for id in "$@"
 do
     echo "Processing $id..." >&2;
 
-    psql -h "$DB_HOST" -d "$DB_NAME" -U "$DB_USER" -c "SELECT id, sequence FROM oligos WHERE primer_set_id=$id;" --csv -t | \
+    psql -h "$DB_HOST" -d "$DB_NAME" -U "$DB_USER" -c "SELECT id, sequence FROM oligos WHERE primer_set_id=$id AND ref_start IS NULL;" --csv -t | \
     awk 'BEGIN { FS="," }; {print ">" $1 "\n" $2}' | \
     bowtie2 -f --end-to-end --score-min L,-0.6,-1.5 -L 8 -x "$bt2_index" -U - | \
     samtools view -b | bedtools bamtobed -i - | awk '{print $4 "," $2 "," $3}' >> "$db_csv"
