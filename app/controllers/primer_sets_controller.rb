@@ -32,10 +32,7 @@ class PrimerSetsController < ApplicationController
     respond_to do |format|
       if @primer_set.save
         # start align script in the background
-        pid = Process.spawn({ 'PGPASSFILE' => '../config/pgpass' },
-                            Shellwords.join(['bash', 'lib/update_primers.sh', 'lib/cov_index/NC_045512.2',
-                                             @primer_set.id]))
-        Process.detach pid # prevent zombie process
+        @primer_set.align_primers
         format.html do
           redirect_to @primer_set,
                       notice: 'Primer set was successfully added. It will be visible after processing and review.'
@@ -53,6 +50,7 @@ class PrimerSetsController < ApplicationController
   def update
     respond_to do |format|
       if @primer_set.update(primer_set_params)
+        @primer_set.align_primers
         format.html { redirect_to @primer_set, notice: 'Primer set was successfully updated.' }
         format.json { render :show, status: :ok, location: @primer_set }
       else
