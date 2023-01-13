@@ -7,4 +7,4 @@ fi
 
 workdir=$(pwd);
 pangolin "$workdir/$1" -t "$2" -o "$workdir" --outfile "$1.pangolin_calls.csv"; # run pangolin
-touch "$workdir/$1.$(basename $PWD).pangolin_calls.done"; # create file to indicate this is done
+touch "$workdir/$1.$(basename "$PWD").pangolin_calls.done"; # create file to indicate this is done

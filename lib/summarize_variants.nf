@@ -6,17 +6,9 @@ params.prev_json=
 
 prev_json = file(params.prev_json, checkIfExists: true).toAbsolutePath()
 
-params.pangolin_path=
-
-pangolin_path = file(params.pangolin_path).toAbsolutePath()
-
-threads = 8
-
-
 ncov_path = '/mnt/home/mcampbell/src/ncov-ingest'
 primer_monitor_path = '/mnt/bioinfo/prg/primer_monitor'
 output_path = '/mnt/hpc_scratch/primer_monitor'
-pangolin_path = 
 
 process download_data {
     // Downloads the full dataset
