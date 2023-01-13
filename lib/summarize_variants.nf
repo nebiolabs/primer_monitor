@@ -6,8 +6,6 @@ params.prev_json=
 
 prev_json = file(params.prev_json, checkIfExists: true).toAbsolutePath()
 
-
-
 ncov_path = '/mnt/home/mcampbell/src/ncov-ingest'
 primer_monitor_path = '/mnt/bioinfo/prg/primer_monitor'
 output_path = '/mnt/hpc_scratch/primer_monitor'
@@ -65,6 +63,7 @@ process transform_data {
         file(gisaid_json) from filtered_data.splitText(file: true, by: 10000)
     output:
         tuple file('*.metadata'), file('*.fasta') into transformed_data
+        file('*.fasta') into transformed_data_for_pangolin
 
 
     shell:
@@ -111,6 +110,7 @@ process load_to_db {
         tuple file(metadata), file(tsv) from metadata_plus_variants
     output:
         file('*.complete') into complete_metadata_files
+        file('*.complete') into complete_metadata_files_pangolin
     shell:
     '''
     RAILS_ENV=production ruby /mnt/bioinfo/prg/primer_monitor/upload.rb \
@@ -121,6 +121,33 @@ process load_to_db {
     '''
 }
 
+process pangolin_calls {
+    cpus 8
+    conda "pangolin"
+    input:
+        file(fasta) from transformed_data_for_pangolin
+    output:
+        file("*.csv") into pangolin_lineage_data
+    shell:
+    '''
+    !{primer_monitor_path}/lib/pangolin_calls/run_pangolin.sh !{fasta} 8
+    '''
+}
+
+process load_pangolin_data {
+    cpus 1
+    input:
+        file(csv) from pangolin_lineage_data
+        file(complete) from complete_metadata_files_pangolin
+        //the .complete is only here to make sure this happens *after* the main DB load
+    output:
+        file('*.complete_pangolin') into complete_files_pangolin
+    shell:
+    '''
+    !{primer_monitor_path}/lib/pangolin_calls/update_fasta_records.sh !{csv}
+    '''
+}
+
 process recalculate_database_views {
     cpus 1
     publishDir "${output_path}", mode: 'copy'
@@ -128,6 +155,7 @@ process recalculate_database_views {
     maxRetries 2
     input:
         file(everything) from complete_metadata_files.collect()
+        file(everything_pangolin) from complete_files_pangolin.collect()
     shell:
     '''
     # recalculate all the views at the end to save time
