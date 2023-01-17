@@ -144,7 +144,7 @@ process load_pangolin_data {
         file('*.complete_pangolin') into complete_files_pangolin
     shell:
     '''
-    !{primer_monitor_path}/lib/pangolin_calls/update_fasta_records.sh !{csv}
+    PGPASSFILE="!{primer_monitor_path}/config/.pgpass" !{primer_monitor_path}/lib/pangolin_calls/update_fasta_records.sh !{csv}
     '''
 }
 
