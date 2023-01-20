@@ -4,6 +4,8 @@ region_n_counts = {}
 
 seqs_to_dates = {}
 
+seqs_to_lineages = {}
+
 regions_to_pos = {}
 
 if len(sys.argv) < 2:
@@ -21,15 +23,17 @@ with open(sys.argv[1]) as f:
     for line in f:
         variant = [field.strip() for field in line.split("\t")]
         if variant[4] not in seqs_to_dates:
-            seqs_to_dates[variant[4]] = variant[5]
+            seqs_to_dates[variant[4]] = variant[6]
+        if variant[4] not in seqs_to_lineages:
+            seqs_to_lineages[variant[4]] = variant[5]
         if variant[3] not in regions_to_pos:
             regions_to_pos[variant[3]] = [variant[1], variant[2]]
         if variant[3] not in region_n_counts:
-            region_n_counts[variant[3]] = {variant[4]: int(variant[6])}
+            region_n_counts[variant[3]] = {variant[4]: int(variant[7])}
         elif variant[4] not in region_n_counts[variant[3]]:
-            region_n_counts[variant[3]][variant[4]] = int(variant[6])
+            region_n_counts[variant[3]][variant[4]] = int(variant[7])
         else:
-            region_n_counts[variant[3]][variant[4]] += int(variant[6])
+            region_n_counts[variant[3]][variant[4]] += int(variant[7])
 
 for region in region_n_counts:
     for seq in region_n_counts[region]:
@@ -50,6 +54,8 @@ for region in region_n_counts:
                 + region_set_name
                 + "\t"
                 + seq
+                + "\t"
+                + seqs_to_lineages[seq]
                 + "\t"
                 + seqs_to_dates[seq]
                 + "\t"
