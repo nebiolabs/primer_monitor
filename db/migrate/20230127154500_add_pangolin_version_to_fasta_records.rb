@@ -1,4 +1,4 @@
-class AddSubmittedDateToFastaRecords < ActiveRecord::Migration[6.1]
+class AddPangolinVersionToFastaRecords < ActiveRecord::Migration[6.1]
   def self.up
     add_column :fasta_records, :pangolin_version, :text
   end
