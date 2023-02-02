@@ -3830,6 +3830,11 @@ iferr@^0.1.5:
   resolved "https://registry.yarnpkg.com/iferr/-/iferr-0.1.5.tgz#c60eed69e6d8fdb6b3104a1fcbca1c192dc5b501"
   integrity sha1-xg7taebY/bazEEofy8ocGS3FtQE=
 
+igv@^2.13.11:
+  version "2.13.11"
+  resolved "https://registry.yarnpkg.com/igv/-/igv-2.13.11.tgz#0c6d5c7da10cab62e92f615d00ac4c5e8cef7717"
+  integrity sha512-Ts3zRdil1otDEESydl6CJUKlWT+hHqee1tXwNwXisb+hmnlBUqrr7eACzJ2Yyv3/S8Fs7+X+rY1F47tYEKw+YQ==
+
 import-cwd@^2.0.0:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/import-cwd/-/import-cwd-2.1.0.tgz#aa6cf36e722761285cb371ec6519f53e2435b0a9"
