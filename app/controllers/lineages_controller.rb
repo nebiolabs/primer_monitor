@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-
 class LineagesController < ApplicationController
   require 'net/http'
   def index
@@ -11,6 +10,5 @@ class LineagesController < ApplicationController
     tracks_url = URI("#{@config[:data_server]}/misc/tracks.json")
 
     @primer_sets = JSON.parse(Net::HTTP.get(tracks_url))
-
   end
 end

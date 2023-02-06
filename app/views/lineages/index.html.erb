@@ -3,16 +3,27 @@
 <!--<  %= image_tag 'lineage_primer_summary_20220211.svg' %  >-->
 <% primer_sets_map = {} %>
 <% i = 0 %>
+<% primer_set_count = @primer_sets.length %>
 <form id="primer_set_selection">
   <p>Show primer sets:</p>
   <% @primer_sets.each { |primerSet, displayName| %>
+    <% col_num = i%5 %>
+    <% if col_num == 0 %>
+        <div class="columns">
+    <% end %>
+    <div class="column is-one-fifth">
     <%= label_tag "primer_set_"+i.to_s, class: 'primer_set_checkbox_label' do %>
       <span class="primer_display_name"><%= displayName %></span>
       <%= check_box_tag "primer_set_"+i.to_s, 1, true, class: 'primer_set_checkbox', disabled: true %>
       <% primer_sets_map["primer_set_"+i.to_s] = [primerSet, displayName] %>
       <% i+=1 %>
     <% end %>
+    </div>
+    <% if col_num == 4 && i<primer_set_count-1 %>
+        </div>
+    <% end %>
   <% } %>
+  </div>
   <button id="select_all_primers" disabled="disabled">Select All</button> <button id="unselect_all_primers" disabled="disabled">Clear All</button>
 </form>
 <p id="primer_set_json" class="invisible"><%= primer_sets_map.to_json %></p>
