@@ -5,8 +5,7 @@
 <% i = 0 %>
 <form id="primer_set_selection">
   <p>Show primer sets:</p>
-  <% sets = @primer_sets %> <!-- temporary -->
-  <% sets.each { |primerSet, displayName| %>
+  <% @primer_sets.each { |primerSet, displayName| %>
     <%= label_tag "primer_set_"+i.to_s, class: 'primer_set_checkbox_label' do %>
       <span class="primer_display_name"><%= displayName %></span>
       <%= check_box_tag "primer_set_"+i.to_s, 1, true, class: 'primer_set_checkbox', disabled: true %>
@@ -16,7 +15,8 @@
   <% } %>
   <button id="select_all_primers" disabled="disabled">Select All</button> <button id="unselect_all_primers" disabled="disabled">Clear All</button>
 </form>
-<p id="primer_set_json"><%= primer_sets_map.to_json %></p>
+<p id="primer_set_json" class="invisible"><%= primer_sets_map.to_json %></p>
+<p id="config" class="invisible"><%= @config.to_json %></p>
 <div id="igv" class="igv_div"></div>
 <hr/>
 <div class="block">

@@ -4,25 +4,12 @@ let $ = require('jquery');
 let igvBrowser = null; //declaring this as a global for later
 let tracks = [];
 let primerSetsToNames = {};
+let config = {};
 
-
-function setupNameMapping()
+function loadConfig()
 {
-    /*$('.primer_set_checkbox_label').each(function (index, element) {
-       const id = element.getAttribute("for");
-       let name = "";
-       const children = element.children;
-
-       for(let i=0; i<children.length; i++)
-       {
-          if(children[i].classList.contains("primer_display_name"))
-          {
-              name = children[i].innerHTML;
-          }
-       }
-       primerSetsToNames[id] = name;
-    });*/
     primerSetsToNames = JSON.parse($('#primer_set_json')[0].innerHTML);
+    config = JSON.parse($('#config')[0].innerHTML);
 
 
 }
@@ -51,7 +38,7 @@ function updatePrimerSets()
     }
 }
 
-async function loadPrimerSets(activePrimerSets, igvBrowser)
+function loadPrimerSets(activePrimerSets, igvBrowser)
 {
     setSelectFormDisabled(true); //lock the form while changes are made
     tracks.forEach(function(track){
@@ -66,7 +53,7 @@ async function loadPrimerSets(activePrimerSets, igvBrowser)
         let primerSetData = primerSetsToNames[primerSetKey];
         const newTrack = {
             "name": primerSetData[1],
-            "url": "http://localhost:8080/primer_sets/"+encodeURIComponent(primerSetData[0])+"/color.bed",
+            "url": config['data_server']+"/primer_sets/"+encodeURIComponent(primerSetData[0])+"/color.bed",
             "format": "bed",
             "displayMode": "EXPANDED",
             "autoHeight": true
@@ -82,13 +69,6 @@ async function loadPrimerSets(activePrimerSets, igvBrowser)
     }).catch(function(){
         setSelectFormDisabled(false); //also unlock the form
     });
-
-
-    //.then(function(addedTrack){
-    //             tracks[primerSetKey] = addedTrack;
-    //         });
-    //await (primerSetsToDo == 0); //wait for loading to finish
-    //alert("done");
 
 }
 
@@ -121,7 +101,8 @@ function initBrowser() {
     const browser_div = document.getElementById("igv");
     igv.createBrowser(browser_div, config).then(function (theBrowser) {
         igvBrowser = theBrowser;
-        setupNameMapping();
+        loadConfig();
+        setCheckboxes(true);
         loadPrimerSets(Object.keys(primerSetsToNames), igvBrowser);
     });
 
