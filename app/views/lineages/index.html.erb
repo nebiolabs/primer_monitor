@@ -4,6 +4,10 @@
 <% primer_sets_map = {} %>
 <% i = 0 %>
 <% primer_set_count = @primer_sets.length %>
+<div class="block">
+  Primers that do not overlap with variants associated with these lineages are shown in blue below a schematic SARS-CoV-2 genome.
+  Overlapping primers are indicated in orange.
+</div>
 <form id="primer_set_selection">
   <p>Show primer sets:</p>
   <div class="columns is-multiline is-gapless">
@@ -24,10 +28,6 @@
 <p id="config" class="invisible"><%= @config.to_json %></p>
 <div id="igv" class="igv_div"></div>
 <hr/>
-<div class="block">
-Primers that do not overlap with variants associated with these lineages are shown in blue below a schematic SARS-CoV-2 genome.
-Overlapping primers are indicated in orange.
-</div>
 <div class="block">
   <h2 class="title">Overlapping amplicons:</h2>
   <ul>
