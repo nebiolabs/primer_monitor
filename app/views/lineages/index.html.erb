@@ -1,17 +1,22 @@
 <h1 class="title">SARS-CoV-2 Lineage Variant Summary</h1>
 
 <!--<  %= image_tag 'lineage_primer_summary_20220211.svg' %  >-->
-<p id="primer_set_json"><%= @primer_sets.to_json %></p>
+<% primer_sets_map = {} %>
+<% i = 0 %>
 <form id="primer_set_selection">
   <p>Show primer sets:</p>
   <% sets = @primer_sets %> <!-- temporary -->
   <% sets.each { |primerSet, displayName| %>
-    <%= label_tag primerSet, class: 'primer_set_checkbox_label' do %>
+    <%= label_tag "primer_set_"+i.to_s, class: 'primer_set_checkbox_label' do %>
       <span class="primer_display_name"><%= displayName %></span>
-      <%= check_box_tag primerSet, 1, true, class: 'primer_set_checkbox', disabled: true %>
+      <%= check_box_tag "primer_set_"+i.to_s, 1, true, class: 'primer_set_checkbox', disabled: true %>
+      <% primer_sets_map["primer_set_"+i.to_s] = [primerSet, displayName] %>
+      <% i+=1 %>
     <% end %>
   <% } %>
+  <button id="select_all_primers" disabled="disabled">Select All</button> <button id="unselect_all_primers" disabled="disabled">Clear All</button>
 </form>
+<p id="primer_set_json"><%= primer_sets_map.to_json %></p>
 <div id="igv" class="igv_div"></div>
 <hr/>
 <div class="block">

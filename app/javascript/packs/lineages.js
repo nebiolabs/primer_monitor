@@ -2,7 +2,7 @@ require("igv");
 let $ = require('jquery');
 
 let igvBrowser = null; //declaring this as a global for later
-let tracks = {};
+let tracks = [];
 let primerSetsToNames = {};
 
 
@@ -27,13 +27,15 @@ function setupNameMapping()
 
 }
 
-function activateCheckboxes()
+function setSelectFormDisabled(state)
 {
     $('.primer_set_checkbox').each(function (index, element) {
-        if (element.disabled) {
-            element.disabled = false;
-        }
+        element.disabled = state;
     });
+
+    $('#select_all_primers')[0].disabled = state;
+
+    $('#unselect_all_primers')[0].disabled = state;
 }
 
 function updatePrimerSets()
@@ -49,24 +51,45 @@ function updatePrimerSets()
     }
 }
 
-function loadPrimerSets(primerSets, igvBrowser)
+async function loadPrimerSets(activePrimerSets, igvBrowser)
 {
-    Object.keys(tracks).forEach(function(track){
-       igvBrowser.removeTrack(tracks[track]);
+    setSelectFormDisabled(true); //lock the form while changes are made
+    tracks.forEach(function(track){
+       igvBrowser.removeTrack(track);
     });
 
-    primerSets.forEach(function(primerSet){
+    tracks = [];
+
+    const primerSetPromises = [];
+
+    activePrimerSets.forEach(function(primerSetKey){
+        let primerSetData = primerSetsToNames[primerSetKey];
         const newTrack = {
-            "name": primerSetsToNames[primerSet],
-            "url": "http://localhost:8080/primer_sets/"+encodeURIComponent(primerSet)+"/color.bed",
+            "name": primerSetData[1],
+            "url": "http://localhost:8080/primer_sets/"+encodeURIComponent(primerSetData[0])+"/color.bed",
             "format": "bed",
             "displayMode": "EXPANDED",
             "autoHeight": true
         }
-        igvBrowser.loadTrack(newTrack).then(function(addedTrack){
-            tracks[primerSet] = addedTrack;
-        });
+        primerSetPromises.push(igvBrowser.loadTrack(newTrack));
     });
+
+    Promise.all(primerSetPromises).then(function(addedTracks){
+        addedTracks.forEach(function(addedTrack){
+            tracks.push(addedTrack);
+        });
+        setSelectFormDisabled(false); //unlock the form
+    }).catch(function(){
+        setSelectFormDisabled(false); //also unlock the form
+    });
+
+
+    //.then(function(addedTrack){
+    //             tracks[primerSetKey] = addedTrack;
+    //         });
+    //await (primerSetsToDo == 0); //wait for loading to finish
+    //alert("done");
+
 }
 
 function initBrowser() {
@@ -100,9 +123,15 @@ function initBrowser() {
         igvBrowser = theBrowser;
         setupNameMapping();
         loadPrimerSets(Object.keys(primerSetsToNames), igvBrowser);
-        activateCheckboxes();
     });
 
+}
+
+function setCheckboxes(state)
+{
+    $('.primer_set_checkbox').each(function (index, element) {
+        element.checked = state;
+    });
 }
 
 
@@ -110,6 +139,21 @@ $(document).ready(function(){
     $('.primer_set_checkbox').on("click", function(){
         updatePrimerSets();
     });
+
+    $('#select_all_primers').on("click", function(){
+        setCheckboxes(true);
+        updatePrimerSets();
+    });
+
+    $('#unselect_all_primers').on("click", function(){
+        setCheckboxes(false);
+        updatePrimerSets();
+    });
+
+    $('#primer_set_selection').on("submit", function(event){
+        event.preventDefault(); //don't refresh
+    });
+
     initBrowser();
 })
 
