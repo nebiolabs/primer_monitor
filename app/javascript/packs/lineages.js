@@ -74,18 +74,18 @@ function loadPrimerSets(activePrimerSets, igvBrowser)
 
 function initBrowser() {
 
-    const config =
+    const browserConfig =
         {
             reference: {
                 "id": "NC_045512.2",
                 "name": "NC_045512.2 (SARS-CoV-2)",
-                "fastaURL": "http://localhost:8080/ref/NC_045512.2.fasta",
-                "indexURL": "http://localhost:8080/ref/NC_045512.2.fasta.fai",
+                "fastaURL": config['data_server']+"/ref/NC_045512.2.fasta",
+                "indexURL": config['data_server']+"/ref/NC_045512.2.fasta.fai",
                 tracks: [
                     {
                         "name": "Genes",
                         "type": "annotation",
-                        "url": "http://localhost:8080/ref/NC_045512.2.gff3",
+                        "url": config['data_server']+"/ref/NC_045512.2.gff3",
                         "format": "gff3",
                         "filterTypes": ['CDS', 'mature_protein_region_of_CDS', 'region', 'stem_loop', 'five_prime_UTR', 'three_prime_UTR'],
                         "displayMode": "EXPANDED",
@@ -99,9 +99,8 @@ function initBrowser() {
         };
 
     const browser_div = document.getElementById("igv");
-    igv.createBrowser(browser_div, config).then(function (theBrowser) {
+    igv.createBrowser(browser_div, browserConfig).then(function (theBrowser) {
         igvBrowser = theBrowser;
-        loadConfig();
         setCheckboxes(true);
         loadPrimerSets(Object.keys(primerSetsToNames), igvBrowser);
     });
@@ -135,6 +134,7 @@ $(document).ready(function(){
         event.preventDefault(); //don't refresh
     });
 
+    loadConfig();
     initBrowser();
 })
 
