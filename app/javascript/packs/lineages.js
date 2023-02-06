@@ -10,9 +10,6 @@ function loadConfig()
 {
     primerSetsToNames = JSON.parse($('#primer_set_json')[0].innerHTML);
     config = JSON.parse($('#config')[0].innerHTML);
-    console.log(primerSetsToNames)
-
-
 }
 
 function setSelectFormDisabled(state)
