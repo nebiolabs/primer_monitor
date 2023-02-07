@@ -4,17 +4,23 @@ let $ = require('jquery');
 let igvBrowser = null; //declaring this as a global for later
 let tracks = [];
 let primerSetsToNames = {};
+let lineageSetsToNames = {};
 let config = {};
 
 function loadConfig()
 {
     primerSetsToNames = JSON.parse($('#primer_set_json')[0].innerHTML);
+    lineageSetsToNames = JSON.parse($('#lineage_set_json')[0].innerHTML);
     config = JSON.parse($('#config')[0].innerHTML);
 }
 
 function setSelectFormDisabled(state)
 {
     $('.primer_set_checkbox').each(function (index, element) {
+        element.disabled = state;
+    });
+
+    $('.lineage_set_radiobutton').each(function (index, element) {
         element.disabled = state;
     });
 
@@ -36,6 +42,8 @@ function setSelectFormDisabled(state)
 
 function updatePrimerSets()
 {
+    const activeLineageGroup = lineageSetsToNames[$('input[name=lineage]:checked').val()][0];
+
     if(igvBrowser != null) { //if it's been loaded
         let activeSets = [];
         $('.primer_set_checkbox').each(function (index, element) {
@@ -43,12 +51,13 @@ function updatePrimerSets()
                 activeSets.push(element.name);
             }
         });
-        loadPrimerSets(activeSets, igvBrowser);
+        loadPrimerSets(activeSets, igvBrowser, activeLineageGroup);
     }
 }
 
-function loadPrimerSets(activePrimerSets, igvBrowser)
+function loadPrimerSets(activePrimerSets, igvBrowser, activeLineageGroup)
 {
+    //activeLineageGroup = "color"; //debug
     setSelectFormDisabled(true); //lock the form while changes are made
     tracks.forEach(function(track){
        igvBrowser.removeTrack(track);
@@ -62,7 +71,7 @@ function loadPrimerSets(activePrimerSets, igvBrowser)
         let primerSetData = primerSetsToNames[primerSetKey];
         const newTrack = {
             "name": primerSetData[1],
-            "url": config['data_server']+"/primer_sets/"+encodeURIComponent(primerSetData[0])+"/color.bed",
+            "url": config['data_server']+"/primer_sets/"+encodeURIComponent(primerSetData[0])+"/"+encodeURIComponent(activeLineageGroup)+".bed",
             "format": "bed",
             "displayMode": "EXPANDED",
             "autoHeight": true
@@ -111,9 +120,17 @@ function initBrowser() {
     igv.createBrowser(browser_div, browserConfig).then(function (theBrowser) {
         igvBrowser = theBrowser;
         setCheckboxes(true);
-        loadPrimerSets(Object.keys(primerSetsToNames), igvBrowser);
+        setRadiobuttons("all");
+        loadPrimerSets(Object.keys(primerSetsToNames), igvBrowser, "all");
     });
 
+}
+
+function setRadiobuttons(selected)
+{
+    $('.lineage_set_radiobutton').each(function (index, element) {
+        element.checked = (lineageSetsToNames[element.value][0] === selected);
+    });
 }
 
 function setCheckboxes(state)

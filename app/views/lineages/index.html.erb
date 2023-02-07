@@ -2,6 +2,7 @@
 
 <!--<  %= image_tag 'lineage_primer_summary_20220211.svg' %  >-->
 <% primer_sets_map = {} %>
+<% lineage_sets_map = {} %>
 <% i = 0 %>
 <% primer_set_count = @primer_sets.length %>
 <div class="block">
@@ -9,7 +10,20 @@
   Overlapping primers are indicated in orange.
 </div>
 <form id="primer_set_selection">
-  <p>Show primer sets:</p>
+  <p>Lineage:</p>
+  <div class="columns is-multiline is-gapless">
+    <% @lineage_sets.each { |lineageSet, displayName| %>
+      <div class="column is-one-fifth">
+        <%= label_tag "lineage_set_"+i.to_s, class: 'lineage_set_radiobutton_label' do %>
+          <span class="primer_display_name"><%= displayName %></span>
+          <%= radio_button_tag "lineage", "lineage_set_"+i.to_s, (lineageSet == "all"), class: 'lineage_set_radiobutton', disabled: true %>
+          <% lineage_sets_map["lineage_set_"+i.to_s] = [lineageSet, displayName] %>
+          <% i+=1 %>
+        <% end %>
+      </div>
+    <% } %>
+  </div>
+  <hr><p>Show primer sets:</p>
   <div class="columns is-multiline is-gapless">
   <% @primer_sets.each { |primerSet, displayName| %>
     <div class="column is-one-fifth">
@@ -27,6 +41,7 @@
 </form>
 <p id="primer_set_json" class="invisible"><%= primer_sets_map.to_json %></p>
 <p id="config" class="invisible"><%= @config.to_json %></p>
+<p id="lineage_set_json" class="invisible"><%= lineage_sets_map.to_json %></p>
 <div id="igv" class="igv_div"></div>
 <hr/>
 <div class="block">
