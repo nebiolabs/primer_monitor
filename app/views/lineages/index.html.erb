@@ -23,6 +23,7 @@
   <% } %>
   </div>
   <button id="select_all_primers" disabled="disabled">Select All</button> <button id="unselect_all_primers" disabled="disabled">Clear All</button>
+  <br><br><button class="button is-small is-primary" id="apply" disabled="disabled">Update Tracks</button>
 </form>
 <p id="primer_set_json" class="invisible"><%= primer_sets_map.to_json %></p>
 <p id="config" class="invisible"><%= @config.to_json %></p>

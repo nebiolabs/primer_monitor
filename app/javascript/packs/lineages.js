@@ -21,6 +21,17 @@ function setSelectFormDisabled(state)
     $('#select_all_primers')[0].disabled = state;
 
     $('#unselect_all_primers')[0].disabled = state;
+
+    $('#apply')[0].disabled = state;
+
+    if(state)
+    {
+        $('#apply').addClass('is-loading');
+    }
+    else
+    {
+        $('#apply').removeClass('is-loading');
+    }
 }
 
 function updatePrimerSets()
@@ -114,17 +125,15 @@ function setCheckboxes(state)
 
 
 $(document).ready(function(){
-    $('.primer_set_checkbox').on("click", function(){
-        updatePrimerSets();
-    });
-
     $('#select_all_primers').on("click", function(){
         setCheckboxes(true);
-        updatePrimerSets();
     });
 
     $('#unselect_all_primers').on("click", function(){
         setCheckboxes(false);
+    });
+
+    $('#apply').on("click", function(){
         updatePrimerSets();
     });
 
