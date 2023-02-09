@@ -7,10 +7,20 @@ min_per_primer="$4";
 threads="$5";
 primer_sets_list_path="$6";
 
+variants_bed="$$_variants.bed"
+variants_counts_bed="$$_variants_with_counts.bed";
+
+./extract_all_variants.sh "$cutoff_date" "$threads" > "$variants_bed";
 shift 6;
 
 for lineage_set_path in "$@"; do
+  if [[ $lineages_path != "all" ]]; then
+    lineages=$(cat "$lineages_path");
+  else
+    lineages="all";
+  fi
   lineage_set_name=$(basename "$lineage_set_path" | sed -E "s/\.csv$//")
   echo "processing lineage set $lineage_set_path"
-  xargs ./process_primer_sets.sh "$cutoff_date" "$output_path" "$min_count" "$min_per_primer" "$threads" "$lineage_set_name" "$lineage_set_path" < "$primer_sets_list_path";
+  echo $lineages | xargs ./count_variants.sh "$variants_bed" "$min_count" "$threads" > "$variants_counts_bed";
+  xargs ./process_primer_sets.sh "$variants_counts_bed" "$output_path" "$min_per_primer" "$threads" "$lineage_set_name" < "$primer_sets_list_path";
 done

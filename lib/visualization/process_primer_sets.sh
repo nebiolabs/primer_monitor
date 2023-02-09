@@ -1,30 +1,12 @@
 #!/usr/bin/env bash
 
-cutoff_date="$1";
+variants_counts_bed="$1";
 output_path="$2";
-min_count="$3";
-min_per_primer="$4";
-threads="$5";
-name="$6";
-lineages_path="$7";
+min_per_primer="$3";
+threads="$4";
+name="$5";
 
-
-variants_bed="$$_variants.bed"
-variants_counts_bed="$$_variants_with_counts.bed";
-
-shift 7;
-
-
-if [[ $lineages_path != "all" ]]; then
-  lineages=$(cat "$lineages_path");
-  ./extract_all_variants.sh "$cutoff_date" "$lineages" > "$variants_bed";
-else
-  ./extract_all_variants.sh "$cutoff_date" > "$variants_bed";
-fi
-
-./count_variants.sh "$variants_bed" "$min_count" "$threads" > "$variants_counts_bed";
-
-rm "$variants_bed";
+shift 5;
 
 for primer_bed in "$@"; do
 	outputname=$(echo "$primer_bed" | sed -E "s/\.bed$//I");
