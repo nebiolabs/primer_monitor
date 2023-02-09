@@ -14,13 +14,13 @@ variants_counts_bed="$$_variants_with_counts.bed";
 shift 6;
 
 for lineage_set_path in "$@"; do
-  if [[ $lineages_path != "all" ]]; then
-    lineages=$(cat "$lineages_path");
+  if [[ $lineage_set_path != "all" ]]; then
+    lineages=$(cat "$lineage_set_path");
   else
     lineages="all";
   fi
-  lineage_set_name=$(basename "$lineage_set_path" | sed -E "s/\.csv$//")
+  lineage_set_name=$(basename "$lineage_set_path" | sed -E "s/\.txt$//")
   echo "processing lineage set $lineage_set_path"
-  echo $lineages | xargs ./count_variants.sh "$variants_bed" "$min_count" "$threads" > "$variants_counts_bed";
+  ./count_variants.sh "$variants_bed" "$min_count" "$threads" "$lineage_set_path" > "$variants_counts_bed";
   xargs ./process_primer_sets.sh "$variants_counts_bed" "$output_path" "$min_per_primer" "$threads" "$lineage_set_name" < "$primer_sets_list_path";
 done
