@@ -6,14 +6,17 @@ min_count="$3";
 min_per_primer="$4";
 primer_sets_list_path="$5";
 
+echo "$(date +'%b %d %H:%M:%S') - script started"
+
 if [[ $cutoff_date == '-' ]]; then # default of 180 days
   cutoff_date="$(date -d "180 days ago" +"%Y-%m-%d")"
 fi
 
 variants_bed="$$_variants.bed"
 variants_counts_bed="$$_variants_with_counts.bed";
-
+echo "$(date +'%b %d %H:%M:%S') - starting DB fetch"
 ./extract_all_variants.sh "$cutoff_date" > "$variants_bed";
+echo "$(date +'%b %d %H:%M:%S') - DB fetch done"
 shift 5;
 
 for lineage_set_path in "$@"; do
@@ -23,7 +26,8 @@ for lineage_set_path in "$@"; do
     lineages="all";
   fi
   lineage_set_name=$(basename "$lineage_set_path" | sed -E "s/\.txt$//")
-  echo "processing lineage set $lineage_set_path"
+  echo "$(date +'%b %d %H:%M:%S') - processing lineage set $lineage_set_path"
   ./count_variants.sh "$variants_bed" "$min_count" "$threads" "$lineage_set_path" > "$variants_counts_bed";
   xargs ./process_primer_sets.sh "$variants_counts_bed" "$output_path" "$min_per_primer" "$threads" "$lineage_set_name" < "$primer_sets_list_path";
 done
+echo "$(date +'%b %d %H:%M:%S') - script done"
