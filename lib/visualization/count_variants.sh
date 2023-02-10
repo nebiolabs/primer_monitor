@@ -15,7 +15,7 @@ scaled_min_count=$(((min_count*variant_count)/base_variant_count))
 #echo "$(date +'%b %d %H:%M:%S') - variant count is $variant_count, cutoff is $scaled_min_count" >&2
 
 if ((scaled_min_count < 10)); then
-  scaled_min_count=10; # exclude variants that occur <5 times in all cases
+  scaled_min_count=10; # exclude variants that occur <10 times in all cases
 fi
 
 cut -f 1-3,7,8 "$$_filtered_variants.bed" | uniq -c \
