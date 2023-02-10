@@ -12,5 +12,5 @@ psql -h "$DB_HOST" -d "$DB_NAME" -U "$DB_USER" -c "SELECT variant_sites.ref_star
 fasta_records.strain, fasta_records.pangolin_lineage, fasta_records.date_collected, variant_sites.variant_type, \
 variant_sites.variant FROM variant_sites INNER JOIN fasta_records ON fasta_records.id=variant_sites.fasta_record_id \
 WHERE (date_collected >= '$1' OR (date_collected IS NULL AND date_submitted >= '$1')) \
-ORDER BY variant_sites.ref_start, variant_sites.ref_end;" --csv -t \
+ORDER BY variant_sites.ref_start, variant_sites.ref_end, variant_sites.variant_type, variant_sites.variant;" --csv -t \
 | tr "," "\t" | sed -E "s/^/NC_045512.2\t/g"
