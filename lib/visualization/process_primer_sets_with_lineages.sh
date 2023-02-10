@@ -5,6 +5,7 @@ output_path="$2";
 min_count="$3";
 min_per_primer="$4";
 primer_sets_list_path="$5";
+threads="$6"
 
 echo "$(date +'%b %d %H:%M:%S') - script started"
 
@@ -17,7 +18,7 @@ variants_counts_bed="$$_variants_with_counts.bed";
 echo "$(date +'%b %d %H:%M:%S') - starting DB fetch"
 ./extract_all_variants.sh "$cutoff_date" > "$variants_bed";
 echo "$(date +'%b %d %H:%M:%S') - DB fetch done"
-shift 5;
+shift 6;
 
 for lineage_set_path in "$@"; do
   if [[ $lineage_set_path != "all" ]]; then
