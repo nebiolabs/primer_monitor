@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
-if (($# < 3)); then
-    echo "usage: extract_all_variants.sh <date cutoff> <threads> <buffer size>" >&2;
+if (($# < 1)); then
+    echo "usage: extract_all_variants.sh <date cutoff>" >&2;
     exit 1;
 fi
 # you need to export DB_HOST, DB_NAME, and DB_USER before running this
