@@ -4,7 +4,7 @@ NEAR_5P_SCORE = 1
 NEAR_3P_SCORE = 2
 MID_3P_SCORE = 4
 OTHER_SCORE = 3
-CUTOFF = int(sys.argv[4])
+CUTOFF = int(sys.argv[3])
 
 primers_scored = {}
 
@@ -57,18 +57,12 @@ with open(sys.argv[1]) as f:
         primers_scored[line[3]][4]+=score
 
     affected = open(sys.argv[2], "w")
-    unaffected = open(sys.argv[3], "w")
     for primer in primers_scored:
-        i = 0
         score = primers_scored[primer][4]
-        for field in primers_scored[primer]:
-            primers_scored[primer][i] = str(primers_scored[primer][i])
-            i+=1
         if score > CUTOFF:
-            pass
+             i = 0
+             for field in primers_scored[primer]:
+                primers_scored[primer][i] = str(primers_scored[primer][i])
+                i+=1
             affected.write("\t".join(primers_scored[primer])+"\n")
-        else:
-            pass
-            unaffected.write("\t".join(primers_scored[primer])+"\n")
     affected.close()
-    unaffected.close()
