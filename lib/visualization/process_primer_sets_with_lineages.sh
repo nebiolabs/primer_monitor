@@ -3,7 +3,7 @@
 cutoff_date="$1";
 output_path="$2";
 min_pct="$3";
-min_per_primer="$4";
+score_cutoff="$4";
 primer_sets_list_path="$5";
 threads="$6"
 
@@ -21,14 +21,9 @@ echo "$(date +'%b %d %H:%M:%S') - DB fetch done"
 shift 6;
 
 for lineage_set_path in "$@"; do
-  if [[ $lineage_set_path != "all" ]]; then
-    lineages=$(cat "$lineage_set_path");
-  else
-    lineages="all";
-  fi
   lineage_set_name=$(basename "$lineage_set_path" | sed -E "s/\.txt$//")
   echo "$(date +'%b %d %H:%M:%S') - processing lineage set $lineage_set_path"
   ./count_variants.sh "$variants_bed" "$min_pct" "$threads" "$lineage_set_path" > "$variants_counts_bed";
-  xargs ./process_primer_sets.sh "$variants_counts_bed" "$output_path" "$min_per_primer" "$threads" "$lineage_set_name" < "$primer_sets_list_path";
+  xargs ./process_primer_sets.sh "$variants_counts_bed" "$output_path" "$score_cutoff" "$threads" "$lineage_set_name" < "$primer_sets_list_path";
 done
 echo "$(date +'%b %d %H:%M:%S') - script done"

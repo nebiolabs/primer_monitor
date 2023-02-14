@@ -2,11 +2,11 @@
 
 variants_counts_bed="$1";
 primer_bed="$2";
-min_per_primer="$3";
+score_cutoff="$3";
 threads="$4";
 intersects_bed="$5";
 no_intersects_bed="$6";
 
-bedtools intersect -wa -a "$primer_bed" -b "$variants_counts_bed" | sort --parallel="$threads" | uniq -c \
-| awk -v min_per_primer="$min_per_primer" 'BEGIN{ OFS="\t" }; $1 >= min_per_primer { print $2, $3, $4, $5, $1, $7 }' > "$intersects_bed";
-bedtools subtract -a "$primer_bed" -b "$intersects_bed" > "$no_intersects_bed";
+bedtools intersect -wa -wb -a "$primer_bed" -b "$variants_counts_bed" | sort --parallel="$threads" > "$$_raw_intersects.bed"
+python classify_overlaps.py "$$_raw_intersects.bed" "$intersects_bed" "$no_intersects_bed" "$score_cutoff";
+rm "$$_raw_intersects.bed"
