@@ -23,3 +23,5 @@ fi
 
 cut -f 1-3,7,8 "$$_filtered_variants.bed" | uniq -c \
 | awk -v min_count="$scaled_min_count" 'BEGIN{ OFS="\t" }; $1 >= min_count { print $2, $3, $4, $5 "/" $6, $1 }';
+
+rm "$$_strains.txt" "$$_filtered_variants.bed";

@@ -27,3 +27,5 @@ for lineage_set_path in "$@"; do
   xargs ./process_primer_sets.sh "$variants_counts_bed" "$output_path" "$score_cutoff" "$threads" "$lineage_set_name" < "$primer_sets_list_path";
 done
 echo "$(date +'%b %d %H:%M:%S') - script done"
+
+rm "$$_variants.bed";
