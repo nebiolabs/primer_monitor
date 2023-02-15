@@ -80,7 +80,7 @@ with open(sys.argv[1]) as f:
             for field in primers_scored[primer]:
                 primers_scored[primer][i] = str(primers_scored[primer][i])
                 i+=1
-            primers_scored[primer][4] = int(math.log(primers_scored[primer][4])) # log to reduce the range of scores
+            primers_scored[primer][4] = math.log(primers_scored[primer][4]) # log to reduce the range of scores
             if primers_scored[primer][4] > 1000:
                 score = 1000 # cap at 1000 to follow BED spec
             print("primers_scored[primer][4]  = " + primers_scored[primer][4])
