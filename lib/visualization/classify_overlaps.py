@@ -75,14 +75,12 @@ with open(sys.argv[1]) as f:
     for primer in primers_scored:
         score = primers_scored[primer][4]
         if score > CUTOFF:
-            print(str(score)+" > "+str(CUTOFF))
+            primers_scored[primer][4] = math.log(primers_scored[primer][4]) # log to reduce the range of scores
+            if primers_scored[primer][4] > 1000:
+                score = 1000 # cap at 1000 to follow BED spec
             i = 0
             for field in primers_scored[primer]:
                 primers_scored[primer][i] = str(primers_scored[primer][i])
                 i+=1
-            primers_scored[primer][4] = math.log(primers_scored[primer][4]) # log to reduce the range of scores
-            if primers_scored[primer][4] > 1000:
-                score = 1000 # cap at 1000 to follow BED spec
-            print("primers_scored[primer][4]  = " + primers_scored[primer][4])
             affected.write("\t".join(primers_scored[primer])+"\n")
     affected.close()
