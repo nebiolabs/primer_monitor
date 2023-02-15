@@ -68,12 +68,12 @@ with open(sys.argv[1]) as f:
             primers_scored[line[3]]=line[:6]
             primers_scored[line[3]][4] = 0
 
-        primers_scored[line[3]][4]+=score
+        primers_scored[line[3]][4]+=(LENGTH_EXPONENT_BASE**score)
 
     affected = open(sys.argv[2], "w")
     for primer in primers_scored:
         score = primers_scored[primer][4]
-        if (LENGTH_EXPONENT_BASE**score) > CUTOFF:
+        if score > CUTOFF:
              i = 0
              for field in primers_scored[primer]:
                 primers_scored[primer][i] = str(primers_scored[primer][i])
