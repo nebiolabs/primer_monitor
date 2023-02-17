@@ -2,12 +2,13 @@
 
 <!--<  %= image_tag 'lineage_primer_summary_20220211.svg' %  >-->
 <% primer_sets_map = {} %>
+<% default_tracks_map = {} %>
 <% lineage_sets_map = {} %>
 <% i = 0 %>
 <% primer_set_count = @primer_sets.length %>
 <div class="block">
   Primers that do not overlap with variants associated with these lineages are shown in blue below a schematic SARS-CoV-2 genome.
-  Overlapping primers are indicated in orange.
+  Primers that overlap with enough sufficiently-frequent variants to be potentially impacted (see below) are indicated in orange.
 </div>
 <form id="primer_set_selection">
   <p>Lineage:</p>
@@ -25,12 +26,14 @@
   </div>
   <hr><p>Show primer sets:</p>
   <div class="columns is-multiline is-gapless">
+  <% i = 0 %>
   <% @primer_sets.each { |primerSet, displayName| %>
     <div class="column is-one-fifth">
     <%= label_tag "primer_set_"+i.to_s, class: 'primer_set_checkbox_label' do %>
       <span class="primer_display_name"><%= displayName %></span>
-      <%= check_box_tag "primer_set_"+i.to_s, 1, true, class: 'primer_set_checkbox', disabled: true %>
+      <%= check_box_tag "primer_set_"+i.to_s, 1, false, class: 'primer_set_checkbox', disabled: true %>
       <% primer_sets_map["primer_set_"+i.to_s] = [primerSet, displayName] %>
+      <% default_tracks_map["primer_set_"+i.to_s] = @default_tracks.include? primerSet %>
       <% i+=1 %>
     <% end %>
     </div>
@@ -40,10 +43,12 @@
   <br><br><button class="button is-small is-primary" id="apply" disabled="disabled">Update Tracks</button>
 </form>
 <p id="primer_set_json" class="invisible"><%= primer_sets_map.to_json %></p>
+<p id="default_tracks_json" class="invisible"><%= default_tracks_map.to_json %></p>
 <p id="config" class="invisible"><%= @config.to_json %></p>
 <p id="lineage_set_json" class="invisible"><%= lineage_sets_map.to_json %></p>
 <div id="igv" class="igv_div"></div>
 <hr/>
+
 <div class="block">
   <h2 class="title">Overlapping amplicons:</h2>
   <ul>
@@ -109,22 +114,22 @@
 <hr>
 <!--
 <h2 class="title">0-5 kb Variants</h2>
-<%= image_tag 'lineage_primer_summary_0-5kb_20220211.svg' %>
+< %= image_tag 'lineage_primer_summary_0-5kb_20220211.svg' % >
 <hr>
 <h2 class="title">5-10 kb Variants</h2>
-<%= image_tag 'lineage_primer_summary_5-10kb_20220211.svg' %>
+< %= image_tag 'lineage_primer_summary_5-10kb_20220211.svg' % >
 <hr>
 <h2 class="title">10-15 kb Variants</h2>
-<%= image_tag 'lineage_primer_summary_10-15kb_20220211.svg' %>
+< %= image_tag 'lineage_primer_summary_10-15kb_20220211.svg' % >
 <hr>
 <h2 class="title">15-20 kb Variants</h2>
-<%= image_tag 'lineage_primer_summary_15-20kb_20220211.svg' %>
+< %= image_tag 'lineage_primer_summary_15-20kb_20220211.svg' % >
 <hr>
 <h2 class="title">20-25 kb Variants</h2>
-<%= image_tag 'lineage_primer_summary_20-25kb_20220211.svg' %>
+< %= image_tag 'lineage_primer_summary_20-25kb_20220211.svg' % >
 <hr>
 <h2 class="title">25-29 kb Variants</h2>
-<%= image_tag 'lineage_primer_summary_25-29kb_20220211.svg' %>
+< %= image_tag 'lineage_primer_summary_25-29kb_20220211.svg' % >
 <hr/>
 -->
 <h2 class="title">Methods:</h2>
@@ -342,6 +347,11 @@
 <p>
   Geneious version 2022.0.2 created by Biomatters. Available
   from <%= link_to 'https://www.geneious.com', 'https://www.geneious.com' %>.
+</p>
+<p>
+  Robinson, James T, Helga Thorvaldsdottir, Douglass Turner, and Jill P Mesirov. “igv.js: An Embeddable JavaScript
+  Implementation of the Integrative Genomics Viewer (IGV).” Bioinformatics 39, no. 1 (January 1, 2023):
+  btac830. <%= link_to 'https://doi.org/10.1093/bioinformatics/btac830', 'https://doi.org/10.1093/bioinformatics/btac830' %>.
 </p>
 
 <hr/>

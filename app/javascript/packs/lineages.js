@@ -5,12 +5,14 @@ let igvBrowser = null; //declaring this as a global for later
 let tracks = [];
 let primerSetsToNames = {};
 let lineageSetsToNames = {};
+let defaultCheckboxStatus = {};
 let config = {};
 
 function loadConfig()
 {
     primerSetsToNames = JSON.parse($('#primer_set_json')[0].innerHTML);
     lineageSetsToNames = JSON.parse($('#lineage_set_json')[0].innerHTML);
+    defaultCheckboxStatus = JSON.parse($('#default_tracks_json')[0].innerHTML);
     config = JSON.parse($('#config')[0].innerHTML);
 }
 
@@ -119,9 +121,9 @@ function initBrowser() {
     const browser_div = document.getElementById("igv");
     igv.createBrowser(browser_div, browserConfig).then(function (theBrowser) {
         igvBrowser = theBrowser;
-        setCheckboxes(true);
+        initCheckboxes();
         setRadiobuttons("all");
-        loadPrimerSets(Object.keys(primerSetsToNames), igvBrowser, "all");
+        updatePrimerSets();
     });
 
 }
@@ -137,6 +139,16 @@ function setCheckboxes(state)
 {
     $('.primer_set_checkbox').each(function (index, element) {
         element.checked = state;
+    });
+}
+
+function initCheckboxes()
+{
+    $('.primer_set_checkbox').each(function (index, element) {
+        if(defaultCheckboxStatus[element.id])
+        {
+            element.checked = true;
+        }
     });
 }
 
@@ -158,6 +170,7 @@ $(document).ready(function(){
         event.preventDefault(); //don't refresh
     });
 
+    initCheckboxes();
     loadConfig();
     initBrowser();
 })

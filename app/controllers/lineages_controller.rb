@@ -9,10 +9,16 @@ class LineagesController < ApplicationController
 
     tracks_url = URI("#{@config[:data_server]}/misc/tracks.json")
 
-    @primer_sets = JSON.parse(Net::HTTP.get(tracks_url))
+    tracks = JSON.parse(Net::HTTP.get(tracks_url))
+
+    @primer_sets = tracks['tracks']
+
+    @default_tracks = tracks['default']
 
     lineages_url = URI("#{@config[:data_server]}/misc/lineage_sets.json")
 
     @lineage_sets = JSON.parse(Net::HTTP.get(lineages_url))
+
+    puts @default_tracks
   end
 end

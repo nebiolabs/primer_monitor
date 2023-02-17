@@ -6,7 +6,7 @@ NEAR_3P_SCORE = 2
 MID_3P_SCORE = 4
 OTHER_SCORE = 3
 CUTOFF = int(sys.argv[3])
-DELETION_MULTIPLIER = 10
+INDEL_MULTIPLIER = 10
 LENGTH_EXPONENT_BASE = 2
 
 primers_scored = {}
@@ -33,35 +33,35 @@ with open(sys.argv[1]) as f:
         overlap_len = overlap_end-overlap_start
         score = 0
         pos = overlap_start
-        fivep_dist = None
-        threep_dist = None
+        dist_5p = None
+        dist_3p = None
         dir = (1 if line[5] == "+" else -1)
         new_score = 0
         if dir > 0:
-            fivep_dist = overlap_start-line[1]
-            threep_dist = line[2]-overlap_start
+            dist_5p = overlap_start-line[1]
+            dist_3p = line[2]-overlap_start
         else:
-            fivep_dist = line[2]-overlap_start
-            threep_dist = overlap_start-line[1]
+            dist_5p = line[2]-overlap_start
+            dist_3p = overlap_start-line[1]
 
         if cigar_op == "I" and overlap_start<int(line[1]): # insertion outside primer
             continue
 
         while pos <= overlap_end:
-            if fivep_dist <= 3:
+            if dist_5p <= 3:
                 new_score = NEAR_5P_SCORE
-            elif threep_dist <= 2:
+            elif dist_3p <= 2:
                 new_score = NEAR_3P_SCORE
-            elif threep_dist >2 and threep_dist <= 5:
+            elif dist_3p >2 and dist_3p <= 5:
                 new_score = MID_3P_SCORE
             else:
                 new_score = OTHER_SCORE
 
-            fivep_dist+=dir
-            threep_dist-=dir
+            dist_5p+=dir
+            dist_3p-=dir
             pos+=1
-            if cigar_op == "D": # deletion
-                new_score = new_score * DELETION_MULTIPLIER
+            if cigar_op == "D" or cigar_op == "I": # indel
+                new_score = new_score * INDEL_MULTIPLIER
 
             score += new_score
 
@@ -75,12 +75,13 @@ with open(sys.argv[1]) as f:
     for primer in primers_scored:
         score = primers_scored[primer][4]
         if score > CUTOFF:
-            primers_scored[primer][4] = math.log(primers_scored[primer][4]) # log to reduce the range of scores
+            primers_scored[primer][4] = math.log(primers_scored[primer][4]) # ln to reduce the range of scores
             if primers_scored[primer][4] > 1000:
                 score = 1000 # cap at 1000 to follow BED spec
             i = 0
-            for field in primers_scored[primer]:
-                primers_scored[primer][i] = str(primers_scored[primer][i])
+            for field in primers_scored[primer]: # convert non-string fields to strings before .join("\t")
+                if type(primers_scored[primer][i]) != type("a string"):
+                    primers_scored[primer][i] = str(primers_scored[primer][i])
                 i+=1
             affected.write("\t".join(primers_scored[primer])+"\n")
     affected.close()
