@@ -1,19 +1,8 @@
 nextflow.enable.dsl=2
 
-ref = params.ref
-ref = file(ref).toAbsolutePath()
-params.prev_json=
-
-prev_json = file(params.prev_json, checkIfExists: true).toAbsolutePath()
-
-params.pangolin_path=
-
-pangolin_path = file(params.pangolin_path).toAbsolutePath()
-
 ncov_path = '/mnt/home/mcampbell/src/ncov-ingest'
 primer_monitor_path = '/mnt/bioinfo/prg/primer_monitor'
 output_path = '/mnt/hpc_scratch/primer_monitor'
-pangolin_path =
 
 process extract_new_records {
     // Get all (deduplicated) records as of yesterday's run
@@ -30,6 +19,7 @@ process extract_new_records {
     touch known_empty.json
     python3 !{primer_monitor_path}/lib/filter_duplicates.py <(cat known_empty.zst) <(zstd -d --long=30 < !{full_json}) > ${date_yesterday}.json
     find !{output_path} -maxdepth 1 -mtime +5 -type f -name "*.full_json*"  -delete
+    rm known_empty.json
     '''
 
 }
