@@ -70,8 +70,20 @@
         <%= form.fields_for :oligos do |es| %>
           <%= render 'oligo_fields', f: es %>
         <% end %>
-        <p>
+        <p id="add-new">
           <%= link_to_add_association 'Add Oligo', form, :oligos, class:'button' %>
+        <div class="file has-name">
+          <label class="file-label">
+            <input class="file-input" type="file" name="fasta" id="fasta_upload">
+            <span class="file-cta white-button">
+              <span class="file-label">
+                Upload FASTA...
+              </span>
+            </span>
+            <span class="file-name" id="fasta_name">
+            </span>
+          </label>
+        </div>
         </p>
       </div>
     </div>
@@ -83,3 +95,5 @@
     <%= form.submit class: 'button is-link'%>
   </div>
 <% end %>
+
+<%= javascript_pack_tag "primer_sets" %>
