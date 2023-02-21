@@ -37,8 +37,8 @@ process transform_data {
 
     shell:
     '''
-    date_today=$(date +%Y-%m-%d)
-    !{ncov_path}/bin/transform-gisaid --output-metadata ${date_today}.metadata --output-fasta ${date_today}.fasta --output-additional-info ${date_today}.info ${date_today}.*.json
+    date_yesterday=$(date --date="yesterday" +%Y-%m-%d)
+    !{ncov_path}/bin/transform-gisaid --output-metadata ${date_yesterday}.metadata --output-fasta ${date_yesterday}.fasta --output-additional-info ${date_yesterday}.info ${date_yesterday}.*.json
     '''
 
 }
