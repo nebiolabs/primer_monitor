@@ -153,7 +153,9 @@ CREATE TABLE public.fasta_records (
     detailed_geo_location_id bigint,
     date_submitted date,
     pangolin_lineage text,
-    pangolin_version text
+    pangolin_version text,
+    pangolin_call_id_id bigint,
+    pending_pangolin_call_id_id bigint
 );
 
 
@@ -1536,6 +1538,20 @@ CREATE INDEX index_fasta_records_on_detailed_geo_location_id ON public.fasta_rec
 
 
 --
+-- Name: index_fasta_records_on_pangolin_call_id_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_fasta_records_on_pangolin_call_id_id ON public.fasta_records USING btree (pangolin_call_id_id);
+
+
+--
+-- Name: index_fasta_records_on_pending_pangolin_call_id_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_fasta_records_on_pending_pangolin_call_id_id ON public.fasta_records USING btree (pending_pangolin_call_id_id);
+
+
+--
 -- Name: index_fasta_records_on_strain; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -1919,6 +1935,14 @@ ALTER TABLE ONLY public.primer_sets
 
 
 --
+-- Name: fasta_records fk_rails_b603fc708f; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.fasta_records
+    ADD CONSTRAINT fk_rails_b603fc708f FOREIGN KEY (pending_pangolin_call_id_id) REFERENCES public.pangolin_calls(id);
+
+
+--
 -- Name: blast_hits fk_rails_b63d58c7a5; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -1940,6 +1964,14 @@ ALTER TABLE ONLY public.proposed_notifications
 
 ALTER TABLE ONLY public.proposed_notifications
     ADD CONSTRAINT fk_rails_d380313e75 FOREIGN KEY (detailed_geo_location_alias_id) REFERENCES public.detailed_geo_location_aliases(id);
+
+
+--
+-- Name: fasta_records fk_rails_db801c5c92; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.fasta_records
+    ADD CONSTRAINT fk_rails_db801c5c92 FOREIGN KEY (pangolin_call_id_id) REFERENCES public.pangolin_calls(id);
 
 
 --
@@ -2056,6 +2088,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20221116151610'),
 ('20230109180448'),
 ('20230127154500'),
-('20230217145345');
+('20230217145345'),
+('20230221144400');
 
 
