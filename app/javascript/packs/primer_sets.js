@@ -1,5 +1,7 @@
 const $ = require("jquery");
 
+
+
 $(document).ready(function(){
 
     const fasta_upload = $('#fasta_upload');
@@ -7,6 +9,14 @@ $(document).ready(function(){
     fasta_upload.on('change', function(){
         if(fasta_upload[0].files.length > 0)
         {
+            if($('#fasta_name').length === 0)
+            {
+                const fastaName = document.createElement("span");
+                fastaName.id = 'fasta_name';
+                fastaName.className = 'file-name';
+                $('#fasta_upload_label')[0].appendChild(fastaName);
+                $('#fasta_div').addClass('has-name');
+            }
             $('#fasta_name')[0].innerHTML = fasta_upload[0].files[0].name;
             fasta_upload[0].files[0].text().then(processFasta);
         }
