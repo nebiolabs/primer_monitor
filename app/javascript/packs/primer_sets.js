@@ -26,13 +26,13 @@ function addPrimer(lastPrimer)
         console.log("Testing: "+child.tagName+", "+child.id);
         if(child.tagName.toUpperCase() === "INPUT")
         {
-            if(child.id.endsWith("name"))
-            {
-                child.value = longName;
-            }
-            else if(child.id.endsWith("short_name"))
+            if(child.id.endsWith("short_name"))
             {
                 child.value = shortName;
+            }
+            else if(child.id.endsWith("name"))
+            {
+                child.value = longName;
             }
             else if(child.id.endsWith("sequence"))
             {
@@ -54,7 +54,7 @@ function processFasta(fastaText)
         let seqDataRaw = seq.split("\n");
         let longName = seqDataRaw[0];
         let sequence = seqDataRaw.slice(1).join("");
-        let shortName = longName.split(" ")[0];
+        let shortName = longName.split(" ")[0].slice(0,5);
         let createOligo = $('.add_fields')[0];
         createOligo.click.call(createOligo);
         addPrimer([longName, shortName, sequence]);
