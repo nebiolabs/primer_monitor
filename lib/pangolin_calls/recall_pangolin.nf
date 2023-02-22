@@ -4,6 +4,21 @@ ncov_path = '/mnt/home/mcampbell/src/ncov-ingest'
 primer_monitor_path = '/mnt/bioinfo/prg/primer_monitor'
 output_path = '/mnt/hpc_scratch/primer_monitor'
 
+process update_pangolin {
+    cpus 1
+    penv 'smp'
+    conda "pangolin"
+
+    output:
+    file 'pangolin_updated.txt'
+
+    shell:
+    '''
+    pangolin --update
+    '''
+
+}
+
 process extract_new_records {
     // Get all (deduplicated) records as of yesterday's run
     cpus 1
@@ -50,6 +65,7 @@ process pangolin_calls {
     conda "pangolin"
     input:
         tuple file(metadata), file(fasta)
+        file pangolin_update_complete
     output:
         file "*.csv"
     shell:
@@ -63,20 +79,31 @@ process load_pangolin_data {
     penv 'smp'
     input:
         file csv
-        file complete
-        //the .complete is only here to make sure this happens *after* the main DB load
     output:
         file '*.complete_pangolin'
     shell:
     '''
-    PGPASSFILE="!{primer_monitor_path}/config/.pgpass" !{primer_monitor_path}/lib/pangolin_calls/update_fasta_records.sh !{csv}
+    PGPASSFILE="!{primer_monitor_path}/config/.pgpass" !{primer_monitor_path}/lib/pangolin_calls/update_fasta_records.sh !{csv} pending_pangolin_call_id
+    '''
+}
+
+process update_current_calls {
+    cpus 1
+    penv 'smp'
+    input:
+        file everything
+    shell:
+    '''
+    PGPASSFILE="!{primer_monitor_path}/config/.pgpass" !{primer_monitor_path}/lib/pangolin_calls/swap_calls.sh
     '''
 }
 
 
 workflow {
+    update_pangolin()
     extract_new_records()
     transform_data(extract_new_records.out.splitText(file: true, by: 2500))
-    pangolin_calls(transform_data.out)
-    load_pangolin_data(pangolin_calls.out, load_to_db.out)
+    pangolin_calls(transform_data.out, update_pangolin.out)
+    load_pangolin_data(pangolin_calls.out)
+    update_current_calls(load_pangolin_data.out.collect())
 }
