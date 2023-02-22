@@ -23,7 +23,6 @@ function addPrimer(lastPrimer)
     let newPrimerContainer = $('#samples > div:nth-last-of-type(2) > div.field-body')[0];
     for(const child of newPrimerContainer.children)
     {
-        console.log("Testing: "+child.tagName+", "+child.id);
         if(child.tagName.toUpperCase() === "INPUT")
         {
             if(child.id.endsWith("short_name"))
