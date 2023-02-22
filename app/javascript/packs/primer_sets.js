@@ -64,6 +64,11 @@ function processFasta(fastaText)
         let longName = seqDataRaw[0];
         let sequence = seqDataRaw.slice(1).join("");
         let shortName = longName.split(" ")[0].slice(0,5);
+        const invalidSeqRE = /[^autcgnbvdhrykmws\-]/i; //matches everything except for all bases and ambiguity codes plus - for gap
+        if(sequence.match(invalidSeqRE) !== null)
+        {
+            confirm("Non-sequence character detected in file '"+fastaName+"'.\n\nSequence:\n>"+seq+"\n\nContinue?");
+        }
         let createOligo = $('.add_fields')[0];
         createOligo.click.call(createOligo);
         addPrimer([longName, shortName, sequence]);
