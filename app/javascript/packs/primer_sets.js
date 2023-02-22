@@ -44,9 +44,10 @@ function addPrimer(lastPrimer)
 
 function processFasta(fastaText)
 {
+    const fastaName = $('#fasta_name')[0].innerHTML;
     if(fastaText[0] !== ">")
     {
-        alert("invalid FASTA!");
+        alert("'"+fastaName+"' is not a valid FASTA file!");
         return;
     }
     fastaText.slice(1).split("\n>").forEach(function(seq){
