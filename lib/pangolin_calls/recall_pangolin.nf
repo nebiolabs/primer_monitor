@@ -8,9 +8,6 @@ params.conda_path =
 params.pangolin_version_path =
 params.pangolin_data_version_path =
 
-pangolin_version = file(params.pangolin_version_path).text
-pangolin_data_version = file(params.pangolin_data_version_path).text
-
 process get_new_versions {
     cpus 1
     penv 'smp'
