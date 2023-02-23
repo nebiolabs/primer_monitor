@@ -4,19 +4,27 @@ ncov_path = '/mnt/home/mcampbell/src/ncov-ingest'
 primer_monitor_path = '/mnt/bioinfo/prg/primer_monitor'
 output_path = '/mnt/hpc_scratch/primer_monitor'
 
-process update_pangolin {
+params.conda_path =
+params.pangolin_version_path =
+params.pangolin_data_version_path =
+
+pangolin_version = file(params.pangolin_version_path).text
+pangolin_data_version = file(params.pangolin_data_version_path).text
+
+process get_new_versions {
     cpus 1
     penv 'smp'
-    conda "pangolin"
 
     output:
-    file 'pangolin_updated.txt'
+    env latest_pangolin
+    env latest_pangolin_data
 
     shell:
     '''
-    pangolin --update
-    '''
+    latest_pangolin=$(!{params.conda_path} search -q -c bioconda pangolin | awk '{ print $2 }' | tail -n 1)
 
+    latest_pangolin_data=$(!{params.conda_path} search -q -c bioconda pangolin-data | awk '{ print $2 }' | tail -n 1)
+    '''
 }
 
 process extract_new_records {
@@ -62,8 +70,10 @@ process transform_data {
 process pangolin_calls {
     cpus 8
     penv 'smp'
-    conda "pangolin"
+    conda "pangolin=$pangolin_version pangolin-data=$pangolin_data_version"
     input:
+        val pangolin_version
+        val pangolin_data_version
         tuple file(metadata), file(fasta)
         file pangolin_update_complete
     output:
@@ -92,18 +102,35 @@ process update_current_calls {
     penv 'smp'
     input:
         file everything
+    output:
+        file 'done.txt'
     shell:
     '''
-    PGPASSFILE="!{primer_monitor_path}/config/.pgpass" !{primer_monitor_path}/lib/pangolin_calls/swap_calls.sh
+    PGPASSFILE="!{primer_monitor_path}/config/.pgpass" !{primer_monitor_path}/lib/pangolin_calls/swap_calls.sh; touch done.txt;
+    '''
+}
+
+process pangolin_calls {
+    cpus 1
+    penv 'smp'
+    input:
+        val pangolin_version
+        val pangolin_data_version
+        file db_update_complete
+    shell:
+    '''
+    echo !{pangolin_version} > !{params.pangolin_version_path}
+    echo !{pangolin_data_version} > !{params.pangolin_data_version_path}
     '''
 }
 
 
 workflow {
-    update_pangolin()
+    get_new_versions()
     extract_new_records()
     transform_data(extract_new_records.out.splitText(file: true, by: 2500))
-    pangolin_calls(transform_data.out, update_pangolin.out)
+    pangolin_calls(get_new_versions.out[0], get_new_versions.out[1], transform_data.out, update_pangolin.out)
     load_pangolin_data(pangolin_calls.out)
     update_current_calls(load_pangolin_data.out.collect())
+    update_pangolin_version_files(get_new_versions.out[0], get_new_versions.out[1], update_current_calls.out)
 }

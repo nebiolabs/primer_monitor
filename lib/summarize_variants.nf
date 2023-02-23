@@ -10,6 +10,12 @@ ncov_path = '/mnt/home/mcampbell/src/ncov-ingest'
 primer_monitor_path = '/mnt/bioinfo/prg/primer_monitor'
 output_path = '/mnt/hpc_scratch/primer_monitor'
 
+params.pangolin_version_path =
+params.pangolin_data_version_path =
+
+pangolin_version = file(params.pangolin_version_path).text
+pangolin_data_version = file(params.pangolin_data_version_path).text
+
 process download_data {
     // Downloads the full dataset
     cpus 16
@@ -123,7 +129,7 @@ process load_to_db {
 
 process pangolin_calls {
     cpus 8
-    conda "pangolin"
+    conda "pangolin=$pangolin_version pangolin-data=$pangolin_data_version"
     input:
         file(fasta) from transformed_data_for_pangolin
     output:
