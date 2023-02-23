@@ -18,6 +18,7 @@ process get_new_versions {
 
     shell:
     '''
+    touch !{flag_path}/recall_pangolin_running.txt;
     latest_pangolin=$(!{params.conda_path} search -q -c bioconda pangolin | awk '{ print $2 }' | tail -n 1)
 
     latest_pangolin_data=$(!{params.conda_path} search -q -c bioconda pangolin-data | awk '{ print $2 }' | tail -n 1)
@@ -103,21 +104,38 @@ process update_current_calls {
         file 'done.txt'
     shell:
     '''
-    PGPASSFILE="!{primer_monitor_path}/config/.pgpass" !{primer_monitor_path}/lib/pangolin_calls/swap_calls.sh; touch done.txt;
+    PGPASSFILE="!{primer_monitor_path}/config/.pgpass" !{primer_monitor_path}/lib/pangolin_calls/swap_calls.sh NOT; touch done.txt;
     '''
 }
 
-process pangolin_calls {
+process update_pangolin_version_files {
     cpus 1
     penv 'smp'
     input:
         val pangolin_version
         val pangolin_data_version
         file db_update_complete
+    output:
+        file 'done.txt'
     shell:
     '''
     echo !{pangolin_version} > !{params.pangolin_version_path}
     echo !{pangolin_data_version} > !{params.pangolin_data_version_path}
+    touch done.txt;
+    '''
+}
+
+process update_new_calls {
+    cpus 1
+    penv 'smp'
+    input:
+        file all_done
+    shell:
+    '''
+    if [ ! -f "!{flag_path}/summarize_variants_running.txt" ]; then
+        PGPASSFILE="!{primer_monitor_path}/config/.pgpass" !{primer_monitor_path}/lib/pangolin_calls/swap_calls.sh; touch done.txt;
+    fi
+    rm !{flag_path}/recall_pangolin_running.txt;
     '''
 }
 
@@ -130,4 +148,5 @@ workflow {
     load_pangolin_data(pangolin_calls.out)
     update_current_calls(load_pangolin_data.out.collect())
     update_pangolin_version_files(get_new_versions.out[0], get_new_versions.out[1], update_current_calls.out)
+    update_new_calls(update_pangolin_version_files.out)
 }

@@ -4,6 +4,8 @@ ref = params.ref
 ref = file(ref).toAbsolutePath()
 params.prev_json=
 
+params.flag_path='/mnt/hpc_scratch/primer_monitor'
+
 prev_json = file(params.prev_json, checkIfExists: true).toAbsolutePath()
 
 ncov_path = '/mnt/home/mcampbell/src/ncov-ingest'
@@ -69,7 +71,7 @@ process transform_data {
         file(gisaid_json) from filtered_data.splitText(file: true, by: 10000)
     output:
         tuple file('*.metadata'), file('*.fasta') into transformed_data
-        file('*.fasta') into transformed_data_for_pangolin
+        file('*.fasta') into transformed_data_for_pangolin_version
 
 
     shell:
@@ -127,10 +129,28 @@ process load_to_db {
     '''
 }
 
+process get_pangolin_version {
+    cpus 1
+
+    input:
+        file(fasta) from transformed_data_for_pangolin_version
+    output:
+        env pangolin_version into pangolin_version_to_call
+        env pangolin_data_version into pangolin_data_version_to_call
+    shell:
+    '''
+    touch !{flag_path}/summarize_variants_running.txt;
+    pangolin_version=$(cat !{params.pangolin_version_path})
+    pangolin_data_version=$(cat !{params.pangolin_data_version_path})
+    '''
+    }
+
 process pangolin_calls {
     cpus 8
     conda "pangolin=$pangolin_version pangolin-data=$pangolin_data_version"
     input:
+        val pangolin_version from pangolin_version_to_call
+        val pangolin_data_version from pangolin_data_version_to_call
         file(fasta) from transformed_data_for_pangolin
     output:
         file("*.csv") into pangolin_lineage_data
@@ -150,7 +170,12 @@ process load_pangolin_data {
         file('*.complete_pangolin') into complete_files_pangolin
     shell:
     '''
-    PGPASSFILE="!{primer_monitor_path}/config/.pgpass" !{primer_monitor_path}/lib/pangolin_calls/update_fasta_records.sh !{csv}
+    field="pangolin_call_id"
+    if [ -f "!{flag_path}/recall_pangolin_running.txt" ]; then
+        field="pending_pangolin_call_id"
+    fi
+    PGPASSFILE="!{primer_monitor_path}/config/.pgpass" !{primer_monitor_path}/lib/pangolin_calls/update_fasta_records.sh !{csv} $field
+    rm !{flag_path}/summarize_variants_running.txt
     '''
 }
 
@@ -162,9 +187,24 @@ process recalculate_database_views {
     input:
         file(everything) from complete_metadata_files.collect()
         file(everything_pangolin) from complete_files_pangolin.collect()
+    output:
+        file refresh_complete.txt into recalculate_database_views_done
     shell:
     '''
     # recalculate all the views at the end to save time
     RAILS_ENV=production ruby /mnt/bioinfo/prg/primer_monitor/upload.rb --skip_data_import && touch refresh_complete.txt
+    '''
+}
+
+process update_new_calls {
+    cpus 1
+    penv 'smp'
+    input:
+        file all_done from recalculate_database_views_done
+    shell:
+    '''
+    if [ ! -f "!{flag_path}/recall_pangolin_running.txt" ]; then
+        PGPASSFILE="!{primer_monitor_path}/config/.pgpass" !{primer_monitor_path}/lib/pangolin_calls/swap_calls.sh; touch done.txt;
+    fi
     '''
 }
