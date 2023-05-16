@@ -13,7 +13,7 @@ output_path = '/mnt/hpc_scratch/primer_monitor'
 process download_data {
     // Downloads the full dataset
     cpus 16
-    conda "ncbi-datasets-cli unzip"
+    conda "ncbi-datasets-cli unzip zstd"
     errorStrategy 'retry' 
     maxRetries 2
     publishDir "${output_path}", mode: 'link', pattern: '*.zst', overwrite: true
