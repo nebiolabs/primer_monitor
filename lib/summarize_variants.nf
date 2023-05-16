@@ -51,7 +51,7 @@ process extract_new_records {
     '''
     date_today=$(date +%Y-%m-%d)
 
-    python parse_ncbi.py <(zstd -d --long=30 < !{metadata_json}) <(zstd -d --long=30 < !{prev_json}) <(zstd -d --long=30 < !{sequences_fasta}) ${date_today}.tsv
+    python !{primer_monitor_path}/lib/parse_ncbi.py <(zstd -d --long=30 < !{metadata_json}) <(zstd -d --long=30 < !{prev_json}) <(zstd -d --long=30 < !{sequences_fasta}) ${date_today}.tsv
 
     find !{output_path} -maxdepth 1 -mtime +5 -type f -name "*.metadata.zst" -delete
     find !{output_path} -maxdepth 1 -mtime +5 -type f -name "*.sequences.zst" -delete
@@ -74,7 +74,7 @@ process transform_data {
     '''
     date_today=$(date +%Y-%m-%d)
 
-    cat !{ncbi_tsv} | gawk process_seqs.awk -v cur_date=${date_today}
+    cat !{ncbi_tsv} | gawk !{primer_monitor_path}/lib/process_seqs.awk -v cur_date=${date_today}
     '''
 
 }
