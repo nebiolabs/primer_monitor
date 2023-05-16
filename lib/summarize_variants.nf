@@ -13,22 +13,25 @@ output_path = '/mnt/hpc_scratch/primer_monitor'
 process download_data {
     // Downloads the full dataset
     cpus 16
-    conda "curl xz zstd"
+    conda "ncbi-datasets-cli unzip"
     errorStrategy 'retry' 
     maxRetries 2
-    publishDir "${output_path}", mode: 'link', pattern: '*.full_json.zst', overwrite: true
+    publishDir "${output_path}", mode: 'link', pattern: '*.zst', overwrite: true
     // mode "link" assumes that the output path is on the same disk as the work directory, switch to copy if not
 
     output:
-        file('*.full_json.zst') into downloaded_data
+        tuple file('*.metadata.zst'), file('*.sequences.zst') into downloaded_data
 
     shell:
     '''
     date_today=$(date +%Y-%m-%d)
     source !{primer_monitor_path}/.env
-    curl -u $USER:$PASSWORD $URL > tmp.json.xz
-    xz -d < tmp.json.xz | zstd --long=30 --ultra -22 -T!{task.cpus} > ${date_today}.full_json.zst
-    rm tmp.json.xz
+    datasets download virus genome taxon SARS-CoV-2 --complete-only --host human --filename tmp.zip
+    unzip tmp.zip
+    zstd --long=30 --ultra -22 -T!{task.cpus} ncbi_dataset/data/data_report.jsonl > ${date_today}.metadata.zst
+    zstd --long=30 --ultra -22 -T!{task.cpus} ncbi_dataset/data/genomic.fna > ${date_today}.sequences.zst
+    rm tmp.zip
+    rm -rf ncbi_dataset
     '''
 
 }
@@ -39,28 +42,29 @@ process extract_new_records {
     conda "python=3.9 zstd"
 
     input:
-        file(full_json) from downloaded_data
+        tuple file(metadata_json), file(sequences_fasta) from downloaded_data
     output:
-        file('*.json') into filtered_data
+        file('*.tsv') into new_data
 
 
     shell:
     '''
     date_today=$(date +%Y-%m-%d)
 
-    python3 !{primer_monitor_path}/lib/filter_duplicates.py <(zstd -d --long=30 < !{prev_json}) <(zstd -d --long=30 < !{full_json}) > ${date_today}.json
+    python parse_ncbi.py <(zstd -d --long=30 < !{metadata_json}) <(zstd -d --long=30 < !{prev_json}) <(zstd -d --long=30 < !{sequences_fasta}) ${date_today}.tsv
 
-    find !{output_path} -maxdepth 1 -mtime +5 -type f -name "*.full_json*"  -delete
+    find !{output_path} -maxdepth 1 -mtime +5 -type f -name "*.metadata.zst" -delete
+    find !{output_path} -maxdepth 1 -mtime +5 -type f -name "*.sequences.zst" -delete
     '''
  
 }
 
 process transform_data {
     cpus 1
-    conda "python=3.9 regex fsspec pandas typing"
+    conda "gawk"
 
     input:
-        file(gisaid_json) from filtered_data.splitText(file: true, by: 10000)
+        file(ncbi_tsv) from new_data.splitText(file: true, by: 10000)
     output:
         tuple file('*.metadata'), file('*.fasta') into transformed_data
         file('*.fasta') into transformed_data_for_pangolin
@@ -70,7 +74,7 @@ process transform_data {
     '''
     date_today=$(date +%Y-%m-%d)
 
-    !{ncov_path}/bin/transform-gisaid --output-metadata ${date_today}.metadata --output-fasta ${date_today}.fasta --output-additional-info ${date_today}.info ${date_today}.*.json 
+    cat !{ncbi_tsv} | gawk process_seqs.awk -v cur_date=${date_today}
     '''
 
 }
