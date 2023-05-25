@@ -17,14 +17,14 @@ class FastaRecord < ApplicationRecord
       record = build_fasta_record(line)
       new_fasta_records << record if record
     end
-    @existing_fasta_strain_ids = nil # invalidates cache since any new records would not be present
+    @existing_fasta_accession_ids = nil # invalidates cache since any new records would not be present
     raise "Unable to parse any records from #{metadata_tsv}" if record_count.zero?
 
     new_fasta_records
   end
 
-  def self.existing_fasta_strain_ids
-    @existing_fasta_strain_ids ||= Hash[FastaRecord.pluck(:strain, :id)]
+  def self.existing_fasta_accession_ids
+    @existing_fasta_accession_ids ||= Hash[FastaRecord.pluck(:genbank_accession, :id)]
   end
 
   def self.build_fasta_record(line)
@@ -33,9 +33,9 @@ class FastaRecord < ApplicationRecord
     return unless strain && accession && region && country && division && date
 
     division = nil if division.blank?
-    return if existing_fasta_strain_ids.key?(strain)
+    return if existing_fasta_accession_ids.key?(accession)
 
-    ActiveRecord::Base.logger.info("New fasta record: #{strain}")
+    ActiveRecord::Base.logger.info("New fasta record: #{accession}")
     # ensure that higher level locations also exist so users can select these for subscriptions
     find_or_create_dg_id(region, nil, nil, nil)
     find_or_create_dg_id(region, country, nil, nil)

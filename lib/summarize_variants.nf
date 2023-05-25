@@ -28,8 +28,8 @@ process download_data {
     source !{primer_monitor_path}/.env
     datasets download virus genome taxon SARS-CoV-2 --complete-only --host human --filename tmp.zip
     unzip tmp.zip
-    zstd --long=30 --ultra -22 -T!{task.cpus} ncbi_dataset/data/data_report.jsonl > ${date_today}.metadata.zst
-    zstd --long=30 --ultra -22 -T!{task.cpus} ncbi_dataset/data/genomic.fna > ${date_today}.sequences.zst
+    zstd --long=30 --ultra -22 -T!{task.cpus} ncbi_dataset/data/data_report.jsonl -o ${date_today}.metadata.zst
+    zstd --long=30 --ultra -22 -T!{task.cpus} ncbi_dataset/data/genomic.fna -o ${date_today}.sequences.zst
     rm tmp.zip
     rm -rf ncbi_dataset
     '''
