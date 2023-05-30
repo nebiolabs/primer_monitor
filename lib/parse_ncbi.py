@@ -58,20 +58,8 @@ with open(sys.argv[3]) as f:
     with open(sys.argv[4], "w") as g:
         g.write("accession\tstrain\tdateCollected\tregion\tcountry\tdivision\tdateReleased\tsequence\n")
 
-        do_print = False
         accession = None
-        for line in f:
-            if line.startswith(">"): # FASTA header
-                if accession is not None and do_print:
-                    g.write("\t".join(output_lines[accession])+"\n")
-                if line[1:].split()[0] in accessions:
-                    do_print = True
-                    accession = line[1:].split()[0]
-                else:
-                    do_print = False
-            else:
-                if do_print:
-                    output_lines[accession][-1] += line.strip()
-
-        if accession is not None:
-            g.write("\t".join(output_lines[accession])+"\n")
+        for line_s in f:
+            line = line_s.split("\t")
+            if line[0][1:].split()[0] in accessions:
+                g.write("\t".join(output_lines[accession].append(line[1].strip())+"\n")
