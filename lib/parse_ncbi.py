@@ -62,4 +62,4 @@ with open(sys.argv[3]) as f:
         for line_s in f:
             line = line_s.split("\t")
             if line[0][1:].split()[0] in accessions:
-                g.write("\t".join(output_lines[accession].append(line[1].strip())+"\n")
+                g.write("\t".join(output_lines[accession].append(line[1].strip())+"\n"))
