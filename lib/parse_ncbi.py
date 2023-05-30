@@ -49,8 +49,7 @@ with open(sys.argv[1]) as f:
             get_if_exists(line, "location", "geographicRegion"),
             loc,
             loc_div,
-            get_if_exists(line, "releaseDate"),
-            "" # sequence
+            get_if_exists(line, "releaseDate")
             ]
 
 # read seqs

@@ -73,7 +73,7 @@ process transform_data {
     '''
     date_today=$(date +%Y-%m-%d)
 
-    cat !{ncbi_tsv} | gawk -f !{primer_monitor_path}/lib/process_seqs.awk -v cur_date=${date_today}
+    cat !{ncbi_tsv} | gawk -F'\t' -f !{primer_monitor_path}/lib/process_seqs.awk -v cur_date=${date_today}
     '''
 
 }
