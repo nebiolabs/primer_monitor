@@ -63,7 +63,7 @@ process transform_data {
     conda "gawk"
 
     input:
-        file(ncbi_tsv) from new_data.splitText(file: true, by: 10000)
+        file(ncbi_tsv) from new_data.splitText(file: true, by: 10000).filter{ it.size()>77 }
     output:
         tuple file('*.metadata'), file('*.fasta') into transformed_data
         file('*.fasta') into transformed_data_for_pangolin
