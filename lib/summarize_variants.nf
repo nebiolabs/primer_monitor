@@ -73,6 +73,8 @@ process transform_data {
     '''
     date_today=$(date +%Y-%m-%d)
 
+    # Create an empty FASTA in case there are no new seqs
+    touch ${date_today}.fasta
     cat !{ncbi_tsv} | gawk -F'\t' -f !{primer_monitor_path}/lib/process_seqs.awk -v cur_date=${date_today}
     '''
 
