@@ -9,6 +9,8 @@ prev_json = file(params.prev_json, checkIfExists: true).toAbsolutePath()
 ncov_path = '/mnt/home/mcampbell/src/ncov-ingest'
 primer_monitor_path = '/mnt/bioinfo/prg/primer_monitor'
 output_path = '/mnt/hpc_scratch/primer_monitor'
+igvstatic_path = '/var/www/igvstatic/primer_sets'
+primers_data_path = '/mnt/hpc_scratch/primer_monitor/visualization_data'
 
 process download_data {
     // Downloads the full dataset
@@ -156,9 +158,25 @@ process recalculate_database_views {
     input:
         file(everything) from complete_metadata_files.collect()
         file(everything_pangolin) from complete_files_pangolin.collect()
+    output:
+        file('refresh_complete.txt') into refresh_complete
     shell:
     '''
     # recalculate all the views at the end to save time
     RAILS_ENV=production ruby /mnt/bioinfo/prg/primer_monitor/upload.rb --skip_data_import && touch refresh_complete.txt
+    '''
+}
+
+process recompute_affected_primers {
+    cpus 1
+    publishDir "${igvstatic_path}", mode: 'copy'
+    errorStrategy 'retry'
+    maxRetries 2
+    input:
+        file(complete) from refresh_complete
+    shell:
+    '''
+    # recalculate all the views at the end to save time
+    ls !{primers_data_path}/lineage_lists/* | xargs !{primer_monitor_path}/lib/visualization/process_primer_sets_with_lineages.sh - "./primer_sets" !{freq_cutoff} !{score_cutoff} "!{primers_data_path}/primer_set_paths.txt"
     '''
 }

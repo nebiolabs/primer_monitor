@@ -48,7 +48,19 @@
 <p id="lineage_set_json" class="invisible"><%= lineage_sets_map.to_json %></p>
 <div id="igv" class="igv_div"></div>
 <hr/>
-
+<div class="block">
+  <h2 class="title">Calculating variant impact:</h2>
+  <p>To distinguish primers that are likely to be actually impacted from ones affected by a rare variant
+    or a sequencing error, impact is determined by both the the number of times each variant appears
+    in the data, and the number, length, and position of variants overlapping a primer.
+    To eliminate sequencing errors and other low-frequency variants that will likely not have a significant
+    impact on primers, a variant is only considered in the calculation if it occurs either in
+    at least 1% of sequences (and no less than 10 sequences) in the dataset (after filtering by lineage).
+    Primers are then scored based on the length and position of overlapping variants,
+    and labeled as affected if this results in a sufficiently high score.
+    To focus on recent mutations in the SARS-CoV-2 virus, only variants from the last 180 days are considered.
+  </p>
+</div>
 <div class="block">
   <h2 class="title">Overlapping amplicons:</h2>
   <ul>
