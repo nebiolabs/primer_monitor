@@ -142,12 +142,12 @@ process get_pangolin_version {
     shell:
     '''
     touch !{flag_path}/summarize_variants_running.txt;
+    use_pending="false"
     if [ -f "!{flag_path}/recall_pangolin_running.txt" ]; then
         use_pending="true"
     fi
     pangolin_version=$(cat !{params.pangolin_version_path})
     pangolin_data_version=$(cat !{params.pangolin_data_version_path})
-    use_pending="false"
     '''
     }
 
