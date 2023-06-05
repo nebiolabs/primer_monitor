@@ -135,13 +135,19 @@ process get_pangolin_version {
     input:
         file(fasta) from transformed_data_for_pangolin_version
     output:
+        file('*.fasta') into transformed_data_for_pangolin
         env pangolin_version into pangolin_version_to_call
         env pangolin_data_version into pangolin_data_version_to_call
+        env use_pending into use_pending_to_load
     shell:
     '''
     touch !{flag_path}/summarize_variants_running.txt;
+    if [ -f "!{flag_path}/recall_pangolin_running.txt" ]; then
+        use_pending="true"
+    fi
     pangolin_version=$(cat !{params.pangolin_version_path})
     pangolin_data_version=$(cat !{params.pangolin_data_version_path})
+    use_pending="false"
     '''
     }
 
@@ -165,17 +171,17 @@ process load_pangolin_data {
     input:
         file(csv) from pangolin_lineage_data
         file(complete) from complete_metadata_files_pangolin
+        val use_pending from use_pending_to_load
         //the .complete is only here to make sure this happens *after* the main DB load
     output:
         file('*.complete_pangolin') into complete_files_pangolin
     shell:
     '''
     field="pangolin_call_id"
-    if [ -f "!{flag_path}/recall_pangolin_running.txt" ]; then
+    if [ "$use_pending" = "true" ]; then
         field="pending_pangolin_call_id"
     fi
     PGPASSFILE="!{primer_monitor_path}/config/.pgpass" !{primer_monitor_path}/lib/pangolin_calls/update_fasta_records.sh !{csv} $field
-    rm !{flag_path}/summarize_variants_running.txt
     '''
 }
 
@@ -206,5 +212,6 @@ process update_new_calls {
     if [ ! -f "!{flag_path}/recall_pangolin_running.txt" ]; then
         PGPASSFILE="!{primer_monitor_path}/config/.pgpass" !{primer_monitor_path}/lib/pangolin_calls/swap_calls.sh; touch done.txt;
     fi
+    rm !{flag_path}/summarize_variants_running.txt
     '''
 }
