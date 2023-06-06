@@ -28,45 +28,47 @@ process get_new_versions {
     '''
 }
 
+
 process extract_new_records {
     // Get all (deduplicated) records as of yesterday's run
     cpus 1
-    penv 'smp'
-    conda "python=3.9 zstd"
+    conda "python=3.9 zstd seqtk"
 
     output:
-    file '*.json'
+        file '*.tsv'
+
 
     shell:
     '''
     date_yesterday=$(date --date="yesterday" +%Y-%m-%d)
     touch known_empty.json
-    python3 !{primer_monitor_path}/lib/filter_duplicates.py <(cat known_empty.zst) <(zstd -d --long=30 < !{full_json}) > ${date_yesterday}.json
-    find !{output_path} -maxdepth 1 -mtime +5 -type f -name "*.full_json*"  -delete
-    rm known_empty.json
+    python !{primer_monitor_path}/lib/parse_ncbi.py <(zstd -d --long=30 < !{output_path}/${date_yesterday}.metadata.zst) known_empty.json <(zstd -d --long=30 < !{output_path}/${date_yesterday}.sequences.zst | seqtk seq | paste - -) ${date_yesterday}.tsv
+    rm known_empty.zst
     '''
 
 }
 
+
 process transform_data {
     cpus 1
-    penv 'smp'
-    conda "python=3.9 regex fsspec pandas typing"
+    conda "gawk"
 
     input:
-    file gisaid_json
-
+        file ncbi_tsv
     output:
-    tuple file('*.metadata'), file('*.fasta')
+        tuple file('*.metadata'), file('*.fasta')
+
 
     shell:
     '''
     date_yesterday=$(date --date="yesterday" +%Y-%m-%d)
-    !{ncov_path}/bin/transform-gisaid --output-metadata ${date_yesterday}.metadata --output-fasta ${date_yesterday}.fasta --output-additional-info ${date_yesterday}.info ${date_yesterday}.*.json
+
+    # Create an empty FASTA in case there are no seqs
+    touch ${date_yesterday}.fasta
+    cat !{ncbi_tsv} | gawk -F'\t' -f !{primer_monitor_path}/lib/process_seqs.awk -v cur_date=${date_yesterday}
     '''
 
 }
-
 
 process pangolin_calls {
     cpus 8
@@ -128,7 +130,7 @@ process update_new_calls {
 workflow {
     get_new_versions()
     extract_new_records()
-    transform_data(extract_new_records.out.splitText(file: true, by: 2500))
+    transform_data(extract_new_records.out.splitText(file: true, by: 2500).filter{ it.size()>77 })
     pangolin_calls(get_new_versions.out[0], get_new_versions.out[1], transform_data.out)
     load_pangolin_data(pangolin_calls.out)
     update_current_calls(load_pangolin_data.out.collect())
