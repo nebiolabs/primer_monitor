@@ -18,6 +18,15 @@ process get_new_versions {
 
     shell:
     '''
+    attempts=0
+    while [ -f "!{flag_path}/pangolin_version_mutex.txt" ]; do
+            if [ "$attempts" -gt 10 ]; then
+                exit 1
+            fi
+            sleep 60
+            attempts=$((attempts + 1))
+    done
+    touch !{flag_path}/pangolin_version_mutex.txt;
     latest_pangolin=$(!{params.conda_path} search -q -c bioconda pangolin | awk '{ print $2 }' | tail -n 1)
     latest_pangolin_data=$(!{params.conda_path} search -q -c bioconda pangolin-data | awk '{ print $2 }' | tail -n 1)
 
@@ -25,6 +34,7 @@ process get_new_versions {
     printf "$latest_pangolin_data" > !{params.pangolin_data_version_path}
 
     touch !{flag_path}/recall_pangolin_running.txt;
+    rm !{flag_path}/pangolin_version_mutex.txt;
     '''
 }
 

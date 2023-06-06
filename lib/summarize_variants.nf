@@ -141,6 +141,15 @@ process get_pangolin_version {
         env use_pending into use_pending_to_load
     shell:
     '''
+    attempts=0
+    while [ -f "!{flag_path}/pangolin_version_mutex.txt" ]; do
+            if [ "$attempts" -gt 10 ]; then
+                exit 1
+            fi
+            sleep 60
+            attempts=$((attempts + 1))
+    done
+    touch !{flag_path}/pangolin_version_mutex.txt;
     touch !{flag_path}/summarize_variants_running.txt;
     use_pending="false"
     if [ -f "!{flag_path}/recall_pangolin_running.txt" ]; then
@@ -148,6 +157,7 @@ process get_pangolin_version {
     fi
     pangolin_version=$(cat !{params.pangolin_version_path})
     pangolin_data_version=$(cat !{params.pangolin_data_version_path})
+    rm !{flag_path}/pangolin_version_mutex.txt;
     '''
     }
 
