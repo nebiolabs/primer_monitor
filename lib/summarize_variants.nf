@@ -74,6 +74,7 @@ process transform_data {
 
     input:
         file ncbi_tsv
+
     output:
         tuple file('*.metadata'), file('*.fasta')
 

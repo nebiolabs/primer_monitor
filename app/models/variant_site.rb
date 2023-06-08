@@ -11,11 +11,11 @@ class VariantSite < ApplicationRecord
     File.readlines(variants_tsv).each do |line|
       next if line.blank?
 
-      strain, ref_pos, variant_type, variant = line.chomp.split("\t")
+      accession, ref_pos, variant_type, variant = line.chomp.split("\t")
       next if variant.nil? # big insertions can push a variant off the end of the genome e.g. USA/VA-SU-SC_65/2021
 
-      fasta_record_id = FastaRecord.existing_fasta_strain_ids[strain]
-      raise "Failed to find fasta record for strain: #{strain}" unless fasta_record_id
+      fasta_record_id = FastaRecord.existing_fasta_accession_ids[accession]
+      raise "Failed to find fasta record for accession: #{accession}" unless fasta_record_id
 
       ref_pos = Integer(ref_pos) - 1 # convert 1-based to 0-based
 
