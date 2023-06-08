@@ -1,6 +1,6 @@
-nextflow.enable.dsl = 1
+nextflow.enable.dsl = 2
 
-ref = params.ref 
+ref = params.ref
 ref = file(ref).toAbsolutePath()
 params.prev_json=
 
@@ -21,22 +21,26 @@ pangolin_data_version = file(params.pangolin_data_version_path).text
 process download_data {
     // Downloads the full dataset
     cpus 16
-    conda "curl xz zstd"
-    errorStrategy 'retry' 
+    penv 'smp'
+    conda "ncbi-datasets-cli unzip zstd"
+    errorStrategy 'retry'
     maxRetries 2
-    publishDir "${output_path}", mode: 'link', pattern: '*.full_json.zst', overwrite: true
+    publishDir "${output_path}", mode: 'link', pattern: '*.zst', overwrite: true
     // mode "link" assumes that the output path is on the same disk as the work directory, switch to copy if not
 
     output:
-        file('*.full_json.zst') into downloaded_data
+        tuple file('*.metadata.zst'), file('*.sequences.zst')
 
     shell:
     '''
     date_today=$(date +%Y-%m-%d)
     source !{primer_monitor_path}/.env
-    curl -u $USER:$PASSWORD $URL > tmp.json.xz
-    xz -d < tmp.json.xz | zstd --long=30 --ultra -22 -T!{task.cpus} > ${date_today}.full_json.zst
-    rm tmp.json.xz
+    datasets download virus genome taxon SARS-CoV-2 --complete-only --host human --filename tmp.zip
+    unzip tmp.zip
+    zstd --long=30 --ultra -22 -T!{task.cpus} ncbi_dataset/data/data_report.jsonl -o ${date_today}.metadata.zst
+    zstd --long=30 --ultra -22 -T!{task.cpus} ncbi_dataset/data/genomic.fna -o ${date_today}.sequences.zst
+    rm tmp.zip
+    rm -rf ncbi_dataset
     '''
 
 }
@@ -44,54 +48,56 @@ process download_data {
 process extract_new_records {
     // Keeps only new records added since previous run
     cpus 1
-    conda "python=3.9 zstd"
+    penv 'smp'
+    conda "python=3.9 zstd seqtk"
 
     input:
-        file(full_json) from downloaded_data
+        tuple file(metadata_json), file(sequences_fasta)
     output:
-        file('*.json') into filtered_data
-
+        file '*.tsv'
 
     shell:
     '''
     date_today=$(date +%Y-%m-%d)
 
-    python3 !{primer_monitor_path}/lib/filter_duplicates.py <(zstd -d --long=30 < !{prev_json}) <(zstd -d --long=30 < !{full_json}) > ${date_today}.json
+    python !{primer_monitor_path}/lib/parse_ncbi.py <(zstd -d --long=30 < !{metadata_json}) <(zstd -d --long=30 < !{prev_json}) <(zstd -d --long=30 < !{sequences_fasta} | seqtk seq | paste - -) ${date_today}.tsv
 
-    find !{output_path} -maxdepth 1 -mtime +5 -type f -name "*.full_json*"  -delete
+    find !{output_path} -maxdepth 1 -mtime +5 -type f -name "*.metadata.zst" -name "*.sequences.zst" -delete
     '''
- 
+
 }
 
 process transform_data {
     cpus 1
-    conda "python=3.9 regex fsspec pandas typing"
+    penv 'smp'
+    conda "gawk"
 
     input:
-        file(gisaid_json) from filtered_data.splitText(file: true, by: 10000)
+        file ncbi_tsv
     output:
-        tuple file('*.metadata'), file('*.fasta') into transformed_data
-        file('*.fasta') into transformed_data_for_pangolin_version
-
+        tuple file('*.metadata'), file('*.fasta')
 
     shell:
     '''
     date_today=$(date +%Y-%m-%d)
 
-    !{ncov_path}/bin/transform-gisaid --output-metadata ${date_today}.metadata --output-fasta ${date_today}.fasta --output-additional-info ${date_today}.info ${date_today}.*.json 
+    # Create an empty FASTA in case there are no new seqs
+    touch ${date_today}.fasta
+    cat !{ncbi_tsv} | gawk -F'\t' -f !{primer_monitor_path}/lib/process_seqs.awk -v cur_date=${date_today}
     '''
 
 }
 
 process align {
     cpus 16
+    penv 'smp'
     conda "minimap2=2.17 sed python=3.9 samtools=1.11"
     publishDir "${output_path}", mode: 'copy', pattern: '*.bam', overwrite: true
 
     input:
-        tuple file(metadata), file(fasta) from transformed_data
+        tuple file(metadata), file(fasta)
     output:
-        tuple file('*.metadata'), file('*.tsv') into metadata_plus_variants
+        tuple file('*.metadata'), file('*.tsv')
 
     shell:
     '''
@@ -110,15 +116,15 @@ process align {
 
 process load_to_db {
     cpus 1
+    penv 'smp'
     publishDir "${output_path}", mode: 'copy'
-    errorStrategy 'retry' 
+    errorStrategy 'retry'
     maxRetries 10
     maxForks 1
     input:
-        tuple file(metadata), file(tsv) from metadata_plus_variants
+        tuple file(metadata), file(tsv)
     output:
-        file('*.complete') into complete_metadata_files
-        file('*.complete') into complete_metadata_files_pangolin
+        file '*.complete'
     shell:
     '''
     RAILS_ENV=production ruby /mnt/bioinfo/prg/primer_monitor/upload.rb \
@@ -132,32 +138,29 @@ process load_to_db {
 process get_pangolin_version {
     cpus 1
 
-    input:
-        file(fasta) from transformed_data_for_pangolin_version
     output:
-        file('*.fasta') into transformed_data_for_pangolin
-        env pangolin_version into pangolin_version_to_call
-        env pangolin_data_version into pangolin_data_version_to_call
-        env use_pending into use_pending_to_load
+        env pangolin_version
+        env pangolin_data_version
+        env use_pending
     shell:
     '''
     attempts=0
-    while [ -f "!{flag_path}/pangolin_version_mutex.txt" ]; do
+    while [ -f "!{flag_path}/pangolin_version_mutex.lock" ]; do
             if [ "$attempts" -gt 10 ]; then
                 exit 1
             fi
             sleep 60
             attempts=$((attempts + 1))
     done
-    touch !{flag_path}/pangolin_version_mutex.txt;
-    touch !{flag_path}/summarize_variants_running.txt;
+    touch !{flag_path}/pangolin_version_mutex.lock;
+    touch !{flag_path}/summarize_variants_running.lock;
     use_pending="false"
-    if [ -f "!{flag_path}/recall_pangolin_running.txt" ]; then
+    if [ -f "!{flag_path}/recall_pangolin_running.lock" ]; then
         use_pending="true"
     fi
     pangolin_version=$(cat !{params.pangolin_version_path})
     pangolin_data_version=$(cat !{params.pangolin_data_version_path})
-    rm !{flag_path}/pangolin_version_mutex.txt;
+    rm !{flag_path}/pangolin_version_mutex.lock;
     '''
     }
 
@@ -165,11 +168,11 @@ process pangolin_calls {
     cpus 8
     conda "pangolin=$pangolin_version pangolin-data=$pangolin_data_version"
     input:
-        val pangolin_version from pangolin_version_to_call
-        val pangolin_data_version from pangolin_data_version_to_call
-        file(fasta) from transformed_data_for_pangolin
+        val pangolin_version
+        val pangolin_data_version
+        file fasta
     output:
-        file("*.csv") into pangolin_lineage_data
+        file "*.csv"
     shell:
     '''
     !{primer_monitor_path}/lib/pangolin_calls/run_pangolin.sh !{fasta} 8
@@ -179,12 +182,12 @@ process pangolin_calls {
 process load_pangolin_data {
     cpus 1
     input:
-        file(csv) from pangolin_lineage_data
-        file(complete) from complete_metadata_files_pangolin
-        val use_pending from use_pending_to_load
+        file csv
+        file complete
+        val use_pending
         //the .complete is only here to make sure this happens *after* the main DB load
     output:
-        file('*.complete_pangolin') into complete_files_pangolin
+        file '*.complete_pangolin'
     shell:
     '''
     field="pangolin_call_id"
@@ -198,13 +201,13 @@ process load_pangolin_data {
 process recalculate_database_views {
     cpus 1
     publishDir "${output_path}", mode: 'copy'
-    errorStrategy 'retry' 
+    errorStrategy 'retry'
     maxRetries 2
     input:
-        file(everything) from complete_metadata_files.collect()
-        file(everything_pangolin) from complete_files_pangolin.collect()
+        file everything
+        file everything_pangolin
     output:
-        file refresh_complete.txt into recalculate_database_views_done
+        file refresh_complete.txt
     shell:
     '''
     # recalculate all the views at the end to save time
@@ -216,12 +219,25 @@ process update_new_calls {
     cpus 1
     penv 'smp'
     input:
-        file all_done from recalculate_database_views_done
+        file all_done
     shell:
     '''
-    if [ ! -f "!{flag_path}/recall_pangolin_running.txt" ]; then
+    if [ ! -f "!{flag_path}/recall_pangolin_running.lock" ]; then
         PGPASSFILE="!{primer_monitor_path}/config/.pgpass" !{primer_monitor_path}/lib/pangolin_calls/swap_calls.sh; touch done.txt;
     fi
-    rm !{flag_path}/summarize_variants_running.txt
+    rm !{flag_path}/summarize_variants_running.lock
     '''
+}
+
+workflow {
+    download_data()
+    extract_new_records(download_data.out)
+    transform_data(extract_new_records.out.splitText(file: true, by: 10000).filter{ it.size()>77 })
+    align(transform_data.out)
+    load_to_db(align.out)
+    get_pangolin_version()
+    pangolin_calls(get_pangolin_version.out[0], get_pangolin_version.out[1], transform_data.out)
+    load_pangolin_data(pangolin_calls.out, load_to_db.out, get_pangolin_version.out[2])
+    recalculate_database_views(load_to_db.out.collect(), load_pangolin_data.out.collect())
+    update_new_calls(recalculate_database_views.out)
 }

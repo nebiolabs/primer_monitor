@@ -4,13 +4,13 @@ ncov_path = '/mnt/home/mcampbell/src/ncov-ingest'
 primer_monitor_path = '/mnt/bioinfo/prg/primer_monitor'
 output_path = '/mnt/hpc_scratch/primer_monitor'
 
-params.conda_path =
 params.pangolin_version_path =
 params.pangolin_data_version_path =
 
 process get_new_versions {
     cpus 1
     penv 'smp'
+    conda '' //It just needs conda itself, not any packages
 
     output:
     env latest_pangolin
@@ -19,22 +19,22 @@ process get_new_versions {
     shell:
     '''
     attempts=0
-    while [ -f "!{flag_path}/pangolin_version_mutex.txt" ]; do
+    while [ -f "!{flag_path}/pangolin_version_mutex.lock" ]; do
             if [ "$attempts" -gt 10 ]; then
                 exit 1
             fi
             sleep 60
             attempts=$((attempts + 1))
     done
-    touch !{flag_path}/pangolin_version_mutex.txt;
-    latest_pangolin=$(!{params.conda_path} search -q -c bioconda pangolin | awk '{ print $2 }' | tail -n 1)
-    latest_pangolin_data=$(!{params.conda_path} search -q -c bioconda pangolin-data | awk '{ print $2 }' | tail -n 1)
+    touch !{flag_path}/pangolin_version_mutex.lock;
+    latest_pangolin=$(conda search -q -c bioconda pangolin | awk '{ print $2 }' | tail -n 1)
+    latest_pangolin_data=$(conda search -q -c bioconda pangolin-data | awk '{ print $2 }' | tail -n 1)
 
     printf "$latest_pangolin" > !{params.pangolin_version_path}
     printf "$latest_pangolin_data" > !{params.pangolin_data_version_path}
 
-    touch !{flag_path}/recall_pangolin_running.txt;
-    rm !{flag_path}/pangolin_version_mutex.txt;
+    touch !{flag_path}/recall_pangolin_running.lock;
+    rm !{flag_path}/pangolin_version_mutex.lock;
     '''
 }
 
@@ -129,10 +129,10 @@ process update_new_calls {
         file all_done
     shell:
     '''
-    if [ ! -f "!{flag_path}/summarize_variants_running.txt" ]; then
+    if [ ! -f "!{flag_path}/summarize_variants_running.lock" ]; then
         PGPASSFILE="!{primer_monitor_path}/config/.pgpass" !{primer_monitor_path}/lib/pangolin_calls/swap_calls.sh; touch done.txt;
     fi
-    rm !{flag_path}/recall_pangolin_running.txt;
+    rm !{flag_path}/recall_pangolin_running.lock;
     '''
 }
 
