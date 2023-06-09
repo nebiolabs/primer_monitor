@@ -192,7 +192,7 @@ process load_pangolin_data {
     shell:
     '''
     field="pangolin_call_id"
-    if [ "$use_pending" = "true" ]; then
+    if [ "!{use_pending}" = "true" ]; then
         field="pending_pangolin_call_id"
     fi
     PGPASSFILE="!{primer_monitor_path}/config/.pgpass" !{primer_monitor_path}/lib/pangolin_calls/update_fasta_records.sh !{csv} $field
