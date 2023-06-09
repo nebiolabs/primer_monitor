@@ -237,7 +237,7 @@ workflow {
     align(transform_data.out)
     load_to_db(align.out)
     get_pangolin_version()
-    pangolin_calls(get_pangolin_version.out[0], get_pangolin_version.out[1], transform_data.out[0])
+    pangolin_calls(get_pangolin_version.out[0], get_pangolin_version.out[1], transform_data.out[1])
     load_pangolin_data(pangolin_calls.out, load_to_db.out, get_pangolin_version.out[2])
     recalculate_database_views(load_to_db.out.collect(), load_pangolin_data.out.collect())
     update_new_calls(recalculate_database_views.out)
