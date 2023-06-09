@@ -208,7 +208,7 @@ process recalculate_database_views {
         file everything
         file everything_pangolin
     output:
-        file refresh_complete.txt
+        file 'refresh_complete.txt'
     shell:
     '''
     # recalculate all the views at the end to save time
