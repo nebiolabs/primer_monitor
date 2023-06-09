@@ -237,8 +237,27 @@ workflow {
     align(transform_data.out)
     load_to_db(align.out)
     get_pangolin_version()
-    pangolin_calls(get_pangolin_version.out[0], get_pangolin_version.out[1], transform_data.out)
+    pangolin_calls(get_pangolin_version.out[0], get_pangolin_version.out[1], transform_data.out[0])
     load_pangolin_data(pangolin_calls.out, load_to_db.out, get_pangolin_version.out[2])
     recalculate_database_views(load_to_db.out.collect(), load_pangolin_data.out.collect())
     update_new_calls(recalculate_database_views.out)
+}
+
+workflow.onError {
+    println "removing lock files..."
+    //get rid of "pipeline running" lock
+    running_lock = file('${flag_path}/summarize_variants_running.lock')
+    running_lock.delete()
+    //get rid of mutex for pangolin version if it exists and is owned by this pipeline
+    mutex = file('${flag_path}/pangolin_version_mutex.lock')
+    String mutex_content = ""
+    if(mutex.exists()) {
+        mutex.withReader {
+             mutex_content = it.getText()
+        }
+        if(mutex_content.equals("summarize_variants"))
+        {
+            mutex.delete()
+        }
+    }
 }

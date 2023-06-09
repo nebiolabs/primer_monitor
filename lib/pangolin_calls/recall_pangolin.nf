@@ -30,6 +30,9 @@ process get_new_versions {
     latest_pangolin=$(conda search -q -c bioconda pangolin | awk '{ print $2 }' | tail -n 1)
     latest_pangolin_data=$(conda search -q -c bioconda pangolin-data | awk '{ print $2 }' | tail -n 1)
 
+    cp !{params.pangolin_version_path} !{params.pangolin_version_path}.old
+    cp !{params.pangolin_data_version_path} !{params.pangolin_data_version_path}.old
+
     printf "$latest_pangolin" > !{params.pangolin_version_path}
     printf "$latest_pangolin_data" > !{params.pangolin_data_version_path}
 
@@ -145,4 +148,34 @@ workflow {
     load_pangolin_data(pangolin_calls.out)
     update_current_calls(load_pangolin_data.out.collect())
     update_new_calls(update_current_calls.out)
+}
+
+workflow.onError {
+    println "removing lock files..."
+    //get rid of "pipeline running" lock
+    running_lock = file('${flag_path}/recall_pangolin_running.lock')
+    running_lock.delete()
+    mutex = file('${flag_path}/pangolin_version_mutex.lock')
+    if(mutex.exists()) {
+        String mutex_content = ""
+        mutex.withReader {
+            mutex_content = it.getText()
+        }
+        if(mutex_content.equals("recall_pangolin"))
+        {
+            pangolin_ver = file("${params.pangolin_version_path}")
+            pangolin_data_ver = file("${params.pangolin_data_version_path}")
+
+            pangolin_ver_old = file("${params.pangolin_version_path}.old")
+            pangolin_data_ver_old = file("${params.pangolin_data_version_path}.old")
+
+            pangolin_ver.delete()
+            pangolin_data_ver.delete()
+
+            pangolin_ver_old.renameTo("${params.pangolin_version_path}")
+            pangolin_data_ver_old.renameTo("${params.pangolin_data_version_path}")
+
+            mutex.delete()
+        }
+    }
 }
