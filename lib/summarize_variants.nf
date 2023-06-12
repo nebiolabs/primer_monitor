@@ -128,6 +128,7 @@ process load_to_db {
         file '*.complete'
     shell:
     '''
+    touch "!{flag_path}/loading_data.lock"
     RAILS_ENV=production ruby /mnt/bioinfo/prg/primer_monitor/upload.rb \
         --skip_view_rebuild \
         --metadata_tsv !{metadata} \
@@ -193,34 +194,35 @@ process load_pangolin_data {
     '''
 }
 
-process recalculate_database_views {
-    cpus 1
-    publishDir "${output_path}", mode: 'copy'
-    errorStrategy 'retry'
-    maxRetries 2
-    input:
-        file everything
-        file everything_pangolin
-    output:
-        file 'refresh_complete.txt'
-    shell:
-    '''
-    # recalculate all the views at the end to save time
-    RAILS_ENV=production ruby /mnt/bioinfo/prg/primer_monitor/upload.rb --skip_data_import && touch refresh_complete.txt
-    '''
-}
-
 process update_new_calls {
     cpus 1
     penv 'smp'
     input:
-        file all_done
+        file everything
+        file everything_pangolin
+    output:
+        file 'done.txt'
     shell:
     '''
     if [ ! -f "!{flag_path}/recall_pangolin_running.lock" ]; then
         PGPASSFILE="!{primer_monitor_path}/config/.pgpass" !{primer_monitor_path}/lib/pangolin_calls/swap_calls.sh; touch done.txt;
     fi
     rm !{flag_path}/summarize_variants_running.lock
+    rm "!{flag_path}/loading_data.lock"
+    '''
+}
+
+process recalculate_database_views {
+    cpus 1
+    publishDir "${output_path}", mode: 'copy'
+    errorStrategy 'retry'
+    maxRetries 2
+    input:
+        file done
+    shell:
+    '''
+    # recalculate all the views at the end to save time
+    RAILS_ENV=production ruby /mnt/bioinfo/prg/primer_monitor/upload.rb --skip_data_import && touch refresh_complete.txt
     '''
 }
 
@@ -233,13 +235,17 @@ workflow {
     get_pangolin_version()
     pangolin_calls(get_pangolin_version.out[0], get_pangolin_version.out[1], transform_data.out)
     load_pangolin_data(pangolin_calls.out, load_to_db.out, get_pangolin_version.out[2])
-    recalculate_database_views(load_to_db.out.collect(), load_pangolin_data.out.collect())
-    update_new_calls(recalculate_database_views.out)
+    update_new_calls(load_to_db.out.collect(), load_pangolin_data.out.collect())
+    recalculate_database_views(update_new_calls.out)
 }
 
 workflow.onError {
     println "removing lock files..."
-    //get rid of "pipeline running" lock
-    running_lock = file('${flag_path}/summarize_variants_running.lock')
-    running_lock.delete()
+    //if it started loading the new seqs, it's not possible to automatically recover
+    if(!(file("${flag_path}/loading_data.lock").exists()))
+    {
+        //get rid of "pipeline running" lock
+        running_lock = file('${flag_path}/summarize_variants_running.lock')
+        running_lock.delete()
+    }
 }

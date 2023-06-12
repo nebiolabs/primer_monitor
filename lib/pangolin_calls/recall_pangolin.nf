@@ -132,6 +132,8 @@ process update_new_calls {
     fi
     rm "!{flag_path}/swapping_calls.lock"
     rm !{flag_path}/recall_pangolin_running.lock;
+    rm !{params.pangolin_version_path}.old
+    rm !{params.pangolin_data_version_path}.old
     '''
 }
 
@@ -148,12 +150,11 @@ workflow {
 
 workflow.onError {
     println "removing lock files..."
-    mutex = file('${flag_path}/pangolin_version_mutex.lock')
-    pangolin_data_ver_old_exists = file("${params.pangolin_data_version_path}.old").exists()
     //if it started swapping the calls, it's not possible to automatically recover
     if(!(file("${flag_path}/swapping_calls.lock").exists()))
     {
-        if(pangolin_data_ver_old_exists)
+        //if we've updated the pangolin version, roll it back
+        if(file("${params.pangolin_data_version_path}.old").exists())
         {
             pangolin_ver = file("${params.pangolin_version_path}")
             pangolin_data_ver = file("${params.pangolin_data_version_path}")
