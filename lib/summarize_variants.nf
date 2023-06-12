@@ -145,23 +145,17 @@ process get_pangolin_version {
         env use_pending
     shell:
     '''
-    attempts=0
-    while [ -f "!{flag_path}/pangolin_version_mutex.lock" ]; do
-            if [ "$attempts" -gt 10 ]; then
-                exit 1
-            fi
-            sleep 60
-            attempts=$((attempts + 1))
-    done
-    touch !{flag_path}/pangolin_version_mutex.lock;
-    touch !{flag_path}/summarize_variants_running.lock;
+    touch !{flag_path}/pangolin_version_mutex.lock
+    exec {lock_fd}>!{flag_path}/pangolin_version_mutex.lock
+    flock $lock_fd
     use_pending="false"
     if [ -f "!{flag_path}/recall_pangolin_running.lock" ]; then
         use_pending="true"
     fi
     pangolin_version=$(cat !{params.pangolin_version_path})
     pangolin_data_version=$(cat !{params.pangolin_data_version_path})
-    rm !{flag_path}/pangolin_version_mutex.lock;
+    exec {lock_fd}>&-
+    rm !{flag_path}/pangolin_version_mutex.lock
     '''
     }
 
@@ -248,16 +242,4 @@ workflow.onError {
     //get rid of "pipeline running" lock
     running_lock = file('${flag_path}/summarize_variants_running.lock')
     running_lock.delete()
-    //get rid of mutex for pangolin version if it exists and is owned by this pipeline
-    mutex = file('${flag_path}/pangolin_version_mutex.lock')
-    String mutex_content = ""
-    if(mutex.exists()) {
-        mutex.withReader {
-             mutex_content = it.getText()
-        }
-        if(mutex_content.equals("summarize_variants"))
-        {
-            mutex.delete()
-        }
-    }
 }

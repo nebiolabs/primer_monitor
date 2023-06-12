@@ -18,26 +18,20 @@ process get_new_versions {
 
     shell:
     '''
-    attempts=0
-    while [ -f "!{flag_path}/pangolin_version_mutex.lock" ]; do
-            if [ "$attempts" -gt 10 ]; then
-                exit 1
-            fi
-            sleep 60
-            attempts=$((attempts + 1))
-    done
-    touch !{flag_path}/pangolin_version_mutex.lock;
-    latest_pangolin=$(conda search -q -c bioconda pangolin | awk '{ print $2 }' | tail -n 1)
-    latest_pangolin_data=$(conda search -q -c bioconda pangolin-data | awk '{ print $2 }' | tail -n 1)
+    touch !{flag_path}/pangolin_version_mutex.lock
+    exec {lock_fd}>!{flag_path}/pangolin_version_mutex.lock
+    flock $lock_fd
+    export latest_pangolin=$(conda search -q -c bioconda pangolin | awk '{ print $2 }' | tail -n 1)
+    export latest_pangolin_data=$(conda search -q -c bioconda pangolin-data | awk '{ print $2 }' | tail -n 1)
 
     cp !{params.pangolin_version_path} !{params.pangolin_version_path}.old
     cp !{params.pangolin_data_version_path} !{params.pangolin_data_version_path}.old
 
     printf "$latest_pangolin" > !{params.pangolin_version_path}
     printf "$latest_pangolin_data" > !{params.pangolin_data_version_path}
-
+    exec {lock_fd}>&-
+    rm !{flag_path}/pangolin_version_mutex.lock
     touch !{flag_path}/recall_pangolin_running.lock;
-    rm !{flag_path}/pangolin_version_mutex.lock;
     '''
 }
 
@@ -121,6 +115,7 @@ process update_current_calls {
         file 'done.txt'
     shell:
     '''
+    touch "!{flag_path}/swapping_calls.lock"
     PGPASSFILE="!{primer_monitor_path}/config/.pgpass" !{primer_monitor_path}/lib/pangolin_calls/swap_calls.sh NOT; touch done.txt;
     '''
 }
@@ -135,6 +130,7 @@ process update_new_calls {
     if [ ! -f "!{flag_path}/summarize_variants_running.lock" ]; then
         PGPASSFILE="!{primer_monitor_path}/config/.pgpass" !{primer_monitor_path}/lib/pangolin_calls/swap_calls.sh; touch done.txt;
     fi
+    rm "!{flag_path}/swapping_calls.lock"
     rm !{flag_path}/recall_pangolin_running.lock;
     '''
 }
@@ -152,16 +148,12 @@ workflow {
 
 workflow.onError {
     println "removing lock files..."
-    //get rid of "pipeline running" lock
-    running_lock = file('${flag_path}/recall_pangolin_running.lock')
-    running_lock.delete()
     mutex = file('${flag_path}/pangolin_version_mutex.lock')
-    if(mutex.exists()) {
-        String mutex_content = ""
-        mutex.withReader {
-            mutex_content = it.getText()
-        }
-        if(mutex_content.equals("recall_pangolin"))
+    pangolin_data_ver_old_exists = file("${params.pangolin_data_version_path}.old").exists()
+    //if it started swapping the calls, it's not possible to automatically recover
+    if(!(file("${flag_path}/swapping_calls.lock").exists()))
+    {
+        if(pangolin_data_ver_old_exists)
         {
             pangolin_ver = file("${params.pangolin_version_path}")
             pangolin_data_ver = file("${params.pangolin_data_version_path}")
@@ -175,7 +167,9 @@ workflow.onError {
             pangolin_ver_old.renameTo("${params.pangolin_version_path}")
             pangolin_data_ver_old.renameTo("${params.pangolin_data_version_path}")
 
-            mutex.delete()
         }
+        //get rid of "pipeline running" lock
+        running_lock = file('${flag_path}/recall_pangolin_running.lock')
+        running_lock.delete()
     }
 }
