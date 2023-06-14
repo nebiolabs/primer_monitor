@@ -5,6 +5,8 @@ if (($# < 1)); then
     exit 1;
 fi
 
+pangolin_csv=$1;
+
 if (($# < 2)); then
     id_field="pangolin_call_id";
 else
@@ -16,7 +18,7 @@ source ../../.env;
 
 
 psql -h "$DB_HOST" -d "$DB_NAME" -U "$DB_USER" >&2 <<CMDS;
-\copy pangolin_calls from '$1' WITH (format csv, header on);
+\copy pangolin_calls from '$pangolin_csv' WITH (format csv, header on);
 UPDATE fasta_records SET fasta_records.$id_field=pangolin_calls.id, WHERE pangolin_calls.taxon=fasta_records.strain AND fasta_records.$id_field IS NULL;
 CMDS
 

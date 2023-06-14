@@ -8,7 +8,6 @@ params.flag_path='/mnt/hpc_scratch/primer_monitor'
 
 prev_json = file(params.prev_json, checkIfExists: true).toAbsolutePath()
 
-ncov_path = '/mnt/home/mcampbell/src/ncov-ingest'
 primer_monitor_path = '/mnt/bioinfo/prg/primer_monitor'
 output_path = '/mnt/hpc_scratch/primer_monitor'
 
@@ -21,7 +20,6 @@ pangolin_data_version = file(params.pangolin_data_version_path).text
 process download_data {
     // Downloads the full dataset
     cpus 16
-    penv 'smp'
     conda "ncbi-datasets-cli unzip zstd"
     errorStrategy 'retry'
     maxRetries 2
@@ -48,7 +46,6 @@ process download_data {
 process extract_new_records {
     // Keeps only new records added since previous run
     cpus 1
-    penv 'smp'
     conda "python=3.9 zstd seqtk"
 
     input:
@@ -69,7 +66,6 @@ process extract_new_records {
 
 process transform_data {
     cpus 1
-    penv 'smp'
     conda "gawk"
 
     input:
@@ -91,7 +87,6 @@ process transform_data {
 
 process align {
     cpus 16
-    penv 'smp'
     conda "minimap2=2.17 sed python=3.9 samtools=1.11"
     publishDir "${output_path}", mode: 'copy', pattern: '*.bam', overwrite: true
 
@@ -117,7 +112,6 @@ process align {
 
 process load_to_db {
     cpus 1
-    penv 'smp'
     publishDir "${output_path}", mode: 'copy'
     errorStrategy 'retry'
     maxRetries 10
@@ -140,13 +134,17 @@ process load_to_db {
 process get_pangolin_version {
     cpus 1
 
+    conda 'bash>=4.1'
+
     output:
         env pangolin_version
         env pangolin_data_version
         env use_pending
     shell:
     '''
+    #! /usr/bin/env bash
     touch !{flag_path}/pangolin_version_mutex.lock
+    # gets a file descriptor for the lock file, opened for writing, and saves its number in $lock_fd
     exec {lock_fd}>!{flag_path}/pangolin_version_mutex.lock
     flock $lock_fd
     use_pending="false"
@@ -155,6 +153,7 @@ process get_pangolin_version {
     fi
     pangolin_version=$(cat !{params.pangolin_version_path})
     pangolin_data_version=$(cat !{params.pangolin_data_version_path})
+    # closes the file descriptor in $lock_fd
     exec {lock_fd}>&-
     rm !{flag_path}/pangolin_version_mutex.lock
     '''
@@ -196,10 +195,9 @@ process load_pangolin_data {
 
 process update_new_calls {
     cpus 1
-    penv 'smp'
     input:
-        file everything
-        file everything_pangolin
+        file seq_load_complete
+        file pangolin_calls_complete
     output:
         file 'done.txt'
     shell:

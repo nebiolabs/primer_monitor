@@ -1,6 +1,5 @@
 nextflow.enable.dsl=2
 
-ncov_path = '/mnt/home/mcampbell/src/ncov-ingest'
 primer_monitor_path = '/mnt/bioinfo/prg/primer_monitor'
 output_path = '/mnt/hpc_scratch/primer_monitor'
 
@@ -10,7 +9,7 @@ params.pangolin_data_version_path =
 process get_new_versions {
     cpus 1
     penv 'smp'
-    conda '' //It just needs conda itself, not any packages
+    conda 'bash>=4.1'
 
     output:
     env latest_pangolin
@@ -18,7 +17,9 @@ process get_new_versions {
 
     shell:
     '''
+    #! /usr/bin/env bash
     touch !{flag_path}/pangolin_version_mutex.lock
+    # gets a file descriptor for the lock file, opened for writing, and saves its number in $lock_fd
     exec {lock_fd}>!{flag_path}/pangolin_version_mutex.lock
     flock $lock_fd
     export latest_pangolin=$(conda search -q -c bioconda pangolin | awk '{ print $2 }' | tail -n 1)
@@ -29,6 +30,7 @@ process get_new_versions {
 
     printf "$latest_pangolin" > !{params.pangolin_version_path}
     printf "$latest_pangolin_data" > !{params.pangolin_data_version_path}
+    # closes the file descriptor in $lock_fd
     exec {lock_fd}>&-
     rm !{flag_path}/pangolin_version_mutex.lock
     touch !{flag_path}/recall_pangolin_running.lock;
