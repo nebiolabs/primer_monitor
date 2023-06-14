@@ -55,8 +55,6 @@ with open(sys.argv[1]) as f:
 # read seqs
 with open(sys.argv[3]) as f:
     with open(sys.argv[4], "w") as g:
-        g.write("accession\tstrain\tdateCollected\tregion\tcountry\tdivision\tdateReleased\tsequence\n")
-
         accession = None
         for line_s in f:
             line = line_s.split("\t")

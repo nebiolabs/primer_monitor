@@ -147,11 +147,15 @@ CREATE TABLE public.fasta_records (
     genbank_accession character varying,
     gisaid_epi_isl character varying,
     date_collected date,
-    created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL,
+    created_at timestamp(6) without time zone,
+    updated_at timestamp(6) without time zone,
     variant_name character varying,
-    detailed_geo_location_id bigint NOT NULL,
-    date_submitted date NOT NULL
+    detailed_geo_location_id bigint,
+    date_submitted date,
+    pangolin_lineage text,
+    pangolin_version text,
+    pangolin_call_id_id bigint,
+    pending_pangolin_call_id_id bigint
 );
 
 
@@ -215,6 +219,8 @@ CREATE VIEW public.date_counts AS
     fr.detailed_geo_location_id,
     fr.date_collected
    FROM public.fasta_records fr
+  WHERE (fr.date_collected > ( SELECT (max(fasta_records.date_collected) - '168 days'::interval)
+           FROM public.fasta_records))
   GROUP BY fr.detailed_geo_location_id, fr.date_collected;
 
 
@@ -414,6 +420,8 @@ CREATE MATERIALIZED VIEW public.time_counts AS
             COALESCE(fasta_records.date_collected, '1900-01-01'::date) AS date_collected
            FROM (public.fasta_records
              JOIN public.detailed_geo_locations ON ((fasta_records.detailed_geo_location_id = detailed_geo_locations.id)))
+          WHERE (fasta_records.date_collected > ( SELECT (max(fasta_records_1.date_collected) - '168 days'::interval)
+                   FROM public.fasta_records fasta_records_1))
           GROUP BY detailed_geo_locations.region, fasta_records.date_collected
         ), region_subregion_time_count AS (
          SELECT count(*) AS region_subregion_time_count,
@@ -422,6 +430,8 @@ CREATE MATERIALIZED VIEW public.time_counts AS
             COALESCE(fasta_records.date_collected, '1900-01-01'::date) AS date_collected
            FROM (public.fasta_records
              JOIN public.detailed_geo_locations ON ((fasta_records.detailed_geo_location_id = detailed_geo_locations.id)))
+          WHERE (fasta_records.date_collected > ( SELECT (max(fasta_records_1.date_collected) - '168 days'::interval)
+                   FROM public.fasta_records fasta_records_1))
           GROUP BY detailed_geo_locations.region, detailed_geo_locations.subregion, fasta_records.date_collected
         ), region_subregion_division_time_count AS (
          SELECT count(*) AS region_subregion_division_time_count,
@@ -431,6 +441,8 @@ CREATE MATERIALIZED VIEW public.time_counts AS
             COALESCE(fasta_records.date_collected, '1900-01-01'::date) AS date_collected
            FROM (public.fasta_records
              JOIN public.detailed_geo_locations ON ((fasta_records.detailed_geo_location_id = detailed_geo_locations.id)))
+          WHERE (fasta_records.date_collected > ( SELECT (max(fasta_records_1.date_collected) - '168 days'::interval)
+                   FROM public.fasta_records fasta_records_1))
           GROUP BY detailed_geo_locations.region, detailed_geo_locations.subregion, detailed_geo_locations.division, fasta_records.date_collected
         ), region_subregion_division_subdivision_time_count AS (
          SELECT count(*) AS region_subregion_division_subdivision_time_count,
@@ -441,6 +453,8 @@ CREATE MATERIALIZED VIEW public.time_counts AS
             COALESCE(fasta_records.date_collected, '1900-01-01'::date) AS date_collected
            FROM (public.fasta_records
              JOIN public.detailed_geo_locations ON ((fasta_records.detailed_geo_location_id = detailed_geo_locations.id)))
+          WHERE (fasta_records.date_collected > ( SELECT (max(fasta_records_1.date_collected) - '168 days'::interval)
+                   FROM public.fasta_records fasta_records_1))
           GROUP BY detailed_geo_locations.region, detailed_geo_locations.subregion, detailed_geo_locations.division, detailed_geo_locations.subdivision, fasta_records.date_collected
         )
  SELECT region_subregion_division_subdivision_time_count.region,
@@ -503,10 +517,11 @@ CREATE MATERIALIZED VIEW public.variant_overlaps AS
     detailed_geo_locations.id AS detailed_geo_location_id,
     COALESCE(fasta_records.date_collected, '1900-01-01'::date) AS date_collected
    FROM ((((public.variant_sites
-     JOIN public.fasta_records ON ((variant_sites.fasta_record_id = fasta_records.id)))
+     JOIN public.fasta_records ON (((variant_sites.fasta_record_id = fasta_records.id) AND (fasta_records.date_collected > ( SELECT (max(fr.date_collected) - '168 days'::interval)
+           FROM public.fasta_records fr)))))
      JOIN public.detailed_geo_locations ON ((fasta_records.detailed_geo_location_id = detailed_geo_locations.id)))
      JOIN public.oligos ON ((NOT ((oligos.ref_start >= variant_sites.ref_end) OR (oligos.ref_end <= variant_sites.ref_start)))))
-     JOIN public.primer_sets ON ((oligos.primer_set_id = primer_sets.id)))
+     JOIN public.primer_sets ON (((oligos.primer_set_id = primer_sets.id) AND (primer_sets.status = 'complete'::public.primer_set_status))))
   WHERE (variant_sites.usable_del_or_snp = true)
 UNION ALL
  SELECT oligos.id AS oligo_id,
@@ -530,10 +545,11 @@ UNION ALL
     detailed_geo_locations.id AS detailed_geo_location_id,
     COALESCE(fasta_records.date_collected, '1900-01-01'::date) AS date_collected
    FROM ((((public.variant_sites
-     JOIN public.fasta_records ON ((variant_sites.fasta_record_id = fasta_records.id)))
+     JOIN public.fasta_records ON (((variant_sites.fasta_record_id = fasta_records.id) AND (fasta_records.date_collected > ( SELECT (max(fr.date_collected) - '168 days'::interval)
+           FROM public.fasta_records fr)))))
      JOIN public.detailed_geo_locations ON ((fasta_records.detailed_geo_location_id = detailed_geo_locations.id)))
      JOIN public.oligos ON (((variant_sites.ref_start > oligos.ref_start) AND (variant_sites.ref_start <= oligos.ref_end))))
-     JOIN public.primer_sets ON ((oligos.primer_set_id = primer_sets.id)))
+     JOIN public.primer_sets ON (((oligos.primer_set_id = primer_sets.id) AND (primer_sets.status = 'complete'::public.primer_set_status))))
   WHERE (variant_sites.usable_insertion = true)
   WITH NO DATA;
 
@@ -700,7 +716,7 @@ CREATE MATERIALIZED VIEW public.identify_primers_for_notifications AS
              JOIN public.users ON ((users.id = primer_set_subscriptions.user_id)))
           WHERE ((oligo_variant_overlaps.date_collected >= (CURRENT_DATE - users.lookback_days)) AND (primer_set_subscriptions.active = true))
           GROUP BY primer_set_subscriptions.user_id, primer_set_subscriptions.primer_set_id, primer_sets.name, oligos.id, oligos.name, join_subscribed_location_to_ids.detailed_geo_location_id, users.lookback_days, users.variant_fraction_threshold, oligo_variant_overlaps.region, oligo_variant_overlaps.subregion, oligo_variant_overlaps.division, oligo_variant_overlaps.subdivision, oligo_variant_overlaps.coords, oligo_variant_overlaps.detailed_geo_location_id
-        ), second_query AS (
+        ), total_sequences_for_denominator AS (
          SELECT fasta_records.detailed_geo_location_id,
             count(fasta_records.id) AS records_count,
             users.lookback_days
@@ -722,13 +738,13 @@ CREATE MATERIALIZED VIEW public.identify_primers_for_notifications AS
     first_query.subdivision,
     first_query.coords,
     first_query.variant_count,
+    total_sequences_for_denominator.records_count,
     first_query.variant_fraction_threshold,
-    second_query.detailed_geo_location_id,
-    second_query.records_count,
-    ((first_query.variant_count)::numeric / (second_query.records_count)::numeric) AS fraction_variant
+    total_sequences_for_denominator.detailed_geo_location_id,
+    ((first_query.variant_count)::numeric / (total_sequences_for_denominator.records_count)::numeric) AS fraction_variant
    FROM (first_query
-     JOIN second_query ON ((second_query.detailed_geo_location_id = first_query.detailed_geo_location_id)))
-  WHERE ((((first_query.variant_count)::numeric / (second_query.records_count)::numeric))::double precision >= first_query.variant_fraction_threshold)
+     JOIN total_sequences_for_denominator ON (((total_sequences_for_denominator.detailed_geo_location_id = first_query.detailed_geo_location_id) AND (total_sequences_for_denominator.lookback_days = first_query.lookback_days))))
+  WHERE ((((first_query.variant_count)::numeric / (total_sequences_for_denominator.records_count)::numeric))::double precision >= first_query.variant_fraction_threshold)
   WITH NO DATA;
 
 
@@ -803,6 +819,26 @@ CREATE VIEW public.join_subscribed_location_to_id AS
 
 
 --
+-- Name: lineages; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.lineages (
+    taxon character varying NOT NULL,
+    lineage character varying NOT NULL,
+    conflict character varying,
+    ambiguity_score real,
+    scorpio_call character varying,
+    scorpio_support numeric,
+    scorpio_conflict numeric,
+    version character varying NOT NULL,
+    pangolin_version date NOT NULL,
+    pango_version character varying NOT NULL,
+    status character varying NOT NULL,
+    note character varying
+);
+
+
+--
 -- Name: oligos_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
@@ -819,6 +855,18 @@ CREATE SEQUENCE public.oligos_id_seq
 --
 
 ALTER SEQUENCE public.oligos_id_seq OWNED BY public.oligos.id;
+
+
+--
+-- Name: oligos_test; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.oligos_test (
+    id integer,
+    ref_start integer,
+    ref_end integer,
+    primer_set_id integer
+);
 
 
 --
@@ -852,6 +900,52 @@ CREATE SEQUENCE public.organisms_id_seq
 --
 
 ALTER SEQUENCE public.organisms_id_seq OWNED BY public.organisms.id;
+
+
+--
+-- Name: pangolin_calls; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.pangolin_calls (
+    id bigint NOT NULL,
+    taxon character varying NOT NULL,
+    lineage character varying NOT NULL,
+    conflict character varying,
+    ambiguity_score double precision,
+    scorpio_call character varying,
+    scorpio_support numeric,
+    scorpio_conflict numeric,
+    scorpio_notes text,
+    version character varying NOT NULL,
+    pangolin_version character varying NOT NULL,
+    scorpio_version character varying NOT NULL,
+    constellation_version character varying NOT NULL,
+    is_designated character varying NOT NULL,
+    qc_status character varying,
+    qc_notes character varying,
+    note character varying,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: pangolin_calls_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.pangolin_calls_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: pangolin_calls_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.pangolin_calls_id_seq OWNED BY public.pangolin_calls.id;
 
 
 --
@@ -1150,6 +1244,13 @@ ALTER TABLE ONLY public.organisms ALTER COLUMN id SET DEFAULT nextval('public.or
 
 
 --
+-- Name: pangolin_calls id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.pangolin_calls ALTER COLUMN id SET DEFAULT nextval('public.pangolin_calls_id_seq'::regclass);
+
+
+--
 -- Name: primer_set_subscriptions id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -1257,7 +1358,7 @@ ALTER TABLE ONLY public.detailed_geo_locations
 --
 
 ALTER TABLE ONLY public.variant_sites
-    ADD CONSTRAINT ensure_variant_unique UNIQUE (ref_start, fasta_record_id);
+    ADD CONSTRAINT ensure_variant_unique UNIQUE (ref_start, fasta_record_id, variant_type);
 
 
 --
@@ -1290,6 +1391,14 @@ ALTER TABLE ONLY public.oligos
 
 ALTER TABLE ONLY public.organisms
     ADD CONSTRAINT organisms_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: pangolin_calls pangolin_calls_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.pangolin_calls
+    ADD CONSTRAINT pangolin_calls_pkey PRIMARY KEY (id);
 
 
 --
@@ -1426,6 +1535,20 @@ CREATE INDEX index_fasta_records_on_created_at ON public.fasta_records USING btr
 --
 
 CREATE INDEX index_fasta_records_on_detailed_geo_location_id ON public.fasta_records USING btree (detailed_geo_location_id);
+
+
+--
+-- Name: index_fasta_records_on_pangolin_call_id_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_fasta_records_on_pangolin_call_id_id ON public.fasta_records USING btree (pangolin_call_id_id);
+
+
+--
+-- Name: index_fasta_records_on_pending_pangolin_call_id_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_fasta_records_on_pending_pangolin_call_id_id ON public.fasta_records USING btree (pending_pangolin_call_id_id);
 
 
 --
@@ -1812,6 +1935,14 @@ ALTER TABLE ONLY public.primer_sets
 
 
 --
+-- Name: fasta_records fk_rails_b603fc708f; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.fasta_records
+    ADD CONSTRAINT fk_rails_b603fc708f FOREIGN KEY (pending_pangolin_call_id_id) REFERENCES public.pangolin_calls(id);
+
+
+--
 -- Name: blast_hits fk_rails_b63d58c7a5; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -1833,6 +1964,14 @@ ALTER TABLE ONLY public.proposed_notifications
 
 ALTER TABLE ONLY public.proposed_notifications
     ADD CONSTRAINT fk_rails_d380313e75 FOREIGN KEY (detailed_geo_location_alias_id) REFERENCES public.detailed_geo_location_aliases(id);
+
+
+--
+-- Name: fasta_records fk_rails_db801c5c92; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.fasta_records
+    ADD CONSTRAINT fk_rails_db801c5c92 FOREIGN KEY (pangolin_call_id_id) REFERENCES public.pangolin_calls(id);
 
 
 --
@@ -1946,6 +2085,10 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20221116101600'),
 ('20221116130745'),
 ('20221116134820'),
-('20221116151610');
+('20221116151610'),
+('20230109180448'),
+('20230127154500'),
+('20230217145345'),
+('20230221144400');
 
 
