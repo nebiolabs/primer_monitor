@@ -196,6 +196,7 @@ process load_pangolin_data {
 process update_new_calls {
     cpus 1
     input:
+        //these files are to make sure all the load_to_db and load_pangolin_data tasks are done first
         file seq_load_complete
         file pangolin_calls_complete
     output:
