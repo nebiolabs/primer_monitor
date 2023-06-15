@@ -54,7 +54,7 @@ process extract_new_records {
     date_yesterday=$(date --date="yesterday" +%Y-%m-%d)
     touch known_empty.json
     python !{primer_monitor_path}/lib/parse_ncbi.py <(zstd -d --long=30 < !{output_path}/${date_yesterday}.metadata.zst) known_empty.json <(zstd -d --long=30 < !{output_path}/${date_yesterday}.sequences.zst | seqtk seq | paste - -) ${date_yesterday}.tsv
-    rm known_empty.zst
+    rm known_empty.json
     '''
 
 }
