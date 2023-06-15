@@ -25,14 +25,6 @@
   </div>
   <div id="navbarBasicExample" class="navbar-menu">
     <div class="navbar-start">
-      <div class="navbar-item column is-narrow is-size-7" style='line-height: 1'>
-        <small>
-          Enabled by data from<br/>
-        </small>
-        <%= link_to 'https://www.gisaid.org/' do %>
-          <%= image_tag 'gisaid.png', alt: 'GISAID logo', height: '20', width: '50' %>
-        <% end %>
-      </div>
 
       <%= link_to 'Primer Variant Summary', root_path, class: 'navbar-item' %>
 
@@ -97,8 +89,7 @@
     <div class="tool-footer-copyright">
       <small>&copy; Copyright 2021 New England Biolabs. All Rights Reserved.</small>
       <br/>
-      <small> GISAID data provided on this website are subject to GISAID’s
-        <%= link_to 'Terms and Conditions', 'https://www.gisaid.org/registration/terms-of-use/' %>
+      <small> SARS-CoV-2 sequences used are available from NCBI GenBank®.
       </small>
     </div>
   </div>

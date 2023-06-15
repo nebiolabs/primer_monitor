@@ -25,6 +25,7 @@ Airbrake.configure do |c|
   c.job_stats           = false
   c.query_stats         = false
   c.performance_stats   = false
+  c.remote_config       = false
 
   # Configures the root directory of your project. Expects a String or a
   # Pathname, which represents the path to your project. Providing this option

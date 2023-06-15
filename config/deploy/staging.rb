@@ -10,17 +10,6 @@ server 'primer-monitor-extdev.neb.com', user: 'deploy', roles: %w{web app db}
 
 set :rails_env, 'production'
 
-# putting in alternate credentials file
-namespace :deploy do
-  namespace :symlink do
-    on roles :app do
-      before :linked_files, :replace_credentials do
-        execute :cp, "-f #{shared_path}/credentials.yml.enc #{release_path}/config/credentials.yml.enc"
-      end
-    end
-  end
-end
-
 
 # role-based syntax
 # ==================
