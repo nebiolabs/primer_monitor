@@ -6,6 +6,8 @@ output_path = '/mnt/hpc_scratch/primer_monitor'
 params.pangolin_version_path =
 params.pangolin_data_version_path =
 
+params.flag_path = '/mnt/hpc_scratch/primer_monitor'
+
 process get_new_versions {
     cpus 1
     penv 'smp'
@@ -18,9 +20,9 @@ process get_new_versions {
     shell:
     '''
     #! /usr/bin/env bash
-    touch !{flag_path}/pangolin_version_mutex.lock
+    touch !{params.flag_path}/pangolin_version_mutex.lock
     # gets a file descriptor for the lock file, opened for writing, and saves its number in $lock_fd
-    exec {lock_fd}>!{flag_path}/pangolin_version_mutex.lock
+    exec {lock_fd}>!{params.flag_path}/pangolin_version_mutex.lock
     flock $lock_fd
     export latest_pangolin=$(conda search -q -c bioconda pangolin | awk '{ print $2 }' | tail -n 1)
     export latest_pangolin_data=$(conda search -q -c bioconda pangolin-data | awk '{ print $2 }' | tail -n 1)
@@ -32,8 +34,8 @@ process get_new_versions {
     printf "$latest_pangolin_data" > !{params.pangolin_data_version_path}
     # closes the file descriptor in $lock_fd
     exec {lock_fd}>&-
-    rm !{flag_path}/pangolin_version_mutex.lock
-    touch !{flag_path}/recall_pangolin_running.lock;
+    rm !{params.flag_path}/pangolin_version_mutex.lock
+    touch !{params.flag_path}/recall_pangolin_running.lock;
     '''
 }
 
@@ -117,7 +119,7 @@ process update_current_calls {
         file 'done.txt'
     shell:
     '''
-    touch "!{flag_path}/swapping_calls.lock"
+    touch "!{params.flag_path}/swapping_calls.lock"
     PGPASSFILE="!{primer_monitor_path}/config/.pgpass" !{primer_monitor_path}/lib/pangolin_calls/swap_calls.sh NOT; touch done.txt;
     '''
 }
@@ -129,11 +131,11 @@ process update_new_calls {
         file all_done
     shell:
     '''
-    if [ ! -f "!{flag_path}/summarize_variants_running.lock" ]; then
+    if [ ! -f "!{params.flag_path}/summarize_variants_running.lock" ]; then
         PGPASSFILE="!{primer_monitor_path}/config/.pgpass" !{primer_monitor_path}/lib/pangolin_calls/swap_calls.sh; touch done.txt;
     fi
-    rm "!{flag_path}/swapping_calls.lock"
-    rm !{flag_path}/recall_pangolin_running.lock;
+    rm "!{params.flag_path}/swapping_calls.lock"
+    rm !{params.flag_path}/recall_pangolin_running.lock;
     rm !{params.pangolin_version_path}.old
     rm !{params.pangolin_data_version_path}.old
     '''
@@ -153,7 +155,7 @@ workflow {
 workflow.onError {
     println "removing lock files..."
     //if it started swapping the calls, it's not possible to automatically recover
-    if(!(file("${flag_path}/swapping_calls.lock").exists()))
+    if(!(file("${params.flag_path}/swapping_calls.lock").exists()))
     {
         //if we've updated the pangolin version, roll it back
         if(file("${params.pangolin_data_version_path}.old").exists())
@@ -172,7 +174,7 @@ workflow.onError {
 
         }
         //get rid of "pipeline running" lock
-        running_lock = file('${flag_path}/recall_pangolin_running.lock')
+        running_lock = file('${params.flag_path}/recall_pangolin_running.lock')
         running_lock.delete()
     }
 }

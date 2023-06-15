@@ -1,0 +1,92 @@
+digraph "dag2023060551263985" {
+p0 [label="download_data"];
+p1 [label="extract_new_records"];
+p0 -> p1 [label="downloaded_data"];
+
+p1 [label="extract_new_records"];
+p2 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="splitText"];
+p1 -> p2 [label="filtered_data"];
+
+p2 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="splitText"];
+p3 [label="transform_data"];
+p2 -> p3;
+
+p3 [label="transform_data"];
+p4 [label="align"];
+p3 -> p4 [label="transformed_data"];
+
+p4 [label="align"];
+p5 [label="load_to_db"];
+p4 -> p5 [label="metadata_plus_variants"];
+
+p5 [label="load_to_db"];
+p9 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
+p5 -> p9 [label="complete_metadata_files"];
+
+p5 [label="load_to_db"];
+p8 [label="load_pangolin_data"];
+p5 -> p8 [label="complete_metadata_files"];
+
+p6 [label="get_pangolin_version"];
+p7 [label="pangolin_calls"];
+p6 -> p7 [label="transformed_data"];
+
+p3 -> p7 [label="transformed_data"];
+
+p7 [label="pangolin_calls"];
+p8 [label="load_pangolin_data"];
+p7 -> p8 [label="pangolin_lineage_data"];
+
+p6 [label="get_pangolin_version"];
+p8 [label="load_pangolin_data"];
+p6 -> p8 [label="use_pending"];
+
+p8 [label="load_pangolin_data"];
+p10 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
+p8 -> p10 [label="complete_files_pangolin"];
+
+p9 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
+p11 [label="update_new_calls"];
+p9 -> p11;
+
+p10 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
+p11 [label="update_new_calls"];
+p10 -> p11;
+
+p11 [label="update_new_calls"];
+p12 [label="recalculate_database_views"];
+p11 -> p12 [label="done"];
+
+p0b [label="get_new_versions"];
+p4b [label="pangolin_calls"];
+p0b -> p4b [label="latest_pangolin"];
+
+p1b [label="extract_new_records"];
+p2b [shape=circle,label="",fixedsize=true,width=0.1,xlabel="splitText"];
+p1b -> p2b;
+
+p2b [shape=circle,label="",fixedsize=true,width=0.1,xlabel="splitText"];
+p3b [label="transform_data"];
+p2b -> p3b;
+
+p3b [label="transform_data"];
+p4b [label="pangolin_calls"];
+p3b -> p4b;
+
+p4b [label="pangolin_calls"];
+p5b [label="load_pangolin_data"];
+p4b -> p5b;
+
+p5b [label="load_pangolin_data"];
+p6b [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
+p5b -> p6b;
+
+p6b [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
+p7b [label="update_current_calls"];
+p6b -> p7b;
+
+p7b [label="update_current_calls"];
+p8b [label="update_new_calls"];
+p7b -> p8b;
+
+}

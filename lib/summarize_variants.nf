@@ -122,7 +122,7 @@ process load_to_db {
         file '*.complete'
     shell:
     '''
-    touch "!{flag_path}/loading_data.lock"
+    touch "!{params.flag_path}/loading_data.lock"
     RAILS_ENV=production ruby /mnt/bioinfo/prg/primer_monitor/upload.rb \
         --skip_view_rebuild \
         --metadata_tsv !{metadata} \
@@ -143,19 +143,19 @@ process get_pangolin_version {
     shell:
     '''
     #! /usr/bin/env bash
-    touch !{flag_path}/pangolin_version_mutex.lock
+    touch !{params.flag_path}/pangolin_version_mutex.lock
     # gets a file descriptor for the lock file, opened for writing, and saves its number in $lock_fd
-    exec {lock_fd}>!{flag_path}/pangolin_version_mutex.lock
+    exec {lock_fd}>!{params.flag_path}/pangolin_version_mutex.lock
     flock $lock_fd
     use_pending="false"
-    if [ -f "!{flag_path}/recall_pangolin_running.lock" ]; then
+    if [ -f "!{params.flag_path}/recall_pangolin_running.lock" ]; then
         use_pending="true"
     fi
     pangolin_version=$(cat !{params.pangolin_version_path})
     pangolin_data_version=$(cat !{params.pangolin_data_version_path})
     # closes the file descriptor in $lock_fd
     exec {lock_fd}>&-
-    rm !{flag_path}/pangolin_version_mutex.lock
+    rm !{params.flag_path}/pangolin_version_mutex.lock
     '''
     }
 
@@ -203,11 +203,11 @@ process update_new_calls {
         file 'done.txt'
     shell:
     '''
-    if [ ! -f "!{flag_path}/recall_pangolin_running.lock" ]; then
+    if [ ! -f "!{params.flag_path}/recall_pangolin_running.lock" ]; then
         PGPASSFILE="!{primer_monitor_path}/config/.pgpass" !{primer_monitor_path}/lib/pangolin_calls/swap_calls.sh; touch done.txt;
     fi
-    rm !{flag_path}/summarize_variants_running.lock
-    rm "!{flag_path}/loading_data.lock"
+    rm !{params.flag_path}/summarize_variants_running.lock
+    rm "!{params.flag_path}/loading_data.lock"
     '''
 }
 
@@ -241,10 +241,10 @@ workflow {
 workflow.onError {
     println "removing lock files..."
     //if it started loading the new seqs, it's not possible to automatically recover
-    if(!(file("${flag_path}/loading_data.lock").exists()))
+    if(!(file("${params.flag_path}/loading_data.lock").exists()))
     {
         //get rid of "pipeline running" lock
-        running_lock = file('${flag_path}/summarize_variants_running.lock')
+        running_lock = file('${params.flag_path}/summarize_variants_running.lock')
         running_lock.delete()
     }
 }
