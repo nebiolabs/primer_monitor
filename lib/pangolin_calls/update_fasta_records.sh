@@ -13,7 +13,8 @@ else
     id_field=$2;
 fi
 
-source ../../.env;
+# ensure this is relative to the script's location
+source "$(dirname "$0")/../../.env";
 
 
 
