@@ -84,7 +84,7 @@ process transform_data {
 process pangolin_calls {
     cpus 8
     penv 'smp'
-    conda "pangolin=$pangolin_version pangolin-data=$pangolin_data_version"
+    conda "pangolin==$pangolin_version pangolin-data==$pangolin_data_version"
     input:
         val pangolin_version
         val pangolin_data_version
@@ -100,6 +100,9 @@ process pangolin_calls {
 process load_pangolin_data {
     cpus 1
     penv 'smp'
+
+    conda 'postgresql>=15'
+
     input:
         file csv
     output:
@@ -113,6 +116,9 @@ process load_pangolin_data {
 process update_current_calls {
     cpus 1
     penv 'smp'
+
+    conda 'postgresql>=15'
+
     input:
         file everything
     output:
@@ -127,6 +133,9 @@ process update_current_calls {
 process update_new_calls {
     cpus 1
     penv 'smp'
+
+    conda 'postgresql>=15'
+
     input:
         file all_done
     shell:
