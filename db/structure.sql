@@ -61,6 +61,7 @@ CREATE FUNCTION public.init_dates_for_pangolin_calls() RETURNS trigger
         BEGIN
           NEW.created_at := NOW();
           NEW.updated_at := NOW();
+          RETURN NEW;
         END;
       $$;
 
@@ -74,6 +75,7 @@ CREATE FUNCTION public.update_date_for_pangolin_calls() RETURNS trigger
     AS $$
         BEGIN
           NEW.updated_at := NOW();
+          RETURN NEW;
         END;
       $$;
 
@@ -2153,6 +2155,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20230217145345'),
 ('20230221144400'),
 ('20230622143230'),
-('20230622154910');
+('20230622154910'),
+('20230622161730');
 
 
