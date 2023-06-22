@@ -37,6 +37,47 @@ CREATE TYPE public.primer_set_status AS ENUM (
 );
 
 
+--
+-- Name: add_dates(); Type: FUNCTION; Schema: public; Owner: -
+--
+
+CREATE FUNCTION public.add_dates() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+        BEGIN
+          NEW.created_at := NOW();
+          NEW.updated_at := NOW();
+        END;
+      $$;
+
+
+--
+-- Name: init_dates_for_pangolin_calls(); Type: FUNCTION; Schema: public; Owner: -
+--
+
+CREATE FUNCTION public.init_dates_for_pangolin_calls() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+        BEGIN
+          NEW.created_at := NOW();
+          NEW.updated_at := NOW();
+        END;
+      $$;
+
+
+--
+-- Name: update_date_for_pangolin_calls(); Type: FUNCTION; Schema: public; Owner: -
+--
+
+CREATE FUNCTION public.update_date_for_pangolin_calls() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+        BEGIN
+          NEW.updated_at := NOW();
+        END;
+      $$;
+
+
 SET default_tablespace = '';
 
 SET default_table_access_method = heap;
@@ -1783,6 +1824,27 @@ CREATE INDEX variant_sites_usable_insertion_idx ON public.variant_sites USING bt
 
 
 --
+-- Name: pangolin_calls add_dates; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER add_dates BEFORE INSERT ON public.pangolin_calls FOR EACH ROW EXECUTE FUNCTION public.add_dates();
+
+
+--
+-- Name: pangolin_calls init_dates; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER init_dates BEFORE INSERT ON public.pangolin_calls FOR EACH ROW EXECUTE FUNCTION public.init_dates_for_pangolin_calls();
+
+
+--
+-- Name: pangolin_calls update_date; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER update_date BEFORE UPDATE ON public.pangolin_calls FOR EACH ROW EXECUTE FUNCTION public.update_date_for_pangolin_calls();
+
+
+--
 -- Name: proposed_notifications fk_rails_03fe9a3c07; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -2089,6 +2151,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20230109180448'),
 ('20230127154500'),
 ('20230217145345'),
-('20230221144400');
+('20230221144400'),
+('20230622143230');
 
 
