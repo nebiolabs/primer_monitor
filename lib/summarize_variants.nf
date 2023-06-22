@@ -118,6 +118,9 @@ process load_to_db {
     errorStrategy 'retry'
     maxRetries 10
     maxForks 1
+
+    conda 'postgresql>=15'
+
     input:
         tuple file(metadata), file(tsv)
     output:
@@ -163,7 +166,7 @@ process get_pangolin_version {
 
 process pangolin_calls {
     cpus 8
-    conda "pangolin=$pangolin_version pangolin-data=$pangolin_data_version"
+    conda "pangolin==$pangolin_version pangolin-data==$pangolin_data_version"
     input:
         val pangolin_version
         val pangolin_data_version
@@ -178,6 +181,9 @@ process pangolin_calls {
 
 process load_pangolin_data {
     cpus 1
+
+    conda 'postgresql>=15'
+
     input:
         file csv
         file complete
@@ -197,6 +203,9 @@ process load_pangolin_data {
 
 process update_new_calls {
     cpus 1
+
+    conda 'postgresql>=15'
+
     input:
         //these files are to make sure all the load_to_db and load_pangolin_data tasks are done first
         file seq_load_complete
