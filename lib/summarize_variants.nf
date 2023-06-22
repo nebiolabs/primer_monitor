@@ -276,5 +276,4 @@ workflow.onError {
         running_lock = file('${params.flag_path}/summarize_variants_running.lock')
         running_lock.delete()
     }
->>>>>>> master
 }
