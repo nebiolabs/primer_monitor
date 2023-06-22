@@ -195,8 +195,8 @@ CREATE TABLE public.fasta_records (
     date_submitted date,
     pangolin_lineage text,
     pangolin_version text,
-    pangolin_call_id_id bigint,
-    pending_pangolin_call_id_id bigint
+    pangolin_call_id bigint,
+    pending_pangolin_call_id bigint
 );
 
 
@@ -1579,17 +1579,17 @@ CREATE INDEX index_fasta_records_on_detailed_geo_location_id ON public.fasta_rec
 
 
 --
--- Name: index_fasta_records_on_pangolin_call_id_id; Type: INDEX; Schema: public; Owner: -
+-- Name: index_fasta_records_on_pangolin_call_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_fasta_records_on_pangolin_call_id_id ON public.fasta_records USING btree (pangolin_call_id_id);
+CREATE INDEX index_fasta_records_on_pangolin_call_id ON public.fasta_records USING btree (pangolin_call_id);
 
 
 --
--- Name: index_fasta_records_on_pending_pangolin_call_id_id; Type: INDEX; Schema: public; Owner: -
+-- Name: index_fasta_records_on_pending_pangolin_call_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_fasta_records_on_pending_pangolin_call_id_id ON public.fasta_records USING btree (pending_pangolin_call_id_id);
+CREATE INDEX index_fasta_records_on_pending_pangolin_call_id ON public.fasta_records USING btree (pending_pangolin_call_id);
 
 
 --
@@ -2001,7 +2001,7 @@ ALTER TABLE ONLY public.primer_sets
 --
 
 ALTER TABLE ONLY public.fasta_records
-    ADD CONSTRAINT fk_rails_b603fc708f FOREIGN KEY (pending_pangolin_call_id_id) REFERENCES public.pangolin_calls(id);
+    ADD CONSTRAINT fk_rails_b603fc708f FOREIGN KEY (pending_pangolin_call_id) REFERENCES public.pangolin_calls(id);
 
 
 --
@@ -2033,7 +2033,7 @@ ALTER TABLE ONLY public.proposed_notifications
 --
 
 ALTER TABLE ONLY public.fasta_records
-    ADD CONSTRAINT fk_rails_db801c5c92 FOREIGN KEY (pangolin_call_id_id) REFERENCES public.pangolin_calls(id);
+    ADD CONSTRAINT fk_rails_db801c5c92 FOREIGN KEY (pangolin_call_id) REFERENCES public.pangolin_calls(id);
 
 
 --
@@ -2152,6 +2152,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20230127154500'),
 ('20230217145345'),
 ('20230221144400'),
-('20230622143230');
+('20230622143230'),
+('20230622154910');
 
 
