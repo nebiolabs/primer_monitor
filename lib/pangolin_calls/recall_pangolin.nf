@@ -126,7 +126,7 @@ process update_current_calls {
     shell:
     '''
     touch "!{params.flag_path}/swapping_calls.lock"
-    PGPASSFILE="!{primer_monitor_path}/config/.pgpass" !{primer_monitor_path}/lib/pangolin_calls/swap_calls.sh NOT; touch done.txt;
+    PGPASSFILE="!{primer_monitor_path}/config/.pgpass" !{primer_monitor_path}/lib/pangolin_calls/swap_current_calls.sh; touch done.txt;
     '''
 }
 
@@ -141,7 +141,7 @@ process update_new_calls {
     shell:
     '''
     if [ ! -f "!{params.flag_path}/summarize_variants_running.lock" ]; then
-        PGPASSFILE="!{primer_monitor_path}/config/.pgpass" !{primer_monitor_path}/lib/pangolin_calls/swap_calls.sh; touch done.txt;
+        PGPASSFILE="!{primer_monitor_path}/config/.pgpass" !{primer_monitor_path}/lib/pangolin_calls/swap_new_calls.sh; touch done.txt;
     fi
     rm "!{params.flag_path}/swapping_calls.lock"
     rm !{params.flag_path}/recall_pangolin_running.lock;
