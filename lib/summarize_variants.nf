@@ -146,9 +146,9 @@ process get_pangolin_version {
     shell:
     '''
     #! /usr/bin/env bash
-    touch !{params.flag_path}/pangolin_version_mutex.lock
+    touch "!{params.flag_path}/pangolin_version_mutex.lock"
     # gets a file descriptor for the lock file, opened for writing, and saves its number in $lock_fd
-    exec {lock_fd}>!{params.flag_path}/pangolin_version_mutex.lock
+    exec {lock_fd}>"!{params.flag_path}/pangolin_version_mutex.lock"
     flock $lock_fd
     use_pending="false"
     if [ -f "!{params.flag_path}/recall_pangolin_running.lock" ]; then
@@ -158,7 +158,8 @@ process get_pangolin_version {
     pangolin_data_version=$(cat !{params.pangolin_data_version_path})
     # closes the file descriptor in $lock_fd
     exec {lock_fd}>&-
-    rm !{params.flag_path}/pangolin_version_mutex.lock
+    rm "!{params.flag_path}/pangolin_version_mutex.lock"
+    touch "!{params.flag_path}/summarize_variants_running.lock"
     '''
     }
 
