@@ -11,7 +11,7 @@ params.flag_path = '/mnt/hpc_scratch/primer_monitor'
 process get_new_versions {
     cpus 1
     penv 'smp'
-    conda 'bash>=4.1'
+    conda "'bash>=4.1'"
 
     output:
     env latest_pangolin
@@ -101,7 +101,7 @@ process load_pangolin_data {
     cpus 1
     penv 'smp'
 
-    conda 'postgresql>=15'
+    conda "'postgresql>=15'"
 
     input:
         file csv
@@ -117,7 +117,7 @@ process update_current_calls {
     cpus 1
     penv 'smp'
 
-    conda 'postgresql>=15'
+    conda "'postgresql>=15'"
 
     input:
         file everything
@@ -134,7 +134,7 @@ process update_new_calls {
     cpus 1
     penv 'smp'
 
-    conda 'postgresql>=15'
+    conda "'postgresql>=15'"
 
     input:
         file all_done

@@ -137,7 +137,7 @@ process load_to_db {
 process get_pangolin_version {
     cpus 1
 
-    conda 'bash>=4.1'
+    conda "'bash>=4.1'"
 
     output:
         env pangolin_version
@@ -180,7 +180,7 @@ process pangolin_calls {
 process load_pangolin_data {
     cpus 1
 
-    conda 'postgresql>=15'
+    conda "'postgresql>=15'"
 
     input:
         file csv
@@ -202,7 +202,7 @@ process load_pangolin_data {
 process update_new_calls {
     cpus 1
 
-    conda 'postgresql>=15'
+    conda "'postgresql>=15'"
 
     input:
         //these files are to make sure all the load_to_db and load_pangolin_data tasks are done first
