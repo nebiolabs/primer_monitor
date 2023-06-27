@@ -37,6 +37,49 @@ CREATE TYPE public.primer_set_status AS ENUM (
 );
 
 
+--
+-- Name: add_dates(); Type: FUNCTION; Schema: public; Owner: -
+--
+
+CREATE FUNCTION public.add_dates() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+        BEGIN
+          NEW.created_at := NOW();
+          NEW.updated_at := NOW();
+        END;
+      $$;
+
+
+--
+-- Name: init_dates_for_pangolin_calls(); Type: FUNCTION; Schema: public; Owner: -
+--
+
+CREATE FUNCTION public.init_dates_for_pangolin_calls() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+        BEGIN
+          NEW.created_at := NOW();
+          NEW.updated_at := NOW();
+          RETURN NEW;
+        END;
+      $$;
+
+
+--
+-- Name: update_date_for_pangolin_calls(); Type: FUNCTION; Schema: public; Owner: -
+--
+
+CREATE FUNCTION public.update_date_for_pangolin_calls() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+        BEGIN
+          NEW.updated_at := NOW();
+          RETURN NEW;
+        END;
+      $$;
+
+
 SET default_tablespace = '';
 
 SET default_table_access_method = heap;
@@ -154,8 +197,8 @@ CREATE TABLE public.fasta_records (
     date_submitted date,
     pangolin_lineage text,
     pangolin_version text,
-    pangolin_call_id_id bigint,
-    pending_pangolin_call_id_id bigint
+    pangolin_call_id bigint,
+    pending_pangolin_call_id bigint
 );
 
 
@@ -1538,17 +1581,17 @@ CREATE INDEX index_fasta_records_on_detailed_geo_location_id ON public.fasta_rec
 
 
 --
--- Name: index_fasta_records_on_pangolin_call_id_id; Type: INDEX; Schema: public; Owner: -
+-- Name: index_fasta_records_on_pangolin_call_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_fasta_records_on_pangolin_call_id_id ON public.fasta_records USING btree (pangolin_call_id_id);
+CREATE INDEX index_fasta_records_on_pangolin_call_id ON public.fasta_records USING btree (pangolin_call_id);
 
 
 --
--- Name: index_fasta_records_on_pending_pangolin_call_id_id; Type: INDEX; Schema: public; Owner: -
+-- Name: index_fasta_records_on_pending_pangolin_call_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_fasta_records_on_pending_pangolin_call_id_id ON public.fasta_records USING btree (pending_pangolin_call_id_id);
+CREATE INDEX index_fasta_records_on_pending_pangolin_call_id ON public.fasta_records USING btree (pending_pangolin_call_id);
 
 
 --
@@ -1783,6 +1826,27 @@ CREATE INDEX variant_sites_usable_insertion_idx ON public.variant_sites USING bt
 
 
 --
+-- Name: pangolin_calls add_dates; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER add_dates BEFORE INSERT ON public.pangolin_calls FOR EACH ROW EXECUTE FUNCTION public.add_dates();
+
+
+--
+-- Name: pangolin_calls init_dates; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER init_dates BEFORE INSERT ON public.pangolin_calls FOR EACH ROW EXECUTE FUNCTION public.init_dates_for_pangolin_calls();
+
+
+--
+-- Name: pangolin_calls update_date; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER update_date BEFORE UPDATE ON public.pangolin_calls FOR EACH ROW EXECUTE FUNCTION public.update_date_for_pangolin_calls();
+
+
+--
 -- Name: proposed_notifications fk_rails_03fe9a3c07; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -1939,7 +2003,7 @@ ALTER TABLE ONLY public.primer_sets
 --
 
 ALTER TABLE ONLY public.fasta_records
-    ADD CONSTRAINT fk_rails_b603fc708f FOREIGN KEY (pending_pangolin_call_id_id) REFERENCES public.pangolin_calls(id);
+    ADD CONSTRAINT fk_rails_b603fc708f FOREIGN KEY (pending_pangolin_call_id) REFERENCES public.pangolin_calls(id);
 
 
 --
@@ -1971,7 +2035,7 @@ ALTER TABLE ONLY public.proposed_notifications
 --
 
 ALTER TABLE ONLY public.fasta_records
-    ADD CONSTRAINT fk_rails_db801c5c92 FOREIGN KEY (pangolin_call_id_id) REFERENCES public.pangolin_calls(id);
+    ADD CONSTRAINT fk_rails_db801c5c92 FOREIGN KEY (pangolin_call_id) REFERENCES public.pangolin_calls(id);
 
 
 --
@@ -2089,6 +2153,9 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20230109180448'),
 ('20230127154500'),
 ('20230217145345'),
-('20230221144400');
+('20230221144400'),
+('20230622143230'),
+('20230622154910'),
+('20230622161730');
 
 

@@ -139,7 +139,7 @@ process load_to_db {
 process get_pangolin_version {
     cpus 1
 
-    conda 'bash>=4.1'
+    conda "'bash>=4.1'"
 
     output:
         env pangolin_version
@@ -148,9 +148,9 @@ process get_pangolin_version {
     shell:
     '''
     #! /usr/bin/env bash
-    touch !{params.flag_path}/pangolin_version_mutex.lock
+    touch "!{params.flag_path}/pangolin_version_mutex.lock"
     # gets a file descriptor for the lock file, opened for writing, and saves its number in $lock_fd
-    exec {lock_fd}>!{params.flag_path}/pangolin_version_mutex.lock
+    exec {lock_fd}>"!{params.flag_path}/pangolin_version_mutex.lock"
     flock $lock_fd
     use_pending="false"
     if [ -f "!{params.flag_path}/recall_pangolin_running.lock" ]; then
@@ -160,7 +160,8 @@ process get_pangolin_version {
     pangolin_data_version=$(cat !{params.pangolin_data_version_path})
     # closes the file descriptor in $lock_fd
     exec {lock_fd}>&-
-    rm !{params.flag_path}/pangolin_version_mutex.lock
+    rm "!{params.flag_path}/pangolin_version_mutex.lock"
+    touch "!{params.flag_path}/summarize_variants_running.lock"
     '''
     }
 
@@ -182,7 +183,7 @@ process pangolin_calls {
 process load_pangolin_data {
     cpus 1
 
-    conda 'postgresql>=15'
+    conda "'postgresql>=15'"
 
     input:
         file csv
@@ -204,7 +205,7 @@ process load_pangolin_data {
 process update_new_calls {
     cpus 1
 
-    conda 'postgresql>=15'
+    conda "'postgresql>=15'"
 
     input:
         //these files are to make sure all the load_to_db and load_pangolin_data tasks are done first
@@ -215,7 +216,7 @@ process update_new_calls {
     shell:
     '''
     if [ ! -f "!{params.flag_path}/recall_pangolin_running.lock" ]; then
-        PGPASSFILE="!{primer_monitor_path}/config/.pgpass" !{primer_monitor_path}/lib/pangolin_calls/swap_calls.sh; touch done.txt;
+        PGPASSFILE="!{primer_monitor_path}/config/.pgpass" !{primer_monitor_path}/lib/pangolin_calls/swap_new_calls.sh; touch done.txt;
     fi
     rm !{params.flag_path}/summarize_variants_running.lock
     rm "!{params.flag_path}/loading_data.lock"

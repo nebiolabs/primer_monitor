@@ -11,7 +11,7 @@ params.flag_path = '/mnt/hpc_scratch/primer_monitor'
 process get_new_versions {
     cpus 1
     penv 'smp'
-    conda 'bash>=4.1'
+    conda "'bash>=4.1'"
 
     output:
     env latest_pangolin
@@ -20,22 +20,22 @@ process get_new_versions {
     shell:
     '''
     #! /usr/bin/env bash
-    touch !{params.flag_path}/pangolin_version_mutex.lock
+    touch "!{params.flag_path}/pangolin_version_mutex.lock"
     # gets a file descriptor for the lock file, opened for writing, and saves its number in $lock_fd
-    exec {lock_fd}>!{params.flag_path}/pangolin_version_mutex.lock
+    exec {lock_fd}>"!{params.flag_path}/pangolin_version_mutex.lock"
     flock $lock_fd
     export latest_pangolin=$(conda search -q -c bioconda pangolin | awk '{ print $2 }' | tail -n 1)
     export latest_pangolin_data=$(conda search -q -c bioconda pangolin-data | awk '{ print $2 }' | tail -n 1)
 
-    cp !{params.pangolin_version_path} !{params.pangolin_version_path}.old
-    cp !{params.pangolin_data_version_path} !{params.pangolin_data_version_path}.old
+    cp "!{params.pangolin_version_path}" "!{params.pangolin_version_path}.old"
+    cp "!{params.pangolin_data_version_path}" "!{params.pangolin_data_version_path}.old"
 
-    printf "$latest_pangolin" > !{params.pangolin_version_path}
-    printf "$latest_pangolin_data" > !{params.pangolin_data_version_path}
+    printf "$latest_pangolin" > "!{params.pangolin_version_path}"
+    printf "$latest_pangolin_data" > "!{params.pangolin_data_version_path}"
     # closes the file descriptor in $lock_fd
     exec {lock_fd}>&-
-    rm !{params.flag_path}/pangolin_version_mutex.lock
-    touch !{params.flag_path}/recall_pangolin_running.lock;
+    rm "!{params.flag_path}/pangolin_version_mutex.lock"
+    touch "!{params.flag_path}/recall_pangolin_running.lock";
     '''
 }
 
@@ -101,7 +101,7 @@ process load_pangolin_data {
     cpus 1
     penv 'smp'
 
-    conda 'postgresql>=15'
+    conda "'postgresql>=15'"
 
     input:
         file csv
@@ -117,7 +117,7 @@ process update_current_calls {
     cpus 1
     penv 'smp'
 
-    conda 'postgresql>=15'
+    conda "'postgresql>=15'"
 
     input:
         file everything
@@ -126,7 +126,7 @@ process update_current_calls {
     shell:
     '''
     touch "!{params.flag_path}/swapping_calls.lock"
-    PGPASSFILE="!{primer_monitor_path}/config/.pgpass" !{primer_monitor_path}/lib/pangolin_calls/swap_calls.sh NOT; touch done.txt;
+    PGPASSFILE="!{primer_monitor_path}/config/.pgpass" !{primer_monitor_path}/lib/pangolin_calls/swap_current_calls.sh; touch done.txt;
     '''
 }
 
@@ -134,19 +134,19 @@ process update_new_calls {
     cpus 1
     penv 'smp'
 
-    conda 'postgresql>=15'
+    conda "'postgresql>=15'"
 
     input:
         file all_done
     shell:
     '''
     if [ ! -f "!{params.flag_path}/summarize_variants_running.lock" ]; then
-        PGPASSFILE="!{primer_monitor_path}/config/.pgpass" !{primer_monitor_path}/lib/pangolin_calls/swap_calls.sh; touch done.txt;
+        PGPASSFILE="!{primer_monitor_path}/config/.pgpass" !{primer_monitor_path}/lib/pangolin_calls/swap_new_calls.sh; touch done.txt;
     fi
     rm "!{params.flag_path}/swapping_calls.lock"
-    rm !{params.flag_path}/recall_pangolin_running.lock;
-    rm !{params.pangolin_version_path}.old
-    rm !{params.pangolin_data_version_path}.old
+    rm "!{params.flag_path}/recall_pangolin_running.lock"
+    rm "!{params.pangolin_version_path}.old"
+    rm "!{params.pangolin_data_version_path}.old"
     '''
 }
 
