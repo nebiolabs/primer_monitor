@@ -10,10 +10,17 @@ def get_relevant_aliases(search_string, aliases):
     for alias in aliases.keys():
         search_split = search_string.split(".")
         alias_split = alias.split(".")
-        min_len = min(len(search_split), len(alias_split))
+        search_len = len(search_split)
+        alias_len = len(alias_split)
+        min_len = min(search_len, alias_len)
         if alias_split[:min_len] == search_split[:min_len]:
+            extra_segment = ""
+            # if search string is more specific than alias
+            if search_len > alias_len:
+                # add the extra specificity onto the alias
+                extra_segment = ".".join([""]+search_split[alias_len:search_len])
             for child in aliases[alias]:
-                relevant_aliases += get_relevant_aliases(child, aliases)
+                relevant_aliases += get_relevant_aliases(child+extra_segment, aliases)
     return relevant_aliases
 
 
