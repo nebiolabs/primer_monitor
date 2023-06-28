@@ -45,7 +45,19 @@ for alias in aliases_data:
 
 relevant_aliases = get_relevant_aliases(search_alias, reversed_aliases)
 
+relevant_aliases_for_search = []
+
 for relevant in relevant_aliases:
-        print(relevant)
+    relevant_aliases_for_search.append(relevant+".") # adding trailing "." so e.g. "A" doesn't match "AY"
+
+with open(sys.argv[2]) as lineages_file:
+    for line in lineages_file:
+        line = line.strip()
+        search_str = line+"." # adding trailing "." for same reason as above
+        for alias in relevant_aliases_for_search:
+            if search_str.startswith(alias):
+                print(line)
+                break # break out of the inner loop and go to the next line
+
 
 
