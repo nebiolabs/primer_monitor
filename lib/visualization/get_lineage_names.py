@@ -10,7 +10,8 @@ def get_relevant_aliases(search_string, aliases):
     for alias in aliases.keys():
         search_split = search_string.split(".")
         alias_split = alias.split(".")
-        if alias_split[:min(len(search_split), len(alias_split))] == search_split:
+        min_len = min(len(search_split), len(alias_split))
+        if alias_split[:min_len] == search_split[:min_len]:
             for child in aliases[alias]:
                 relevant_aliases += get_relevant_aliases(child, aliases)
     return relevant_aliases
