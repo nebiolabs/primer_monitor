@@ -53,10 +53,11 @@ interesting_lineages = get_lineages(alias_str, lineages_file, starting_lineages,
 
 lineage_groups = {}
 
+print("{")
 for lineage in interesting_lineages:
     lineages = get_lineage_names.process_aliases(alias_str, lineages_file, lineage)[0]
     with open(output_path+"/"+lineage+".txt", "w") as f:
         f.write(lineages)
-    print(lineage)
-
+    print('"'+lineage+'*": "'+lineage+'",')
+print("}")
 
