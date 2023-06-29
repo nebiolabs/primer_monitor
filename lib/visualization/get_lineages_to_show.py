@@ -3,6 +3,7 @@
 
 import get_lineage_names
 import sys
+import json
 
 # gets all sublineages for a given lineage listed in the lineages file
 def get_sublineages(result, base):
@@ -46,9 +47,16 @@ starting_lineages = sys.argv[1].split(",")
 alias_str = sys.stdin.read()
 lineages_file = sys.argv[2]
 cutoff = int(sys.argv[3])
+output_path = sys.argv[4]
 
 interesting_lineages = get_lineages(alias_str, lineages_file, starting_lineages, cutoff)
 
+lineage_groups = {}
+
 for lineage in interesting_lineages:
+    lineages = get_lineage_names.process_aliases(alias_str, lineages_file, lineage)[0]
+    with open(output_path+"/"+lineage+".txt", "w") as f:
+        f.write(lineages)
     print(lineage)
+
 
