@@ -7,9 +7,9 @@ BEGIN {
         ARGV[1] = "" # skip this "file"
     }
 
-    strainsfile = ARGV[2]
+    strainsfile = ARGV[2] # this argument is a file to write to, not read from
     ARGV[2] = "-" # read data from stdin
-    ARGC = 3
+    ARGC = 3 # adjust argument count to account for removed argument
 }
 
 FILENAME == ARGV[1] && all != 1 { #lineages data to read

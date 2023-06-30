@@ -2,12 +2,13 @@
 
 variants_bed="$1";
 min_pct="$2";
-threads="$3";
-lineage_set="$4";
+lineage_set="$3";
 
-./filter_variants.awk "$lineage_set" < "$variants_bed" "$$_strains.txt" > "$$_filtered_variants.bed"
+strains_file="$$_strains.txt"
 
-sequence_count=$(wc -l "$$_strains.txt" | sed -E "s/^\s*//" | cut -f 1 -d" "); #get just the line count and no leading spaces or file name
+./filter_variants.awk "$lineage_set" < "$variants_bed" "$strains_file" > "$$_filtered_variants.bed"
+
+sequence_count=$(wc -l "$strains_file" | sed -E "s/^\s*//" | cut -f 1 -d" "); #get just the line count and no leading spaces or file name
 
 # this basically does int(sequence_count*(min_pct/100)) to use min_pct as a percent
 scaled_min_count=$(bc <<CALC
