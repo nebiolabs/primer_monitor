@@ -1,12 +1,19 @@
 #!/usr/bin/env bash
 
+# counts occurrences of variants
+
 variants_bed="$1";
 min_pct="$2";
 lineage_set="$3";
+output_path="$4";
 
 strains_file="$$_strains.txt"
 
 ./filter_variants.awk "$lineage_set" < "$variants_bed" "$strains_file" > "$$_filtered_variants.bed"
+
+lineage_name=$(basename "$lineage_set" | sed -E "s/\.txt$//");
+mkdir -p "$output_path/lineage_variants"
+cp "$$_filtered_variants.bed" "$output_path/lineage_variants/$lineage_name.bed"
 
 sequence_count=$(wc -l "$strains_file" | sed -E "s/^\s*//" | cut -f 1 -d" "); #get just the line count and no leading spaces or file name
 

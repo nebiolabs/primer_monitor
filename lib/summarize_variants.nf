@@ -10,7 +10,7 @@ prev_json = file(params.prev_json, checkIfExists: true).toAbsolutePath()
 
 primer_monitor_path = '/mnt/bioinfo/prg/primer_monitor'
 output_path = '/mnt/hpc_scratch/primer_monitor'
-igvstatic_path = '/var/www/igvstatic/primer_sets'
+igvstatic_path = '/var/www/igvstatic'
 primers_data_path = '/mnt/hpc_scratch/primer_monitor/visualization_data'
 
 params.pangolin_version_path =
@@ -247,10 +247,14 @@ process recompute_affected_primers {
     maxRetries 2
     input:
         file complete
+        file "${organism_dirname}/lineage_variants"
+        file "${organism_dirname}/primer_sets"
     shell:
     '''
-    # recalculate all the views at the end to save time
-    ls !{primers_data_path}/lineage_lists/* | xargs !{primer_monitor_path}/lib/visualization/process_primer_sets_with_lineages.sh - "./primer_sets" !{freq_cutoff} !{score_cutoff} "!{primers_data_path}/primer_set_paths.txt"
+    # recompute the primer data for igvjs visualization
+    ls !{primers_data_path}/primer_sets_raw > primer_set_paths.txt
+    ls !{igvstatic_path}/lineage_sets/* | xargs !{primer_monitor_path}/lib/visualization/process_primer_sets_with_lineages.sh - "./!{organism_dirname}" !{freq_cutoff} !{score_cutoff} primer_set_paths.txt
+    rm primer_set_paths.txt
     '''
 }
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# gets BED file of variants, no lineage filtering
+# gets BED file of variants from DB, no lineage filtering
 
 if (($# < 1)); then
     echo "usage: extract_all_variants.sh <date cutoff>" >&2;

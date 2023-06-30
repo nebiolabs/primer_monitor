@@ -2,7 +2,6 @@
 
 # entry point
 
-
 cutoff_date="$1";
 output_path="$2";
 min_pct="$3";
@@ -12,6 +11,8 @@ primer_sets_dir_path="$6";
 threads="$7"
 
 echo "$(date +'%b %d %H:%M:%S') - script started"
+
+mkdir -p "$output_path"
 
 if [[ $cutoff_date == '-' ]]; then # default of 180 days
   cutoff_date="$(date -d "180 days ago" +"%Y-%m-%d")"
@@ -27,7 +28,7 @@ shift 7;
 for lineage_set_path in "$@"; do
   lineage_set_name=$(basename "$lineage_set_path" | sed -E "s/\.txt$//")
   echo "$(date +'%b %d %H:%M:%S') - processing lineage set $lineage_set_path"
-  ./count_variants.sh "$variants_bed" "$min_pct" "$lineage_set_path" > "$variants_counts_bed";
+  ./count_variants.sh "$variants_bed" "$min_pct" "$lineage_set_path" "$output_path" > "$variants_counts_bed";
   xargs ./process_primer_sets.sh "$variants_counts_bed" "$output_path" "$score_cutoff" "$threads" "$lineage_set_name" "$primer_sets_dir_path" < "$primer_sets_list_path";
 done
 echo "$(date +'%b %d %H:%M:%S') - script done"
