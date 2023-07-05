@@ -16,6 +16,8 @@ primers_data_path = '/mnt/hpc_scratch/primer_monitor/visualization_data'
 params.pangolin_version_path =
 params.pangolin_data_version_path =
 
+organism_dirname = "2697049"
+
 pangolin_version = file(params.pangolin_version_path).text
 pangolin_data_version = file(params.pangolin_data_version_path).text
 
@@ -252,8 +254,8 @@ process recompute_affected_primers {
     shell:
     '''
     # recompute the primer data for igvjs visualization
-    ls !{primers_data_path}/primer_sets_raw > primer_set_paths.txt
-    ls !{igvstatic_path}/lineage_sets/* | xargs !{primer_monitor_path}/lib/visualization/process_primer_sets_with_lineages.sh - "./!{organism_dirname}" !{freq_cutoff} !{score_cutoff} primer_set_paths.txt
+    ls !{igvstatic_path}/!{organism_dirname}/primer_sets_raw > primer_set_paths.txt
+    ls !{igvstatic_path}/!{organism_dirname}/lineage_sets/* | xargs !{primer_monitor_path}/lib/visualization/process_primer_sets_with_lineages.sh - "./!{organism_dirname}" !{freq_cutoff} !{score_cutoff} primer_set_paths.txt
     rm primer_set_paths.txt
     '''
 }
