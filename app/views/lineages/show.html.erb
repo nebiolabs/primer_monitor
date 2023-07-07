@@ -16,33 +16,3 @@
 <% last_seen = seqs_by_date_submitted.first.date_submitted %>
 
 <p><span class="bold-text">Last submitted to NCBI on:</span> <%= last_seen %> (last collected <%= last_seen_collected.nil? ? 'N/A' : last_seen_collected %>)</p>
-
-<!--<div class="tile">
-    <strong>NCBI Taxonomy ID:</strong>
-    </%= link_to @organism.ncbi_taxon_id, "https://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?id=#{@organism.ncbi_taxon_id}" %>
-</div>
-
-<hr/>
-<h2 class="title">Primer Sets:</h2>
-
-<table>
-  <thead>
-  <tr>
-    <th data-priority="1">Primer Set</th>
-    <th>Oligos</th>
-    <th data-priority="2">Subscribed?</th>
-  </tr>
-  </thead>
-
-  <tbody>
-  </% @organism.primer_sets.accessible_by(Ability.new(current_user)).each do |primer_set| %>
-    <tr>
-      <td></%= link_to primer_set.name, primer_set %></td>
-      <td></%= primer_set.oligos.join(", ") %></td>
-      <td>
-        </%= render '/primer_sets/primer_set_subscription', user: current_user, primer_set: primer_set, primer_set_subscription: @subscriptions[primer_set.id] %>
-      </td>
-    </tr>
-  </% end %>
-  </tbody>
-</table>-->
