@@ -3,7 +3,7 @@
 <h3 class="title">Overview:</h3>
 
 <p><span class="bold-text">Sequences seen:</span> <%= @lineage.fasta_records.count %></p>
-
+<br>
 <% seqs_by_date_collected = @lineage.fasta_records.order(date_collected: :desc) %>
 <% seqs_by_date_submitted = @lineage.fasta_records.order(date_submitted: :desc) %>
 
@@ -16,3 +16,5 @@
 <% last_seen = seqs_by_date_submitted.first.date_submitted %>
 
 <p><span class="bold-text">Last submitted to NCBI on:</span> <%= last_seen.strftime("%Y-%m-%d") %> (last collected <%= last_seen_collected.nil? ? 'N/A' : last_seen_collected.strftime("%Y-%m-%d") %>)</p>
+<br>
+<p><span class="bold-text">More data on outbreak.info:</span> <a href="https://outbreak.info/situation-reports/<%= @lineage.name %>">https://outbreak.info/situation-reports/<%= @lineage.name %></a></p>
