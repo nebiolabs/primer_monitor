@@ -4,6 +4,7 @@ require 'set'
 
 class PangolinCall < ApplicationRecord
   belongs_to :lineage
+  has_one :fasta_record
 
   def self.parse(pangolin_csv)
     raise "Unable to find calls file #{pangolin_csv}" unless File.exist?(pangolin_csv)

@@ -2,6 +2,7 @@
 
 class FastaRecord < ApplicationRecord
   belongs_to :detailed_geo_location
+  belongs_to :pangolin_call, foreign_key: :pangolin_call_id, optional: true
 
   def self.parse(metadata_tsv)
     raise "Unable to find counts file #{metadata_tsv}" unless File.exist?(metadata_tsv)
@@ -71,4 +72,5 @@ class FastaRecord < ApplicationRecord
 
     dg_id
   end
+
 end

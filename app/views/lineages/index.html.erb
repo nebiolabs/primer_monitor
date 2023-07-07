@@ -1,17 +1,22 @@
 
-<h1>Lineages for <% @organism.full_name %></h1>
+<h1>Lineages for <% @organism.name %></h1>
 
 <table>
   <thead>
     <tr>
       <th>Name</th>
+      <th>Last Seen</th>
+      <th>Times Seen</th>
     </tr>
   </thead>
 
   <tbody>
     <% @lineages.each do |lineage| %>
       <tr>
-        <td><%= lineage.full_name %></td>
+        <td><%= lineage.name %></td>
+        <% last_seen = lineage.fasta_records.order(date_submitted: :desc).first.date_submitted %>
+        <td><%= last_seen.nil? ? 'Unknown' : last_seen %></td>
+        <td><%= lineage.fasta_records.count %></td>
       </tr>
     <% end %>
   </tbody>

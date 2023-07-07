@@ -16,6 +16,7 @@ Rails.application.routes.draw do
   get 'history', to: 'history#show'
   get 'lineage_variants', to: 'lineage_variants#index'
   resources :organisms
+  resources :lineages
   resources :oligos
   resources :primer_sets
   resources :users

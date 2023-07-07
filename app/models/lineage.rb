@@ -2,6 +2,8 @@
 
 class Lineage < ApplicationRecord
   belongs_to :organism
+  has_many :pangolin_calls
+  has_many :fasta_records, through: :pangolin_calls
 
   def self.parse(pangolin_csv)
     raise "Unable to find calls file #{pangolin_csv}" unless File.exist?(pangolin_csv)
@@ -30,4 +32,5 @@ class Lineage < ApplicationRecord
 
     new_lineages
   end
+
 end

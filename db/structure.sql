@@ -1869,13 +1869,6 @@ CREATE INDEX variant_sites_usable_insertion_idx ON public.variant_sites USING bt
 
 
 --
--- Name: pangolin_calls add_dates; Type: TRIGGER; Schema: public; Owner: -
---
-
-CREATE TRIGGER add_dates BEFORE INSERT ON public.pangolin_calls FOR EACH ROW EXECUTE FUNCTION public.add_dates();
-
-
---
 -- Name: pangolin_calls init_dates; Type: TRIGGER; Schema: public; Owner: -
 --
 
