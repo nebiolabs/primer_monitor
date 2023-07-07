@@ -9,7 +9,9 @@ output_path="$4";
 
 strains_file="$$_strains.txt"
 
-./filter_variants.awk "$lineage_set" < "$variants_bed" "$strains_file" > "$$_filtered_variants.bed"
+echo "\"$(dirname "$0")/filter_variants.awk\" \"$lineage_set\" < \"$variants_bed\" \"$(pwd)/$strains_file\" > \"$$_filtered_variants.bed\"" >&2
+"$(dirname "$0")/filter_variants.awk" "$lineage_set" < "$variants_bed" "$(pwd)/$strains_file" > "$$_filtered_variants.bed"
+
 
 lineage_name=$(basename "$lineage_set" | sed -E "s/\.txt$//");
 mkdir -p "$output_path/lineage_variants"

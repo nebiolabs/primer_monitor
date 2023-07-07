@@ -9,7 +9,7 @@ no_intersects_bed="$6";
 
 bedtools intersect -wa -wb -a "$primer_bed" -b "$variants_counts_bed" | sort --parallel="$threads" > "$$_raw_intersects.bed"
 
-python classify_overlaps.py "$$_raw_intersects.bed" "$intersects_bed" "$score_cutoff";
+python3 "$(dirname "$0")/classify_overlaps.py" "$$_raw_intersects.bed" "$intersects_bed" "$score_cutoff";
 
 bedtools subtract -a "$primer_bed" -b "$intersects_bed" > "$no_intersects_bed";
 

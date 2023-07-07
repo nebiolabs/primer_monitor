@@ -22,8 +22,11 @@ def define_options
   Slop.parse(ARGV.map(&:strip)) do |o|
     o.string '--metadata_tsv', 'TSV file containing metadata information'
     o.string '--variants_tsv', 'TSV file containing variants information'
-    o.bool '--skip_data_import', 'Performs the data import steps', default: false
-    o.bool '--skip_view_rebuild', 'Rebuilds materialized views', default: false
+    o.string '--pangolin_csv', 'CSV file containing pangolin calls'
+    o.string '--pending', 'Save calls as pending', default: false
+    o.bool '--import_calls', 'Performs pangolin data import', default: false
+    o.bool '--import_seqs', 'Performs sequence/variant data import', default: false
+    o.bool '--rebuild_views', 'Rebuilds materialized views', default: false
 
     # The available log levels are: :debug, :info, :warn, :error, and
     # :fatal, corresponding to the log level numbers from 0 up to 4
@@ -53,12 +56,12 @@ end
 def import_metadata(metadata_file)
   return unless metadata_file
 
-  @log.debug("starting import: #{metadata_file}: ")
+  @log.info("starting import: #{metadata_file}: ")
 
   fasta_records = FastaRecord.parse(metadata_file)
   result = FastaRecord.import(fasta_records, validate: false, on_duplicate_key_ignore: true)
-  result.failed_instances.each { |rec| @log.error("Failed to insert #{rec}") }
-  @log.debug("Loaded #{result.ids.size}/#{fasta_records.size} new fasta records")
+  result.failed_instances.each { |rec| @log.error("Failed to insert \"#{rec}\"") }
+  @log.info("Loaded #{result.ids.size}/#{fasta_records.size} new fasta records")
 end
 
 def import_variants(variants_file)
@@ -77,17 +80,38 @@ def create_new_notifications!
   ProposedNotification.import(new_proposed_notifications, validate: false)
 end
 
+def import_pangolin(pangolin_csv, pending)
+  return unless pangolin_csv
+
+  @log.info("starting import: #{pangolin_csv}: ")
+
+  lineages = Lineage.parse(pangolin_csv)
+  result_lineages = Lineage.import(lineages)
+  result_lineages.failed_instances.each { |rec| @log.error("Failed to insert lineage \"#{rec}\"") }
+  @log.info("Loaded #{result_lineages.ids.size}/#{lineages.size} new lineages")
+
+
+  calls = PangolinCall.parse(pangolin_csv)
+  result_calls = PangolinCall.import(calls, validate: false)
+  result_calls.failed_instances.each { |rec| @log.error("Failed to insert pangolin call \"#{rec}\"") }
+  @log.info("Loaded #{result_calls.size}/#{calls.size} new pangolin calls")
+
+  PangolinCall.update_fasta_recs pending
+end
+
 def main
   opts = parse_options
   @log.level = Logger.const_get(opts[:verbose])
 
   setup_db_connection
   ActiveRecord::Base.transaction do
-    unless opts[:skip_data_import]
+
+    if opts[:import_seqs]
       import_metadata(opts[:metadata_tsv])
       import_variants(opts[:variants_tsv])
     end
-    unless opts[:skip_view_rebuild]
+    import_pangolin(opts[:pangolin_csv], opts[:pending]) if opts[:import_calls]
+    if opts[:rebuild_views]
       %w[variant_overlaps counts time_counts oligo_variant_overlaps
          identify_primers_for_notifications initial_score].each do |view|
         ActiveRecord::Base.connection.execute("REFRESH MATERIALIZED VIEW #{view}")

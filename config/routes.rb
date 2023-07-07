@@ -14,7 +14,7 @@ Rails.application.routes.draw do
   get 'help', to: 'help#show'
   get 'about', to: 'about#show'
   get 'history', to: 'history#show'
-  get 'lineages', to: 'lineages#index'
+  get 'lineage_variants', to: 'lineage_variants#index'
   resources :organisms
   resources :oligos
   resources :primer_sets

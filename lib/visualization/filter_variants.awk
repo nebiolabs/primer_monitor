@@ -12,7 +12,7 @@ BEGIN {
     ARGC = 3 # adjust argument count to account for removed argument
 }
 
-FILENAME == ARGV[1] && all != 1 { #lineages data to read
+FILENAME == ARGV[1] && all != 1 { #lineage_variants data to read
     lineages[$0] = 1
 }
 

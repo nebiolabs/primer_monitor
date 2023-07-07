@@ -6,12 +6,20 @@ params.prev_json=
 
 params.flag_path='/mnt/hpc_scratch/primer_monitor'
 
+params.freq_cutoff = 0.1
+freq_cutoff = params.freq_cutoff
+
+params.score_cutoff = 50
+score_cutoff = params.score_cutoff
+
 prev_json = file(params.prev_json, checkIfExists: true).toAbsolutePath()
 
-primer_monitor_path = '/mnt/bioinfo/prg/primer_monitor'
-output_path = '/mnt/hpc_scratch/primer_monitor'
-igvstatic_path = '/var/www/igvstatic'
-primers_data_path = '/mnt/hpc_scratch/primer_monitor/visualization_data'
+params.primer_monitor_path = '/mnt/bioinfo/prg/primer_monitor'
+primer_monitor_path = params.primer_monitor_path
+params.output_path = '/mnt/hpc_scratch/primer_monitor'
+output_path = params.output_path
+params.igvstatic_path = '/var/www/igvstatic'
+igvstatic_path = params.igvstatic_path
 
 params.pangolin_version_path =
 params.pangolin_data_version_path =
@@ -130,8 +138,8 @@ process load_to_db {
     shell:
     '''
     touch "!{params.flag_path}/loading_data.lock"
-    RAILS_ENV=production ruby /mnt/bioinfo/prg/primer_monitor/upload.rb \
-        --skip_view_rebuild \
+    RAILS_ENV=production ruby !{primer_monitor_path}/upload.rb \
+        --import_seqs \
         --metadata_tsv !{metadata} \
         --variants_tsv !{tsv} \
         && mv !{metadata} !{metadata}.complete
@@ -196,11 +204,11 @@ process load_pangolin_data {
         file '*.complete_pangolin'
     shell:
     '''
-    field="pangolin_call_id"
-    if [ "!{use_pending}" = "true" ]; then
-        field="pending_pangolin_call_id"
-    fi
-    PGPASSFILE="!{primer_monitor_path}/config/.pgpass" !{primer_monitor_path}/lib/pangolin_calls/update_fasta_records.sh !{csv} $field
+    RAILS_ENV=production ruby !{primer_monitor_path}/upload.rb \
+            --import_calls \
+            --pangolin_csv !{csv} \
+            --pending !{use_pending} \
+            && mv !{csv} !{csv}.complete_pangolin
     '''
 }
 
@@ -237,25 +245,29 @@ process recalculate_database_views {
     shell:
     '''
     # recalculate all the views at the end to save time
-    RAILS_ENV=production ruby /mnt/bioinfo/prg/primer_monitor/upload.rb --skip_data_import && touch refresh_complete.txt
+    RAILS_ENV=production ruby !{primer_monitor_path}/upload.rb --rebuild_views && touch refresh_complete.txt
     '''
 }
 
 
 process recompute_affected_primers {
-    cpus 1
+    cpus 8
     publishDir "${igvstatic_path}", mode: 'copy'
     errorStrategy 'retry'
     maxRetries 2
     input:
         file complete
+    output:
         file "${organism_dirname}/lineage_variants"
         file "${organism_dirname}/primer_sets"
     shell:
     '''
     # recompute the primer data for igvjs visualization
+    source !{primer_monitor_path}/.env
+    echo $DB_NAME
     ls !{igvstatic_path}/!{organism_dirname}/primer_sets_raw > primer_set_paths.txt
-    ls !{igvstatic_path}/!{organism_dirname}/lineage_sets/* | xargs !{primer_monitor_path}/lib/visualization/process_primer_sets_with_lineages.sh - "./!{organism_dirname}" !{freq_cutoff} !{score_cutoff} primer_set_paths.txt
+    cat <(printf "{") <(ls !{igvstatic_path}/!{organism_dirname}/lineage_sets | sed -E 's/^(.*)\\.txt$/"\\1": "\\1.*",/') <(echo '"all": "All"}') > !{igvstatic_path}/!{organism_dirname}/misc/lineage_sets.json
+    ls !{igvstatic_path}/!{organism_dirname}/lineage_sets | xargs !{primer_monitor_path}/lib/visualization/process_primer_sets_with_lineages.sh - "./!{organism_dirname}" !{freq_cutoff} !{score_cutoff} primer_set_paths.txt "!{igvstatic_path}/!{organism_dirname}" 8
     rm primer_set_paths.txt
     '''
 }
@@ -271,7 +283,7 @@ workflow {
     load_pangolin_data(pangolin_calls.out, load_to_db.out, get_pangolin_version.out[2])
     update_new_calls(load_to_db.out.collect(), load_pangolin_data.out.collect())
     recalculate_database_views(update_new_calls.out)
-    recompute_affected_primers(recompute_affected_primers.out)
+    recompute_affected_primers(recalculate_database_views.out)
 }
 
 workflow.onError {

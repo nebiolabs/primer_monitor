@@ -35,7 +35,7 @@ class FastaRecord < ApplicationRecord
     division = nil if division.blank?
     return if existing_fasta_accession_ids.key?(accession)
 
-    ActiveRecord::Base.logger.info("New fasta record: #{accession}")
+    ActiveRecord::Base.logger.info("New fasta record: \"#{accession}\"")
     # ensure that higher level locations also exist so users can select these for subscriptions
     find_or_create_dg_id(region, nil, nil, nil)
     find_or_create_dg_id(region, country, nil, nil)
