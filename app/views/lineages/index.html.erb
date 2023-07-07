@@ -13,7 +13,7 @@
   <tbody>
     <% @lineages.each do |lineage| %>
       <tr>
-        <td><%= lineage.name %></td>
+        <td><a href="<%= lineage_url(lineage) %>"><%= lineage.name %></a></td>
         <% last_seen = lineage.fasta_records.order(date_submitted: :desc).first.date_submitted %>
         <td><%= last_seen.nil? ? 'Unknown' : last_seen %></td>
         <td><%= lineage.fasta_records.count %></td>

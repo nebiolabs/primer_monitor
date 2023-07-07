@@ -10,5 +10,6 @@ class LineagesController < ApplicationController
 
   def show
     authorize! :show, LineagesController
+    @lineage = Lineage.find_by(id: params[:id])
   end
 end
