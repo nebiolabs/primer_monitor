@@ -10,9 +10,9 @@
 <% first_seen_collected = seqs_by_date_collected.last.date_collected %>
 <% first_seen = seqs_by_date_submitted.last.date_submitted %>
 
-<p><span class="bold-text">First submitted to NCBI on:</span> <%= first_seen %> (first collected <%= first_seen_collected.nil? ? 'N/A' : first_seen_collected %>)</p>
+<p><span class="bold-text">First submitted to NCBI on:</span> <%= first_seen.strftime("%Y-%m-%d") %> (first collected <%= first_seen_collected.nil? ? 'N/A' : first_seen_collected.strftime("%Y-%m-%d") %>)</p>
 
 <% last_seen_collected = seqs_by_date_collected.first.date_collected %>
 <% last_seen = seqs_by_date_submitted.first.date_submitted %>
 
-<p><span class="bold-text">Last submitted to NCBI on:</span> <%= last_seen %> (last collected <%= last_seen_collected.nil? ? 'N/A' : last_seen_collected %>)</p>
+<p><span class="bold-text">Last submitted to NCBI on:</span> <%= last_seen.strftime("%Y-%m-%d") %> (last collected <%= last_seen_collected.nil? ? 'N/A' : last_seen_collected.strftime("%Y-%m-%d") %>)</p>
