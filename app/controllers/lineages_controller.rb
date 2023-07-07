@@ -4,7 +4,7 @@ class LineagesController < ApplicationController
 
   def index
     authorize! :index, LineagesController
-    @organism = Organism.find_by(ncbi_taxon_id: 2697049)
+    @organism = Organism.find_by(ncbi_taxon_id: 2_697_049)
     @lineages = Lineage.where(organism_id: @organism.id)
   end
 
