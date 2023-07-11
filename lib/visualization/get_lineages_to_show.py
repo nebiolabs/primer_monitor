@@ -12,8 +12,20 @@ def passes_filter(lineage, total, cutoff, lineage_data):
         # no recorded lineages, fail
         return False
 
-    timediff = (today-lineage_data[lineage]['median_date']).days
-    return total > cutoff*(timediff/90)
+    # increase cutoff for long-lasting lineages so they don't overwhelm new ones
+    time_range = (((lineage_data[lineage]['last_seen']-lineage_data[lineage]['first_seen']).days)/90)
+    base_cutoff = cutoff*max(time_range, 1)
+
+
+    time_diff_median = (today-lineage_data[lineage]['median_date']).days
+    time_diff_newest = (today-lineage_data[lineage]['last_seen']).days
+
+    old_adjustment = 1
+    # massive score penalty for really old lineages to get rid of stuff like B.1.*
+    if (time_diff_newest > 90 and time_diff_median > 180) or time_diff_median > 360:
+        old_adjustment = 100+(max(time_diff_newest-90, 0))
+
+    return total > base_cutoff*((time_diff_newest/30)+(time_diff_median/90))*old_adjustment
 
 # gets all sublineages for a given lineage listed in the lineages file
 def get_sublineages(result, base):
