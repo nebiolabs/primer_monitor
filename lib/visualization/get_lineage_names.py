@@ -6,6 +6,8 @@
 import json
 import sys
 import re
+import statistics
+import datetime
 
 def get_relevant_aliases(search_string, aliases):
     relevant_aliases = [search_string]
@@ -55,25 +57,40 @@ def process_aliases(alias_str, lineage_filename, search_string):
     for relevant in relevant_aliases:
         relevant_aliases_for_search.append(relevant+".") # adding trailing "." so e.g. "A" doesn't match "AY"
 
+    lineage_data = [[], [], [], []]
     with open(lineage_filename) as lineages_file:
         has_counts = False
-        total_counts = 0
+        has_dates = False
         for line_s in lineages_file:
             if "," in line_s:
-                # if the file has a second column, assuming that is counts
-                has_counts = True
+                # if the file has a second column
                 line = line_s.split(",")
+                #print(line)
+                #print(len(line))
+                if len(line) >= 2:
+                    has_counts = True
+                if len(line) >= 5:
+                    has_dates = True
             else:
                 # make this a 1-element list so the rest of the code can stay the same
                 line = [line_s.strip()]
             search_str = line[0]+"." # adding trailing "." for same reason as above
             for alias in relevant_aliases_for_search:
+                #print(alias, search_str)
                 if search_str.startswith(alias):
                     output+=(line[0]+"\n")
+                    #print("checking "+str(line))
                     if has_counts:
-                        total_counts += int(line[1])
+                        lineage_data[0].append(int(line[1]))
+                    if has_dates:
+                        lineage_data[1].append(datetime.datetime.strptime(line[2], '%Y-%m-%d').date())
+                        lineage_data[2].append(datetime.datetime.strptime(line[3], '%Y-%m-%d').date())
+                        lineage_data[3].append(datetime.datetime.strptime(line[4].strip(), '%Y-%m-%d').date())
                     break # break out of the inner loop and go to the next line
-    return [output, total_counts]
+    min_date = min(lineage_data[1]) if len(lineage_data[1]) > 0 else None
+    max_date = max(lineage_data[2]) if len(lineage_data[2]) > 0 else None
+    median_date = datetime.datetime.fromtimestamp(statistics.median([datetime.datetime(year=date_rec.year,month=date_rec.month,day=date_rec.day).timestamp() for date_rec in lineage_data[3]])).date() if len(lineage_data[3]) > 0 else None
+    return [output, sum(lineage_data[0]), min_date, max_date, median_date]
 
 
 if __name__ == "__main__":
