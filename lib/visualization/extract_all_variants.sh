@@ -10,8 +10,6 @@ fi
 
 # WARNING: do not allow arbitrary user data for date cutoff and lineage set, SQL injection risk
 
-echo "foo \$DB_NAME is $DB_NAME" >&2
-
 psql -h "$DB_HOST" -d "$DB_NAME" -U "$DB_USER" -c "SELECT variant_sites.ref_start, variant_sites.ref_end, \
 fasta_records.genbank_accession, lineages.name, fasta_records.date_collected, variant_sites.variant_type, \
 variant_sites.variant FROM variant_sites \
