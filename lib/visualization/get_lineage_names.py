@@ -6,7 +6,6 @@
 import json
 import sys
 import re
-import statistics
 import datetime
 import psycopg2
 import os
@@ -85,14 +84,11 @@ def process_aliases(alias_str, lineage_filename, search_string, conn):
     median_date = None
     if len(lineage_data) > 0 and conn is not None:
         cur = conn.cursor()
-        #print('SELECT COUNT(fasta_records.id) AS num_seen, min(fasta_records.date_submitted) AS first_seen, \
-        #              max(fasta_records.date_submitted) AS last_seen, to_timestamp(percentile_cont(0.5) WITHIN GROUP \
-        #              (ORDER BY cast(extract(epoch FROM date_submitted) AS integer)))::date AS median_date FROM fasta_records INNER JOIN pangolin_calls \
-        #              ON pangolin_calls.id=fasta_records.pangolin_call_id WHERE pangolin_calls.lineage IN (%s);' % ("'"+("','".join(lineage_data))+"'",))
         cur.execute('SELECT COUNT(fasta_records.id) AS num_seen, min(fasta_records.date_submitted) AS first_seen, \
         max(fasta_records.date_submitted) AS last_seen, to_timestamp(percentile_cont(0.5) WITHIN GROUP \
         (ORDER BY cast(extract(epoch FROM date_submitted) AS integer)))::date AS median_date FROM fasta_records INNER JOIN pangolin_calls \
-        ON pangolin_calls.id=fasta_records.pangolin_call_id WHERE pangolin_calls.lineage IN %s;', (tuple(lineage_data),))
+        ON pangolin_calls.id=fasta_records.pangolin_call_id INNER JOIN lineages ON lineages.id=pangolin_calls.lineage_id \
+        WHERE lineages.name IN %s;', (tuple(lineage_data),))
         num_seen, min_date, max_date, median_date = cur.fetchone()
         #print(num_seen, min_date, max_date, median_date)
         cur.close()

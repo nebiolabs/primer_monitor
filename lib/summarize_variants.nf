@@ -24,7 +24,8 @@ igvstatic_path = params.igvstatic_path
 params.pangolin_version_path =
 params.pangolin_data_version_path =
 
-organism_dirname = "2697049"
+params.organism_dirname = "2697049"
+organism_dirname = params.organism_dirname
 
 pangolin_version = file(params.pangolin_version_path).text
 pangolin_data_version = file(params.pangolin_data_version_path).text
@@ -255,7 +256,7 @@ process recompute_affected_primers {
     publishDir "${igvstatic_path}", mode: 'copy'
     errorStrategy 'retry'
     maxRetries 2
-    conda 'libiconv'
+    conda 'libiconv psycopg2'
     input:
         file complete
     output:
@@ -270,25 +271,25 @@ process recompute_affected_primers {
     # recompute the primer data for igvjs visualization
     set -e # fail on error
     source !{primer_monitor_path}/.env
-    mkdir -p ${organism_dirname}/misc
-    mkdir -p ${organism_dirname}/lineage_sets
+    mkdir -p !{organism_dirname}/misc
+    mkdir -p !{organism_dirname}/lineage_sets
 
     !{primer_monitor_path}/lib/visualization/get_lineage_data.sh > lineages.csv
 
-    !{primer_monitor_path}/lib/visualization/get_primer_sets.sh ${organism_dirname}/primer_sets_raw > ${organism_dirname}/misc/tracks.json
+    !{primer_monitor_path}/lib/visualization/get_primer_sets.sh !{organism_dirname}/primer_sets_raw > !{organism_dirname}/misc/tracks.json
 
     psql -h "$DB_HOST" -d "$DB_NAME" -U "$DB_USER" -c "SELECT COALESCE(date_collected, date_submitted), COUNT(*) \
     FROM fasta_records GROUP BY COALESCE(date_collected, date_submitted);" --csv -t > seq_counts.csv
 
     curl https://raw.githubusercontent.com/cov-lineages/pango-designation/master/pango_designation/alias_key.json \
-    | python get_lineages_to_show.py A,B lineages.csv seq_counts.csv ${organism_dirname}/lineage_sets
+    | python !{primer_monitor_path}/lib/visualization/get_lineages_to_show.py A,B lineages.csv seq_counts.csv !{organism_dirname}/lineage_sets
 
     cat <(printf "{") <(ls !{igvstatic_path}/!{organism_dirname}/lineage_sets \
-    | sed -E 's/^(.*)\\.txt$/"\\1": "\\1.*",/') <(echo '"all": "All"}') > ${organism_dirname}/misc/lineage_sets.json
+    | sed -E 's/^(.*)\\.txt$/"\\1": "\\1.*",/') <(echo '"all": "All"}') > !{organism_dirname}/misc/lineage_sets.json
 
     ls !{igvstatic_path}/!{organism_dirname}/lineage_sets \
     | xargs !{primer_monitor_path}/lib/visualization/process_primer_sets_with_lineages.sh - "./!{organism_dirname}" !{freq_cutoff} !{score_cutoff} \
-    <(!{igvstatic_path}/!{organism_dirname}/primer_sets_raw) "!{igvstatic_path}/!{organism_dirname}" !{task.cpus}
+    <(ls !{igvstatic_path}/!{organism_dirname}/primer_sets_raw) "!{igvstatic_path}/!{organism_dirname}" !{task.cpus}
     '''
 }
 
