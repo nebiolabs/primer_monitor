@@ -19,6 +19,8 @@ Rails.application.routes.draw do
     resources :lineages, param: :name, constraints: { name: /[A-Z]+(\.\d+)*/ }
   end
 
+  get 'lineages', to: 'lineages#index'
+
   resources :oligos
   resources :primer_sets
   resources :users

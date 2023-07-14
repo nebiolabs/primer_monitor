@@ -4,8 +4,12 @@ class LineagesController < ApplicationController
 
   def index
     authorize! :index, LineagesController
-    @organism = Organism.find_by(ncbi_taxon_id: 2_697_049)
-    @lineages = Lineage.where(organism_id: @organism.id)
+    if params.key? :organism_name
+      @organism = Organism.find_by(name: params[:organism_name])
+      @lineages = Lineage.where(organism_id: @organism.id)
+    else
+      redirect_to lineage_variants_url, status: 301
+    end
   end
 
   def show
