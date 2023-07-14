@@ -866,19 +866,32 @@ CREATE VIEW public.join_subscribed_location_to_id AS
 --
 
 CREATE TABLE public.lineages (
-    taxon character varying NOT NULL,
-    lineage character varying NOT NULL,
-    conflict character varying,
-    ambiguity_score real,
-    scorpio_call character varying,
-    scorpio_support numeric,
-    scorpio_conflict numeric,
-    version character varying NOT NULL,
-    pangolin_version date NOT NULL,
-    pango_version character varying NOT NULL,
-    status character varying NOT NULL,
-    note character varying
+    id bigint NOT NULL,
+    name character varying NOT NULL,
+    caller_name character varying,
+    organism_id bigint NOT NULL,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
 );
+
+
+--
+-- Name: lineages_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.lineages_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: lineages_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.lineages_id_seq OWNED BY public.lineages.id;
 
 
 --
@@ -922,7 +935,8 @@ CREATE TABLE public.organisms (
     name character varying NOT NULL,
     created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL,
-    alias character varying
+    alias character varying,
+    reference_accession character varying
 );
 
 
@@ -952,7 +966,7 @@ ALTER SEQUENCE public.organisms_id_seq OWNED BY public.organisms.id;
 CREATE TABLE public.pangolin_calls (
     id bigint NOT NULL,
     taxon character varying NOT NULL,
-    lineage character varying NOT NULL,
+    _lineage_name character varying,
     conflict character varying,
     ambiguity_score double precision,
     scorpio_call character varying,
@@ -968,7 +982,8 @@ CREATE TABLE public.pangolin_calls (
     qc_notes character varying,
     note character varying,
     created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL
+    updated_at timestamp(6) without time zone NOT NULL,
+    lineage_id bigint
 );
 
 
@@ -1273,6 +1288,13 @@ ALTER TABLE ONLY public.genomic_features ALTER COLUMN id SET DEFAULT nextval('pu
 
 
 --
+-- Name: lineages id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.lineages ALTER COLUMN id SET DEFAULT nextval('public.lineages_id_seq'::regclass);
+
+
+--
 -- Name: oligos id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -1418,6 +1440,14 @@ ALTER TABLE ONLY public.fasta_records
 
 ALTER TABLE ONLY public.genomic_features
     ADD CONSTRAINT genomic_features_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: lineages lineages_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.lineages
+    ADD CONSTRAINT lineages_pkey PRIMARY KEY (id);
 
 
 --
@@ -1595,13 +1625,6 @@ CREATE INDEX index_fasta_records_on_pending_pangolin_call_id ON public.fasta_rec
 
 
 --
--- Name: index_fasta_records_on_strain; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE UNIQUE INDEX index_fasta_records_on_strain ON public.fasta_records USING btree (strain);
-
-
---
 -- Name: index_genomic_features_on_organism_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -1609,10 +1632,31 @@ CREATE INDEX index_genomic_features_on_organism_id ON public.genomic_features US
 
 
 --
+-- Name: index_lineages_on_name; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_lineages_on_name ON public.lineages USING btree (name);
+
+
+--
+-- Name: index_lineages_on_organism_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_lineages_on_organism_id ON public.lineages USING btree (organism_id);
+
+
+--
 -- Name: index_oligos_on_primer_set_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_oligos_on_primer_set_id ON public.oligos USING btree (primer_set_id);
+
+
+--
+-- Name: index_pangolin_calls_on_lineage_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_pangolin_calls_on_lineage_id ON public.pangolin_calls USING btree (lineage_id);
 
 
 --
@@ -1826,13 +1870,6 @@ CREATE INDEX variant_sites_usable_insertion_idx ON public.variant_sites USING bt
 
 
 --
--- Name: pangolin_calls add_dates; Type: TRIGGER; Schema: public; Owner: -
---
-
-CREATE TRIGGER add_dates BEFORE INSERT ON public.pangolin_calls FOR EACH ROW EXECUTE FUNCTION public.add_dates();
-
-
---
 -- Name: pangolin_calls init_dates; Type: TRIGGER; Schema: public; Owner: -
 --
 
@@ -1964,6 +2001,14 @@ ALTER TABLE ONLY public.subscribed_geo_locations
 
 ALTER TABLE ONLY public.subscribed_geo_locations
     ADD CONSTRAINT fk_rails_7c2744b62d FOREIGN KEY (detailed_geo_location_alias_id) REFERENCES public.detailed_geo_location_aliases(id);
+
+
+--
+-- Name: lineages fk_rails_82a1911871; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.lineages
+    ADD CONSTRAINT fk_rails_82a1911871 FOREIGN KEY (organism_id) REFERENCES public.organisms(id);
 
 
 --
@@ -2156,6 +2201,11 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20230221144400'),
 ('20230622143230'),
 ('20230622154910'),
-('20230622161730');
+('20230622161730'),
+('20230630135330'),
+('20230706125330'),
+('20230706131800'),
+('20230714105625'),
+('20230714172920');
 
 

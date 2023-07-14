@@ -122,8 +122,17 @@ $navbar-item-img-max-height: 3rem;
 ul {
   list-style: unset;
 }
+.invisible
+{
+  display: none;
+}
 
 .white-button
 {
   background-color: white;
+}
+
+.bold-text
+{
+  font-weight: bold;
 }

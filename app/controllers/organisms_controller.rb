@@ -68,11 +68,15 @@ class OrganismsController < ApplicationController
 
   # Use callbacks to share common setup or constraints between actions.
   def set_organism
-    @organism = Organism.find(params[:id])
+    @organism = Organism.find_by(name: params[:name])
   end
 
   # Only allow a list of trusted parameters through.
   def organism_params
     params.require(:organism).permit(:name, :alias, :ncbi_taxon_id)
   end
-end
+
+  def to_param
+    name
+  end
+  end

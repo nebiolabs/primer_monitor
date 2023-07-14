@@ -16,6 +16,9 @@ fi
 # ensure this is relative to the script's location
 source "$(dirname "$0")/../../.env";
 
+# gets a list of unique lineage names
+cat "$pangolin_csv" | cut -f2 -d',' | grep -v 'Unassigned' | grep -v 'lineage' | sort | uniq > lineages_new.txt
+
 
 
 psql -h "$DB_HOST" -d "$DB_NAME" -U "$DB_USER" >&2 <<CMDS;

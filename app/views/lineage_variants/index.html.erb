@@ -1,0 +1,396 @@
+<h1 class="title">SARS-CoV-2 Lineage Variant Summary</h1>
+
+<!--<  %= image_tag 'lineage_primer_summary_20220211.svg' %  >-->
+<% primer_sets_map = {} %>
+<% default_tracks_map = {} %>
+<% lineage_sets_map = {} %>
+<% i = 0 %>
+<% primer_set_count = @primer_sets.length %>
+<div class="block">
+  Primers that do not overlap with variants associated with these lineages are shown in blue below a schematic SARS-CoV-2 genome.
+  Primers that overlap with enough sufficiently-frequent variants to be potentially impacted (see below) are indicated in orange.
+</div>
+<form id="primer_set_selection">
+  <p>Lineage:</p>
+  <div class="columns is-multiline is-gapless">
+    <% @lineage_sets.each { |lineageSet, displayName| %>
+      <div class="column is-one-fifth">
+        <%= label_tag "lineage_set_"+i.to_s, class: 'lineage_set_radiobutton_label' do %>
+          <span class="primer_display_name"><%= displayName %></span>
+          <%= radio_button_tag "lineage", "lineage_set_"+i.to_s, (lineageSet == "all"), class: 'lineage_set_radiobutton', disabled: true %>
+          <% lineage_sets_map["lineage_set_"+i.to_s] = [lineageSet, displayName] %>
+          <% i+=1 %>
+        <% end %>
+      </div>
+    <% } %>
+  </div>
+  <hr><p>Show primer sets:</p>
+  <div class="columns is-multiline is-gapless">
+  <% i = 0 %>
+  <% @primer_sets.each { |primerSet, displayName| %>
+    <div class="column is-one-fifth">
+    <%= label_tag "primer_set_"+i.to_s, class: 'primer_set_checkbox_label' do %>
+      <span class="primer_display_name"><%= displayName %></span>
+      <%= check_box_tag "primer_set_"+i.to_s, 1, false, class: 'primer_set_checkbox', disabled: true %>
+      <% primer_sets_map["primer_set_"+i.to_s] = [primerSet, displayName] %>
+      <% default_tracks_map["primer_set_"+i.to_s] = @default_tracks.include? primerSet %>
+      <% i+=1 %>
+    <% end %>
+    </div>
+  <% } %>
+  </div>
+  <button id="select_all_primers" disabled="disabled">Select All</button> <button id="unselect_all_primers" disabled="disabled">Clear All</button>
+  <br><br><button class="button is-small is-primary" id="apply" disabled="disabled">Update Tracks</button>
+</form>
+<p id="primer_set_json" class="invisible"><%= primer_sets_map.to_json %></p>
+<p id="default_tracks_json" class="invisible"><%= default_tracks_map.to_json %></p>
+<p id="config" class="invisible"><%= @config.to_json %></p>
+<p id="lineage_set_json" class="invisible"><%= lineage_sets_map.to_json %></p>
+<div id="igv" class="igv_div"></div>
+<hr/>
+<div class="block">
+  <h2 class="title">Calculating variant impact:</h2>
+  <p>To distinguish primers that are likely to be actually impacted from ones affected by a rare variant
+    or a sequencing error, impact is determined by both the the number of times each variant appears
+    in the data, and the number, length, and position of variants overlapping a primer.
+    To eliminate sequencing errors and other low-frequency variants that will likely not have a significant
+    impact on primers, a variant is only considered in the calculation if it occurs either in
+    at least 1% of sequences (and no less than 10 sequences) in the dataset (after filtering by lineage).
+    Primers are then scored based on the length and position of overlapping variants,
+    and labeled as affected if this results in a sufficiently high score.
+    To focus on recent mutations in the SARS-CoV-2 virus, only variants from the last 180 days are considered.
+  </p>
+</div>
+<div class="block">
+  <h2 class="title">Overlapping amplicons:</h2>
+  <ul>
+    <li>The NEB LAMP E2019 E gene amplicon overlaps with a variant observed in the BA.1, BA.1.1, and BA.2 (omicron)
+      lineages.
+    </li>
+    <li>The CDC/NEB qPCR E3019 N1 gene probe overlaps with a variant observed in the BA.1 (omicron) lineage.</li>
+    <li>The CDC/NEB qPCR E3019 N1 gene R primer overlaps with a variant observed in Delta lineages.</li>
+    <li>The US CDC/Flu SC2 N Gene probe overlaps with a variant observed in the Delta and BA.2 lineages.</li>
+    <li>The China CDC N gene qPCR amplicon overlaps with variants in all lineages.</li>
+    <li>The Charité RdRp primers overlap with variants observed in Delta and BA.1 lineages</li>
+    <li>The Charité E amplicon overlaps with a variant observed in BA.1, BA.1.1, and BA.2 (omicron) lineages.</li>
+    <li>The Multiplex amplicon designs (ARTIC v3, v4, VarSkip, Midnight 1200 bp, ...) overlap with multiple variants:
+    </li>
+  </ul>
+</div>
+<hr>
+<div>
+  <div class='tableauPlaceholder' id='viz1638046792815' style='position: relative'>
+    <noscript>
+      <a href='#'><img alt=' ' src='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;va&#47;variant_overlap_summary&#47;OverlapSummary&#47;1_rss.png' style='border: none'/></a>
+    </noscript>
+    <object class='tableauViz' style='display:none;'>
+      <param name='host_url' value='https%3A%2F%2Fpublic.tableau.com%2F'/>
+      <param name='embed_code_version' value='3'/>
+      <param name='site_root' value=''/>
+      <param name='name' value='variant_overlap_summary&#47;OverlapSummary'/>
+      <param name='tabs' value='yes'/>
+      <param name='toolbar' value='yes'/>
+      <param name='static_image' value='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;va&#47;variant_overlap_summary&#47;OverlapSummary&#47;1.png'/>
+      <param name='animate_transition' value='yes'/>
+      <param name='display_static_image' value='yes'/>
+      <param name='display_spinner' value='yes'/>
+      <param name='display_overlay' value='yes'/>
+      <param name='display_count' value='yes'/>
+      <param name='language' value='en-US'/>
+    </object>
+  </div>
+  <script type='text/javascript'>
+      var divElement = document.getElementById('viz1638046792815');
+      var vizElement = divElement.getElementsByTagName('object')[0];
+      if (divElement.offsetWidth > 800) {
+          vizElement.style.minWidth = '1000px';
+          vizElement.style.maxWidth = '100%';
+          vizElement.style.minHeight = '850px';
+          vizElement.style.maxHeight = (divElement.offsetWidth * 0.75) + 'px';
+      } else if (divElement.offsetWidth > 500) {
+          vizElement.style.minWidth = '1000px';
+          vizElement.style.maxWidth = '100%';
+          vizElement.style.minHeight = '850px';
+          vizElement.style.maxHeight = (divElement.offsetWidth * 0.75) + 'px';
+      } else {
+          vizElement.style.width = '100%';
+          vizElement.style.minHeight = '750px';
+          vizElement.style.maxHeight = (divElement.offsetWidth * 1.77) + 'px';
+      }
+      var scriptElement = document.createElement('script');
+      scriptElement.src = 'https://public.tableau.com/javascripts/api/viz_v1.js';
+      vizElement.parentNode.insertBefore(scriptElement, vizElement);
+  </script>
+  <%= javascript_pack_tag "lineage_variants" %>
+</div>
+<hr>
+<!--
+<h2 class="title">0-5 kb Variants</h2>
+< %= image_tag 'lineage_primer_summary_0-5kb_20220211.svg' % >
+<hr>
+<h2 class="title">5-10 kb Variants</h2>
+< %= image_tag 'lineage_primer_summary_5-10kb_20220211.svg' % >
+<hr>
+<h2 class="title">10-15 kb Variants</h2>
+< %= image_tag 'lineage_primer_summary_10-15kb_20220211.svg' % >
+<hr>
+<h2 class="title">15-20 kb Variants</h2>
+< %= image_tag 'lineage_primer_summary_15-20kb_20220211.svg' % >
+<hr>
+<h2 class="title">20-25 kb Variants</h2>
+< %= image_tag 'lineage_primer_summary_20-25kb_20220211.svg' % >
+<hr>
+<h2 class="title">25-29 kb Variants</h2>
+< %= image_tag 'lineage_primer_summary_25-29kb_20220211.svg' % >
+<hr/>
+-->
+<h2 class="title">Methods:</h2>
+<p>
+  Sequences reported in <%= link_to 'Sequence Sources', '#sequence_sources' %> for each lineage were aligned to the
+  NC_045512.2 reference sequence (minimap2 -r 10000 --score-N=0). Variants > 2% frequency (freebayes) were
+  evaluated for overlap with primer regions (bedtools) and displayed (Geneious Prime 2021.0.3).
+  Due to the rapid increase in omicron sequences, BA.1, BA.1.1 and BA.2 lineage variants were identified
+  by classifying recent consensus sequences submitted to GISAID using pangolin --usher before alignment and variant
+  calling (2% frequency threshold).
+  Variants were manually filtered to remove Delta contamination.
+  Exclusion criteria: Variants present in Omicron lineage sequences and Delta lineage sequences that
+  dropped in frequency between November 2021 and January 2022 were excluded.
+</p>
+<hr>
+<h3 id='sequence_sources' class="title">Sequence Sources:</h3>
+
+<p>
+  <b>AY.* (combined delta)</b>
+  This is a composite track containing variants from all circulating AY.lineages as of 2022-02-01. No single virus will
+  contain all these mutations.
+  It includes variants from lineages AY.3, AY.4, AY.25, AY.25.1, AY.43, AY.44, AY.100, AY.103, AY.122
+</p>
+<p>
+  <b>B.1.617.2</b>:
+  GitHub. “Potential Sequences That Should Be Included in B.1.617 · Issue #49 · Cov-Lineages/Pango-Designation.”
+  Accessed June 20, 2021.
+  <a href="https://github.com/cov-lineages/pango-designation/issues/49">https://github.com/cov-lineages/pango-designation/issues/49</a>.
+</p>
+<p>
+  <b>AY.3</b>:
+  GitHub. “B.1.617.2 Sub-Lineage with ORF1a: I3731V · Issue #121 · Cov-Lineages/Pango-Designation.” Accessed November
+  27, 2021.
+  <a href="https://github.com/cov-lineages/pango-designation/issues/121">https://github.com/cov-lineages/pango-designation/issues/121</a>.
+</p>
+<p>
+  <b>AY.4</b>:
+  GitHub. “Proposal for Sub-Lineages within B.1.617.2 · Issue #180 · Cov-Lineages/Pango-Designation.” Accessed October
+  1, 2021.
+  <a href="https://github.com/cov-lineages/pango-designation/issues/180">https://github.com/cov-lineages/pango-designation/issues/180</a>.
+</p>
+<p>
+  <b>AY.25</b>:
+  GitHub. “B.1.617.2 Sublineage with Expansion in Cape Cod, Massachusetts, USA in July 2021 · Issue #181 ·
+  Cov-Lineages/Pango-Designation.” Accessed October 1, 2021.
+  <a href="https://github.com/cov-lineages/pango-designation/issues/181">https://github.com/cov-lineages/pango-designation/issues/181</a>.
+</p>
+<p>
+  <b>AY.25.1</b>:
+  GitHub. “Proposal of New Sub-Lineage of Delta AY.25 for Peru with Principal Mutation in Spike: D796Y · Issue #355 ·
+  Cov-Lineages/Pango-Designation.” Accessed February 11, 2022.
+
+  <a href="https://github.com/cov-lineages/pango-designation/issues/355">https://github.com/cov-lineages/pango-designation/issues/355</a>.
+</p>
+<p>
+  <b>AY.43</b>:
+  GitHub. “Proposal for Large European Delta Sub-Lineage with N:9L, ORF1b:829I (~80k Seqs) · Issue #240 ·
+  Cov-Lineages/Pango-Designation.” Accessed November 27, 2021.
+  <a href="https://github.com/cov-lineages/pango-designation/issues/240">https://github.com/cov-lineages/pango-designation/issues/240</a>.
+</p>
+<p>
+  <b>AY.44</b>:
+  GitHub. “Proposal for Large US Delta Sub-Lineage with Orf1b:183V (~80k Sequences) · Issue #242 ·
+  Cov-Lineages/Pango-Designation.” Accessed November 27, 2021.
+  <a href="https://github.com/cov-lineages/pango-designation/issues/242">https://github.com/cov-lineages/pango-designation/issues/242</a>.
+</p>
+<p>
+  <b>AY.100</b>:
+  GitHub. “Added New Lineage AY.100 with 129 New Sequence Designations · Cov-Lineages/Pango-Designation@f792f5d.”
+  Accessed November 27, 2021.
+  <a href="https://github.com/cov-lineages/pango-designation/commit/0892b9f7e2f19f7f8d9e655de277083747b267e1">https://github.com/cov-lineages/pango-designation/commit/0892b9f7e2f19f7f8d9e655de277083747b267e1</a>.
+</p>
+<p>
+  <b>AY.103</b>:
+  GitHub. “Added New Lineage AY.103 with 18135 New Sequence Designations and 13 … ·
+  Cov-Lineages/Pango-Designation@0892b9f.” Accessed November 27, 2021.
+  <a href="https://github.com/cov-lineages/pango-designation/commit/0892b9f7e2f19f7f8d9e655de277083747b267e1">https://github.com/cov-lineages/pango-designation/commit/0892b9f7e2f19f7f8d9e655de277083747b267e1</a>.
+</p>
+<p>
+  <b>AY.122</b>:
+  GitHub. “Still Undesignated Orf1a:K261N Delta Sublineage Is Dominant in Russia and Widespread in Europe · Issue #320 ·
+  Cov-Lineages/Pango-Designation.” Accessed February 11, 2022.
+  <a href="https://github.com/cov-lineages/pango-designation/issues/320">https://github.com/cov-lineages/pango-designation/issues/320</a>.
+</p>
+<p>
+  <b>BA.1 (omicron)</b>:
+  GitHub. “B.1.1 decendant associated with Southern Africa with high number of Spike mutations · Issue #343 ·
+  Cov-Lineages/Pango-Designation.” Accessed November 27, 2021.
+  <a href='https://github.com/cov-lineages/pango-designation/issues/343'>https://github.com/cov-lineages/pango-designation/issues/343</a>.
+</p>
+<p>
+  <b>BA.1.1 (omicron)</b>:
+  GitHub. “Omicron Sublineage with Potentially Beneficial Mutation S:346K · Issue #360 ·
+  Cov-Lineages/Pango-Designation.” Accessed February 11, 2022.
+  <a href='https://github.com/cov-lineages/pango-designation/issues/360'>https://github.com/cov-lineages/pango-designation/issues/360</a>.
+</p>
+<p>
+  <b>BA.2 (omicron)</b>:
+  GitHub. “Proposal to Split B.1.1.529 to Incorporate a Newly Characterised Sibling Lineage · Issue #361 ·
+  Cov-Lineages/Pango-Designation.” Accessed February 11, 2022.
+  <a href='https://github.com/cov-lineages/pango-designation/issues/361'>https://github.com/cov-lineages/pango-designation/issues/361</a>.
+</p>
+
+<hr/>
+
+<h3 class="title">Amplicon Designs:</h3>
+<p>
+  <b>US CDC</b>:
+  Lu, Xiaoyan, Lijuan Wang, Senthilkumar K. Sakthivel, Brett Whitaker, Janna Murray, Shifaq Kamili, Brian Lynch, et al.
+  “US CDC Real-Time Reverse Transcription PCR Panel for Detection of Severe Acute Respiratory Syndrome Coronavirus 2 -
+  Volume 26, Number 8—August 2020 - Emerging Infectious Diseases Journal - CDC.” Accessed April 23, 2021.
+  <a href="https://doi.org/10.3201/eid2608.201246">https://doi.org/10.3201/eid2608.201246</a>.
+</p>
+<p>
+  <b>China CDC</b>:
+  “新型冠状病毒核酸检测引物和探针序列（Specific Primers and Probes for Detection 2019 Novel Coronavirus）.” Accessed June 20, 2021.
+  <a href="http://ivdc.chinacdc.cn/kyjz/202001/t20200121_211337.html">http://ivdc.chinacdc.cn/kyjz/202001/t20200121_211337.html</a>.
+</p>
+<p>
+  <b>Charité</b>:
+  Corman, Victor M., Olfert Landt, Marco Kaiser, Richard Molenkamp, Adam Meijer, Daniel KW Chu, Tobias Bleicker, et al.
+  “Detection of 2019 Novel Coronavirus (2019-NCoV) by Real-Time RT-PCR.” Eurosurveillance 25, no. 3 (January 23, 2020):
+  2000045.
+  <a href="https://doi.org/10.2807/1560-7917.ES.2020.25.3.2000045">https://doi.org/10.2807/1560-7917.ES.2020.25.3.2000045</a>a.
+</p>
+<p>
+  <b>ARTIC v3</b>:
+  Tyson, John R., Phillip James, David Stoddart, Natalie Sparks, Arthur Wickenhagen, Grant Hall, Ji Hyun Choi, et al.
+  “Improvements to the ARTIC Multiplex PCR Method for SARS-CoV-2 Genome Sequencing Using Nanopore.” BioRxiv: The
+  Preprint Server for Biology, September 4, 2020.
+  <a href="https://doi.org/10.1101/2020.09.04.283077">https://doi.org/10.1101/2020.09.04.283077</a>.
+</p>
+<p>
+  <b>Midnight 1200 bp</b>:
+  Freed, Nikki E., Markéta Vlková, Muhammad B. Faisal, and Olin K. Silander. “Rapid and Inexpensive Whole-Genome
+  Sequencing of SARS-CoV-2 Using 1200 Bp Tiled Amplicons and Oxford Nanopore Rapid Barcoding.” Biology Methods &
+  Protocols 5, no. 1 (2020): bpaa014.
+  <a href="https://doi.org/10.1093/biomethods/bpaa014">https://doi.org/10.1093/biomethods/bpaa014</a>.
+</p>
+<p>
+  <b>ARTIC v4, v4.1</b>:
+  ARTIC Real-time Genomic Surveillance. “SARS-CoV-2 Version 4 Scheme Release - Laboratory,” June 24, 2021.
+  <a href="https://community.artic.network/t/sars-cov-2-version-4-scheme-release/312">,
+    https://community.artic.network/t/sars-cov-2-version-4-scheme-release/312</a>
+  <a href="https://community.artic.network/t/sars-cov-2-v4-1-update-for-omicron-variant/342">https://community.artic.network/t/sars-cov-2-v4-1-update-for-omicron-variant/342</a>
+</p>
+<p>
+  <b>VarSkip</b>:
+  VarSkip Multiplex PCR Designs for SARS-CoV-2 Sequencing. 2021. Reprint, New England Biolabs Inc., 2021.
+  <a href="https://github.com/nebiolabs/VarSkip">https://github.com/nebiolabs/VarSkip"</a>.
+</p>
+<p>
+  <b>Resende</b>:
+  Resende, Paola Cristina, Fernando Couto Motta, Sunando Roy, Luciana Appolinario, Allison Fabri, Joilson Xavier,
+  Kathryn Harris, et al.
+  “SARS-CoV-2 Genomes Recovered by Long Amplicon Tiling Multiplex Approach Using Nanopore Sequencing and Applicable to
+  Other Sequencing Platforms,” May 1, 2020.
+  <a href="https://doi.org/10.1101/2020.04.30.069039">https://doi.org/10.1101/2020.04.30.069039</a>.
+</p>
+<p>
+  <b>USydney</b>:
+  Eden, John-Sebastian, and Eby Sim. “SARS-CoV-2 Genome Sequencing Using Long Pooled Amplicons on Illumina Platforms.”
+  protocols.io, April 4, 2020.
+  <a href="https://www.protocols.io/view/sars-cov-2-genome-sequencing-using-long-pooled-amp-befyjbpw">https://www.protocols.io/view/sars-cov-2-genome-sequencing-using-long-pooled-amp-befyjbpw</a>.
+</p>
+<p>
+  <b>Swift</b>
+  Swift BioSciences. “NEW- Swift Normalase™ Amplicon SARS-CoV-2 Panels.” Accessed December 2, 2021.
+  <a href="https://swiftbiosci.com/swift-normalase-amplicon-sars-cov-2-panels-3/">https://swiftbiosci.com/swift-normalase-amplicon-sars-cov-2-panels-3/"</a>.
+</p>
+<p>
+  <b>UNZA</b>
+  Simulundu, Edgar, Francis Mupeta, Pascalina Chanda-Kapata, Ngonda Saasa, Katendi Changula, Walter Muleya, Simbarashe
+  Chitanga, et al. “First COVID-19 Case in Zambia — Comparative Phylogenomic Analyses of SARS-CoV-2 Detected in African
+  Countries.” International Journal of Infectious Diseases 102 (January 1, 2021): 455–59.
+  <a href="https://doi.org/10.1016/j.ijid.2020.09.1480">https://doi.org/10.1016/j.ijid.2020.09.1480</a>.
+</p>
+
+<hr/>
+
+<h3 class='title'>Software Tools:</h3>
+<p>
+  Li, Heng. “Minimap2: Pairwise Alignment for Nucleotide Sequences.” Bioinformatics 34, no. 18 (September 15, 2018):
+  3094–3100. <%= link_to 'https://doi.org/10.1093/bioinformatics/bty191', 'https://doi.org/10.1093/bioinformatics/bty191' %>
+  .
+</p>
+<p>
+  Pangolin. Python. 2020. Reprint, CoV-lineages,
+  2022. <%= link_to 'https://github.com/cov-lineages/pangolin', 'https://github.com/cov-lineages/pangolin' %>.
+</p>
+<p>
+  Gofasta. Go. 2020. Reprint, virus-evolution,
+  2022. <%= link_to 'https://github.com/virus-evolution/gofasta', 'https://github.com/virus-evolution/gofasta' %>.
+</p>
+<p>
+  Köster, Johannes, and Sven Rahmann. “Snakemake—a Scalable Bioinformatics Workflow Engine.” Bioinformatics 28, no. 19
+  (October 1, 2012):
+  2520–22. <%= link_to 'https://doi.org/10.1093/bioinformatics/bts480', 'https://doi.org/10.1093/bioinformatics/bts480' %>
+  .
+</p>
+<p>
+  Scorpio. Python. 2021. Reprint, CoV-lineages,
+  2022. <%= link_to 'https://github.com/cov-lineages/scorpio', 'https://github.com/cov-lineages/scorpio' %>.
+</p>
+<p>
+  Garrison, Erik, and Gabor Marth. “Haplotype-Based Variant Detection from Short-Read Sequencing.” ArXiv:1207.3907
+  [q-Bio], July 20, 2012. <%= link_to 'http://arxiv.org/abs/1207.3907', 'http://arxiv.org/abs/1207.3907' %>.
+</p>
+<p>
+  Quinlan, Aaron R, and Ira M Hall. “BEDTools: A Flexible Suite of Utilities for Comparing Genomic Features.”
+  Bioinformatics (Oxford, England) 26 (2010):
+  841–42. <%= link_to 'https://doi.org/10.1093/bioinformatics/btq033', 'https://doi.org/10.1093/bioinformatics/btq033' %>
+  .
+</p>
+<p>
+  Geneious version 2022.0.2 created by Biomatters. Available
+  from <%= link_to 'https://www.geneious.com', 'https://www.geneious.com' %>.
+</p>
+<p>
+  Robinson, James T, Helga Thorvaldsdottir, Douglass Turner, and Jill P Mesirov. “igv.js: An Embeddable JavaScript
+  Implementation of the Integrative Genomics Viewer (IGV).” Bioinformatics 39, no. 1 (January 1, 2023):
+  btac830. <%= link_to 'https://doi.org/10.1093/bioinformatics/btac830', 'https://doi.org/10.1093/bioinformatics/btac830' %>.
+</p>
+
+<hr/>
+<h3 class='title'>History:</h3>
+<p>
+  2022-02-11: added VarSkip v2, condensed Delta lineages into a single composite track, added BA.1.1 and BA.2
+</p>
+<p>
+  2021-12-10: added additional requested primer sets (ARTICv4.1, USydney, Resende, Swift, UNZA), updated omicron
+  nomenclature
+</p>
+<p>
+  2021-11-29: added missing diagnostic tests
+</p>
+<p>
+  2021-11-27: added currently circulating lineages, new primer overlap visualization
+</p>
+<p>
+  2021-10-07: removed duplicate VarSkip amplicon 61
+</p>
+<p>
+  2021-09-29: Added VarSkip, removed new
+  <a href='https://www.cdc.gov/coronavirus/2019-ncov/variants/variant-info.html#anchor_1632150752495'>VBM lineages</a>
+</p>
+<p>
+  2021-06-24: Added ARTICv4
+</p>
+<p>
+  2021-06-20: Updated to currently relevant variants of concerns.
+</p>

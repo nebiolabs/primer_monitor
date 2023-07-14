@@ -6,13 +6,26 @@ params.prev_json=
 
 params.flag_path='/mnt/hpc_scratch/primer_monitor'
 
+params.pct_cutoff = 1
+pct_cutoff = params.pct_cutoff
+
+params.score_cutoff = 100
+score_cutoff = params.score_cutoff
+
 prev_json = file(params.prev_json, checkIfExists: true).toAbsolutePath()
 
-primer_monitor_path = '/mnt/bioinfo/prg/primer_monitor'
-output_path = '/mnt/hpc_scratch/primer_monitor'
+params.primer_monitor_path = '/mnt/bioinfo/prg/primer_monitor'
+primer_monitor_path = params.primer_monitor_path
+params.output_path = '/mnt/hpc_scratch/primer_monitor'
+output_path = params.output_path
+params.igvstatic_path = '/var/www/igvstatic'
+igvstatic_path = params.igvstatic_path
 
 params.pangolin_version_path =
 params.pangolin_data_version_path =
+
+params.organism_dirname = "2697049"
+organism_dirname = params.organism_dirname
 
 pangolin_version = file(params.pangolin_version_path).text
 pangolin_data_version = file(params.pangolin_data_version_path).text
@@ -126,8 +139,8 @@ process load_to_db {
     shell:
     '''
     touch "!{params.flag_path}/loading_data.lock"
-    RAILS_ENV=production ruby /mnt/bioinfo/prg/primer_monitor/upload.rb \
-        --skip_view_rebuild \
+    RAILS_ENV=production ruby !{primer_monitor_path}/upload.rb \
+        --import_seqs \
         --metadata_tsv !{metadata} \
         --variants_tsv !{tsv} \
         && mv !{metadata} !{metadata}.complete
@@ -192,11 +205,11 @@ process load_pangolin_data {
         file '*.complete_pangolin'
     shell:
     '''
-    field="pangolin_call_id"
-    if [ "!{use_pending}" = "true" ]; then
-        field="pending_pangolin_call_id"
-    fi
-    PGPASSFILE="!{primer_monitor_path}/config/.pgpass" !{primer_monitor_path}/lib/pangolin_calls/update_fasta_records.sh !{csv} $field
+    RAILS_ENV=production ruby !{primer_monitor_path}/upload.rb \
+            --import_calls \
+            --pangolin_csv !{csv} \
+            --pending !{use_pending} \
+            && mv !{csv} !{csv}.complete_pangolin
     '''
 }
 
@@ -227,11 +240,62 @@ process recalculate_database_views {
     errorStrategy 'retry'
     maxRetries 2
     input:
-        file done
+        file calls_updated
+    output:
+        file 'refresh_complete.txt';
     shell:
     '''
     # recalculate all the views at the end to save time
-    RAILS_ENV=production ruby /mnt/bioinfo/prg/primer_monitor/upload.rb --skip_data_import && touch refresh_complete.txt
+    RAILS_ENV=production ruby !{primer_monitor_path}/upload.rb --rebuild_views && touch refresh_complete.txt
+    '''
+}
+
+
+process recompute_affected_primers {
+    cpus 8
+    publishDir "${igvstatic_path}", mode: 'copy'
+    errorStrategy 'retry'
+    maxRetries 2
+    conda 'libiconv psycopg2 bedtools coreutils'
+    input:
+        file complete
+    output:
+        file "${organism_dirname}/lineage_variants"
+        file "${organism_dirname}/lineage_sets"
+        file "${organism_dirname}/primer_sets"
+        file "${organism_dirname}/primer_sets_raw"
+        file "${organism_dirname}/misc/lineage_sets.json"
+        file "${organism_dirname}/misc/tracks.json"
+    shell:
+    '''
+    # recompute the primer data for igvjs visualization
+    set -e # fail on error
+    source !{primer_monitor_path}/.env
+    mkdir -p !{organism_dirname}/misc
+    mkdir -p !{organism_dirname}/lineage_sets
+    mkdir -p !{organism_dirname}/primer_sets_raw
+    mkdir -p !{organism_dirname}/lineage_sets
+
+    !{primer_monitor_path}/lib/visualization/get_lineage_data.sh > lineages.csv
+
+    !{primer_monitor_path}/lib/visualization/get_primer_sets.sh !{organism_dirname}/primer_sets_raw > !{organism_dirname}/misc/tracks.json
+
+    psql -h "$DB_HOST" -d "$DB_NAME" -U "$DB_USER" -c "SELECT COALESCE(date_collected, date_submitted), COUNT(*) \
+    FROM fasta_records GROUP BY COALESCE(date_collected, date_submitted);" --csv -t > seq_counts.csv
+
+    curl https://raw.githubusercontent.com/cov-lineages/pango-designation/master/pango_designation/alias_key.json \
+    | python !{primer_monitor_path}/lib/visualization/get_lineages_to_show.py A,B lineages.csv seq_counts.csv !{organism_dirname}/lineage_sets
+
+    cat <(printf "{") <(ls !{organism_dirname}/lineage_sets \
+    | sed -E 's/^(.*)\\.txt$/"\\1": "\\1.*",/') <(echo '"all": "All"}') > !{organism_dirname}/misc/lineage_sets.json
+
+    ls !{organism_dirname}/primer_sets_raw > primer_sets_data.txt
+
+    cat <(ls !{organism_dirname}/lineage_sets) <(echo "all.txt") \
+    | xargs !{primer_monitor_path}/lib/visualization/process_primer_sets_with_lineages.sh - "./!{organism_dirname}" !{pct_cutoff} !{score_cutoff} \
+    primer_sets_data.txt "./!{organism_dirname}" !{task.cpus}
+
+    rm primer_sets_data.txt
     '''
 }
 
@@ -246,6 +310,7 @@ workflow {
     load_pangolin_data(pangolin_calls.out, load_to_db.out, get_pangolin_version.out[2])
     update_new_calls(load_to_db.out.collect(), load_pangolin_data.out.collect())
     recalculate_database_views(update_new_calls.out)
+    recompute_affected_primers(recalculate_database_views.out)
 }
 
 workflow.onError {
