@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -e
+
 variants_counts_bed="$1";
 primer_bed="$2";
 output_file="$3";

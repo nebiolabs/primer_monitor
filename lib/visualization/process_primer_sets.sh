@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -e
+
 variants_counts_bed="$1";
 output_path="$2";
 score_cutoff="$3";

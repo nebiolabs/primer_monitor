@@ -6,10 +6,10 @@ params.prev_json=
 
 params.flag_path='/mnt/hpc_scratch/primer_monitor'
 
-params.freq_cutoff = 0.1
-freq_cutoff = params.freq_cutoff
+params.pct_cutoff = 1
+pct_cutoff = params.pct_cutoff
 
-params.score_cutoff = 50
+params.score_cutoff = 100
 score_cutoff = params.score_cutoff
 
 prev_json = file(params.prev_json, checkIfExists: true).toAbsolutePath()
@@ -256,7 +256,7 @@ process recompute_affected_primers {
     publishDir "${igvstatic_path}", mode: 'copy'
     errorStrategy 'retry'
     maxRetries 2
-    conda 'libiconv psycopg2'
+    conda 'libiconv psycopg2 bedtools coreutils'
     input:
         file complete
     output:
@@ -273,6 +273,8 @@ process recompute_affected_primers {
     source !{primer_monitor_path}/.env
     mkdir -p !{organism_dirname}/misc
     mkdir -p !{organism_dirname}/lineage_sets
+    mkdir -p !{organism_dirname}/primer_sets_raw
+    mkdir -p !{organism_dirname}/lineage_sets
 
     !{primer_monitor_path}/lib/visualization/get_lineage_data.sh > lineages.csv
 
@@ -284,12 +286,16 @@ process recompute_affected_primers {
     curl https://raw.githubusercontent.com/cov-lineages/pango-designation/master/pango_designation/alias_key.json \
     | python !{primer_monitor_path}/lib/visualization/get_lineages_to_show.py A,B lineages.csv seq_counts.csv !{organism_dirname}/lineage_sets
 
-    cat <(printf "{") <(ls !{igvstatic_path}/!{organism_dirname}/lineage_sets \
+    cat <(printf "{") <(ls !{organism_dirname}/lineage_sets \
     | sed -E 's/^(.*)\\.txt$/"\\1": "\\1.*",/') <(echo '"all": "All"}') > !{organism_dirname}/misc/lineage_sets.json
 
-    ls !{igvstatic_path}/!{organism_dirname}/lineage_sets \
-    | xargs !{primer_monitor_path}/lib/visualization/process_primer_sets_with_lineages.sh - "./!{organism_dirname}" !{freq_cutoff} !{score_cutoff} \
-    <(ls !{igvstatic_path}/!{organism_dirname}/primer_sets_raw) "!{igvstatic_path}/!{organism_dirname}" !{task.cpus}
+    ls !{organism_dirname}/primer_sets_raw > primer_sets_data.txt
+
+    cat <(ls !{organism_dirname}/lineage_sets) <(echo "all.txt") \
+    | xargs !{primer_monitor_path}/lib/visualization/process_primer_sets_with_lineages.sh - "./!{organism_dirname}" !{pct_cutoff} !{score_cutoff} \
+    primer_sets_data.txt "./!{organism_dirname}" !{task.cpus}
+
+    rm primer_sets_data.txt
     '''
 }
 

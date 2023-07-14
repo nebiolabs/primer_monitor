@@ -2,6 +2,8 @@
 
 # you need to export DB_HOST, DB_NAME, and DB_USER before running this
 
+set -e
+
 psql -h "$DB_HOST" -d "$DB_NAME" -U "$DB_USER" -c "SELECT lineages.name, \
 COUNT(fasta_records.id) AS num_seen, min(fasta_records.date_submitted) AS first_seen, \
 max(fasta_records.date_submitted) AS last_seen, \
