@@ -10,6 +10,10 @@ class LineagesController < ApplicationController
 
   def show
     authorize! :show, LineagesController
-    @lineage = Lineage.find_by(id: params[:id])
+    @lineage = Lineage.find_by(name: params[:name])
+  end
+
+  def to_param
+    name
   end
 end

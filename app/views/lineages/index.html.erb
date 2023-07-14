@@ -12,8 +12,9 @@
 
   <tbody>
     <% @lineages.each do |lineage| %>
+    <% next if lineage.name == "Unassigned" %>
       <tr>
-        <td><a href="<%= lineage_url(lineage) %>"><%= lineage.name %></a></td>
+        <td><a href="<%= organism_lineage_url(@organism.name, lineage.name) %>"><%= lineage.name %></a></td>
         <% last_seen = lineage.fasta_records.order(date_submitted: :desc).first.date_submitted %>
         <td><%= last_seen.nil? ? 'Unknown' : last_seen.strftime("%Y-%m-%d") %></td>
         <td><%= lineage.fasta_records.count %></td>

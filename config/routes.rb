@@ -15,8 +15,10 @@ Rails.application.routes.draw do
   get 'about', to: 'about#show'
   get 'history', to: 'history#show'
   get 'lineage_variants', to: 'lineage_variants#index'
-  resources :organisms
-  resources :lineages
+  resources :organisms, param: :name do
+    resources :lineages, param: :name, constraints: { name: /[A-Z]+(\.\d+)*/ }
+  end
+
   resources :oligos
   resources :primer_sets
   resources :users

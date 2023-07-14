@@ -86,7 +86,7 @@ function loadPrimerSets(activePrimerSets, igvBrowser, activeLineageGroup)
     }
     igvBrowser.loadTrack(variantsTrack).then(function(addedTrack){
         tracks.push(addedTrack);
-        
+
         activePrimerSets.forEach(function(primerSetKey){
             let primerSetData = primerSetsToNames[primerSetKey];
             const newTrack = {
