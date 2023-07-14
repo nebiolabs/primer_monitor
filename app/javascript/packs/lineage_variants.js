@@ -73,7 +73,7 @@ function loadPrimerSets(activePrimerSets, igvBrowser, activeLineageGroup)
         let primerSetData = primerSetsToNames[primerSetKey];
         const newTrack = {
             "name": primerSetData[1],
-            "url": config['data_server']+"/"+config['organism']+"/primer_sets/"+encodeURIComponent(primerSetData[0])+"/"+encodeURIComponent(activeLineageGroup)+".bed",
+            "url": config['data_server']+"/"+config['organism_taxid']+"/primer_sets/"+encodeURIComponent(primerSetData[0])+"/"+encodeURIComponent(activeLineageGroup)+".bed",
             "format": "bed",
             "displayMode": "EXPANDED",
             "autoHeight": true
@@ -97,15 +97,15 @@ function initBrowser() {
     const browserConfig =
         {
             reference: {
-                "id": "NC_045512.2",
-                "name": "NC_045512.2 (SARS-CoV-2)",
-                "fastaURL": config['data_server']+"/ref/NC_045512.2.fasta",
-                "indexURL": config['data_server']+"/ref/NC_045512.2.fasta.fai",
+                "id": config['reference_accession'],
+                "name": config['organism_name']+" ("+config['reference_accession']+")",
+                "fastaURL": config['data_server']+"/"+config['organism_taxid']+"/ref/"+config['reference_accession']+".fasta",
+                "indexURL": config['data_server']+"/"+config['organism_taxid']+"/ref/"+config['reference_accession']+".fasta.fai",
                 tracks: [
                     {
                         "name": "Genes",
                         "type": "annotation",
-                        "url": config['data_server']+"/ref/NC_045512.2.gff3",
+                        "url": config['data_server']+"/"+config['organism_taxid']+"/ref/"+config['reference_accession']+".gff3",
                         "format": "gff3",
                         "filterTypes": ['CDS', 'mature_protein_region_of_CDS', 'region', 'stem_loop', 'five_prime_UTR', 'three_prime_UTR'],
                         "displayMode": "EXPANDED",

@@ -31,10 +31,10 @@ while read -r seq_name_raw; do
 done < <(cut -f 1 < "$primer_sets_tmp" | sort | uniq)
 printf "}\n"
 
+mkdir -p "$1"
+
 # $1 is checked to be set above
 rm "$1"/*.bed
-
-mkdir -p "$1"
 
 while read -r seq_rec; do
   seq_name=$(urlify_name "$(echo "$seq_rec" | cut -f 1)")

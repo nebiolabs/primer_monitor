@@ -5,20 +5,27 @@ class LineageVariantsController < ApplicationController
   def index
     authorize! :index, LineageVariantsController
 
+    # note: hardcoding SARS-CoV-2 taxid
+    organism = Organism.find_by(ncbi_taxon_id: '2697049')
+
     @config = {
       "data_server": ENV['IGV_DATA_SERVER'],
-      "organism": '2697049' # note: hardcoding SARS-CoV-2 taxid
+      "organism_taxid": organism.ncbi_taxon_id,
+      "organism_name": organism.name,
+      "reference_accession": organism.reference_accession
     }
 
-    tracks_url = URI("#{@config[:data_server]}/#{@config[:organism]}/misc/tracks.json")
+    tracks_url = URI("#{@config[:data_server]}/#{@config[:organism_taxid]}/misc/tracks.json")
 
-    tracks = JSON.parse(Net::HTTP.get(tracks_url))
+    @primer_sets = JSON.parse(Net::HTTP.get(tracks_url))
 
-    @primer_sets = tracks['tracks']
+    defaults_url = URI("#{@config[:data_server]}/#{@config[:organism_taxid]}/misc/defaults.json")
 
-    @default_tracks = tracks['default']
+    defaults = JSON.parse(Net::HTTP.get(defaults_url))
 
-    lineages_url = URI("#{@config[:data_server]}/#{@config[:organism]}/misc/lineage_sets.json")
+    @default_tracks = defaults['tracks']
+
+    lineages_url = URI("#{@config[:data_server]}/#{@config[:organism_taxid]}/misc/lineage_sets.json")
 
     @lineage_sets = JSON.parse(Net::HTTP.get(lineages_url))
 
