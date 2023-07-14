@@ -21,4 +21,4 @@ INNER JOIN lineages ON pangolin_calls.lineage_id=lineages.id \
 WHERE (date_collected >= '$1
 ' OR (date_collected IS NULL AND date_submitted >= '$1')) \
 ORDER BY variant_sites.ref_start, variant_sites.ref_end, variant_sites.variant_type, variant_sites.variant;" --csv -t \
-| tr "," "\t" | sed -E "s/^/NC_045512.2\t/g"
+| tr "," "\t" | sed -E "s/^/NC_045512.2\t/g" | grep -v -E "\t[0-9]+N"
