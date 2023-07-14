@@ -7,6 +7,7 @@ let primerSetsToNames = {};
 let lineageSetsToNames = {};
 let defaultCheckboxStatus = {};
 let config = {};
+let lineageSetNameMap = {};
 
 function loadConfig()
 {
@@ -14,6 +15,12 @@ function loadConfig()
     lineageSetsToNames = JSON.parse($('#lineage_set_json')[0].innerHTML);
     defaultCheckboxStatus = JSON.parse($('#default_tracks_json')[0].innerHTML);
     config = JSON.parse($('#config')[0].innerHTML);
+
+    for (let lineageSetKey in lineageSetsToNames) {
+        let lineageSet = lineageSetsToNames[lineageSetKey];
+        lineageSetNameMap[lineageSet[0]] = lineageSet[1];
+    }
+
 }
 
 function setSelectFormDisabled(state)
@@ -70,33 +77,37 @@ function loadPrimerSets(activePrimerSets, igvBrowser, activeLineageGroup)
     const primerSetPromises = [];
 
     const variantsTrack = {
-        "name": activeLineageGroup+" Variants",
+        "name": lineageSetNameMap[activeLineageGroup]+" Variants",
         "url": config['data_server']+"/"+config['organism_taxid']+"/lineage_variants/"+encodeURIComponent(activeLineageGroup)+".bed",
         "format": "bed",
+        "color": "#575757",
         "displayMode": "COLLAPSED",
         "autoHeight": true
     }
-    primerSetPromises.push(igvBrowser.loadTrack(variantsTrack));
-
-    activePrimerSets.forEach(function(primerSetKey){
-        let primerSetData = primerSetsToNames[primerSetKey];
-        const newTrack = {
-            "name": primerSetData[1],
-            "url": config['data_server']+"/"+config['organism_taxid']+"/primer_sets/"+encodeURIComponent(primerSetData[0])+"/"+encodeURIComponent(activeLineageGroup)+".bed",
-            "format": "bed",
-            "displayMode": "EXPANDED",
-            "autoHeight": true
-        }
-        primerSetPromises.push(igvBrowser.loadTrack(newTrack));
-    });
-
-    Promise.all(primerSetPromises).then(function(addedTracks){
-        addedTracks.forEach(function(addedTrack){
-            tracks.push(addedTrack);
+    igvBrowser.loadTrack(variantsTrack).then(function(addedTrack){
+        tracks.push(addedTrack);
+        
+        activePrimerSets.forEach(function(primerSetKey){
+            let primerSetData = primerSetsToNames[primerSetKey];
+            const newTrack = {
+                "name": primerSetData[1],
+                "url": config['data_server']+"/"+config['organism_taxid']+"/primer_sets/"+encodeURIComponent(primerSetData[0])+"/"+encodeURIComponent(activeLineageGroup)+".bed",
+                "format": "bed",
+                "displayMode": "EXPANDED",
+                "autoHeight": true
+            }
+            primerSetPromises.push(igvBrowser.loadTrack(newTrack));
         });
-        setSelectFormDisabled(false); //unlock the form
-    }).catch(function(){
-        setSelectFormDisabled(false); //also unlock the form
+
+        Promise.all(primerSetPromises).then(function(addedTracks){
+            addedTracks.forEach(function(addedTrack){
+                tracks.push(addedTrack);
+            });
+            setSelectFormDisabled(false); //unlock the form
+        }).catch(function(){
+            setSelectFormDisabled(false); //also unlock the form
+        });
+
     });
 
 }
