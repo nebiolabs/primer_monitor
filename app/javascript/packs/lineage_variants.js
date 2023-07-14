@@ -69,6 +69,15 @@ function loadPrimerSets(activePrimerSets, igvBrowser, activeLineageGroup)
 
     const primerSetPromises = [];
 
+    const variantsTrack = {
+        "name": activeLineageGroup+" Variants",
+        "url": config['data_server']+"/"+config['organism_taxid']+"/lineage_variants/"+encodeURIComponent(activeLineageGroup)+".bed",
+        "format": "bed",
+        "displayMode": "COLLAPSED",
+        "autoHeight": true
+    }
+    primerSetPromises.push(igvBrowser.loadTrack(variantsTrack));
+
     activePrimerSets.forEach(function(primerSetKey){
         let primerSetData = primerSetsToNames[primerSetKey];
         const newTrack = {
