@@ -24,6 +24,8 @@ class Lineage < ApplicationRecord
 
       new_lineage_names.add line.chomp.split(',')[1]
     end
+
+    # if there are no records (not only pre-existing lineages, but nothing at all)
     raise "Unable to parse any records from #{pangolin_csv}" if record_count.zero?
 
     new_lineages = []
@@ -36,5 +38,4 @@ class Lineage < ApplicationRecord
 
     new_lineages
   end
-
 end
