@@ -12,13 +12,17 @@ class Lineage < ApplicationRecord
     record_count = 0
 
     File.readlines(pangolin_csv).each do |line|
-      next if line.start_with?("taxon,")
+      next if line.start_with?('taxon,')
 
       record_count += 1
-      if line.chomp.split("\t")[1].blank? || line.chomp.split(",")[1].nil?
-        ActiveRecord::Base.logger.info line.chomp.split(",")
+      if line.chomp.split("\t")[1].blank? || line.chomp.split(',')[1].nil?
+        ActiveRecord::Base.logger.info line.chomp.split(',')
       end
-      new_lineage_names.add line.chomp.split(",")[1]
+
+      # prevent trying to re-add lineages that are already in the database
+      next if Lineage.exists? name: line.chomp.split(',')[1]
+
+      new_lineage_names.add line.chomp.split(',')[1]
     end
     raise "Unable to parse any records from #{pangolin_csv}" if record_count.zero?
 
