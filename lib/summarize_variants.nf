@@ -256,7 +256,7 @@ process recompute_affected_primers {
     publishDir "${igvstatic_path}", mode: 'copy'
     errorStrategy 'retry'
     maxRetries 2
-    conda "libiconv psycopg2 bedtools coreutils 'postgresql>=15'"
+    conda "libiconv psycopg2 bedtools coreutils 'postgresql>=15' gawk"
     input:
         file complete
     output:
