@@ -109,7 +109,11 @@ process load_pangolin_data {
         file '*.complete_pangolin'
     shell:
     '''
-    PGPASSFILE="!{primer_monitor_path}/config/.pgpass" !{primer_monitor_path}/lib/pangolin_calls/update_fasta_records.sh !{csv} pending_pangolin_call_id
+    RAILS_ENV=production ruby !{primer_monitor_path}/upload.rb \
+            --import_calls \
+            --pangolin_csv !{csv} \
+            --pending true \
+            && mv !{csv} !{csv}.complete_pangolin
     '''
 }
 
