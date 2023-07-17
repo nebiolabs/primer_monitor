@@ -113,7 +113,7 @@ process load_pangolin_data {
             --import_calls \
             --pangolin_csv !{csv} \
             --pending true \
-            && mv !{csv} !{csv}.complete_pangolin
+            && mv !{csv} !{csv}.$(basename $PWD).complete_pangolin
     '''
 }
 
