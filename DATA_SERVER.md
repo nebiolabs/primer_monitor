@@ -44,12 +44,9 @@ lineage group.
 * `<organism taxid>/lineage_variants/<lineage set>.bed`: A BED file listing the variants detected in the specified
   lineage set. The filenames match the internal names from `lineage_sets.json`.
 
-* `<organism taxid>/lineage_variants/<lineage set>.bed.tbi`: A tabix index for `<lineage set>.bed`.
-
 ### Reference sequence
 
 * `<organism taxid>/ref/<genbank accession>.fasta`: The reference sequence of the SARS-CoV-2 virus in FASTA format. For SARS-CoV-2, `<genbank accession>` is `NC_045512.2`.
 * `<organism taxid>/ref/<genbank accession>.fasta.fai`: An index of the FASTA reference sequence.
 * `<organism taxid>/ref/<genbank accession>.gff3`: A GFF3 file containing genome annotations.
-* `<organism taxid>/ref/<genbank accession>.gff3.tbi`: A tabix index of the annotations file.
 
