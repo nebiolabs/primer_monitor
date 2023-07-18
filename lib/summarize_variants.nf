@@ -21,6 +21,9 @@ output_path = params.output_path
 params.igvstatic_path = '/var/www/igvstatic'
 igvstatic_path = params.igvstatic_path
 
+params.frontend_host = 'primer-monitor.neb.com'
+frontend_host = params.frontend_host
+
 params.pangolin_version_path =
 params.pangolin_data_version_path =
 
@@ -252,7 +255,6 @@ process recalculate_database_views {
 
 process recompute_affected_primers {
     cpus 8
-    publishDir "${igvstatic_path}", mode: 'copy'
     errorStrategy 'retry'
     maxRetries 2
     conda "libiconv psycopg2 bedtools coreutils 'postgresql>=15' gawk"
@@ -275,8 +277,8 @@ process recompute_affected_primers {
     export DB_NAME
     mkdir -p !{organism_dirname}/misc
     mkdir -p !{organism_dirname}/lineage_sets
+    mkdir -p !{organism_dirname}/lineage_variants
     mkdir -p !{organism_dirname}/primer_sets_raw
-    mkdir -p !{organism_dirname}/lineage_sets
 
     !{primer_monitor_path}/lib/visualization/get_lineage_data.sh > lineages.csv
 
@@ -298,6 +300,14 @@ process recompute_affected_primers {
     primer_sets_data.txt "./!{organism_dirname}" !{task.cpus}
 
     rm primer_sets_data.txt
+
+    # remove old files so this doesn't clutter up the directories
+    ssh !{frontend_host} "rm -r !{igvstatic_path}/!{organism_dirname}/primer_sets; \
+    rm !{igvstatic_path}/!{organism_dirname}/primer_sets_raw/* !{igvstatic_path}/!{organism_dirname}/lineage_sets/* \
+    !{igvstatic_path}/!{organism_dirname}/lineage_variants/*;"
+
+    # copies over the new files
+    scp -r ./!{organism_dirname} !{frontend_host}:!{igvstatic_path}/!{organism_dirname};
     '''
 }
 
