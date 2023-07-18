@@ -10,7 +10,7 @@
    viewBox="0 0 851.05002 1101.24"
    version="1.1"
    id="svg348"
-   sodipodi:docname="both_v4.svg"
+   sodipodi:docname="pipeline_documentation.svg"
    inkscape:version="1.2.1 (9c6d41e4, 2022-07-14)"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
@@ -30,14 +30,14 @@
      inkscape:document-units="pt"
      showgrid="false"
      inkscape:zoom="1.0323759"
-     inkscape:cx="535.17328"
-     inkscape:cy="185.49445"
+     inkscape:cx="536.14192"
+     inkscape:cy="1116.3569"
      inkscape:window-width="1920"
-     inkscape:window-height="953"
+     inkscape:window-height="945"
      inkscape:window-x="0"
      inkscape:window-y="25"
      inkscape:window-maximized="0"
-     inkscape:current-layer="svg348" />
+     inkscape:current-layer="edge15-8" />
   <g
      id="graph0"
      class="graph"
@@ -671,6 +671,29 @@
          id="text214"
          style="fill:#000000;fill-opacity:1;stroke:none;stroke-opacity:1">recalculate_database_views</text>
     </g>
+    <g
+       id="node13-0"
+       class="node"
+       transform="translate(0.35905226,89.210153)">
+      <title
+         id="title210-2">p12</title>
+      <ellipse
+         fill="none"
+         stroke="#000000"
+         cx="140.36"
+         cy="-18"
+         rx="113.28"
+         ry="18"
+         id="ellipse212-4" />
+      <text
+         text-anchor="middle"
+         x="140.36"
+         y="-12.95"
+         font-family="Times, serif"
+         font-size="14px"
+         id="text214-8"
+         style="fill:#000000;fill-opacity:1;stroke:none;stroke-opacity:1">recompute_affected_primers</text>
+    </g>
     <!-- p11&#45;&gt;p12 -->
     <g
        id="edge15"
@@ -689,12 +712,37 @@
          id="polygon221" />
       <text
          text-anchor="middle"
-         x="153.49001"
+         x="154.9901"
          y="-57.200001"
          font-family="Times, serif"
          font-size="14px"
          id="text223"
          style="fill:#000000;fill-opacity:1;stroke:none;stroke-opacity:1">done</text>
+    </g>
+    <g
+       id="edge15-8"
+       class="edge"
+       transform="translate(-1.4427443,89.036394)">
+      <title
+         id="title217-1">p11-&gt;p12</title>
+      <path
+         fill="none"
+         stroke="#000000"
+         d="m 140.36,-88.41 c 0,11.77 0,27.68 0,41.3"
+         id="path219-4" />
+      <polygon
+         fill="#000000"
+         stroke="#000000"
+         points="136.86,-47.35 143.86,-47.35 140.36,-37.35 "
+         id="polygon221-7" />
+      <text
+         text-anchor="middle"
+         x="166.99083"
+         y="-57.200001"
+         font-family="Times, serif"
+         font-size="14px"
+         id="text223-1"
+         style="fill:#000000;fill-opacity:1;stroke:none;stroke-opacity:1">complete</text>
     </g>
     <!-- p0b -->
     <g

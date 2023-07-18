@@ -57,6 +57,10 @@ p11 [label="update_new_calls"];
 p12 [label="recalculate_database_views"];
 p11 -> p12 [label="done"];
 
+p12 [label="recalculate_database_views"];
+p13 [label="recompute_affected_primers"];
+p12 -> p13 [label="complete"];
+
 p0b [label="get_new_versions"];
 p4b [label="pangolin_calls"];
 p0b -> p4b [label="latest_pangolin"];
