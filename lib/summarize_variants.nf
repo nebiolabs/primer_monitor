@@ -271,7 +271,7 @@ process recompute_affected_primers {
     set -e # fail on error
     source !{primer_monitor_path}/.env
     export DB_HOST
-    export DB_USER
+    export DB_USER_RO
     export DB_NAME
     mkdir -p !{organism_dirname}/misc
     mkdir -p !{organism_dirname}/lineage_sets
@@ -282,7 +282,7 @@ process recompute_affected_primers {
 
     !{primer_monitor_path}/lib/visualization/get_primer_sets.sh !{organism_dirname}/primer_sets_raw > !{organism_dirname}/misc/tracks.json
 
-    psql -h "$DB_HOST" -d "$DB_NAME" -U "$DB_USER" -c "SELECT COALESCE(date_collected, date_submitted), COUNT(*) \
+    psql -h "$DB_HOST" -d "$DB_NAME" -U "$DB_USER_RO" -c "SELECT COALESCE(date_collected, date_submitted), COUNT(*) \
     FROM fasta_records GROUP BY COALESCE(date_collected, date_submitted);" --csv -t > seq_counts.csv
 
     curl https://raw.githubusercontent.com/cov-lineages/pango-designation/master/pango_designation/alias_key.json \

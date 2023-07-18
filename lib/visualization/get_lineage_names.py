@@ -97,7 +97,7 @@ def process_aliases(alias_str, lineage_filename, search_string, conn):
 
 
 if __name__ == "__main__":
-    conn = psycopg2.connect("dbname="+os.environ['DB_NAME']+" user="+os.environ['DB_USER']+" host="+os.environ['DB_HOST'])
+    conn = psycopg2.connect("dbname="+os.environ['DB_NAME']+" user="+os.environ['DB_USER_RO']+" host="+os.environ['DB_HOST'])
     result = process_aliases(sys.stdin.read(), sys.argv[2], sys.argv[1], conn)
     conn.close()
     print(result[0])

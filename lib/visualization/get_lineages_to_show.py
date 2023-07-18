@@ -123,7 +123,7 @@ with open(sys.argv[2]) as f:
                                  'last_seen':datetime.datetime.strptime(line[3], '%Y-%m-%d').date(),
                                  'median_date':datetime.datetime.strptime(line[4], '%Y-%m-%d').date()}
 
-conn = psycopg2.connect("dbname="+os.environ['DB_NAME']+" user="+os.environ['DB_USER']+" host="+os.environ['DB_HOST'])
+conn = psycopg2.connect("dbname="+os.environ['DB_NAME']+" user="+os.environ['DB_USER_RO']+" host="+os.environ['DB_HOST'])
 interesting_lineages = get_lineages(alias_str, lineages_file, starting_lineages, seqs_per_day, lineage_data, conn)
 conn.close()
 

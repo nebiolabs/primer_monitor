@@ -17,7 +17,7 @@ fi
 source "$(dirname "$0")/../../.env";
 
 # gets a list of unique lineage names
-cat "$pangolin_csv" | cut -f2 -d',' | grep -v 'Unassigned' | grep -v 'lineage' | sort | uniq > lineages_new.txt
+cut -f2 -d',' "$pangolin_csv" | grep -v 'Unassigned' | grep -v 'lineage' | sort | uniq > lineages_new.txt
 
 
 

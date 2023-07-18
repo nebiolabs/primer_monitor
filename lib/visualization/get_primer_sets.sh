@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 
-# you need to export DB_HOST, DB_NAME, and DB_USER before running this
+# you need to export DB_HOST, DB_NAME, and DB_USER_RO before running this
 
 set -e
 
 primer_sets_tmp=$(mktemp)
 
-psql -h "$DB_HOST" -d "$DB_NAME" -U "$DB_USER" -c "SELECT primer_sets.name, organisms.reference_accession, \
+psql -h "$DB_HOST" -d "$DB_NAME" -U "$DB_USER_RO" -c "SELECT primer_sets.name, organisms.reference_accession, \
 oligos.ref_start,oligos.ref_end, oligos.name, '0' AS score, \
 COALESCE(oligos.strand, '.') AS strand FROM oligos INNER JOIN primer_sets \
 ON oligos.primer_set_id=primer_sets.id INNER JOIN organisms ON organisms.id=primer_sets.organism_id \
