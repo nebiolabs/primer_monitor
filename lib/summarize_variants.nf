@@ -45,7 +45,6 @@ process download_data {
     shell:
     '''
     date_today=$(date +%Y-%m-%d)
-    source !{primer_monitor_path}/.env
     datasets download virus genome taxon SARS-CoV-2 --complete-only --host human --filename tmp.zip
     unzip tmp.zip
     zstd --long=30 --ultra -22 -T!{task.cpus} ncbi_dataset/data/data_report.jsonl -o ${date_today}.metadata.zst
@@ -271,6 +270,9 @@ process recompute_affected_primers {
     # recompute the primer data for igvjs visualization
     set -e # fail on error
     source !{primer_monitor_path}/.env
+    export DB_HOST
+    export DB_USER
+    export DB_NAME
     mkdir -p !{organism_dirname}/misc
     mkdir -p !{organism_dirname}/lineage_sets
     mkdir -p !{organism_dirname}/primer_sets_raw
