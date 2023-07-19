@@ -7,14 +7,14 @@
 <% seqs_by_date_collected = @lineage.fasta_records.order(date_collected: :desc) %>
 <% seqs_by_date_submitted = @lineage.fasta_records.order(date_submitted: :desc) %>
 
-<% first_seen_collected = seqs_by_date_collected.last.date_collected %>
-<% first_seen = seqs_by_date_submitted.last.date_submitted %>
+<% first_seen_collected = seqs_by_date_collected.last&.date_collected %>
+<% first_seen = seqs_by_date_submitted.last&.date_submitted %>
 
-<p><span class="bold-text">First submitted to NCBI on:</span> <%= first_seen.strftime("%Y-%m-%d") %> (first collected <%= first_seen_collected.nil? ? 'N/A' : first_seen_collected.strftime("%Y-%m-%d") %>)</p>
+<p><span class="bold-text">First submitted to NCBI on:</span> <%= first_seen.nil? ? 'N/A' : first_seen.strftime("%Y-%m-%d") %> (first collected <%= first_seen_collected.nil? ? 'N/A' : first_seen_collected.strftime("%Y-%m-%d") %>)</p>
 
-<% last_seen_collected = seqs_by_date_collected.first.date_collected %>
-<% last_seen = seqs_by_date_submitted.first.date_submitted %>
+<% last_seen_collected = seqs_by_date_collected.first&.date_collected %>
+<% last_seen = seqs_by_date_submitted.first&.date_submitted %>
 
-<p><span class="bold-text">Last submitted to NCBI on:</span> <%= last_seen.strftime("%Y-%m-%d") %> (last collected <%= last_seen_collected.nil? ? 'N/A' : last_seen_collected.strftime("%Y-%m-%d") %>)</p>
+<p><span class="bold-text">Last submitted to NCBI on:</span> <%= last_seen.nil? ? 'N/A' : last_seen.strftime("%Y-%m-%d") %> (last collected <%= last_seen_collected.nil? ? 'N/A' : last_seen_collected.strftime("%Y-%m-%d") %>)</p>
 <br>
 <p><span class="bold-text">More data on outbreak.info:</span> <a href="https://outbreak.info/situation-reports/<%= @lineage.name %>">https://outbreak.info/situation-reports/<%= @lineage.name %></a></p>
