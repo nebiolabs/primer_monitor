@@ -123,11 +123,11 @@ namespace :deploy do
     task :link_igvstatic do
       on roles :app do
         within release_path do
-          execute <<-BASH
-            for dir in `ls #{release_path}/igvstatic`; do
-              pushd $dir && 
-              ln -sf #{shared_path}/igvstatic/$(basename \"$dir\")/* . &&
-              popd;
+          execute <<~BASH
+            for dir in #{release_path}/igvstatic/*; do \
+              pushd $dir && \
+              ln -sf #{shared_path}/igvstatic/$(basename \"$dir\")/* . && \
+              popd
             done
           BASH
         end
