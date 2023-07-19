@@ -313,8 +313,8 @@ process recompute_affected_primers {
     rm primer_sets_data.txt
 
     # remove old files so this doesn't clutter up the directories
-    ssh !{ssh_opts} !{frontend_host} "rm -r !{igvstatic_path}/!{organism_dirname}/primer_sets; \
-    rm !{igvstatic_path}/!{organism_dirname}/primer_sets_raw/* !{igvstatic_path}/!{organism_dirname}/lineage_sets/* \
+    ssh !{ssh_opts} !{frontend_host} "rm -rf !{igvstatic_path}/!{organism_dirname}/primer_sets; \
+    rm -f !{igvstatic_path}/!{organism_dirname}/primer_sets_raw/* !{igvstatic_path}/!{organism_dirname}/lineage_sets/* \
     !{igvstatic_path}/!{organism_dirname}/lineage_variants/*;"
 
     # copies over the new files
