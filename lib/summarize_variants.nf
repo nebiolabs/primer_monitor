@@ -318,7 +318,7 @@ process recompute_affected_primers {
     !{igvstatic_path}/!{organism_dirname}/lineage_variants/*;"
 
     # copies over the new files
-    scp !{scp_opts} -r ./!{organism_dirname} !{frontend_host}:!{igvstatic_path}/!{organism_dirname};
+    scp !{scp_opts} -r ./!{organism_dirname}/* !{frontend_host}:!{igvstatic_path}/!{organism_dirname}/;
     '''
 }
 

@@ -118,6 +118,20 @@ namespace :deploy do
     end
   end
 
+  namespace :symlink do
+    desc 'Link ref and defaults into igvstatic data'
+    task :link_igvstatic do
+      on roles :app do
+        within release_path do
+          execute "for dir in `ls igvstatic`; do ln -sf $dir/igvstatic/* #{shared_path}/igvstatic/; done"
+        end
+      end
+    end
+
+    after :linked_files, :link_igvstatic
+
+  end
+
   after :published, :restart
   #after 'deploy:restart_services', 'deploy:seed'
 
