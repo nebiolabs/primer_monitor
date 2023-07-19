@@ -15,17 +15,17 @@ class LineageVariantsController < ApplicationController
       "reference_accession": organism.reference_accession
     }
 
-    tracks_url = URI("#{@config[:data_server]}/#{@config[:organism_taxid]}/misc/tracks.json")
+    tracks_url = URI("#{@config[:data_server]}/#{@config[:organism_taxid]}/config/tracks.json")
 
     @primer_sets = JSON.parse(Net::HTTP.get(tracks_url))
 
-    defaults_url = URI("#{@config[:data_server]}/#{@config[:organism_taxid]}/misc/defaults.json")
+    defaults_url = URI("#{@config[:data_server]}/#{@config[:organism_taxid]}/defaults.json")
 
     defaults = JSON.parse(Net::HTTP.get(defaults_url))
 
     @default_tracks = defaults['tracks']
 
-    lineages_url = URI("#{@config[:data_server]}/#{@config[:organism_taxid]}/misc/lineage_sets.json")
+    lineages_url = URI("#{@config[:data_server]}/#{@config[:organism_taxid]}/config/lineage_sets.json")
 
     @lineage_sets = JSON.parse(Net::HTTP.get(lineages_url))
 

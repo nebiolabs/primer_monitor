@@ -10,20 +10,20 @@ should work for this purpose.
 ## Data Server File Paths
 
 For the purposes of this section, we will leave off the domain of the IGV data server for clarity 
-(e.g. a path below of `<organism taxid>/misc/tracks.json` indicates a full URL of `<IGV data server URL>/<organism taxid>/misc/tracks.json`).
+(e.g. a path below of `<organism taxid>/config/tracks.json` indicates a full URL of `<IGV data server URL>/<organism taxid>/config/tracks.json`).
 
 Primer Monitor expects the data files hosted by the data server to be at the following paths:
 
-### Metadata
+### Configuration
 
-* `<organism taxid>/misc/tracks.json`: A JSON file with key-value pairs mapping the internal name of a primer set (used in URLs),
+* `<organism taxid>/defaults.json`: A JSON file containing a key "tracks", with a value of a list of the internal names of the
+  primer sets to select by default on initial page load.
+
+* `<organism taxid>/config/tracks.json`: A JSON file with key-value pairs mapping the internal name of a primer set (used in URLs),
 to the name a user should see on the site (e.g. `"ARTIC_v4": "ARTIC v4"`). The list of available primer sets is
 also obtained from the list of key-value pairs in this file.
 
-* `<organism taxid>/misc/defaults.json`: A JSON file containing a key "tracks", with a value of a list of the internal names of the 
-primer sets to select by default on initial page load.
-
-* `<organism taxid>/misc/lineage_sets.json`: A JSON file with key-value pairs mapping the internal name of a lineage set 
+* `<organism taxid>/config/lineage_sets.json`: A JSON file with key-value pairs mapping the internal name of a lineage set 
 (used in URLs), to the name a user should see on the site (e.g. `"BA.2": "BA.2.*"`). The list of available 
 lineage sets is also obtained from the list of key-value pairs in this file.
 
