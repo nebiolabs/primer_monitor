@@ -49,3 +49,6 @@ coverage/**
 # Ignore all .DS_Store
 .DS_Store
 **/.DS_Store
+
+# Ignore .pgpass
+config/.pgpass
