@@ -24,6 +24,17 @@ igvstatic_path = params.igvstatic_path
 params.frontend_host = 'primer-monitor.neb.com'
 frontend_host = params.frontend_host
 
+params.jump_proxy =
+
+ssh_opts = ""
+scp_opts = ""
+
+if(params.jump_proxy)
+{
+    ssh_opts = "-J ${params.jump_proxy}"
+    scp_opts = "-o ProxyJump=${params.jump_proxy}"
+}
+
 params.pangolin_version_path =
 params.pangolin_data_version_path =
 
@@ -302,12 +313,12 @@ process recompute_affected_primers {
     rm primer_sets_data.txt
 
     # remove old files so this doesn't clutter up the directories
-    ssh !{frontend_host} "rm -r !{igvstatic_path}/!{organism_dirname}/primer_sets; \
+    ssh !{ssh_opts} !{frontend_host} "rm -r !{igvstatic_path}/!{organism_dirname}/primer_sets; \
     rm !{igvstatic_path}/!{organism_dirname}/primer_sets_raw/* !{igvstatic_path}/!{organism_dirname}/lineage_sets/* \
     !{igvstatic_path}/!{organism_dirname}/lineage_variants/*;"
 
     # copies over the new files
-    scp -r ./!{organism_dirname} !{frontend_host}:!{igvstatic_path}/!{organism_dirname};
+    scp !{scp_opts} -r ./!{organism_dirname} !{frontend_host}:!{igvstatic_path}/!{organism_dirname};
     '''
 }
 
