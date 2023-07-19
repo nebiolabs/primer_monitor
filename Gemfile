@@ -52,14 +52,16 @@ group :development, :test do
 end
 
 group :development do
-  # Access an interactive console on exception pages or by calling 'console' anywhere in the code.
+  gem 'bcrypt_pbkdf'
   gem 'capistrano', '~> 3.10', require: false
   gem 'capistrano-rails', '~> 1.3', require: false
   gem 'capistrano-rbenv', '~> 2.2'
+  gem 'ed25519'
   gem 'listen', '~> 3.2'
   gem 'rubocop', require: false
   gem 'rubocop-performance', require: false
   gem 'rubocop-rails', require: false
+  # Access an interactive console on exception pages or by calling 'console' anywhere in the code.
   gem 'web-console', '>= 3.3.0'
   # for measuring test coverage
   gem 'simplecov'
