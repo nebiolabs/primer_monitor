@@ -27,7 +27,7 @@ fi
 
 mkdir -p "$output_path/lineage_variants"
 LINECOUNT=$(wc -l < "$$_filtered_variants.bed");
-awk -F"\t" '{ OFS="\t"; print $1, $2, $3, $7 "->" $8 }' "$$_filtered_variants.bed" | sort -k2n -k3n -k4 | uniq -c \
+awk -F"\t" '{ OFS="\t"; print $1, $2, $3, $8 }' "$$_filtered_variants.bed" | sort -k2n -k3n -k4 | uniq -c \
 | awk -v linecount="$LINECOUNT" '$1 > linecount*0.001 { OFS="\t"; print $2, $3, $4, $5 }' > "$output_path/lineage_variants/$lineage_name.bed"
 
 
