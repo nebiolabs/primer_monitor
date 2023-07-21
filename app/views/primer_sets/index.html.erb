@@ -23,7 +23,7 @@
         <% end %>
       </td>
       <td><%= link_to primer_set.organism, primer_set.organism %></td>
-      <td><%= primer_set.oligos.join(", ") %></td>
+      <td><%= primer_set.oligos.length > 12 ? primer_set.oligos[..11].join(", ")+'...' : primer_set.oligos.join(", ") %></td>
       <td>
         <%= render 'primer_set_subscription',
                    user: current_user,
