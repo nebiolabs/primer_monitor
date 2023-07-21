@@ -2,19 +2,15 @@
 
 <h3 class="title">Overview:</h3>
 
-<p><span class="bold-text">Sequences seen:</span> <%= @lineage.fasta_records.count %></p>
+<p><span class="bold-text">Sequences seen:</span> <%= @lineage_info['times_seen'] %></p>
 <br>
-<% seqs_by_date_collected = @lineage.fasta_records.order(date_collected: :desc) %>
-<% seqs_by_date_submitted = @lineage.fasta_records.order(date_submitted: :desc) %>
 
-<% first_seen_collected = seqs_by_date_collected.last&.date_collected %>
-<% first_seen = seqs_by_date_submitted.last&.date_submitted %>
+<p><span class="bold-text">First seen on:</span> <%= @lineage_info['first_seen'].nil? ? 'N/A' : @lineage_info['first_seen'] %></p>
 
-<p><span class="bold-text">First submitted to NCBI on:</span> <%= first_seen.nil? ? 'N/A' : first_seen.strftime("%Y-%m-%d") %> (first collected <%= first_seen_collected.nil? ? 'N/A' : first_seen_collected.strftime("%Y-%m-%d") %>)</p>
-
-<% last_seen_collected = seqs_by_date_collected.first&.date_collected %>
-<% last_seen = seqs_by_date_submitted.first&.date_submitted %>
-
-<p><span class="bold-text">Last submitted to NCBI on:</span> <%= last_seen.nil? ? 'N/A' : last_seen.strftime("%Y-%m-%d") %> (last collected <%= last_seen_collected.nil? ? 'N/A' : last_seen_collected.strftime("%Y-%m-%d") %>)</p>
+<p><span class="bold-text">Last seen on:</span> <%= @lineage_info['last_seen'].nil? ? 'N/A' : @lineage_info['last_seen'] %></p>
 <br>
 <p><span class="bold-text">More data on outbreak.info:</span> <a href="https://outbreak.info/situation-reports/<%= @lineage.name %>">https://outbreak.info/situation-reports/<%= @lineage.name %></a></p>
+
+<br>
+
+<p><span class="bold-text">Note:</span> In the above data, "seen" refers to the date the sample was collected, unless that date was not provided for a sequence, in which case it refers to the date it was submitted to NCBI.</p>

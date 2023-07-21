@@ -1379,6 +1379,31 @@ ALTER TABLE ONLY public.verified_notifications ALTER COLUMN id SET DEFAULT nextv
 
 
 --
+-- Name: lineages lineages_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.lineages
+    ADD CONSTRAINT lineages_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: lineage_info; Type: MATERIALIZED VIEW; Schema: public; Owner: -
+--
+
+CREATE MATERIALIZED VIEW public.lineage_info AS
+ SELECT lineages.name,
+    lineages.organism_id,
+    count(fasta_records.id) AS times_seen,
+    COALESCE(max(fasta_records.date_collected), max(fasta_records.date_submitted)) AS last_seen,
+    COALESCE(min(fasta_records.date_collected), min(fasta_records.date_submitted)) AS first_seen
+   FROM ((public.lineages
+     JOIN public.pangolin_calls ON ((pangolin_calls.lineage_id = lineages.id)))
+     JOIN public.fasta_records ON ((fasta_records.pangolin_call_id = pangolin_calls.id)))
+  GROUP BY lineages.id
+  WITH NO DATA;
+
+
+--
 -- Name: amplification_methods amplification_methods_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -1440,14 +1465,6 @@ ALTER TABLE ONLY public.fasta_records
 
 ALTER TABLE ONLY public.genomic_features
     ADD CONSTRAINT genomic_features_pkey PRIMARY KEY (id);
-
-
---
--- Name: lineages lineages_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.lineages
-    ADD CONSTRAINT lineages_pkey PRIMARY KEY (id);
 
 
 --
@@ -2207,6 +2224,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20230706131800'),
 ('20230714105625'),
 ('20230714172920'),
-('20230718131700');
+('20230718131700'),
+('20230721152550');
 
 

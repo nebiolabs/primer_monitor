@@ -113,7 +113,7 @@ def main
     import_pangolin(opts[:pangolin_csv], opts[:pending]) if opts[:import_calls]
     if opts[:rebuild_views]
       %w[variant_overlaps counts time_counts oligo_variant_overlaps
-         identify_primers_for_notifications initial_score].each do |view|
+         identify_primers_for_notifications initial_score lineage_info].each do |view|
         ActiveRecord::Base.connection.execute("REFRESH MATERIALIZED VIEW #{view}")
         @log.info("refreshing #{view}")
       end
