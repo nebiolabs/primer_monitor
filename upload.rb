@@ -86,7 +86,7 @@ def import_pangolin(pangolin_csv, pending)
   @log.info("starting import: #{pangolin_csv}: ")
 
   lineages = Lineage.parse(pangolin_csv)
-  result_lineages = Lineage.import(lineages)
+  result_lineages = Lineage.import(lineages, on_duplicate_key_ignore: true)
   result_lineages.failed_instances.each { |rec| @log.error("Failed to insert lineage \"#{rec}\"") }
   @log.info("Loaded #{result_lineages.ids.size}/#{lineages.size} new lineages")
 
