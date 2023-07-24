@@ -1,11 +1,9 @@
 <h1 class="title">SARS-CoV-2 Lineage Variant Summary</h1>
 
-<!--<  %= image_tag 'lineage_primer_summary_20220211.svg' %  >-->
 <% primer_sets_map = {} %>
 <% default_tracks_map = {} %>
 <% lineage_sets_map = {} %>
 <% i = 0 %>
-<% primer_set_count = @primer_sets.length %>
 <div class="block">
   Primers that do not overlap with variants associated with these lineages are shown in blue below a schematic SARS-CoV-2 genome.
   Primers that overlap with enough sufficiently-frequent variants to be potentially impacted (see below) are indicated in orange.
@@ -139,26 +137,6 @@
   <%= javascript_pack_tag "lineage_variants" %>
 </div>
 <hr>
-<!--
-<h2 class="title">0-5 kb Variants</h2>
-< %= image_tag 'lineage_primer_summary_0-5kb_20220211.svg' % >
-<hr>
-<h2 class="title">5-10 kb Variants</h2>
-< %= image_tag 'lineage_primer_summary_5-10kb_20220211.svg' % >
-<hr>
-<h2 class="title">10-15 kb Variants</h2>
-< %= image_tag 'lineage_primer_summary_10-15kb_20220211.svg' % >
-<hr>
-<h2 class="title">15-20 kb Variants</h2>
-< %= image_tag 'lineage_primer_summary_15-20kb_20220211.svg' % >
-<hr>
-<h2 class="title">20-25 kb Variants</h2>
-< %= image_tag 'lineage_primer_summary_20-25kb_20220211.svg' % >
-<hr>
-<h2 class="title">25-29 kb Variants</h2>
-< %= image_tag 'lineage_primer_summary_25-29kb_20220211.svg' % >
-<hr/>
--->
 <h2 class="title">Methods:</h2>
 <p>
   Sequences reported in <%= link_to 'Sequence Sources', '#sequence_sources' %> for each lineage were aligned to the
