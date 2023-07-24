@@ -2,7 +2,6 @@ nextflow.enable.dsl = 2
 
 ref = params.ref
 ref = file(ref).toAbsolutePath()
-params.prev_json=
 
 params.flag_path='/mnt/hpc_scratch/primer_monitor'
 
@@ -11,8 +10,6 @@ pct_cutoff = params.pct_cutoff
 
 params.score_cutoff = 100
 score_cutoff = params.score_cutoff
-
-prev_json = file(params.prev_json, checkIfExists: true).toAbsolutePath()
 
 params.primer_monitor_path = '/mnt/bioinfo/prg/primer_monitor'
 primer_monitor_path = params.primer_monitor_path
@@ -72,7 +69,7 @@ process download_data {
 process extract_new_records {
     // Keeps only new records added since previous run
     cpus 1
-    conda "python=3.9 zstd seqtk"
+    conda "python=3.9 zstd seqtk 'postgresql>=15'"
 
     input:
         tuple file(metadata_json), file(sequences_fasta)
@@ -83,9 +80,11 @@ process extract_new_records {
     '''
     date_today=$(date +%Y-%m-%d)
 
-    python !{primer_monitor_path}/lib/parse_ncbi.py <(zstd -d --long=30 < !{metadata_json}) <(zstd -d --long=30 < !{prev_json}) <(zstd -d --long=30 < !{sequences_fasta} | seqtk seq | paste - -) ${date_today}.tsv
+    python !{primer_monitor_path}/lib/parse_ncbi.py <(zstd -d --long=30 < !{metadata_json}) \
+    <(psql -h "$DB_HOST" -d "$DB_NAME" -U "$DB_USER_RO" -c "SELECT genbank_accession FROM fasta_records;" --csv -t) \
+    <(zstd -d --long=30 < !{sequences_fasta} | seqtk seq | paste - -) ${date_today}.tsv;
 
-    find !{output_path} -maxdepth 1 -mtime +5 -type f -name "*.metadata.zst" -name "*.sequences.zst" -delete
+    find !{output_path} -maxdepth 1 -mtime +5 -type f -name "*.metadata.zst" -name "*.sequences.zst" -delete;
     '''
 
 }

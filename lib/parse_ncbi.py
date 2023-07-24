@@ -22,10 +22,7 @@ accessions = set()
 # read prev metadata
 with open(sys.argv[2]) as f:
     for line_s in f:
-        line = json.loads(line_s)
-        accession = get_if_exists(line, "accession")
-        if accession == "":
-            continue # skipping anything with no accession number (should not ever happen)
+        # just a list of accessions, not a JSON file
         prev_accessions.add(accession)
 
 # read current metadata
