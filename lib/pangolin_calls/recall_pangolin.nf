@@ -20,6 +20,13 @@ process get_new_versions {
     shell:
     '''
     #! /usr/bin/env bash
+
+    if [ -f "!{params.flag_path}/recall_pangolin_running.lock" ]; then
+        echo "Another recall_pangolin instance is running, aborting..." >&2
+        exit 1;
+    fi
+    touch "!{params.flag_path}/recall_pangolin_running.lock"
+
     touch "!{params.flag_path}/pangolin_version_mutex.lock"
     # gets a file descriptor for the lock file, opened for writing, and saves its number in $lock_fd
     exec {lock_fd}>"!{params.flag_path}/pangolin_version_mutex.lock"
@@ -35,7 +42,7 @@ process get_new_versions {
     # closes the file descriptor in $lock_fd
     exec {lock_fd}>&-
     rm "!{params.flag_path}/pangolin_version_mutex.lock"
-    touch "!{params.flag_path}/recall_pangolin_running.lock";
+    touch "!{params.flag_path}/pangolin_update_running.lock";
     '''
 }
 
@@ -144,13 +151,14 @@ process update_new_calls {
         file all_done
     shell:
     '''
-    if [ ! -f "!{params.flag_path}/summarize_variants_running.lock" ]; then
+    if [ ! -f "!{params.flag_path}/data_update_running.lock" ]; then
         PGPASSFILE="!{primer_monitor_path}/config/.pgpass" !{primer_monitor_path}/lib/pangolin_calls/swap_new_calls.sh; touch done.txt;
     fi
     rm "!{params.flag_path}/swapping_calls.lock"
-    rm "!{params.flag_path}/recall_pangolin_running.lock"
+    rm "!{params.flag_path}/pangolin_update_running.lock"
     rm "!{params.pangolin_version_path}.old"
     rm "!{params.pangolin_data_version_path}.old"
+    rm "!{params.flag_path}/recall_pangolin_running.lock"
     '''
 }
 
@@ -187,7 +195,10 @@ workflow.onError {
 
         }
         //get rid of "pipeline running" lock
-        running_lock = file('${params.flag_path}/recall_pangolin_running.lock')
+        running_lock = file('${params.flag_path}/pangolin_update_running.lock')
         running_lock.delete()
+
+        pipeline_lock = file('${params.flag_path}/recall_pangolin_running.lock')
+        pipeline_lock.delete()
     }
 }

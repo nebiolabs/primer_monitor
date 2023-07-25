@@ -55,6 +55,11 @@ process download_data {
 
     shell:
     '''
+    if [ -f "!{params.flag_path}/summarize_variants_running.lock" ]; then
+        echo "Another summarize_variants instance is running, aborting..." >&2
+        exit 1;
+    fi
+    touch "!{params.flag_path}/summarize_variants_running.lock"
     date_today=$(date +%Y-%m-%d)
     datasets download virus genome taxon SARS-CoV-2 --complete-only --host human --filename tmp.zip
     unzip tmp.zip
@@ -176,7 +181,7 @@ process get_pangolin_version {
     exec {lock_fd}>"!{params.flag_path}/pangolin_version_mutex.lock"
     flock $lock_fd
     use_pending="false"
-    if [ -f "!{params.flag_path}/recall_pangolin_running.lock" ]; then
+    if [ -f "!{params.flag_path}/data_update_running.lock" ]; then
         use_pending="true"
     fi
     pangolin_version=$(cat !{params.pangolin_version_path})
@@ -184,7 +189,7 @@ process get_pangolin_version {
     # closes the file descriptor in $lock_fd
     exec {lock_fd}>&-
     rm "!{params.flag_path}/pangolin_version_mutex.lock"
-    touch "!{params.flag_path}/summarize_variants_running.lock"
+    touch "!{params.flag_path}/data_update_running.lock"
     '''
     }
 
@@ -238,10 +243,10 @@ process update_new_calls {
         file 'done.txt'
     shell:
     '''
-    if [ ! -f "!{params.flag_path}/recall_pangolin_running.lock" ]; then
+    if [ ! -f "!{params.flag_path}/data_update_running.lock" ]; then
         PGPASSFILE="!{primer_monitor_path}/config/.pgpass" !{primer_monitor_path}/lib/pangolin_calls/swap_new_calls.sh; touch done.txt;
     fi
-    rm !{params.flag_path}/summarize_variants_running.lock
+    rm !{params.flag_path}/data_update_running.lock
     rm "!{params.flag_path}/loading_data.lock"
     '''
 }
@@ -318,6 +323,9 @@ process recompute_affected_primers {
 
     # copies over the new files
     scp !{scp_opts} -r ./!{organism_dirname}/* !{frontend_host}:!{igvstatic_path}/!{organism_dirname}/;
+
+    # remove lock file
+    rm "!{params.flag_path}/summarize_variants_running.lock";
     '''
 }
 
@@ -341,7 +349,9 @@ workflow.onError {
     if(!(file("${params.flag_path}/loading_data.lock").exists()))
     {
         //get rid of "pipeline running" lock
-        running_lock = file('${params.flag_path}/summarize_variants_running.lock')
+        running_lock = file('${params.flag_path}/data_update_running.lock')
         running_lock.delete()
+        pipeline_lock = file('${params.flag_path}/summarize_variants_running.lock')
+        pipeline_lock.delete()
     }
 }
