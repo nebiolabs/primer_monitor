@@ -46,22 +46,52 @@ process get_new_versions {
     '''
 }
 
+process download_data {
+    // Downloads the full dataset
+    cpus 16
+    conda "ncbi-datasets-cli unzip zstd"
+    errorStrategy 'retry'
+    maxRetries 2
+
+    output:
+        tuple file('*.metadata.zst'), file('*.sequences.zst')
+
+    shell:
+    '''
+    if [ -f "!{params.flag_path}/summarize_variants_running.lock" ]; then
+        echo "Another summarize_variants instance is running, aborting..." >&2
+        exit 1;
+    fi
+    touch "!{params.flag_path}/summarize_variants_running.lock"
+    date_today=$(date +%Y-%m-%d)
+    datasets download virus genome taxon SARS-CoV-2 --complete-only --host human --filename tmp.zip
+    unzip tmp.zip
+    zstd --long=30 --ultra -22 -T!{task.cpus} ncbi_dataset/data/data_report.jsonl -o ${date_today}.metadata.zst
+    zstd --long=30 --ultra -22 -T!{task.cpus} ncbi_dataset/data/genomic.fna -o ${date_today}.sequences.zst
+    rm tmp.zip
+    rm -rf ncbi_dataset
+    '''
+
+}
+
 
 process extract_new_records {
-    // Get all (deduplicated) records as of yesterday's run
+    // Get all (deduplicated) records currently in the database
     cpus 1
     conda "python=3.9 zstd seqtk"
 
+    input:
+        tuple file(metadata_json), file(sequences_fasta)
     output:
         file '*.tsv'
 
 
     shell:
     '''
-    date_yesterday=$(date --date="yesterday" +%Y-%m-%d)
-    touch known_empty.json
-    python !{primer_monitor_path}/lib/parse_ncbi.py <(zstd -d --long=30 < !{output_path}/${date_yesterday}.metadata.zst) known_empty.json <(zstd -d --long=30 < !{output_path}/${date_yesterday}.sequences.zst | seqtk seq | paste - -) ${date_yesterday}.tsv
-    rm known_empty.json
+    date_today=$(date +%Y-%m-%d)
+    python !{primer_monitor_path}/lib/parse_ncbi.py <(zstd -d --long=30 < !{metadata_json}) \
+    <(psql -h "$DB_HOST" -d "$DB_NAME" -U "$DB_USER_RO" -c "SELECT genbank_accession FROM fasta_records;" --csv -t) \
+    <(zstd -d --long=30 < !{sequences_fasta} | seqtk seq | paste - -) ${date_today}.tsv True;
     '''
 
 }
@@ -79,11 +109,11 @@ process transform_data {
 
     shell:
     '''
-    date_yesterday=$(date --date="yesterday" +%Y-%m-%d)
+    date_today=$(date +%Y-%m-%d)
 
     # Create an empty FASTA in case there are no seqs
-    touch ${date_yesterday}.fasta
-    cat !{ncbi_tsv} | gawk -F'\t' -f !{primer_monitor_path}/lib/process_seqs.awk -v cur_date=${date_yesterday}
+    touch ${date_today}.fasta
+    cat !{ncbi_tsv} | gawk -F'\t' -f !{primer_monitor_path}/lib/process_seqs.awk -v cur_date=${date_today}
     '''
 
 }
@@ -165,7 +195,8 @@ process update_new_calls {
 
 workflow {
     get_new_versions()
-    extract_new_records()
+    download_data()
+    extract_new_records(download_data.out)
     transform_data(extract_new_records.out.splitText(file: true, by: 2500).filter{ it.size()>77 })
     pangolin_calls(get_new_versions.out[0], get_new_versions.out[1], transform_data.out)
     load_pangolin_data(pangolin_calls.out)

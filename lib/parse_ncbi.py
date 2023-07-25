@@ -19,6 +19,12 @@ prev_accessions = set()
 # accession numbers seen in current but not prev
 accessions = set()
 
+# if True, only sequences present in the previous list will be output, instead of only seqs not present
+output_existing_only = False
+
+if len(sys.argv) >= 6:
+    output_existing_only = (sys.argv[5].lower() == "true")
+
 # read prev metadata
 with open(sys.argv[2]) as f:
     for line_s in f:
@@ -30,8 +36,8 @@ with open(sys.argv[1]) as f:
     for line_s in f:
         line = json.loads(line_s)
         accession = get_if_exists(line, "accession")
-        if accession == "" or accession in prev_accessions:
-            continue # skipping anything with no accession number (should not ever happen) or that duplicates an old sequence
+        if accession == "" or (accession in prev_accessions and not output_existing_only) or (accession not in prev_accessions and output_existing_only):
+            continue # skipping anything with no accession number (should not ever happen) or that duplicates an old sequence (or that is new if output_existing_only is true)
         accessions.add(accession)
         loc = get_if_exists(line, "location", "geographicLocation")
         loc_div = ""
