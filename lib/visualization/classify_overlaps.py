@@ -5,7 +5,7 @@ NEAR_5P_SCORE = 1
 NEAR_3P_SCORE = 2
 MID_3P_SCORE = 4
 OTHER_SCORE = 3
-CUTOFF = int(sys.argv[3])
+CUTOFF = int(sys.argv[4])
 INDEL_MULTIPLIER = 10
 LENGTH_EXPONENT_BASE = 2
 
@@ -80,12 +80,16 @@ with open(sys.argv[1]) as f:
         primers_scored[seq_name][4]+=(LENGTH_EXPONENT_BASE**score) # update score
 
     affected = open(sys.argv[2], "w")
+    unaffected = open(sys.argv[3], "w")
     for primer in primers_scored:
         score = int(primers_scored[primer][4])
+        ln_score = math.log(score) # ln to reduce the range of scores
+        if ln_score > 1000:
+            ln_score = 1000 # cap at 1000 to follow BED spec
+        primers_scored[primer][4] = str(ln_score)
         if score > CUTOFF:
-            score = math.log(score) # ln to reduce the range of scores
-            if score > 1000:
-                score = 1000 # cap at 1000 to follow BED spec
-            primers_scored[primer][4] = str(score)
             affected.write("\t".join(primers_scored[primer])+"\n")
+        else:
+            unaffected.write("\t".join(primers_scored[primer])+"\n")
     affected.close()
+    unaffected.close()
