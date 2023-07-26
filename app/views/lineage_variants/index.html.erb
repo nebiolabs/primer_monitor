@@ -57,7 +57,7 @@
     in the data, and the number, length, and position of variants overlapping a primer.
     To eliminate sequencing errors and other low-frequency variants that will likely not have a significant
     impact on primers, a variant is only considered in the calculation if it occurs either in
-    at least 0.1% of sequences (and no less than 10 sequences) in the dataset (after filtering by lineage).
+    at least 1% of sequences (and no less than 10 sequences) in the dataset (after filtering by lineage).
     Primers are then scored based on the length and position of overlapping variants,
     and labeled as affected if this results in a sufficiently high score.
     To focus on recent mutations in the SARS-CoV-2 virus, only variants from the last 180 days are considered.
@@ -70,10 +70,10 @@
     a flat multiplier is applied to the score for the relevant bases.
     Indels and variants 3-5 nt in from (but not at) the 3' end of a primer have the highest multipliers,
     as these traits suggest the variant is likely to affect the primer. Variants ≤3 nt from the 5' end
-    of the primer, or ≤2 nt from the 3' end, actually have multipliers that reduce the score compared
+    of the primer, or ≤2 nt from the 3' end have multipliers that reduce the score compared
     to the default for any other position, as we consider variants at these positions to be less likely
-    to affect a primer overall. For 5' variants, this is because it just creates a flap on the 5' end,
-    which doesn't interfere with amplification. For variants at the 3' end, this is because a polymerase's
+    to affect a primer overall. For 5' variants, this is because it creates a flap on the 5' end,
+    which does not interfere with amplification. For variants at the 3' end, this is because a polymerase's
     exo activity can remove and correct the mismatched base, reducing its impact.
   </p>
 </div>
