@@ -79,4 +79,4 @@ class OrganismsController < ApplicationController
   def to_param
     name
   end
-  end
+end

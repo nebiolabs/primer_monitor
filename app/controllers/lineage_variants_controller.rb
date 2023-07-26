@@ -5,7 +5,7 @@ class LineageVariantsController < ApplicationController
   def index
     authorize! :index, LineageVariantsController
 
-    # note: hardcoding SARS-CoV-2 taxid
+    # NOTE: hardcoding SARS-CoV-2 taxid
     organism = Organism.find_by(ncbi_taxon_id: '2697049')
 
     @config = {

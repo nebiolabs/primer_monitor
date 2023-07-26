@@ -72,5 +72,4 @@ class FastaRecord < ApplicationRecord
 
     dg_id
   end
-
 end
