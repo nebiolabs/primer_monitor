@@ -15,9 +15,9 @@
       <tr>
         <td><%= organism.full_name %></td>
         <td><%= organism.ncbi_taxon_id %></td>
-        <td><%= link_to 'Show', organism %></td>
-        <td><%= link_to 'Edit', edit_organism_path(organism) %></td>
-        <td><%= link_to 'Destroy', organism, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+        <td><%= link_to 'Show', organism_path(organism.name) %></td>
+        <td><%= link_to 'Edit', edit_organism_path(organism.name) %></td>
+        <td><%= link_to 'Destroy', organism_path(organism.name), method: :delete, data: { confirm: 'Are you sure?' } %></td>
       </tr>
     <% end %>
   </tbody>

@@ -22,7 +22,7 @@
           <%= link_to 'Source', primer_set.display_url %>
         <% end %>
       </td>
-      <td><%= link_to primer_set.organism, primer_set.organism %></td>
+      <td><%= link_to primer_set.organism, organism_path(primer_set.organism.name) %></td>
       <td><%= primer_set.oligos.length > 12 ? primer_set.oligos[..11].join(", ")+'...' : primer_set.oligos.join(", ") %></td>
       <td>
         <%= render 'primer_set_subscription',
