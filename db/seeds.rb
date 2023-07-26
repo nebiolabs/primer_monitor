@@ -94,7 +94,7 @@ end
 # puts view_defs.keys
 conn = ActiveRecord::Base.connection
 # drops all views in views directory, reversed to deal with view interdependencies
-view_defs.keys.reverse.each do |v|
+view_defs.keys.reverse_each do |v|
   Rails.logger.info("dropping #{v}")
   conn.execute(
     view_defs[v][:view] && "drop view if exists #{v} CASCADE;" ||
