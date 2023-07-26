@@ -43,7 +43,7 @@ fi
 
 cut -f 1-3,7,8 "$$_filtered_variants.bed" | sort -k2n -k3n -k4 | uniq -c > "$$_frequent_variants.bed";
 
-awk -v min_count="$scaled_min_count" -v seq_count="$sequence_count" '$1 >= min_count { OFS="\t"; print $2, $3, $4, $5, ($1/seq_count)*100 }' < "$$_frequent_variants.bed" > "$output_path/lineage_variants/$lineage_name.bed"
+awk -v min_count="$scaled_min_count" -v seq_count="$sequence_count" '$1 >= min_count { OFS="\t"; print $2, $3, $4, $6, ($1/seq_count)*100 }' < "$$_frequent_variants.bed" > "$output_path/lineage_variants/$lineage_name.bed"
 
 awk -v min_count="$scaled_min_count" 'BEGIN{ OFS="\t" }; $1 >= min_count { print $2, $3, $4, $5 "/" $6, $1 }' < "$$_frequent_variants.bed";
 
