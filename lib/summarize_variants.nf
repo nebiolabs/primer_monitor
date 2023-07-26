@@ -6,7 +6,7 @@ params.prev_json=
 
 params.flag_path='/mnt/hpc_scratch/primer_monitor'
 
-params.pct_cutoff = 0.1
+params.pct_cutoff = 1
 pct_cutoff = params.pct_cutoff
 
 params.score_cutoff = 100

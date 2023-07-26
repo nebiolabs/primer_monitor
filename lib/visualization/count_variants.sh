@@ -26,10 +26,6 @@ fi
 
 
 mkdir -p "$output_path/lineage_variants"
-LINECOUNT=$(wc -l < "$$_filtered_variants.bed");
-awk -F"\t" '{ OFS="\t"; print $1, $2, $3, $8 }' "$$_filtered_variants.bed" | sort -k2n -k3n -k4 | uniq -c \
-| awk -v linecount="$LINECOUNT" '$1 > linecount*0.001 { OFS="\t"; print $2, $3, $4, $5, ($1/linecount)*100 }' > "$output_path/lineage_variants/$lineage_name.bed"
-
 
 sequence_count=$(wc -l "$strains_file" | sed -E "s/^\s*//" | cut -f 1 -d" "); #get just the line count and no leading spaces or file name
 
@@ -45,7 +41,10 @@ if ((scaled_min_count < 10)); then
   scaled_min_count=10; # exclude variants that occur <10 times in all cases
 fi
 
-cut -f 1-3,7,8 "$$_filtered_variants.bed" | uniq -c \
-| awk -v min_count="$scaled_min_count" 'BEGIN{ OFS="\t" }; $1 >= min_count { print $2, $3, $4, $5 "/" $6, $1 }';
+cut -f 1-3,7,8 "$$_filtered_variants.bed" | sort -k2n -k3n -k4 | uniq -c > "$$_frequent_variants.bed";
 
-rm "$$_strains.txt" "$$_filtered_variants.bed";
+awk -v min_count="$scaled_min_count" -v seq_count="$sequence_count" '$1 >= min_count { OFS="\t"; print $2, $3, $4, $5, ($1/seq_count)*100 }' < "$$_frequent_variants.bed" > "$output_path/lineage_variants/$lineage_name.bed"
+
+awk -v min_count="$scaled_min_count" 'BEGIN{ OFS="\t" }; $1 >= min_count { print $2, $3, $4, $5 "/" $6, $1 }' < "$$_frequent_variants.bed";
+
+rm "$$_strains.txt" "$$_filtered_variants.bed" "$$_frequent_variants.bed";
