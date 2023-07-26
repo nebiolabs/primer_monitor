@@ -15,6 +15,6 @@ python3 "$(dirname "$0")/classify_overlaps.py" "$$_raw_intersects.bed" "$filter_
 
 bedtools subtract -a "$primer_bed" -b "$$_raw_intersects.bed" > "$$_no_intersects.bed";
 
-cat "$$_no_intersects_bed" "$$_filter_fail_intersects.bed" | sort -k2n > "$filter_fail_bed";
+cat "$$_no_intersects.bed" "$$_filter_fail_intersects.bed" | sort -k2n > "$filter_fail_bed";
 
-rm "$$_raw_intersects.bed"
+rm "$$_raw_intersects.bed" "$$_filter_fail_intersects.bed" "$$_no_intersects.bed";
