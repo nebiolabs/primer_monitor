@@ -26,15 +26,17 @@
   <div id="navbarBasicExample" class="navbar-menu">
     <div class="navbar-start">
 
+      <% sarscov2 = Organism.find_by(ncbi_taxon_id: 2_697_049).name %>
+
       <%= link_to 'Primer Variant Summary', root_path, class: 'navbar-item' %>
 
       <% if can? :index, PrimerSet %>
         <%= link_to "Primer Sets", primer_sets_path, class: 'navbar-item' %>
       <% end %>
 
-      <%= link_to 'Lineages', organism_lineages_url(Organism.find_by(ncbi_taxon_id: 2_697_049).name), class: 'navbar-item' %>
+      <%= link_to 'Lineages', organism_lineages_url(sarscov2), class: 'navbar-item' %>
 
-      <%= link_to 'Lineage Variants', lineage_variants_path, class: 'navbar-item' %>
+      <%= link_to 'Lineage Variants', organism_lineage_variants_path(sarscov2), class: 'navbar-item' %>
 
       <%= link_to 'About', about_path, class: 'navbar-item' %>
     </div>
