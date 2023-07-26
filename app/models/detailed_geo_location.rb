@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class DetailedGeoLocation < ApplicationRecord
-  has_many :fasta_records
+  has_many :fasta_records, dependent: :nullify
   belongs_to :detailed_geo_location_alias
 
   def self.unique_fields

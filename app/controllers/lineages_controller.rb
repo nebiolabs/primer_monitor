@@ -11,7 +11,7 @@ class LineagesController < ApplicationController
       SQL
       @lineages = ActiveRecord::Base.connection.execute(ActiveRecord::Base.sanitize_sql([query, @organism.id])).to_a
     else
-      redirect_to lineage_variants_url, status: 301
+      redirect_to lineage_variants_url, status: :moved_permanently
     end
   end
 

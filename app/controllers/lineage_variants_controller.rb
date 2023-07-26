@@ -28,7 +28,5 @@ class LineageVariantsController < ApplicationController
     lineages_url = URI("#{@config[:data_server]}/#{@config[:organism_taxid]}/config/lineage_sets.json")
 
     @lineage_sets = JSON.parse(Net::HTTP.get(lineages_url))
-
-    puts @default_tracks
   end
 end

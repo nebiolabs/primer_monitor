@@ -23,7 +23,7 @@ class PrimerSet < ApplicationRecord
   end
 
   def doi_url
-    "https://doi.org/#{doi}" unless doi.blank?
+    "https://doi.org/#{doi}" if doi.present?
   end
 
   def subscription_for_user(user)

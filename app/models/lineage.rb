@@ -2,7 +2,7 @@
 
 class Lineage < ApplicationRecord
   belongs_to :organism
-  has_many :pangolin_calls
+  has_many :pangolin_calls, dependent: :destroy
   has_many :fasta_records, through: :pangolin_calls
 
   def self.parse(pangolin_csv)

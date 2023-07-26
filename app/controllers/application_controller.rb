@@ -30,6 +30,9 @@ class ApplicationController < ActionController::Base
   end
 
   def update_last_request_time
+    # using update_attribute for performance
+    # rubocop:disable Rails/SkipsModelValidations
     current_user&.update_attribute(:last_request_at, DateTime.now)
+    # rubocop:enable Rails/SkipsModelValidations
   end
 end
