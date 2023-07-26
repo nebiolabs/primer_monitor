@@ -63,18 +63,20 @@
     To focus on recent mutations in the SARS-CoV-2 virus, only variants from the last 180 days are considered.
   </p>
   <br>
-  <p>The score of a primer is the sum of the scores for each variant on that primer.
-    Variants for a primer are scored based on length, whether they are indels or mismatches,
-    and position in the primer. As a variant being longer is likely to increase its impact,
-    an exponentially-increasing length penalty is added. To account for variant position and indels,
-    a flat multiplier is applied to the score for the relevant bases.
-    Indels and variants 3-5 nt in from (but not at) the 3' end of a primer have the highest multipliers,
-    as these traits suggest the variant is likely to affect the primer. Variants ≤3 nt from the 5' end
-    of the primer, or ≤2 nt from the 3' end have multipliers that reduce the score compared
-    to the default for any other position, as we consider variants at these positions to be less likely
-    to affect a primer overall. For 5' variants, this is because it creates a flap on the 5' end,
-    which does not interfere with amplification. For variants at the 3' end, this is because a polymerase's
-    exo activity can remove and correct the mismatched base, reducing its impact.
+  <p>The composite score for a primer is the sum of all overlapping variant scores. Variant scores are based on length,
+    whether they are indels or mismatches, and position in the primer. Since long variants are more likely to disrupt
+    primer binding, an exponentially-increasing length penalty is added. To account for variant position and indels,
+    a flat multiplier is applied to the score for the relevant bases. Indels and variants 3-5 nt in from (but not at)
+    the 3' end of a primer have the highest multipliers, as these traits empirically relate primer disruption.
+    Variants ≤3 nt from the 5' end of the primer, or ≤2 nt from the 3' end have multipliers that reduce the score
+    compared to the default for any other position.  We consider variants at these positions to be less likely to
+    affect polymerase binding. For 5' variants, this is because it creates a flap on the 5' end, which interferes less
+    with amplification. For variants at the 3' end, we assume that 3’-5’ exonuclease activity in commonly used
+    polymerases can remove mismatched bases. While we attempt to model the observed effects of variants observed,
+    it is likely imperfect. Proposed variant impacts should be assessed experimentally as we did for
+    <a href=”https://www.medrxiv.org/content/10.1101/2021.12.16.21267734v1”>early omicron</a>,
+    <a href=”https://www.biorxiv.org/content/10.1101/2023.01.26.525759v1”>BQ.1 associated variation </a> and
+    <a href=”https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0259610”>more generally for LAMP applications</a>
   </p>
 </div>
 <div class="block">
