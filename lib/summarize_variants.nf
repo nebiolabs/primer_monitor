@@ -9,7 +9,7 @@ params.flag_path='/mnt/hpc_scratch/primer_monitor'
 params.pct_cutoff = 1
 pct_cutoff = params.pct_cutoff
 
-params.score_cutoff = 100
+params.score_cutoff = 80
 score_cutoff = params.score_cutoff
 
 prev_json = file(params.prev_json, checkIfExists: true).toAbsolutePath()
