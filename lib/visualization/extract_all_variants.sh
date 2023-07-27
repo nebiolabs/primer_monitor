@@ -22,4 +22,4 @@ INNER JOIN organisms ON organisms.id=lineages.organism_id \
 WHERE (date_collected >= '$1
 ' OR (date_collected IS NULL AND date_submitted >= '$1')) \
 ORDER BY variant_sites.ref_start, variant_sites.ref_end, variant_sites.variant_type, variant_sites.variant;" --csv -t \
-| tr "," "\t" | grep -v -E "\t[0-9]+N"
+| tr "," "\t" | grep -v -E "[[:blank:]][0-9]+N"
