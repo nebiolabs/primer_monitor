@@ -21,7 +21,7 @@
   <% @organism.primer_sets.accessible_by(Ability.new(current_user)).each do |primer_set| %>
     <tr>
       <td><%= link_to primer_set.name, primer_set %></td>
-      <td><%= primer_set.oligos.join(", ") %></td>
+      <td><%= primer_set.oligos.length > 12 ? primer_set.oligos[..11].join(", ")+'...' : primer_set.oligos.join(", ") %></td>
       <td>
         <%= render '/primer_sets/primer_set_subscription', user: current_user, primer_set: primer_set, primer_set_subscription: @subscriptions[primer_set.id] %>
       </td>
