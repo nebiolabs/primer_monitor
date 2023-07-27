@@ -142,7 +142,7 @@ function initBrowser() {
     igv.createBrowser(browser_div, browserConfig).then(function (theBrowser) {
         igvBrowser = theBrowser;
         initCheckboxes();
-        setRadiobuttons("A");
+        setRadiobuttons("XBB");
         updatePrimerSets();
     });
 
