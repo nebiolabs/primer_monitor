@@ -7,7 +7,7 @@ set -e
 primer_sets_tmp=$(mktemp)
 
 psql -h "$DB_HOST" -d "$DB_NAME" -U "$DB_USER_RO" -c "SELECT primer_sets.name, organisms.reference_accession, \
-oligos.ref_start,oligos.ref_end, oligos.name, '0' AS score, \
+oligos.ref_start,oligos.ref_end, regexp_replace(oligos.name, '\s', '_', 'g'), '0' AS score, \
 COALESCE(oligos.strand, '.') AS strand FROM oligos INNER JOIN primer_sets \
 ON oligos.primer_set_id=primer_sets.id INNER JOIN organisms ON organisms.id=primer_sets.organism_id \
 WHERE primer_sets.status='complete' AND oligos.ref_start IS NOT NULL;" --csv -t | tr "," "\t" > "$primer_sets_tmp"
