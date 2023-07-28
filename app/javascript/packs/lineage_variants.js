@@ -138,6 +138,9 @@ function initBrowser() {
             }
         };
 
+    //remove duplicate browsers to prevent it from multiplying on back/forward
+    $('.igv_div').children('.igv-container').remove();
+
     const browser_div = document.getElementById("igv");
     igv.createBrowser(browser_div, browserConfig).then(function (theBrowser) {
         igvBrowser = theBrowser;
