@@ -7,8 +7,8 @@ class PrimerSetsController < ApplicationController
   # GET /primer_sets
   # GET /primer_sets.json
   def index
-    @primer_sets = PrimerSet.includes(:organism, :oligos).accessible_by(current_ability)
-    @subscriptions = PrimerSetSubscription.subscriptions_for_user_by_primer_set(current_user)
+    # hardcoded SARS-CoV-2
+    redirect_to organism_path(Organism.find_by(ncbi_taxon_id: '2697049').name), status: :moved_permanently
   end
 
   # GET /primer_sets/1
