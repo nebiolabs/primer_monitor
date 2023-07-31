@@ -64,7 +64,7 @@ function processFasta(fastaText)
         let longName = seqDataRaw[0];
         let sequence = seqDataRaw.slice(1).join("");
         let shortName = longName.split(" ")[0].slice(0,5);
-        const invalidSeqRE = /[^autcgnbvdhrykmws\- \t]/i; //matches everything except for all bases and ambiguity codes, - (for gaps), and whitespace
+        const invalidSeqRE = /[^autcgnbvdhrykmws\- \t\r]/i; //matches everything except for all bases and ambiguity codes, - (for gaps), and whitespace
         if(sequence.match(invalidSeqRE) !== null)
         {
             confirm("Non-sequence character detected in file '"+fastaName+"'.\n\nSequence:\n>"+seq+"\n\nContinue?");
