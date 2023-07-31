@@ -8,7 +8,7 @@ class PrimerSetsController < ApplicationController
   # GET /primer_sets.json
   def index
     # hardcoded SARS-CoV-2
-    redirect_to organism_path(Organism.find_by(ncbi_taxon_id: '2697049')), status: :temporary_redirect
+    redirect_to organism_path(Organism.find_by(ncbi_taxon_id: '2697049').name), status: :temporary_redirect
   end
 
   # GET /primer_sets/1
