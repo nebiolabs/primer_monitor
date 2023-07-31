@@ -13,7 +13,27 @@ class PrimerSetsController < ApplicationController
 
   # GET /primer_sets/1
   # GET /primer_sets/1.json
-  def show; end
+  def show
+    @config = {
+      "data_server": ENV['IGV_DATA_SERVER'],
+      "organism_taxid": @primer_set.organism.ncbi_taxon_id,
+      "organism_name": @primer_set.organism.name,
+      "reference_accession": @primer_set.organism.reference_accession
+    }
+
+    tracks_url = URI("#{@config[:data_server]}/#{@config[:organism_taxid]}/config/tracks.json")
+
+    primer_sets = JSON.parse(Net::HTTP.get(tracks_url)).invert
+
+    Rails.logger.warn primer_sets
+    Rails.logger.warn @primer_set.name
+
+    return unless primer_sets.key? @primer_set.name
+
+    @config['primer_set_display_name'] = @primer_set.name
+    @config['primer_set_name'] = primer_sets[@primer_set.name]
+
+  end
 
   # GET /primer_sets/new
   def new
