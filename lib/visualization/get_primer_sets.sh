@@ -17,16 +17,10 @@ if [ $# -le 0 ]; then
   exit 1;
 fi
 
-
-urlify_name ()
-{
-  echo "$1" | iconv -t ASCII//TRANSLIT | sed -E "s/[ \/]/_/g; s/['\"]//g"
-}
-
 printf "{"
 first=1
 while read -r seq_name_raw; do
-  seq_name=$(urlify_name "$seq_name_raw")
+  seq_name=$("$(dirname "$0")/urlify_name.sh" "$seq_name_raw")
   if [ $first -eq 0 ]; then
     printf ',\n'
   fi
@@ -41,7 +35,7 @@ mkdir -p "$1"
 rm -f "$1"/*.bed
 
 while read -r seq_rec; do
-  seq_name=$(urlify_name "$(echo "$seq_rec" | cut -f 1)")
+  seq_name=$("$(dirname "$0")/urlify_name.sh" "$(echo "$seq_rec" | cut -f 1)")
   echo "$seq_rec" | cut -f 2-7 >> "$1/$seq_name.bed"
 done < <(sort -k3 "$primer_sets_tmp")
 
