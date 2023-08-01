@@ -10,7 +10,8 @@ score_cutoff="$4"
 cpus="$5"
 full_update="false"
 if (($# > 5)); then
-  primer_set="$6"
+  # a file with a list of primer set names to update, one per line
+  primer_sets_file="$6"
 else
   full_update="true";
 fi
@@ -62,7 +63,9 @@ fi
 if [ "$full_update" = true ]; then
   echo "$organism_dirname/primer_sets_raw" > primer_sets_data.txt
 else
-  echo "$organism_dirname/primer_sets_raw/$("$(dirname "$0")/urlify_name.sh" "$primer_set").bed" > primer_sets_data.txt
+  while read -r primer_set; do
+    echo "$organism_dirname/primer_sets_raw/$("$(dirname "$0")/urlify_name.sh" "$primer_set").bed" >> primer_sets_data.txt;
+  done < "$primer_sets_file"
 fi
 
 cat <(ls "$organism_dirname/lineage_sets") <(echo "all.txt") \
