@@ -55,15 +55,16 @@ if [ "$full_update" = true ]; then
   | sed -E 's/^(.*)\\.txt$/"\\1": "\\1.*",/') <(echo '"all": "All"}') > "$organism_dirname/config/lineage_sets.json"
 else
   # download existing lineage sets from the data server
-  scp_proxy -r "$FRONTEND_HOST:$IGVSTATIC_PATH/$organism_dirname/lineage_sets" "./$organism_dirname/lineage_sets";
+  scp_proxy -r "$FRONTEND_HOST:$IGVSTATIC_PATH/$organism_dirname/lineage_sets" "./$organism_dirname";
   scp_proxy -r "$FRONTEND_HOST:$IGVSTATIC_PATH/$organism_dirname/config/lineage_sets.json" "./$organism_dirname/config/lineage_sets.json";
 fi
 
+
 if [ "$full_update" = true ]; then
-  echo "$organism_dirname/primer_sets_raw" > primer_sets_data.txt
+  ls "$organism_dirname/primer_sets_raw" | xargs basename -a > primer_sets_data.txt
 else
   while read -r primer_set; do
-    echo "$organism_dirname/primer_sets_raw/$("$(dirname "$0")/urlify_name.sh" "$primer_set").bed" >> primer_sets_data.txt;
+    echo "$("$(dirname "$0")/urlify_name.sh" "$primer_set").bed" >> primer_sets_data.txt;
   done < "$primer_sets_file"
 fi
 
@@ -73,13 +74,21 @@ primer_sets_data.txt "./$organism_dirname" "$cpus"
 
 rm primer_sets_data.txt
 
-
 if [ "$full_update" = true ]; then
   # if full update, remove old files so this doesn't clutter up the directories
   ssh_proxy "$FRONTEND_HOST" "rm -rf $IGVSTATIC_PATH/$organism_dirname/primer_sets; \
   rm -f $IGVSTATIC_PATH/$organism_dirname/primer_sets_raw/* $IGVSTATIC_PATH/$organism_dirname/lineage_sets/* \
   $IGVSTATIC_PATH/$organism_dirname/lineage_variants/*;"
-fi
 
-# copies over the new files
-scp_proxy -r "./$organism_dirname/*" "$FRONTEND_HOST:$IGVSTATIC_PATH/$organism_dirname/";
+  # copies over the new files
+  scp_proxy -r "./$organism_dirname/*" "$FRONTEND_HOST:$IGVSTATIC_PATH/$organism_dirname/";
+
+else
+  # copies over only the files changed for the new primer
+  while read -r primer_set; do
+    urlified_primer_set_name=$("$(dirname "$0")/urlify_name.sh" "$primer_set")
+    scp_proxy -r "./$organism_dirname/config/tracks.json" "$FRONTEND_HOST:$IGVSTATIC_PATH/$organism_dirname/config/tracks.json";
+    scp_proxy -r "./$organism_dirname/primer_sets_raw/${urlified_primer_set_name}.bed" "$FRONTEND_HOST:$IGVSTATIC_PATH/$organism_dirname/primer_sets_raw/${urlified_primer_set_name}.bed";
+    scp_proxy -r "./$organism_dirname/primer_sets/${urlified_primer_set_name}" "$FRONTEND_HOST:$IGVSTATIC_PATH/$organism_dirname/primer_sets";
+  done  < "$primer_sets_file"
+fi
