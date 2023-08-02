@@ -59,7 +59,7 @@ fi
 
 
 if [ -z "$primer_sets_file" ]; then
-  ls "$organism_dirname/primer_sets_raw" | xargs basename -a > primer_sets_data.txt
+  find "$organism_dirname/primer_sets_raw" -exec basename -a "{}" + > primer_sets_data.txt
 else
   while read -r primer_set; do
     echo "$("$(dirname "$0")/urlify_name.sh" "$primer_set").bed" >> primer_sets_data.txt;
