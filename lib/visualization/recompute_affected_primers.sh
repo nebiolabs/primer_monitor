@@ -8,12 +8,11 @@ organism_dirname="$2"
 pct_cutoff="$3"
 score_cutoff="$4"
 cpus="$5"
-full_update="false"
+full_update="true";
 if (($# > 5)); then
   # a file with a list of primer set names to update, one per line
   primer_sets_file="$6"
-else
-  full_update="true";
+  full_update="false"
 fi
 
 # unset any pre-existing value for JUMP_PROXY so unset == "don't use a jump proxy"
