@@ -39,7 +39,7 @@ ssh_proxy()
 
 "$primer_monitor_path/lib/visualization/get_primer_sets.sh" "$organism_dirname/primer_sets_raw" "$primer_sets_file" > "$organism_dirname/config/tracks.json"
 
-if [ -n "$primer_sets_file" ]; then
+if [ -z "$primer_sets_file" ]; then
   # if full update, recompute lineage sets
   "$primer_monitor_path/lib/visualization/get_lineage_data.sh" > lineages.csv;
 
@@ -58,7 +58,7 @@ else
 fi
 
 
-if [ -n "$primer_sets_file" ]; then
+if [ -z "$primer_sets_file" ]; then
   ls "$organism_dirname/primer_sets_raw" | xargs basename -a > primer_sets_data.txt
 else
   while read -r primer_set; do
@@ -72,7 +72,7 @@ primer_sets_data.txt "./$organism_dirname" "$cpus"
 
 rm primer_sets_data.txt
 
-if [ -n "$primer_sets_file" ]; then
+if [ -z "$primer_sets_file" ]; then
   # if full update, remove old files so this doesn't clutter up the directories
   ssh_proxy "$FRONTEND_HOST" "rm -rf $IGVSTATIC_PATH/$organism_dirname/primer_sets; \
   rm -f $IGVSTATIC_PATH/$organism_dirname/primer_sets_raw/* $IGVSTATIC_PATH/$organism_dirname/lineage_sets/* \
