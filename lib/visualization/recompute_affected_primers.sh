@@ -8,11 +8,9 @@ organism_dirname="$2"
 pct_cutoff="$3"
 score_cutoff="$4"
 cpus="$5"
-full_update="true";
 if (($# > 5)); then
   # a file with a list of primer set names to update, one per line
   primer_sets_file="$6"
-  full_update="false"
 fi
 
 # unset any pre-existing value for JUMP_PROXY so unset == "don't use a jump proxy"
@@ -39,9 +37,9 @@ ssh_proxy()
   ssh ${JUMP_PROXY:+"-J"} "${JUMP_PROXY:-''}" "$@"
 }
 
-"$primer_monitor_path/lib/visualization/get_primer_sets.sh" "$organism_dirname/primer_sets_raw" > "$organism_dirname/config/tracks.json"
+"$primer_monitor_path/lib/visualization/get_primer_sets.sh" "$organism_dirname/primer_sets_raw" "$primer_sets_file" > "$organism_dirname/config/tracks.json"
 
-if [ "$full_update" = true ]; then
+if [ -n "$primer_sets_file" ]; then
   # if full update, recompute lineage sets
   "$primer_monitor_path/lib/visualization/get_lineage_data.sh" > lineages.csv;
 
@@ -60,7 +58,7 @@ else
 fi
 
 
-if [ "$full_update" = true ]; then
+if [ -n "$primer_sets_file" ]; then
   ls "$organism_dirname/primer_sets_raw" | xargs basename -a > primer_sets_data.txt
 else
   while read -r primer_set; do
@@ -74,7 +72,7 @@ primer_sets_data.txt "./$organism_dirname" "$cpus"
 
 rm primer_sets_data.txt
 
-if [ "$full_update" = true ]; then
+if [ -n "$primer_sets_file" ]; then
   # if full update, remove old files so this doesn't clutter up the directories
   ssh_proxy "$FRONTEND_HOST" "rm -rf $IGVSTATIC_PATH/$organism_dirname/primer_sets; \
   rm -f $IGVSTATIC_PATH/$organism_dirname/primer_sets_raw/* $IGVSTATIC_PATH/$organism_dirname/lineage_sets/* \

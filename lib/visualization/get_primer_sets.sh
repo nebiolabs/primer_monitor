@@ -4,13 +4,19 @@
 
 set -e
 
+primer_sets_file="$2"
+
+if [ -z "$primer_sets_file" ]; then
+  unset primer_sets_file
+fi
+
 primer_sets_tmp=$(mktemp)
 
 psql -h "$DB_HOST" -d "$DB_NAME" -U "$DB_USER_RO" -c "SELECT primer_sets.name, organisms.reference_accession, \
 oligos.ref_start,oligos.ref_end, oligos.name, '0' AS score, \
 COALESCE(oligos.strand, '.') AS strand FROM oligos INNER JOIN primer_sets \
 ON oligos.primer_set_id=primer_sets.id INNER JOIN organisms ON organisms.id=primer_sets.organism_id \
-WHERE primer_sets.status='complete' AND oligos.ref_start IS NOT NULL;" --csv -t | tr "," "\t" > "$primer_sets_tmp"
+WHERE (primer_sets.status='complete' ${primer_sets_file:+"OR primer_sets.status='ready'"}) AND oligos.ref_start IS NOT NULL;" --csv -t | tr "," "\t" > "$primer_sets_tmp"
 
 if [ $# -le 0 ]; then
   # to prevent the rm further down from destroying files, fail if $1 not set
