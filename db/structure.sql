@@ -33,7 +33,8 @@ CREATE TYPE public.oligo_category AS ENUM (
 CREATE TYPE public.primer_set_status AS ENUM (
     'pending',
     'complete',
-    'failed'
+    'failed',
+    'ready'
 );
 
 
@@ -2225,6 +2226,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20230714105625'),
 ('20230714172920'),
 ('20230718131700'),
-('20230721152550');
+('20230721152550'),
+('20230802152750');
 
 
