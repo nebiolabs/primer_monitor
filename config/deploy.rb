@@ -14,6 +14,8 @@ set :conditionally_migrate, true
 # set the locations that we will look for changed assets to determine whether to precompile
 set :assets_dependencies, %w[app/assets lib/assets vendor/assets Gemfile.lock config/routes.rb]
 
+set :backend_deploy_to, ->{ fetch(:backend_deploy_path) }
+
 # clear the previous precompile task
 Rake::Task['deploy:assets:precompile'].clear_actions
 class PrecompileRequired < StandardError
@@ -27,6 +29,22 @@ append :linked_files, 'config/database.yml', 'config/master.key', '.env'
 append :linked_dirs,  'log', 'tmp/pids', 'tmp/cache', 'tmp/sockets', 'public/system'
 
 set :keep_releases, 10
+
+desc 'Deploy primer-monitor backend'
+task :backend do
+  invoke 'backend:git'
+end
+
+namespace :backend do
+  desc 'Pull backend code from git'
+  task :git do
+    on roles(:backend) do
+      within :backend_deploy_path do
+        execute("cd #{fetch(:backend_deploy_path)} && git pull && git checkout #{fetch(:branch)}")
+      end
+    end
+  end
+end
 
 namespace :deploy do
   desc 'Restart application'
@@ -140,5 +158,6 @@ namespace :deploy do
 
   after :published, :restart
   #after 'deploy:restart_services', 'deploy:seed'
+  after 'deploy:restart_services', 'backend'
 
 end

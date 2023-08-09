@@ -7,6 +7,9 @@
 # server "example.com", user: "deploy", roles: %w{app web}, other_property: :other_value
 # server "db.example.com", user: "deploy", roles: %w{db}
 server 'primer-monitor.neb.com', user: 'deploy', roles: %w{web app db}
+server 'hpc-g', user: 'seq-shepherd', roles: %w{backend}
+
+set :backend_deploy_path, '/mnt/bioinfo/prg/primer_monitor'
 
 # role-based syntax
 # ==================
