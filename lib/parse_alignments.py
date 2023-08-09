@@ -1,10 +1,19 @@
-
+"""
+Parses variants from CIGAR strings in alignment SAM data.
+"""
 import sys
 import re
 
+
 def parse_cigar(cigar_string):
-    parsed = re.findall("(\d+[\w=])", cigar_string)
+    """
+    Parses CIGAR string into list of operations.
+    :param cigar_string: CIGAR string
+    :return: List of operations.
+    """
+    parsed = re.findall(r"(\d+[\w=])", cigar_string)
     return parsed
+
 
 # print("Sample\tReference position\tMismatch type\tMismatch")
 for line in sys.stdin:
@@ -23,15 +32,14 @@ for line in sys.stdin:
     ref_consuming_ops = ("M", "D", "N", "=", "X")
     for item in parsed_cigar:
         length = int(item[:-1])
-        type = item[len(item)-1:]
-        if type == "D":
+        op_type = item[len(item) - 1:]
+        if op_type == "D":
             output = "-" * length
         else:
-            output = query_seq[query_start : query_start + length]
-        if not type in "MHS=": #dont print match or clips
-            print(f"{query_name}\t{ref_start}\t{type}\t{output}")
-        if type in read_consuming_ops:
+            output = query_seq[query_start: query_start + length]
+        if op_type not in "MHS=":  # don't print match or clips
+            print(f"{query_name}\t{ref_start}\t{op_type}\t{output}")
+        if op_type in read_consuming_ops:
             query_start += length
-        if type in ref_consuming_ops:
+        if op_type in ref_consuming_ops:
             ref_start += length
-        

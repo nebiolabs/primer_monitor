@@ -1,3 +1,7 @@
+"""
+Scores overlaps between primers and variants and determines
+if the primer is likely affected by the overlap.
+"""
 import sys
 import math
 
@@ -31,7 +35,7 @@ with open(sys.argv[1]) as f:
             variant_start_pos = int(line[variant_start_ind + 1])
             variant_end_pos = int(line[variant_start_ind + 2])
             variant_name = line[variant_start_ind + 3]
-        except:
+        except (ValueError, IndexError):
             print(line)
             raise
 
@@ -43,8 +47,8 @@ with open(sys.argv[1]) as f:
         pos = overlap_start
         dist_5p = None
         dist_3p = None
-        dir = (1 if strand == "+" else -1)
-        if dir > 0:
+        primer_dir = (1 if strand == "+" else -1)
+        if primer_dir > 0:
             dist_5p = overlap_start - primer_start_pos
             dist_3p = primer_end_pos - overlap_start
         else:
@@ -65,8 +69,8 @@ with open(sys.argv[1]) as f:
             else:
                 new_score = OTHER_SCORE
 
-            dist_5p += dir
-            dist_3p -= dir
+            dist_5p += primer_dir
+            dist_3p -= primer_dir
             pos += 1
             if cigar_op == "D" or cigar_op == "I":  # indel
                 new_score *= INDEL_MULTIPLIER

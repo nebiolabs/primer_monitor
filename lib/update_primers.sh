@@ -1,37 +1,35 @@
 #!/usr/bin/env bash
 
 if (($# < 1)); then # if bowtie2 index missing
-	echo "usage: get_primers.sh <bowtie2 index> [primer_set_ids...]" >&2
-	exit 1
+  echo "usage: get_primers.sh <bowtie2 index> [primer_set_ids...]" >&2
+  exit 1
 fi
 
 if (($# < 2)); then # if primer set IDs missing
-	echo "no primer set ids specified, exiting" >&2
-	exit 1
+  echo "no primer set ids specified, exiting" >&2
+  exit 1
 fi
 
-bt2_index=$1;
-shift;
+bt2_index=$1
+shift
 
 # you need to export DB_HOST, DB_NAME, and DB_USER before running this
 
 db_csv=$(mktemp)
 
-
-null_check="AND ref_start IS NULL";
+null_check="AND ref_start IS NULL"
 
 if [ -n "$REALIGN" ]; then
-  null_check="";
+  null_check=""
 fi
 
-for id in "$@"
-do
-    echo "Processing $id..." >&2;
+for id in "$@"; do
+  echo "Processing $id..." >&2
 
-    psql -h "$DB_HOST" -d "$DB_NAME" -U "$DB_USER" -c "SELECT id, sequence FROM oligos WHERE primer_set_id=$id $null_check;" --csv -t | \
-    awk 'BEGIN { FS="," }; {print ">" $1 "\n" $2}' | \
-    bowtie2 -f --end-to-end --score-min L,-0.6,-1.5 -L 8 -x "$bt2_index" -U - | \
-    samtools view -b | bedtools bamtobed -i - | awk '{print $4 "," $2 "," $3}' >> "$db_csv"
+  psql -h "$DB_HOST" -d "$DB_NAME" -U "$DB_USER" -c "SELECT id, sequence FROM oligos WHERE primer_set_id=$id $null_check;" --csv -t |
+    awk 'BEGIN { FS="," }; {print ">" $1 "\n" $2}' |
+    bowtie2 -f --end-to-end --score-min L,-0.6,-1.5 -L 8 -x "$bt2_index" -U - |
+    samtools view -b | bedtools bamtobed -i - | awk '{print $4 "," $2 "," $3}' >>"$db_csv"
 
 done
 

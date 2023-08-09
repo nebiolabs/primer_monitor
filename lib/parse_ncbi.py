@@ -1,14 +1,22 @@
+"""
+Filters duplicate sequences out of an NCBI dataset given a list of sequences in the database.
+Usage: ./parse_ncbi.py <metadata> <old accessions> <new sequences> <output filename>
+"""
 import sys
 import json
 
-# returns the value from within the dict, or "" if a key is missing
+
 def get_if_exists(cur_dict, *keys):
+    """
+    returns the value from within the dict, or "" if a key is missing
+    """
     try:
         for key in keys:
             cur_dict = cur_dict[key]
     except KeyError:
         return ""
     return cur_dict
+
 
 # maps accession numbers to data
 output_lines = {}
@@ -29,15 +37,18 @@ if len(sys.argv) >= 6:
 with open(sys.argv[2]) as f:
     for line_s in f:
         # just a list of accessions, not a JSON file
-        prev_accessions.add(accession)
+        prev_accessions.add(line_s.strip())
 
 # read current metadata
 with open(sys.argv[1]) as f:
     for line_s in f:
         line = json.loads(line_s)
         accession = get_if_exists(line, "accession")
-        if accession == "" or (accession in prev_accessions and not output_existing_only) or (accession not in prev_accessions and output_existing_only):
-            continue # skipping anything with no accession number (should not ever happen) or that duplicates an old sequence (or that is new if output_existing_only is true)
+        if accession == "" or (accession in prev_accessions and not output_existing_only) or (
+                accession not in prev_accessions and output_existing_only):
+            # skipping anything with no accession number (should not ever happen)
+            # or that duplicates an old sequence (or that is new if output_existing_only is true)
+            continue
         accessions.add(accession)
         loc = get_if_exists(line, "location", "geographicLocation")
         loc_div = ""
@@ -53,7 +64,7 @@ with open(sys.argv[1]) as f:
             loc,
             loc_div,
             get_if_exists(line, "releaseDate")
-            ]
+        ]
 
 # read seqs
 with open(sys.argv[3]) as f:
@@ -63,4 +74,4 @@ with open(sys.argv[3]) as f:
             line = line_s.split("\t")
             accession = line[0][1:].split()[0]
             if accession in accessions:
-                g.write("\t".join(output_lines[accession]+[line[1].strip()])+"\n")
+                g.write("\t".join(output_lines[accession] + [line[1].strip()]) + "\n")
