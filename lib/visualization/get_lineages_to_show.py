@@ -129,9 +129,14 @@ conn.close()
 
 lineage_groups = {}
 
+aliases_data = json.loads(alias_str)
+reversed_aliases = reverse_aliases(aliases_data)
+
 print("{")
 for lineage in interesting_lineages:
     lineages = get_lineage_names.process_aliases(alias_str, lineages_file, lineage, None)[0]
+    if lineage in reversed_aliases:
+        lineage = reversed_aliases[lineage]
     with open(output_path+"/"+lineage+".txt", "w") as f:
         f.write(lineages)
     print('"'+lineage+'*": "'+lineage+'",')

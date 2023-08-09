@@ -28,15 +28,32 @@ def get_relevant_aliases(search_string, aliases):
                 relevant_aliases += get_relevant_aliases(child+extra_segment, aliases)
     return relevant_aliases
 
+def reverse_aliases(aliases_json):
+    reversed_aliases = {}
+
+    for alias in aliases_data:
+        if type(aliases_data[alias]) == type([]): # is a list
+            for parent in aliases_data[alias]:
+                if parent not in reversed_aliases:
+                    reversed_aliases[parent] = []
+                reversed_aliases[parent].append(alias)
+        else:
+            parent = aliases_data[alias]
+            if parent not in reversed_aliases:
+                reversed_aliases[parent] = []
+            reversed_aliases[parent].append(alias)
+
+    return reversed_aliases
+
 def process_aliases(alias_str, lineage_filename, search_string, conn):
 
     output = ""
 
     aliases_data = json.loads(alias_str)
+    reversed_aliases = reverse_aliases(aliases_data)
 
     search_alias = re.sub('\.?\*$', '', search_string) # remove trailing ".*" or "*" from name
 
-    reversed_aliases = {}
 
     for alias in aliases_data:
         if type(aliases_data[alias]) == type([]): # is a list
