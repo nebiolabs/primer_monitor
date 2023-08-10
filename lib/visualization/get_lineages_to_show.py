@@ -192,9 +192,10 @@ print("{")
 for lineage_group in interesting_lineages:
     recorded_lineages = get_lineage_names.process_aliases(pango_aliases_data, lineage_list_file, lineage_group, None)[0]
     # if this lineage group has a single alias name, and that name is not a recombinant lineage (starts with X), use that name
+    display_name = lineage_group + "*"
     if lineage_group in reversed_aliases and len(reversed_aliases[lineage_group]) == 1 and not reversed_aliases[lineage_group][0].startswith("X"):
-        lineage_group = reversed_aliases[lineage_group][0]
+        display_name = reversed_aliases[lineage_group][0] + "* (" + lineage_group + "*)"
     with open(output_path + "/" + lineage_group + ".txt", "w") as f:
         f.write(recorded_lineages)
-    print('"' + lineage_group + '*": "' + lineage_group + '",')
+    print('"' + display_name + '": "' + lineage_group + '",')
 print("}")
