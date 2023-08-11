@@ -25,9 +25,6 @@ class PrimerSetsController < ApplicationController
 
     primer_sets = JSON.parse(Net::HTTP.get(tracks_url)).invert
 
-    Rails.logger.warn primer_sets
-    Rails.logger.warn @primer_set.name
-
     return unless primer_sets.key? @primer_set.name
 
     @config['primer_set_display_name'] = @primer_set.name
