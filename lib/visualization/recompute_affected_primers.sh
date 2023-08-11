@@ -50,7 +50,7 @@ if [ -z "$primer_sets_file" ]; then
   curl https://raw.githubusercontent.com/cov-lineages/pango-designation/master/pango_designation/alias_key.json \
   | python "$primer_monitor_path/lib/visualization/get_lineages_to_show.py" A,B lineages.csv seq_counts.csv "$organism_dirname/lineage_sets"
 
-  cat <(printf "{") <(find "$organism_dirname/lineage_sets" -exec basename -a "{}" + \
+  cat <(printf "{") <(find "$organism_dirname/lineage_sets" -exec basename -a "{}" + -name '*.txt' \
   | sed -E 's/^(.*)\\.txt$/"\\1": "\\1.*",/') <(echo '"all": "All"}') > "$organism_dirname/config/lineage_sets.json"
 else
   # download existing lineage sets from the data server
@@ -60,7 +60,7 @@ fi
 
 
 if [ -z "$primer_sets_file" ]; then
-  find "$organism_dirname/primer_sets_raw" -exec basename -a "{}" + > primer_sets_data.txt
+  find "$organism_dirname/primer_sets_raw" -exec basename -a "{}" + -name '*.bed' > primer_sets_data.txt
 else
   while read -r primer_set; do
     echo "$("$(dirname "$0")/urlify_name.sh" "$primer_set").bed" >> primer_sets_data.txt;
