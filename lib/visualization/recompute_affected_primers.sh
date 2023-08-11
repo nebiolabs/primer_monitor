@@ -24,6 +24,7 @@ mkdir -p "$organism_dirname/config"
 mkdir -p "$organism_dirname/lineage_sets"
 mkdir -p "$organism_dirname/lineage_variants"
 mkdir -p "$organism_dirname/primer_sets_raw"
+mkdir -p "$organism_dirname/primer_sets_fasta"
 
 scp_proxy()
 {
@@ -37,7 +38,7 @@ ssh_proxy()
   ssh ${JUMP_PROXY:+"-J"} "${JUMP_PROXY:-''}" "$@"
 }
 
-"$primer_monitor_path/lib/visualization/get_primer_sets.sh" "$organism_dirname/primer_sets_raw" "$primer_sets_file" > "$organism_dirname/config/tracks.json"
+"$primer_monitor_path/lib/visualization/get_primer_sets.sh" "$organism_dirname/primer_sets_raw" "$organism_dirname/primer_sets_fasta" "$primer_sets_file" > "$organism_dirname/config/tracks.json"
 
 if [ -z "$primer_sets_file" ]; then
   # if full update, recompute lineage sets
@@ -76,7 +77,7 @@ if [ -z "$primer_sets_file" ]; then
   # if full update, remove old files so this doesn't clutter up the directories
   ssh_proxy "$FRONTEND_HOST" "rm -rf $IGVSTATIC_PATH/$organism_dirname/primer_sets; \
   rm -f $IGVSTATIC_PATH/$organism_dirname/primer_sets_raw/* $IGVSTATIC_PATH/$organism_dirname/lineage_sets/* \
-  $IGVSTATIC_PATH/$organism_dirname/lineage_variants/*;"
+  $IGVSTATIC_PATH/$organism_dirname/lineage_variants/* $IGVSTATIC_PATH/$organism_dirname/primer_sets_fasta/*;"
 
   # copies over the new files
   scp_proxy -r "./$organism_dirname/*" "$FRONTEND_HOST:$IGVSTATIC_PATH/$organism_dirname/";
@@ -87,6 +88,7 @@ else
     urlified_primer_set_name=$("$(dirname "$0")/urlify_name.sh" "$primer_set")
     scp_proxy -r "./$organism_dirname/config/tracks.json" "$FRONTEND_HOST:$IGVSTATIC_PATH/$organism_dirname/config/tracks.json";
     scp_proxy -r "./$organism_dirname/primer_sets_raw/${urlified_primer_set_name}.bed" "$FRONTEND_HOST:$IGVSTATIC_PATH/$organism_dirname/primer_sets_raw/${urlified_primer_set_name}.bed";
+    scp_proxy -r "./$organism_dirname/primer_sets_fasta/${urlified_primer_set_name}.fasta" "$FRONTEND_HOST:$IGVSTATIC_PATH/$organism_dirname/primer_sets_fasta/${urlified_primer_set_name}.fasta";
     scp_proxy -r "./$organism_dirname/primer_sets/${urlified_primer_set_name}" "$FRONTEND_HOST:$IGVSTATIC_PATH/$organism_dirname/primer_sets";
   done  < "$primer_sets_file"
 fi

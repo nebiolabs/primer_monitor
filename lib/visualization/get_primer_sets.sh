@@ -4,7 +4,7 @@
 
 set -e
 
-primer_sets_file="$2"
+primer_sets_file="$3"
 
 if [ -z "$primer_sets_file" ]; then
   unset primer_sets_file
@@ -32,6 +32,10 @@ while read -r seq_name_raw; do
   fi
   printf "\"%s\": \"%s\"" "$seq_name" "$seq_name_raw"
   first=0
+
+  psql -h "$DB_HOST" -d "$DB_NAME" -U "$DB_USER_RO" -v "primer_set_name=$seq_name_raw" \
+  <<< "SELECT name,sequence FROM oligos WHERE primer_set_id=(SELECT id FROM primer_sets WHERE name = :'primer_set_name');" \
+  --csv -t | awk -F',' '{ print ">" $1 "\n" $2 }' > "$2/$seq_name.fasta"
 done < <(cut -f 1 < "$primer_sets_tmp" | sort | uniq)
 printf "}\n"
 
