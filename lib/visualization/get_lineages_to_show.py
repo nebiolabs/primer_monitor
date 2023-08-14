@@ -198,4 +198,5 @@ for lineage_group in interesting_lineages:
     with open(output_path + "/" + lineage_group + ".txt", "w") as f:
         f.write(recorded_lineages)
     print('"' + display_name + '": "' + lineage_group + '",')
+print('"all": "All"')
 print("}")
