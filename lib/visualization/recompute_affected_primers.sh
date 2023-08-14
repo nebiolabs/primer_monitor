@@ -58,7 +58,7 @@ if [ -z "$primer_sets_file" ]; then
   FROM fasta_records GROUP BY COALESCE(date_collected, date_submitted);" --csv -t > seq_counts.csv
 
   echo "$(date +'%b %d %H:%M:%S') - calculating lineage groups of interest"
-  curl https://raw.githubusercontent.com/cov-lineages/pango-designation/master/pango_designation/alias_key.json \
+  curl -Ssf https://raw.githubusercontent.com/cov-lineages/pango-designation/master/pango_designation/alias_key.json \
   | python "$primer_monitor_path/lib/visualization/get_lineages_to_show.py" A,B lineages.csv seq_counts.csv "$organism_dirname/lineage_sets" > "$organism_dirname/config/lineage_sets.json"
   echo "$(date +'%b %d %H:%M:%S') - done calculating lineage groups"
 else
