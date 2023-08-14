@@ -48,10 +48,7 @@ if [ -z "$primer_sets_file" ]; then
   FROM fasta_records GROUP BY COALESCE(date_collected, date_submitted);" --csv -t > seq_counts.csv
 
   curl https://raw.githubusercontent.com/cov-lineages/pango-designation/master/pango_designation/alias_key.json \
-  | python "$primer_monitor_path/lib/visualization/get_lineages_to_show.py" A,B lineages.csv seq_counts.csv "$organism_dirname/lineage_sets"
-
-  cat <(printf "{") <(find "$organism_dirname/lineage_sets" -name '*.txt' -exec basename -a "{}" + \
-  | sed -E 's/^(.*)\\.txt$/"\\1": "\\1.*",/') <(echo '"all": "All"}') > "$organism_dirname/config/lineage_sets.json"
+  | python "$primer_monitor_path/lib/visualization/get_lineages_to_show.py" A,B lineages.csv seq_counts.csv "$organism_dirname/lineage_sets" > "$organism_dirname/config/lineage_sets.json"
 else
   # download existing lineage sets from the data server
   scp_proxy -r "$FRONTEND_HOST:$IGVSTATIC_PATH/$organism_dirname/lineage_sets" "./$organism_dirname";
