@@ -280,6 +280,7 @@ process recompute_affected_primers {
         file "${organism_dirname}/lineage_sets"
         file "${organism_dirname}/primer_sets"
         file "${organism_dirname}/primer_sets_raw"
+        file "${organism_dirname}/primer_sets_fasta"
         file "${organism_dirname}/config/lineage_sets.json"
         file "${organism_dirname}/config/tracks.json"
     shell:
