@@ -33,7 +33,10 @@ class PrimerSet < ApplicationRecord
   end
 
   def notify_admins_about_primer_set_update
-    PrimerSetMailer.updated_primer_set_email('ckumar@neb.com', self).deliver_later
+    Role.find_by(name: 'administrator').users.each do |user|
+      PrimerSetMailer.updated_primer_set_email(user.email, self).deliver_later
+    end
+    PrimerSetMailer.updated_primer_set_email('primer-monitor@neb.com', self).deliver_later
   end
 
   def align_primers
