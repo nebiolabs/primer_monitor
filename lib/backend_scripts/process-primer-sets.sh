@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 source "$(dirname "$0")/../../.env";
 
 new_primers_file="$(mktemp)"
@@ -11,6 +13,8 @@ if [ "$line_count" -gt 0 ]; then
   "$NEXTFLOW_INSTALL_PATH" -log "$BACKEND_SCRATCH_PATH/log_primer_sets/" \
   run "$BACKEND_INSTALL_PATH/lib/pangolin_calls/process_primer_sets.nf" \
   -w "$BACKEND_SCRATCH_PATH/work_primer_sets/" \
+  --pct-cutoff "$PCT_CUTOFF" \
+  --score-cutoff "$SCORE_CUTOFF" \
   --primer-names "$new_primers_file" \
   -N "$NOTIFICATION_EMAILS";
 fi

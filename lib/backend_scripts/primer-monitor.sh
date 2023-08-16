@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 source "$(dirname "$0")/../../.env";
 mkdir -p "$BACKEND_SCRATCH_PATH/status";
 
