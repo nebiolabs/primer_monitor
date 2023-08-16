@@ -40,7 +40,7 @@ class PrimerSet < ApplicationRecord
 
   def align_primers
     pid = Process.spawn({ 'DB_HOST' => ENV['DB_HOST'], 'DB_NAME' => ENV['DB_NAME'], 'DB_USER' => ENV['DB_USER'] },
-                        Shellwords.join(['bash', 'lib/update_primers.sh', 'lib/cov_index/NC_045512.2',
+                        Shellwords.join(['bash', 'lib/update_primers.sh', 'bt2_indices/2697049/NC_045512.2',
                                          id.to_s]))
     Process.detach pid # prevent zombie process
     pid
