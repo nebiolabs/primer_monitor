@@ -29,7 +29,6 @@ class PrimerSetsController < ApplicationController
 
     @config['primer_set_display_name'] = @primer_set.name
     @config['primer_set_name'] = primer_sets[@primer_set.name]
-
   end
 
   # GET /primer_sets/new
