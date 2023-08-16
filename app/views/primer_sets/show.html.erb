@@ -52,16 +52,32 @@
 <h2 class="title">IGV Visualization:</h2>
 
 <p id="config" class="invisible"><%= @config.to_json %></p>
-<div id="igv" class="igv_div"><p class="igv-message">
-  This primer set has not yet been processed for the igv.js visualization. Processing should be complete within about 24 hours after it is approved and made public.
-</p></div>
+
+<% if @primer_set.status == PrimerSet.statuses[:complete] %>
+
+<div id="igv" class="igv_div"></div>
+
+<% else %>
+
+<p class="igv-message">
+  This primer set has not yet been processed for the igv.js visualization. Processing should be complete shortly after it is approved and made public.
+</p>
+
+<% end %>
+
 <hr/>
+
+<% if @primer_set.status == PrimerSet.statuses[:complete] %>
 
 <a href="<%= "#{@config[:data_server]}/#{@config[:organism_taxid]}/primer_sets_bed/#{@config['primer_set_name']}.bed" %>">Download Primer Set BED</a>
 <br>
 <a href="<%= "#{@config[:data_server]}/#{@config[:organism_taxid]}/primer_sets_fasta/#{@config['primer_set_name']}.fasta" %>">Download Sequence FASTA</a>
 
+
 <hr/>
+
+<% end %>
+
 <h2 class="title">Primers:</h2>
 <table>
   <thead>
