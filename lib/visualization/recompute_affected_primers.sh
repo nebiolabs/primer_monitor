@@ -26,7 +26,7 @@ export DB_NAME
 mkdir -p "$organism_dirname/config"
 mkdir -p "$organism_dirname/lineage_sets"
 mkdir -p "$organism_dirname/lineage_variants"
-mkdir -p "$organism_dirname/primer_sets_raw"
+mkdir -p "$organism_dirname/primer_sets_bed"
 mkdir -p "$organism_dirname/primer_sets_fasta"
 
 scp_proxy()
@@ -43,7 +43,7 @@ ssh_proxy()
 
 echo "$(date +'%b %d %H:%M:%S') - getting primer sets"
 
-"$primer_monitor_path/lib/visualization/get_primer_sets.sh" "$organism_dirname/primer_sets_raw" "$organism_dirname/primer_sets_fasta" "$primer_sets_file" > "$organism_dirname/config/tracks.json"
+"$primer_monitor_path/lib/visualization/get_primer_sets.sh" "$organism_dirname/primer_sets_bed" "$organism_dirname/primer_sets_fasta" "$primer_sets_file" > "$organism_dirname/config/tracks.json"
 
 echo "$(date +'%b %d %H:%M:%S') - done getting primer sets"
 
@@ -73,7 +73,7 @@ fi
 
 echo "$(date +'%b %d %H:%M:%S') - getting list of primer sets to process"
 if [ -z "$primer_sets_file" ]; then
-  find "$organism_dirname/primer_sets_raw" -name '*.bed' -exec basename -a "{}" + > primer_sets_data.txt
+  find "$organism_dirname/primer_sets_bed" -name '*.bed' -exec basename -a "{}" + > primer_sets_data.txt
 else
   while read -r primer_set; do
     echo "$("$(dirname "$0")/urlify_name.sh" "$primer_set").bed" >> primer_sets_data.txt;
@@ -91,7 +91,7 @@ if [ -z "$primer_sets_file" ]; then
   # if full update, remove old files so this doesn't clutter up the directories
   echo "$(date +'%b %d %H:%M:%S') - removing old files"
   ssh_proxy "$FRONTEND_HOST" "rm -rf $IGVSTATIC_PATH/$organism_dirname/primer_sets; \
-  rm -f $IGVSTATIC_PATH/$organism_dirname/primer_sets_raw/* $IGVSTATIC_PATH/$organism_dirname/lineage_sets/* \
+  rm -f $IGVSTATIC_PATH/$organism_dirname/primer_sets_bed/* $IGVSTATIC_PATH/$organism_dirname/lineage_sets/* \
   $IGVSTATIC_PATH/$organism_dirname/lineage_variants/* $IGVSTATIC_PATH/$organism_dirname/primer_sets_fasta/*;"
 
   echo "$(date +'%b %d %H:%M:%S') - uploading new data"
@@ -104,9 +104,9 @@ else
   while read -r primer_set; do
     urlified_primer_set_name=$("$(dirname "$0")/urlify_name.sh" "$primer_set")
     scp_proxy -r "./$organism_dirname/config/tracks.json" "$FRONTEND_HOST:$IGVSTATIC_PATH/$organism_dirname/config/tracks.json";
-    scp_proxy -r "./$organism_dirname/primer_sets_raw/${urlified_primer_set_name}.bed" "$FRONTEND_HOST:$IGVSTATIC_PATH/$organism_dirname/primer_sets_raw/${urlified_primer_set_name}.bed";
+    scp_proxy -r "./$organism_dirname/primer_sets_bed/${urlified_primer_set_name}.bed" "$FRONTEND_HOST:$IGVSTATIC_PATH/$organism_dirname/primer_sets_bed/${urlified_primer_set_name}.bed";
     scp_proxy -r "./$organism_dirname/primer_sets_fasta/${urlified_primer_set_name}.fasta" "$FRONTEND_HOST:$IGVSTATIC_PATH/$organism_dirname/primer_sets_fasta/${urlified_primer_set_name}.fasta";
-    scp_proxy -r "./$organism_dirname/primer_sets/${urlified_primer_set_name}" "$FRONTEND_HOST:$IGVSTATIC_PATH/$organism_dirname/primer_sets";
+    scp_proxy -r "./$organism_dirname/primer_sets_status/${urlified_primer_set_name}" "$FRONTEND_HOST:$IGVSTATIC_PATH/$organism_dirname/primer_sets";
   done  < "$primer_sets_file"
 fi
 

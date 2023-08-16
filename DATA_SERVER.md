@@ -29,11 +29,14 @@ lineage sets is also obtained from the list of key-value pairs in this file.
 
 ### Primer sets
 
-* `<organism taxid>/primer_sets/<primer set name>/<lineage group name>.bed`: A BED file (minimum 9 columns) containing a record for
+* `<organism taxid>/primer_sets_status/<primer set name>/<lineage group name>.bed`: A BED file (minimum 9 columns) containing a record for
 each primer in the primer set. The color is used to mark whether the primer is affected by a variant in the specified
 lineage group.
 
-* `<organism taxid>/primer_sets_raw/<primer set name>.bed`: A BED file containing the raw primer annotations for
+* `<organism taxid>/primer_sets_bed/<primer set name>.bed`: A BED file containing the raw primer annotations for
+  each primer in the primer set.
+
+* `<organism taxid>/primer_sets_fasta/<primer set name>.fasta`: A FASTA file containing the raw primer sequences for
   each primer in the primer set.
 
 ### Lineage sets

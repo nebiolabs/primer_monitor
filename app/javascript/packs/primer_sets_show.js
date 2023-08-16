@@ -27,7 +27,7 @@ function initBrowser() {
                     },
                     {
                         "name": config['primer_set_display_name'],
-                        "url": config['data_server']+"/"+config['organism_taxid']+"/primer_sets_raw/"+config['primer_set_name']+".bed",
+                        "url": config['data_server']+"/"+config['organism_taxid']+"/primer_sets_bed/"+config['primer_set_name']+".bed",
                         "format": "bed",
                         "displayMode": "EXPANDED",
                         "autoHeight": true
