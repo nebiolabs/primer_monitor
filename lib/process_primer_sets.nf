@@ -11,8 +11,6 @@ score_cutoff = params.score_cutoff
 
 params.primer_monitor_path = '/mnt/bioinfo/prg/primer_monitor'
 primer_monitor_path = params.primer_monitor_path
-params.output_path = '/mnt/hpc_scratch/primer_monitor'
-output_path = params.output_path
 
 params.organism_dirname = "2697049"
 organism_dirname = params.organism_dirname
@@ -48,8 +46,6 @@ process update_db {
     while read -f primer_set; do
         psql -h "$DB_HOST" -d "$DB_NAME" -U "$DB_USER_RO" -v "primer_set=$primer_set" <<< "UPDATE primer_sets SET status='complete' WHERE name=:'primer_set';";
     done < !{completed_primers}
-
-    touch done.txt;
     '''
 }
 
