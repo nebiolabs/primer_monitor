@@ -32,7 +32,7 @@ class OligosController < ApplicationController
         format.html { redirect_to @oligo, notice: 'Oligo was successfully created.' }
         format.json { render :show, status: :created, location: @oligo }
       else
-        format.html { render :new }
+        format.html { render :created }
         format.json { render json: @oligo.errors, status: :unprocessable_entity }
       end
     end

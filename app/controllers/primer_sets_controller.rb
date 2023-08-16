@@ -55,7 +55,7 @@ class PrimerSetsController < ApplicationController
         end
         format.json { render :show, status: :created, location: @primer_set }
       else
-        format.html { render :new }
+        format.html { render :created }
         format.json { render json: @primer_set.errors, status: :unprocessable_entity }
       end
     end

@@ -31,7 +31,7 @@ CREATE TYPE public.oligo_category AS ENUM (
 --
 
 CREATE TYPE public.primer_set_status AS ENUM (
-    'new',
+    'created',
     'complete',
     'failed',
     'processing'
@@ -446,7 +446,7 @@ CREATE TABLE public.primer_sets (
     organism_id integer NOT NULL,
     created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL,
-    status public.primer_set_status DEFAULT 'new'::public.primer_set_status,
+    status public.primer_set_status DEFAULT 'created'::public.primer_set_status,
     citation_url character varying,
     doi character varying,
     amplification_method_id bigint
@@ -2228,6 +2228,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20230718131700'),
 ('20230721152550'),
 ('20230802152750'),
-('20230814161850');
+('20230814161850'),
+('20230816160045');
 
 

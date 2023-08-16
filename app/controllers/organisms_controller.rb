@@ -34,7 +34,7 @@ class OrganismsController < ApplicationController
         format.html { redirect_to @organism, notice: 'Organism was successfully created.' }
         format.json { render :show, status: :created, location: @organism }
       else
-        format.html { render :new }
+        format.html { render :created }
         format.json { render json: @organism.errors, status: :unprocessable_entity }
       end
     end
