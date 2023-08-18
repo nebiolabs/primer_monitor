@@ -12,6 +12,10 @@ class PrimerSet < ApplicationRecord
 
   accepts_nested_attributes_for :oligos, reject_if: :all_blank, allow_destroy: true
 
+  validates :name, uniqueness: true, presence: true
+
+  validates :oligos, presence: true
+
   after_save :notify_admins_about_primer_set_update
 
   def to_s

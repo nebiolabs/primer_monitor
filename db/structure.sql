@@ -1699,6 +1699,13 @@ CREATE UNIQUE INDEX index_primer_set_subscriptions_on_user_id_and_primer_set_id 
 
 
 --
+-- Name: index_primer_sets_on_name; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_primer_sets_on_name ON public.primer_sets USING btree (name);
+
+
+--
 -- Name: index_primer_sets_on_organism_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -2229,6 +2236,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20230721152550'),
 ('20230802152750'),
 ('20230814161850'),
-('20230816160045');
+('20230816160045'),
+('20230818095330');
 
 
