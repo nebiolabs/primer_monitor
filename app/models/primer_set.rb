@@ -16,6 +16,8 @@ class PrimerSet < ApplicationRecord
 
   validates :oligos, presence: true
 
+  validates_associated :oligos
+
   after_save :notify_admins_about_primer_set_update
 
   def to_s
