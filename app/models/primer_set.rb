@@ -25,7 +25,7 @@ class PrimerSet < ApplicationRecord
   end
 
   def display_url
-    citation_url || doi_url
+    citation_url.presence || doi_url
   end
 
   def doi_url
