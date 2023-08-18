@@ -9,6 +9,6 @@ class Organism < ApplicationRecord
   end
 
   def full_name
-    name + (self.alias.nil? ? '' : " (#{self.alias})")
+    name + (self.alias.blank? ? '' : " (#{self.alias})")
   end
 end
