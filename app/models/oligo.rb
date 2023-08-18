@@ -9,7 +9,8 @@ class Oligo < ApplicationRecord
 
   validates :short_name, length: 1..5, allow_blank: true
 
-  validates :sequence, presence: true, format: { with: /\A([ATUCGWSMKRYBDHVN]|\s)+\z/i, message: 'contains invalid bases' }
+  validates :sequence, presence: true,
+                       format: { with: /\A([ATUCGWSMKRYBDHVN]|\s)*\z/i, message: 'contains invalid bases' }
 
   validates :name, presence: true
 
