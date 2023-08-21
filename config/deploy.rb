@@ -6,6 +6,8 @@ set :ssh_options, { forward_agent: true }
 set :repo_url, 'git@github.com:bwlang/primer_monitor.git'
 set :puma_service_name, 'puma'
 
+set :whenever_roles, [:app, :backend]
+
 # only migrate if there are migrations pending
 set :conditionally_migrate, true
 
@@ -15,6 +17,10 @@ set :conditionally_migrate, true
 set :assets_dependencies, %w[app/assets lib/assets vendor/assets Gemfile.lock config/routes.rb]
 
 set :backend_deploy_to, ->{ fetch(:backend_deploy_path) }
+set :whenever_command, "bundle exec whenever"
+set :whenever_environment,  ->{ fetch :rails_env, fetch(:stage, "production") }
+set :whenever_variables,    ->{ "environment=#{fetch :whenever_environment}&backend_path=#{fetch(:backend_deploy_path)}" }
+require "whenever/capistrano"
 
 # clear the previous precompile task
 Rake::Task['deploy:assets:precompile'].clear_actions
