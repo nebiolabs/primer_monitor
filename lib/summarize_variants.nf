@@ -41,6 +41,23 @@ organism_dirname = params.organism_dirname
 pangolin_version = file(params.pangolin_version_path).text
 pangolin_data_version = file(params.pangolin_data_version_path).text
 
+process set_lock {
+    // Sets lock file
+    cpus 1
+    output:
+        file 'done.txt'
+
+    shell:
+    '''
+    if [ -f "!{params.flag_path}/summarize_variants_running.lock" ]; then
+        echo "Another summarize_variants instance is running, aborting..." >&2
+        exit 1;
+    fi
+    touch "!{params.flag_path}/summarize_variants_running.lock"
+    '''
+
+}
+
 process download_data {
     // Downloads the full dataset
     cpus 16
@@ -50,16 +67,14 @@ process download_data {
     publishDir "${output_path}", mode: 'link', pattern: '*.zst', overwrite: true
     // mode "link" assumes that the output path is on the same disk as the work directory, switch to copy if not
 
+    input:
+        file lock_set
+
     output:
         tuple file('*.metadata.zst'), file('*.sequences.zst')
 
     shell:
     '''
-    if [ -f "!{params.flag_path}/summarize_variants_running.lock" ]; then
-        echo "Another summarize_variants instance is running, aborting..." >&2
-        exit 1;
-    fi
-    touch "!{params.flag_path}/summarize_variants_running.lock"
     date_today=$(date +%Y-%m-%d)
     datasets download virus genome taxon SARS-CoV-2 --complete-only --host human --filename tmp.zip
     unzip tmp.zip
@@ -276,34 +291,41 @@ process recompute_affected_primers {
     input:
         file complete
     output:
-        file "${organism_dirname}/lineage_variants"
-        file "${organism_dirname}/lineage_sets"
-        file "${organism_dirname}/primer_sets"
-        file "${organism_dirname}/primer_sets_bed"
-        file "${organism_dirname}/primer_sets_fasta"
-        file "${organism_dirname}/config/lineage_sets.json"
-        file "${organism_dirname}/config/tracks.json"
+        file "done.txt"
     shell:
     '''
     # recompute the primer data for igvjs visualization
     touch "!{params.flag_path}/recomputing_primers.lock"
     !{primer_monitor_path}/lib/visualization/recompute_affected_primers.sh !{primer_monitor_path} !{organism_dirname} !{pct_cutoff} !{score_cutoff} !{task.cpus}
     rm "!{params.flag_path}/recomputing_primers.lock"
+    touch done.txt
+    '''
+}
+
+process clear_lock {
+    cpus 1
+    input:
+        file complete
+    shell:
+    '''
+    rm "!{params.flag_path}/summarize_variants_running.lock"
     '''
 }
 
 workflow {
-    download_data()
+    set_lock()
+    download_data(set_lock.out)
     extract_new_records(download_data.out)
     transform_data(extract_new_records.out.splitText(file: true, by: 10000).filter{ it.size()>77 })
     align(transform_data.out)
     load_to_db(align.out)
-    get_pangolin_version()
+    get_pangolin_version(set_lock.out)
     pangolin_calls(get_pangolin_version.out[0], get_pangolin_version.out[1], transform_data.out)
     load_pangolin_data(pangolin_calls.out, load_to_db.out, get_pangolin_version.out[2])
     update_new_calls(load_to_db.out.collect(), load_pangolin_data.out.collect())
     recalculate_database_views(update_new_calls.out)
     recompute_affected_primers(recalculate_database_views.out)
+    clear_lock(recompute_affected_primers.out)
 }
 
 workflow.onError {
