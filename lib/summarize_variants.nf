@@ -286,7 +286,9 @@ process recompute_affected_primers {
     shell:
     '''
     # recompute the primer data for igvjs visualization
+    touch "!{params.flag_path}/recomputing_primers.lock"
     !{primer_monitor_path}/lib/visualization/recompute_affected_primers.sh !{primer_monitor_path} !{organism_dirname} !{pct_cutoff} !{score_cutoff} !{task.cpus}
+    rm "!{params.flag_path}/recomputing_primers.lock"
     '''
 }
 
@@ -312,7 +314,19 @@ workflow.onError {
         //get rid of "pipeline running" lock
         running_lock = file('${params.flag_path}/data_update_running.lock')
         running_lock.delete()
+        if(running_lock.exists())
+        {
+            running_lock.delete()
+        }
         pipeline_lock = file('${params.flag_path}/summarize_variants_running.lock')
-        pipeline_lock.delete()
+        if(pipeline_lock.exists())
+        {
+            pipeline_lock.delete()
+        }
+        recompute_lock = file('${params.flag_path}/recomputing_primers.lock')
+        if(recompute_lock.exists())
+        {
+            recompute_lock.delete()
+        }
     }
 }
