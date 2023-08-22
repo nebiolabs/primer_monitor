@@ -20,7 +20,6 @@ set :backend_deploy_to, ->{ fetch(:backend_deploy_path) }
 set :whenever_command, "bundle exec whenever"
 set :whenever_environment,  ->{ fetch :rails_env, fetch(:stage, "production") }
 set :whenever_variables,    ->{ "environment=#{fetch :whenever_environment}&backend_path=#{fetch(:backend_deploy_path)}" }
-require "whenever/capistrano"
 
 # clear the previous precompile task
 Rake::Task['deploy:assets:precompile'].clear_actions
