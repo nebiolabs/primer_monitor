@@ -12,7 +12,7 @@ process set_lock {
     // Sets lock file
     cpus 1
     output:
-        file 'done.txt'
+        file "${params.flag_path}/recall_pangolin_running.lock"
 
     shell:
     '''
