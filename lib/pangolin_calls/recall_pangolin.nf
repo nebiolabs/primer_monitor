@@ -30,9 +30,12 @@ process get_new_versions {
     penv 'smp'
     conda "'bash>=4.1'"
 
+    input:
+         file lock_set
+
     output:
-    env latest_pangolin
-    env latest_pangolin_data
+        env latest_pangolin
+        env latest_pangolin_data
 
     shell:
     '''
@@ -63,6 +66,9 @@ process download_data {
     conda "ncbi-datasets-cli unzip zstd"
     errorStrategy 'retry'
     maxRetries 2
+
+    input:
+         file lock_set
 
     output:
         tuple file('*.metadata.zst'), file('*.sequences.zst')

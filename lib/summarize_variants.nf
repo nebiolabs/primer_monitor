@@ -184,6 +184,9 @@ process get_pangolin_version {
 
     conda "'bash>=4.1'"
 
+    input:
+         file lock_set
+
     output:
         env pangolin_version
         env pangolin_data_version
