@@ -45,7 +45,7 @@ process set_lock {
     // Sets lock file
     cpus 1
     output:
-        file "${params.flag_path}/summarize_variants_running.lock"
+        file "done.txt"
 
     shell:
     '''
@@ -54,6 +54,7 @@ process set_lock {
         exit 1;
     fi
     touch "!{params.flag_path}/summarize_variants_running.lock"
+    touch done.txt
     '''
 
 }
