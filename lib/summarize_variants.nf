@@ -8,7 +8,7 @@ params.flag_path='/mnt/hpc_scratch/primer_monitor'
 params.pct_cutoff = 1
 pct_cutoff = params.pct_cutoff
 
-params.score_cutoff = 80
+params.score_cutoff = 3
 score_cutoff = params.score_cutoff
 
 params.primer_monitor_path = '/mnt/bioinfo/prg/primer_monitor'

@@ -58,7 +58,7 @@ with open(sys.argv[1]) as f:
         if cigar_op == "I" and overlap_start < primer_start_pos:  # insertion outside primer
             continue
 
-        while pos <= overlap_end:
+        while pos < overlap_end:
             new_score = 0
             if dist_5p <= 3:
                 new_score = NEAR_5P_SCORE
