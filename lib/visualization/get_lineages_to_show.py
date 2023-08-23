@@ -114,6 +114,15 @@ with open(seqs_per_day_file) as f:
         seqs_per_day[line[0]] = int(line[1])
 
 output_path = sys.argv[4]
+
+overrides = []
+
+if len(sys.argv) >= 6:
+    overrides_file = sys.argv[5]
+    with open(overrides_file) as f:
+        for line in f:
+            overrides.append(line.strip())
+
 lineage_data = {}
 with open(sys.argv[2]) as f:
     for line_s in f:
@@ -126,6 +135,10 @@ with open(sys.argv[2]) as f:
 conn = psycopg2.connect("dbname="+os.environ['DB_NAME']+" user="+os.environ['DB_USER_RO']+" host="+os.environ['DB_HOST'])
 interesting_lineages = get_lineages(alias_str, lineages_file, starting_lineages, seqs_per_day, lineage_data, conn)
 conn.close()
+
+for lineage in overrides:
+    if lineage not in interesting_lineages:
+        interesting_lineages.append(lineage)
 
 lineage_groups = {}
 

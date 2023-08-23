@@ -24,6 +24,10 @@ igvstatic_path = params.igvstatic_path
 params.frontend_host = 'primer-monitor.neb.com'
 frontend_host = params.frontend_host
 
+params.override_path =
+override_path = params.override_path
+override_path = file(override_path).toAbsolutePath()
+
 params.jump_proxy =
 
 ssh_opts = ""
@@ -300,7 +304,7 @@ process recompute_affected_primers {
     FROM fasta_records GROUP BY COALESCE(date_collected, date_submitted);" --csv -t > seq_counts.csv
 
     curl https://raw.githubusercontent.com/cov-lineages/pango-designation/master/pango_designation/alias_key.json \
-    | python !{primer_monitor_path}/lib/visualization/get_lineages_to_show.py A,B lineages.csv seq_counts.csv !{organism_dirname}/lineage_sets
+    | python !{primer_monitor_path}/lib/visualization/get_lineages_to_show.py A,B lineages.csv seq_counts.csv !{organism_dirname}/lineage_sets !{override_path}
 
     cat <(printf "{") <(ls !{organism_dirname}/lineage_sets \
     | sed -E 's/^(.*)\\.txt$/"\\1": "\\1.*",/') <(echo '"all": "All"}') > !{organism_dirname}/config/lineage_sets.json
