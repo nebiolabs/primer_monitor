@@ -137,8 +137,7 @@ interesting_lineages = get_lineages(alias_str, lineages_file, starting_lineages,
 conn.close()
 
 for lineage in overrides:
-    if lineage not in interesting_lineages:
-        interesting_lineages.append(lineage)
+    interesting_lineages.add(lineage)
 
 lineage_groups = {}
 
