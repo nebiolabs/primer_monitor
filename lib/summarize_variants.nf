@@ -273,7 +273,7 @@ process recompute_affected_primers {
     cpus 8
     errorStrategy 'retry'
     maxRetries 2
-    conda "libiconv psycopg2 bedtools coreutils 'postgresql>=15' gawk"
+    conda "libiconv psycopg2 bedtools coreutils 'postgresql>=15' gawk bc"
     input:
         file complete
     output:
