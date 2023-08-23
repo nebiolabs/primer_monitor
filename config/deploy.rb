@@ -36,9 +36,16 @@ append :linked_dirs,  'log', 'tmp/pids', 'tmp/cache', 'tmp/sockets', 'public/sys
 
 set :keep_releases, 10
 
+desc 'Deploy primer-monitor backend (except crontab)'
+task :backend_src do
+  invoke 'backend:git'
+end
+
 desc 'Deploy primer-monitor backend'
 task :backend do
-  invoke 'backend:git'
+  set :whenever_roles, [:backend]
+  invoke 'backend_src'
+  invoke 'whenever:update_crontab'
 end
 
 namespace :backend do
@@ -164,6 +171,6 @@ namespace :deploy do
 
   after :published, :restart
   #after 'deploy:restart_services', 'deploy:seed'
-  after 'deploy:restart_services', 'backend'
+  after 'deploy:restart_services', 'backend_src'
 
 end
