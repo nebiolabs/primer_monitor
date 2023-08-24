@@ -33,6 +33,9 @@ params.jump_proxy =
 ssh_opts = ""
 scp_opts = ""
 
+params.temp_dir = '/tmp'
+temp_dir = params.temp_dir
+
 if(params.jump_proxy)
 {
     ssh_opts = "-J ${params.jump_proxy}"
@@ -62,6 +65,10 @@ process download_data {
 
     shell:
     '''
+
+    TMPDIR="!{temp_dir}"
+    export TMPDIR
+
     date_today=$(date +%Y-%m-%d)
     datasets download virus genome taxon SARS-CoV-2 --complete-only --host human --filename tmp.zip
     unzip tmp.zip
@@ -85,6 +92,10 @@ process extract_new_records {
 
     shell:
     '''
+
+    TMPDIR="!{temp_dir}"
+    export TMPDIR
+
     date_today=$(date +%Y-%m-%d)
 
     python !{primer_monitor_path}/lib/parse_ncbi.py <(zstd -d --long=30 < !{metadata_json}) <(zstd -d --long=30 < !{prev_json}) <(zstd -d --long=30 < !{sequences_fasta} | seqtk seq | paste - -) ${date_today}.tsv
@@ -127,6 +138,10 @@ process align {
 
     shell:
     '''
+
+        TMPDIR="!{temp_dir}"
+        export TMPDIR
+
         date_today=$(date +%Y-%m-%d)
 
         sed -E 's/ /_/g' !{fasta} \
@@ -204,7 +219,7 @@ process pangolin_calls {
         file "*.csv"
     shell:
     '''
-    !{primer_monitor_path}/lib/pangolin_calls/run_pangolin.sh !{fasta} 8
+    !{primer_monitor_path}/lib/pangolin_calls/run_pangolin.sh !{fasta} 8 !{temp_dir}
     '''
 }
 
@@ -295,6 +310,9 @@ process recompute_affected_primers {
     mkdir -p !{organism_dirname}/lineage_sets
     mkdir -p !{organism_dirname}/lineage_variants
     mkdir -p !{organism_dirname}/primer_sets_raw
+
+    TMPDIR="!{temp_dir}"
+    export TMPDIR
 
     !{primer_monitor_path}/lib/visualization/get_lineage_data.sh > lineages.csv
 
