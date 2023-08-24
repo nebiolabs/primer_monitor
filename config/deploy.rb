@@ -36,24 +36,42 @@ append :linked_dirs,  'log', 'tmp/pids', 'tmp/cache', 'tmp/sockets', 'public/sys
 
 set :keep_releases, 10
 
-desc 'Deploy primer-monitor backend (except crontab)'
-task :backend_src do
-  invoke 'backend:git'
-end
-
 desc 'Deploy primer-monitor backend'
 task :backend do
   set :whenever_roles, [:backend]
-  invoke 'backend_src'
-  invoke 'whenever:update_crontab'
+  invoke 'backend:git'
+  invoke 'backend:bundle'
+  invoke 'backend:update_crontab'
 end
 
 namespace :backend do
   desc 'Pull backend code from git'
   task :git do
     on roles(:backend) do
-      within :backend_deploy_path do
+      within fetch(:backend_deploy_to) do
         execute("cd #{fetch(:backend_deploy_path)} && git pull && git checkout #{fetch(:branch)}")
+      end
+    end
+  end
+
+  desc 'Update the crontab on the backend'
+  # Apparently I can't change whenever_path per role, so I had to recreate the command here
+  task :update_crontab do
+    on roles(:backend) do
+      within fetch(:backend_deploy_to) do
+        with fetch(:whenever_command_environment_variables) do
+          args = fetch(:whenever_command)+[fetch(:whenever_update_flags), "--roles=backend", load_file]
+          execute(*args)
+        end
+      end
+    end
+  end
+
+  desc 'Install gems'
+  task :bundle do
+    on roles(:backend) do
+      within fetch(:backend_deploy_to) do
+          execute(:bundle, :install)
       end
     end
   end
