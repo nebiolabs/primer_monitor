@@ -6,7 +6,7 @@ set :ssh_options, { forward_agent: true }
 set :repo_url, 'git@github.com:bwlang/primer_monitor.git'
 set :puma_service_name, 'puma'
 
-set :whenever_roles, [:app, :backend]
+set :whenever_roles, [:app]
 
 # only migrate if there are migrations pending
 set :conditionally_migrate, true
@@ -189,6 +189,6 @@ namespace :deploy do
 
   after :published, :restart
   #after 'deploy:restart_services', 'deploy:seed'
-  after 'deploy:restart_services', 'backend_src'
+  after 'deploy:restart_services', 'backend'
 
 end
