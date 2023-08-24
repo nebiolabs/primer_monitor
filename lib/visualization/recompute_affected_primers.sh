@@ -8,13 +8,22 @@ organism_dirname="$2"
 pct_cutoff="$3"
 score_cutoff="$4"
 cpus="$5"
+primer_sets_file="$6"
+
+if (($# > 6)); then
+  # a file with a list of lineage groups to always show, one per line
+  overrides_path="$7"
+fi
+
+if [ "$primer_sets_file" = "all" ]; then
+  # unset the file if "all" is specified
+  unset primer_sets_file
+fi
+
 
 echo "$(date +'%b %d %H:%M:%S') - primer recomputation started"
 
-if (($# > 5)); then
-  # a file with a list of primer set names to update, one per line
-  primer_sets_file="$6"
-fi
+
 
 # unset any pre-existing value for JUMP_PROXY so unset == "don't use a jump proxy"
 unset JUMP_PROXY
@@ -59,7 +68,7 @@ if [ -z "$primer_sets_file" ]; then
 
   echo "$(date +'%b %d %H:%M:%S') - calculating lineage groups of interest"
   curl -Ssf https://raw.githubusercontent.com/cov-lineages/pango-designation/master/pango_designation/alias_key.json \
-  | python "$primer_monitor_path/lib/visualization/get_lineages_to_show.py" A,B lineages.csv seq_counts.csv "$organism_dirname/lineage_sets" > "$organism_dirname/config/lineage_sets.json"
+  | python "$primer_monitor_path/lib/visualization/get_lineages_to_show.py" A,B lineages.csv seq_counts.csv "$organism_dirname/lineage_sets" > "$organism_dirname/config/lineage_sets.json" "$overrides_path"
   echo "$(date +'%b %d %H:%M:%S') - done calculating lineage groups"
 else
   echo "$(date +'%b %d %H:%M:%S') - performing partial update"
