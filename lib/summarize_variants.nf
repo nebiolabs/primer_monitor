@@ -21,10 +21,17 @@ igvstatic_path = params.igvstatic_path
 params.frontend_host = 'primer-monitor.neb.com'
 frontend_host = params.frontend_host
 
+params.override_path =
+override_path = params.override_path
+override_path = file(override_path).toAbsolutePath()
+
 params.jump_proxy =
 
 ssh_opts = ""
 scp_opts = ""
+
+params.temp_dir = '/tmp'
+temp_dir = params.temp_dir
 
 if(params.jump_proxy)
 {
@@ -76,6 +83,10 @@ process download_data {
 
     shell:
     '''
+
+    TMPDIR="!{temp_dir}"
+    export TMPDIR
+
     date_today=$(date +%Y-%m-%d)
     datasets download virus genome taxon SARS-CoV-2 --complete-only --host human --filename tmp.zip
     unzip tmp.zip
@@ -99,6 +110,10 @@ process extract_new_records {
 
     shell:
     '''
+
+    TMPDIR="!{temp_dir}"
+    export TMPDIR
+
     date_today=$(date +%Y-%m-%d)
 
     python !{primer_monitor_path}/lib/parse_ncbi.py <(zstd -d --long=30 < !{metadata_json}) \
@@ -143,6 +158,10 @@ process align {
 
     shell:
     '''
+
+        TMPDIR="!{temp_dir}"
+        export TMPDIR
+
         date_today=$(date +%Y-%m-%d)
 
         sed -E 's/ /_/g' !{fasta} \
@@ -223,7 +242,7 @@ process pangolin_calls {
         file "*.csv"
     shell:
     '''
-    !{primer_monitor_path}/lib/pangolin_calls/run_pangolin.sh !{fasta} 8
+    !{primer_monitor_path}/lib/pangolin_calls/run_pangolin.sh !{fasta} 8 !{temp_dir}
     '''
 }
 
@@ -291,7 +310,7 @@ process recompute_affected_primers {
     cpus 8
     errorStrategy 'retry'
     maxRetries 2
-    conda "libiconv psycopg2 bedtools coreutils 'postgresql>=15' gawk"
+    conda "libiconv psycopg2 bedtools coreutils 'postgresql>=15' gawk bc"
     input:
         file complete
     output:
@@ -300,7 +319,7 @@ process recompute_affected_primers {
     '''
     # recompute the primer data for igvjs visualization
     touch "!{params.flag_path}/recomputing_primers.lock"
-    !{primer_monitor_path}/lib/visualization/recompute_affected_primers.sh !{primer_monitor_path} !{organism_dirname} !{pct_cutoff} !{score_cutoff} !{task.cpus}
+    !{primer_monitor_path}/lib/visualization/recompute_affected_primers.sh !{primer_monitor_path} !{organism_dirname} !{pct_cutoff} !{score_cutoff} !{task.cpus} all !{override_path}
     rm "!{params.flag_path}/recomputing_primers.lock"
     touch done.txt
     '''

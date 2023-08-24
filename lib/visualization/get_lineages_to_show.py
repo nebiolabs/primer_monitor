@@ -168,6 +168,15 @@ with open(seqs_per_day_file) as f:
         daily_new_seq_counts[daily_seq_rec[0]] = int(daily_seq_rec[1])
 
 output_path = sys.argv[4]
+
+overrides = []
+
+if len(sys.argv) >= 6:
+    overrides_file = sys.argv[5]
+    with open(overrides_file) as f:
+        for line in f:
+            overrides.append(line.strip())
+
 lineage_data = {}
 with open(sys.argv[2]) as f:
     for line_s in f:
@@ -182,6 +191,9 @@ db_conn = psycopg2.connect(
 interesting_lineages = get_lineages(pango_aliases_data, lineage_list_file, base_lineages, daily_new_seq_counts,
                                     lineage_data, db_conn)
 db_conn.close()
+
+for lineage in overrides:
+    interesting_lineages.add(lineage)
 
 lineage_groups = {}
 

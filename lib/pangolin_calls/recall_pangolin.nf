@@ -8,6 +8,9 @@ params.pangolin_data_version_path =
 
 params.flag_path = '/mnt/hpc_scratch/primer_monitor'
 
+params.temp_dir = '/tmp'
+temp_dir = params.temp_dir
+
 process set_lock {
     // Sets lock file
     cpus 1
@@ -25,6 +28,8 @@ process set_lock {
     '''
 
 }
+
+
 
 process get_new_versions {
     cpus 1
@@ -106,6 +111,10 @@ process extract_new_records {
 
     shell:
     '''
+
+    TMPDIR="!{temp_dir}"
+    export TMPDIR
+
     date_today=$(date +%Y-%m-%d)
     python !{primer_monitor_path}/lib/parse_ncbi.py <(zstd -d --long=30 < !{metadata_json}) \
     <(psql -h "$DB_HOST" -d "$DB_NAME" -U "$DB_USER_RO" -c "SELECT genbank_accession FROM fasta_records;" --csv -t) \
@@ -148,7 +157,7 @@ process pangolin_calls {
         file "*.csv"
     shell:
     '''
-    !{primer_monitor_path}/lib/pangolin_calls/run_pangolin.sh !{fasta} 8
+    !{primer_monitor_path}/lib/pangolin_calls/run_pangolin.sh !{fasta} 8 !{temp_dir}
     '''
 }
 
