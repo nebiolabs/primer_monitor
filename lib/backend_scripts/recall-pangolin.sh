@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-source "$(dirname "$0")/../../.env";
+source "$BACKEND_INSTALL_PATH/.env";
 mkdir -p "$BACKEND_SCRATCH_PATH/status";
 
 "$NEXTFLOW_INSTALL_PATH" -log "$BACKEND_SCRATCH_PATH/log_pangolin/" \

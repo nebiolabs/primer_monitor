@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-source "$(dirname "$0")/../../.env";
+source "$BACKEND_INSTALL_PATH/.env";
 
 new_primers_file="$(mktemp)"
 
