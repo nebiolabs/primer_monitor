@@ -56,6 +56,7 @@ process set_lock {
 
     shell:
     '''
+    # The command creates the lock file if it does not exist, otherwise returns 1
     if ! ( set -o noclobber; : > !{params.flag_path}/summarize_variants_running.lock ) &> /dev/null; then
         echo "Another summarize_variants instance is running, aborting..." >&2
         exit 1;
