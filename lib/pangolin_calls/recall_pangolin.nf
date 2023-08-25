@@ -19,7 +19,7 @@ process set_lock {
 
     shell:
     '''
-    if ! { set -o noclobber; : > !{params.flag_path}/recall_pangolin_running.lock } &> /dev/null; then
+    if ! ( set -o noclobber; : > !{params.flag_path}/recall_pangolin_running.lock ) &> /dev/null; then
         echo "Another recall_pangolin instance is running, aborting..." >&2
         exit 1;
     fi

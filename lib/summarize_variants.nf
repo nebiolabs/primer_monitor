@@ -56,7 +56,7 @@ process set_lock {
 
     shell:
     '''
-    if ! { set -o noclobber; : > !{params.flag_path}/summarize_variants_running.lock } &> /dev/null; then
+    if ! ( set -o noclobber; : > !{params.flag_path}/summarize_variants_running.lock ) &> /dev/null; then
         echo "Another summarize_variants instance is running, aborting..." >&2
         exit 1;
     fi
