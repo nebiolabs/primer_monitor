@@ -7,7 +7,7 @@
 # server "example.com", user: "deploy", roles: %w{app web}, other_property: :other_value
 # server "db.example.com", user: "deploy", roles: %w{db}
 server 'primer-monitor-dev.neb.com', user: 'deploy', roles: %w{web app db}
-server 'hpc-g', user: 'seq-shepherd', roles: %w{backend}
+server 'hpc-g', user: 'seq-shepherd', roles: %w{backend}, no_release: true
 
 # Ensure this matches $BACKEND_INSTALL_PATH on the remote server
 set :backend_deploy_path, '/mnt/hpc_scratch/primer_monitor_dev/primer_monitor'
