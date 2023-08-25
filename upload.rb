@@ -86,9 +86,12 @@ def import_pangolin(pangolin_csv, pending)
   @log.info("starting import: #{pangolin_csv}: ")
 
   lineages = Lineage.parse(pangolin_csv)
-  result_lineages = Lineage.import(lineages, on_duplicate_key_ignore: true)
-  result_lineages.failed_instances.each { |rec| @log.error("Failed to insert lineage \"#{rec}\"") }
-  @log.info("Loaded #{result_lineages.ids.size}/#{lineages.size} new lineages")
+  ActiveRecord::Base.transaction do
+    ActiveRecord::Base.connection.execute('LOCK lineages IN ROW EXCLUSIVE MODE')
+    result_lineages = Lineage.import(lineages, on_duplicate_key_ignore: true)
+    result_lineages.failed_instances.each { |rec| @log.error("Failed to insert lineage \"#{rec}\"") }
+    @log.info("Loaded #{result_lineages.ids.size}/#{lineages.size} new lineages")
+  end
 
 
   calls = PangolinCall.parse(pangolin_csv)
