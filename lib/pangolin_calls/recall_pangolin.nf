@@ -19,11 +19,10 @@ process set_lock {
 
     shell:
     '''
-    if [ -f "!{params.flag_path}/recall_pangolin_running.lock" ]; then
+    if ! { set -o noclobber; : > !{params.flag_path}/recall_pangolin_running.lock } &> /dev/null; then
         echo "Another recall_pangolin instance is running, aborting..." >&2
         exit 1;
     fi
-    touch "!{params.flag_path}/recall_pangolin_running.lock"
     touch done.txt
     '''
 
@@ -81,11 +80,6 @@ process download_data {
 
     shell:
     '''
-    if [ -f "!{params.flag_path}/summarize_variants_running.lock" ]; then
-        echo "Another summarize_variants instance is running, aborting..." >&2
-        exit 1;
-    fi
-    touch "!{params.flag_path}/summarize_variants_running.lock"
     date_today=$(date +%Y-%m-%d)
     datasets download virus genome taxon SARS-CoV-2 --complete-only --host human --filename tmp.zip
     unzip tmp.zip
