@@ -13,4 +13,5 @@ run "$BACKEND_INSTALL_PATH/lib/summarize_variants.nf" \
 --igvstatic_path "$FRONTEND_HOST" \
 --frontend_host "$FRONTEND_HOST" \
 --jump_proxy "$JUMP_PROXY" \
+--override_path "$BACKEND_INSTALL_PATH/igvstatic/2697049/overrides.txt" \
 -N "$NOTIFICATION_EMAILS";
