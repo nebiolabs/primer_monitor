@@ -6,7 +6,7 @@ export PATH="$PATH:$CONDA_BIN_PATH"
 
 new_primers_file="$(mktemp)"
 
-psql -h "$DB_HOST" -d "$DB_NAME" -U "$DB_USER_RO" -c "SELECT name FROM primer_sets WHERE status='pending';" -t --csv > "$new_primers_file";
+"$PSQL_INSTALL_PATH" -h "$DB_HOST" -d "$DB_NAME" -U "$DB_USER_RO" -c "SELECT name FROM primer_sets WHERE status='pending';" -t --csv > "$new_primers_file";
 
 line_count="$(wc -l < "$new_primers_file")"
 
