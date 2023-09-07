@@ -3,6 +3,8 @@
 source "$BACKEND_INSTALL_PATH/.env";
 mkdir -p "$BACKEND_SCRATCH_PATH/status";
 
+export PATH="$PATH:$CONDA_BIN_PATH"
+
 "$NEXTFLOW_INSTALL_PATH" -log "$BACKEND_SCRATCH_PATH/log_download/" \
 run "$BACKEND_INSTALL_PATH/lib/summarize_variants.nf" \
 --ref "$BACKEND_INSTALL_PATH/igvstatic/2697049/ref/NC_045512.2.fasta" \

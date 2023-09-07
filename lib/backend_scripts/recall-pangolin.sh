@@ -3,6 +3,8 @@
 source "$BACKEND_INSTALL_PATH/.env";
 mkdir -p "$BACKEND_SCRATCH_PATH/status";
 
+export PATH="$PATH:$CONDA_BIN_PATH"
+
 "$NEXTFLOW_INSTALL_PATH" -log "$BACKEND_SCRATCH_PATH/log_pangolin/" \
 run "$BACKEND_INSTALL_PATH/lib/pangolin_calls/recall_pangolin.nf" \
 -w "$BACKEND_SCRATCH_PATH/work_pangolin/" \
