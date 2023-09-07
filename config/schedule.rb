@@ -29,6 +29,7 @@ every 1.day, at: ['2:00 am'], roles: [:backend] do
   command "source #{backend_path}/.env && export HEAD_SGE_QMASTER_PORT HEAD_SGE_ROOT && \
   SGE_QMASTER_PORT=\"$HEAD_SGE_QMASTER_PORT\" SGE_ROOT=\"$HEAD_SGE_ROOT\" \"$QSUB_PATH\" -S /bin/bash \
   -v \"NXF_JAVA_HOME=$NXF_JAVA_HOME\" -v \"BACKEND_INSTALL_PATH=$BACKEND_INSTALL_PATH\" \
+  -o \"$BACKEND_SCRATCH_PATH/download_qsub.log\" -e \"$BACKEND_SCRATCH_PATH/download_qsub.err\" \
   #{backend_path}/lib/backend_scripts/primer-monitor.sh", output: "\"$BACKEND_SCRATCH_PATH/download_cron.log\""
 end
 
@@ -36,6 +37,7 @@ every 2.weeks, at: ['3:00 am'], roles: [:backend] do
   command "source #{backend_path}/.env && export HEAD_SGE_QMASTER_PORT HEAD_SGE_ROOT && \
   SGE_QMASTER_PORT=\"$HEAD_SGE_QMASTER_PORT\" SGE_ROOT=\"$HEAD_SGE_ROOT\" \"$QSUB_PATH\" -S /bin/bash \
   -v \"NXF_JAVA_HOME=$NXF_JAVA_HOME\" -v \"BACKEND_INSTALL_PATH=$BACKEND_INSTALL_PATH\" \
+  -o \"$BACKEND_SCRATCH_PATH/pangolin_qsub.log\" -e \"$BACKEND_SCRATCH_PATH/pangolin_qsub.err\" \
   #{backend_path}/lib/backend_scripts/recall-pangolin.sh", output: "\"$BACKEND_SCRATCH_PATH/pangolin_cron.log\""
 end
 
@@ -43,5 +45,6 @@ every 1.minute, roles: [:backend] do
   command "source #{backend_path}/.env && export HEAD_SGE_QMASTER_PORT HEAD_SGE_ROOT && \
   SGE_QMASTER_PORT=\"$HEAD_SGE_QMASTER_PORT\" SGE_ROOT=\"$HEAD_SGE_ROOT\" \"$QSUB_PATH\" -S /bin/bash \
   -v \"NXF_JAVA_HOME=$NXF_JAVA_HOME\" -v \"BACKEND_INSTALL_PATH=$BACKEND_INSTALL_PATH\" \
+  -o \"$BACKEND_SCRATCH_PATH/primers_qsub.log\" -e \"$BACKEND_SCRATCH_PATH/primers_qsub.err\" \
   #{backend_path}/lib/backend_scripts/process-primer-sets.sh", output: "\"$BACKEND_SCRATCH_PATH/primers_cron.log\""
 end
