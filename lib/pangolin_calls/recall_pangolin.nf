@@ -51,8 +51,8 @@ process get_new_versions {
     # gets a file descriptor for the lock file, opened for writing, and saves its number in $lock_fd
     exec {lock_fd}>"!{params.flag_path}/pangolin_version_mutex.lock"
     flock $lock_fd
-    export latest_pangolin=$(conda search -q -c bioconda pangolin | awk '{ print $2 }' | tail -n 1)
-    export latest_pangolin_data=$(conda search -q -c bioconda pangolin-data | awk '{ print $2 }' | tail -n 1)
+    export latest_pangolin=$(micromamba search -c bioconda pangolin | grep -E "Version[[:blank:]]+[0-9]" | awk '{ print $2 }')
+    export latest_pangolin_data=$(micromamba search -c bioconda pangolin-data | grep -E "Version[[:blank:]]+[0-9]" | awk '{ print $2 }')
 
     cp "!{params.pangolin_version_path}" "!{params.pangolin_version_path}.old"
     cp "!{params.pangolin_data_version_path}" "!{params.pangolin_data_version_path}.old"
