@@ -1,7 +1,9 @@
 nextflow.enable.dsl=2
 
-primer_monitor_path = '/mnt/bioinfo/prg/primer_monitor'
-output_path = '/mnt/hpc_scratch/primer_monitor'
+params.primer_monitor_path = '/mnt/bioinfo/prg/primer_monitor'
+primer_monitor_path = params.primer_monitor_path
+params.output_path = '/mnt/hpc_scratch/primer_monitor'
+output_path = params.output_path
 
 params.pangolin_version_path =
 params.pangolin_data_version_path =
@@ -109,6 +111,8 @@ process extract_new_records {
 
     TMPDIR="!{temp_dir}"
     export TMPDIR
+
+    source "!{primer_monitor_path}/.env"
 
     date_today=$(date +%Y-%m-%d)
     python !{primer_monitor_path}/lib/parse_ncbi.py <(zstd -d --long=30 < !{metadata_json}) \

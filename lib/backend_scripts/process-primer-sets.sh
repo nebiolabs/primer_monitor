@@ -17,6 +17,8 @@ if [ "$line_count" -gt 0 ] && [ ! -e "$BACKEND_SCRATCH_PATH/status/recomputing_p
   "$NEXTFLOW_INSTALL_PATH" -log "$BACKEND_SCRATCH_PATH/log_primer_sets/" \
   run "$BACKEND_INSTALL_PATH/lib/pangolin_calls/process_primer_sets.nf" \
   -w "$BACKEND_SCRATCH_PATH/work_primer_sets/" \
+  --primer_monitor_path "$BACKEND_INSTALL_PATH" \
+  --output_path "$BACKEND_SCRATCH_PATH" \
   --pct-cutoff "$PCT_CUTOFF" \
   --score-cutoff "$SCORE_CUTOFF" \
   --primer-names "$new_primers_file" \

@@ -9,6 +9,8 @@ export PATH="$PATH:$CONDA_BIN_PATH"
 run "$BACKEND_INSTALL_PATH/lib/summarize_variants.nf" \
 --ref "$BACKEND_INSTALL_PATH/igvstatic/2697049/ref/NC_045512.2.fasta" \
 -w "$BACKEND_SCRATCH_PATH/work_download/" \
+--primer_monitor_path "$BACKEND_INSTALL_PATH" \
+--output_path "$BACKEND_SCRATCH_PATH" \
 --pangolin_version_path "$BACKEND_INSTALL_PATH/pangolin_ver.txt" \
 --pangolin_data_version_path "$BACKEND_INSTALL_PATH/pangolin_data_ver.txt" \
 --flag_path "$BACKEND_SCRATCH_PATH/status" \
