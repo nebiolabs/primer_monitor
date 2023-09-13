@@ -6,5 +6,5 @@ if (($# < 2)); then
 fi
 
 workdir=$(pwd);
-pangolin "$workdir/$1" -t "$2" -o "$workdir" --outfile "$1.pangolin_calls.csv" ${3:+"--tmpdir"} "$3"; # run pangolin
+pangolin "$workdir/$1" -t "$2" -o "$workdir" --outfile "$1.pangolin_calls.csv" ${3:+"--tempdir"} "$3"; # run pangolin
 touch "$workdir/$1.$(basename "$PWD").pangolin_calls.done"; # create file to indicate this is done
