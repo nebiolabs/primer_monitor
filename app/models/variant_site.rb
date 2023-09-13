@@ -14,7 +14,7 @@ class VariantSite < ApplicationRecord
       accession, ref_pos, variant_type, variant = line.chomp.split("\t")
       next if variant.nil? # big insertions can push a variant off the end of the genome e.g. USA/VA-SU-SC_65/2021
 
-      variants << (this.parse accession, ref_pos, variant_type, variant)
+      variants << (parse_record accession, ref_pos, variant_type, variant)
     end
 
     raise "Unable to parse any records from #{variants_tsv}" if variants.empty?
