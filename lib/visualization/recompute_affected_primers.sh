@@ -105,7 +105,8 @@ if [ -z "$primer_sets_file" ]; then
 
   echo "$(date +'%b %d %H:%M:%S') - uploading new data"
   # copies over the new files
-  scp_proxy -r "./$organism_dirname/*" "$FRONTEND_HOST:$IGVSTATIC_PATH/$organism_dirname/";
+  # the * is intentionally not quoted so globbing works
+  scp_proxy -r "./$organism_dirname/"* "$FRONTEND_HOST:$IGVSTATIC_PATH/$organism_dirname/";
 
 else
   # copies over only the files changed for the new primer
