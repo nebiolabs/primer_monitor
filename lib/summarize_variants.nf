@@ -284,8 +284,9 @@ process update_new_calls {
     shell:
     '''
     if [ ! -f "!{params.flag_path}/data_update_running.lock" ]; then
-        PGPASSFILE="!{primer_monitor_path}/config/.pgpass" !{primer_monitor_path}/lib/pangolin_calls/swap_new_calls.sh; touch done.txt;
+        PGPASSFILE="!{primer_monitor_path}/config/.pgpass" !{primer_monitor_path}/lib/pangolin_calls/swap_new_calls.sh;
     fi
+    touch done.txt;
     rm !{params.flag_path}/data_update_running.lock
     rm "!{params.flag_path}/loading_data.lock"
     '''
