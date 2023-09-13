@@ -15,7 +15,7 @@ class Lineage < ApplicationRecord
       next if line.start_with?('taxon,')
 
       record_count += 1
-      new_lineage = this.parse_record(line)
+      new_lineage = parse_record(line)
       new_lineage_names.add new_lineage unless new_lineage.nil?
     end
 
