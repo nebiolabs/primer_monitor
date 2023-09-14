@@ -1,28 +1,6 @@
 #!/usr/bin/env bash
 
-source "$BACKEND_INSTALL_PATH/.env";
-
-export PATH="$PATH:$CONDA_BIN_PATH"
-
-new_primers_file="$(mktemp)"
-
-"$PSQL_INSTALL_PATH" -h "$DB_HOST" -d "$DB_NAME" -U "$DB_USER_RO" -c "SELECT name FROM primer_sets WHERE status='pending';" -t --csv > "$new_primers_file";
-
-line_count="$(wc -l < "$new_primers_file")"
-
-# only run the nextflow if there are actually primers, and no other conflicting script is running
-if [ "$line_count" -gt 0 ] && [ ! -e "$BACKEND_SCRATCH_PATH/status/recomputing_primers.lock" ] && \
-[ ! -e "$BACKEND_SCRATCH_PATH/status/loading_data.lock" ]; then
-
-  "$NEXTFLOW_INSTALL_PATH" -log "$BACKEND_SCRATCH_PATH/log_primer_sets/" \
-  run "$BACKEND_INSTALL_PATH/lib/pangolin_calls/process_primer_sets.nf" \
-  -w "$BACKEND_SCRATCH_PATH/work_primer_sets/" \
-  --primer_monitor_path "$BACKEND_INSTALL_PATH" \
-  --output_path "$BACKEND_SCRATCH_PATH" \
-  --pct-cutoff "$PCT_CUTOFF" \
-  --score-cutoff "$SCORE_CUTOFF" \
-  --primer-names "$new_primers_file" \
-  -N "$NOTIFICATION_EMAILS";
-fi
-
-rm "$new_primers_file";
+SGE_QMASTER_PORT="$HEAD_SGE_QMASTER_PORT" SGE_ROOT="$HEAD_SGE_ROOT" "$QSUB_PATH" -S /bin/bash \
+-v "NXF_JAVA_HOME=$NXF_JAVA_HOME" -v "BACKEND_INSTALL_PATH=$BACKEND_INSTALL_PATH" \
+-o "$BACKEND_SCRATCH_PATH/primers_qsub.log" -e "$BACKEND_SCRATCH_PATH/primers_qsub.err" \
+"$BACKEND_INSTALL_PATH}/lib/backend_scripts/process-primer-sets-run.sh"
