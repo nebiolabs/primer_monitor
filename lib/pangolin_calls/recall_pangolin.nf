@@ -49,12 +49,14 @@ process get_new_versions {
     '''
     #! /usr/bin/env bash
 
+    source "!{primer_monitor_path}/.env"
+
     touch "!{params.flag_path}/pangolin_version_mutex.lock"
     # gets a file descriptor for the lock file, opened for writing, and saves its number in $lock_fd
     exec {lock_fd}>"!{params.flag_path}/pangolin_version_mutex.lock"
     flock $lock_fd
-    export latest_pangolin=$(micromamba search -c bioconda pangolin | grep -E "Version[[:blank:]]+[0-9]" | awk '{ print $2 }')
-    export latest_pangolin_data=$(micromamba search -c bioconda pangolin-data | grep -E "Version[[:blank:]]+[0-9]" | awk '{ print $2 }')
+    export latest_pangolin=$("$CONDA_BIN_PATH/micromamba" search -c bioconda pangolin | grep -E "Version[[:blank:]]+[0-9]" | awk '{ print $2 }')
+    export latest_pangolin_data=$("$CONDA_BIN_PATH/micromamba" search -c bioconda pangolin-data | grep -E "Version[[:blank:]]+[0-9]" | awk '{ print $2 }')
 
     cp "!{params.pangolin_version_path}" "!{params.pangolin_version_path}.old"
     cp "!{params.pangolin_data_version_path}" "!{params.pangolin_data_version_path}.old"
