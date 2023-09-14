@@ -100,7 +100,7 @@ process download_data {
 process extract_new_records {
     // Get all (deduplicated) records currently in the database
     cpus 1
-    conda "python=3.9 zstd seqtk"
+    conda "python=3.9 zstd seqtk 'postgresql>=15'"
 
     input:
         tuple file(metadata_json), file(sequences_fasta)
