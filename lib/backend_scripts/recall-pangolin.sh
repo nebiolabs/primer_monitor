@@ -1,6 +1,28 @@
 #!/usr/bin/env bash
 
-SGE_QMASTER_PORT="$HEAD_SGE_QMASTER_PORT" SGE_ROOT="$HEAD_SGE_ROOT" "$QSUB_PATH" -S /bin/bash \
--v "NXF_JAVA_HOME=$NXF_JAVA_HOME" -v "BACKEND_INSTALL_PATH=$BACKEND_INSTALL_PATH" \
--o "$BACKEND_SCRATCH_PATH/pangolin_qsub.log" -e "$BACKEND_SCRATCH_PATH/pangolin_qsub.err" \
-"$BACKEND_INSTALL_PATH/lib/backend_scripts/recall-pangolin-run.sh"
+if ! ( set -o noclobber; : > !{params.flag_path}/recall_pangolin_running.lock ) &> /dev/null; then
+    echo "Another recall_pangolin instance is running, aborting..." >&2
+    exit 1;
+fi
+
+source "$BACKEND_INSTALL_PATH/.env";
+mkdir -p "$BACKEND_SCRATCH_PATH/status";
+
+export PATH="$PATH:$CONDA_BIN_PATH:$QSUB_PATH"
+
+export NXF_CONDA_CACHEDIR="$BACKEND_SCRATCH_PATH/conda_pangolin"
+
+"$NEXTFLOW_INSTALL_PATH" -log "$BACKEND_SCRATCH_PATH/log_pangolin-$(date +%F_%T)" \
+run "$BACKEND_INSTALL_PATH/lib/pangolin_calls/recall_pangolin.nf" \
+-w "$BACKEND_SCRATCH_PATH/work_pangolin/" \
+--primer_monitor_path "$BACKEND_INSTALL_PATH" \
+--output_path "$BACKEND_SCRATCH_PATH" \
+--pangolin_version_path "$BACKEND_INSTALL_PATH/pangolin_ver.txt" \
+--pangolin_data_version_path "$BACKEND_INSTALL_PATH/pangolin_data_ver.txt" \
+--flag_path "$BACKEND_SCRATCH_PATH/status" \
+--pct-cutoff "$PCT_CUTOFF" \
+--score-cutoff "$SCORE_CUTOFF" \
+-N "$NOTIFICATION_EMAILS" \
+-c "$BACKEND_INSTALL_PATH/lib/nextflow.config"
+
+rm "!{params.flag_path}/recall_pangolin_running.lock"

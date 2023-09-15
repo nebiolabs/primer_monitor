@@ -311,8 +311,8 @@ process recalculate_database_views {
 
 process recompute_affected_primers {
     cpus 8
-    errorStrategy 'retry'
-    maxRetries 2
+    errorStrategy { sleep(120); return 'retry' }
+    maxRetries 10
     conda "libiconv psycopg2 bedtools coreutils 'postgresql>=15' gawk bc"
     input:
         file complete
@@ -321,7 +321,10 @@ process recompute_affected_primers {
     shell:
     '''
     # recompute the primer data for igvjs visualization
-    touch "!{params.flag_path}/recomputing_primers.lock"
+    if ! ( set -o noclobber; : > !{params.flag_path}/recomputing_primers.lock ) &> /dev/null; then
+        echo "Another primer recomputation is running, aborting..." >&2
+        exit 1;
+    fi
     !{primer_monitor_path}/lib/visualization/recompute_affected_primers.sh !{primer_monitor_path} !{organism_dirname} !{pct_cutoff} !{score_cutoff} !{task.cpus} all !{override_path}
     rm "!{params.flag_path}/recomputing_primers.lock"
     touch done.txt
