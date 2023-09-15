@@ -48,24 +48,6 @@ organism_dirname = params.organism_dirname
 pangolin_version = file(params.pangolin_version_path).text
 pangolin_data_version = file(params.pangolin_data_version_path).text
 
-process set_lock {
-    // Sets lock file
-    cpus 1
-    output:
-        file "done.txt"
-
-    shell:
-    '''
-    # The command creates the lock file if it does not exist, otherwise returns 1
-    if ! ( set -o noclobber; : > !{params.flag_path}/summarize_variants_running.lock ) &> /dev/null; then
-        echo "Another summarize_variants instance is running, aborting..." >&2
-        exit 1;
-    fi
-    touch done.txt
-    '''
-
-}
-
 process download_data {
     // Downloads the full dataset
     cpus 16
@@ -74,10 +56,6 @@ process download_data {
     maxRetries 2
     publishDir "${output_path}", mode: 'link', pattern: '*.zst', overwrite: true
     // mode "link" assumes that the output path is on the same disk as the work directory, switch to copy if not
-
-    input:
-        file lock_set
-
     output:
         tuple file('*.metadata.zst'), file('*.sequences.zst')
 
@@ -206,9 +184,6 @@ process get_pangolin_version {
 
     conda "'bash>=4.1'"
 
-    input:
-         file lock_set
-
     output:
         env pangolin_version
         env pangolin_data_version
@@ -331,30 +306,18 @@ process recompute_affected_primers {
     '''
 }
 
-process clear_lock {
-    cpus 1
-    input:
-        file complete
-    shell:
-    '''
-    rm "!{params.flag_path}/summarize_variants_running.lock"
-    '''
-}
-
 workflow {
-    set_lock()
-    download_data(set_lock.out)
+    download_data()
     extract_new_records(download_data.out)
     transform_data(extract_new_records.out.splitText(file: true, by: 10000).filter{ it.size()>77 })
     align(transform_data.out)
     load_to_db(align.out)
-    get_pangolin_version(set_lock.out)
+    get_pangolin_version()
     pangolin_calls(get_pangolin_version.out[0], get_pangolin_version.out[1], transform_data.out)
     load_pangolin_data(pangolin_calls.out, load_to_db.out, get_pangolin_version.out[2])
     update_new_calls(load_to_db.out.collect(), load_pangolin_data.out.collect())
     recalculate_database_views(update_new_calls.out)
     recompute_affected_primers(recalculate_database_views.out)
-    clear_lock(recompute_affected_primers.out)
 }
 
 workflow.onError {
@@ -368,11 +331,6 @@ workflow.onError {
         if(running_lock.exists())
         {
             running_lock.delete()
-        }
-        pipeline_lock = file('${params.flag_path}/summarize_variants_running.lock')
-        if(pipeline_lock.exists())
-        {
-            pipeline_lock.delete()
         }
         recompute_lock = file('${params.flag_path}/recomputing_primers.lock')
         if(recompute_lock.exists())

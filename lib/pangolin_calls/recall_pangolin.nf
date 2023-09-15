@@ -13,33 +13,10 @@ params.flag_path = '/mnt/hpc_scratch/primer_monitor'
 params.temp_dir = '/tmp'
 temp_dir = params.temp_dir
 
-process set_lock {
-    // Sets lock file
-    cpus 1
-    output:
-        file "done.txt"
-
-    shell:
-    '''
-    # The command creates the lock file if it does not exist, otherwise returns 1
-    if ! ( set -o noclobber; : > !{params.flag_path}/recall_pangolin_running.lock ) &> /dev/null; then
-        echo "Another recall_pangolin instance is running, aborting..." >&2
-        exit 1;
-    fi
-    touch done.txt
-    '''
-
-}
-
-
-
 process get_new_versions {
     cpus 1
     penv 'smp'
     conda "'bash>=4.1'"
-
-    input:
-         file lock_set
 
     output:
         env latest_pangolin
@@ -76,9 +53,6 @@ process download_data {
     conda "ncbi-datasets-cli unzip zstd"
     errorStrategy 'retry'
     maxRetries 2
-
-    input:
-         file lock_set
 
     output:
         tuple file('*.metadata.zst'), file('*.sequences.zst')
@@ -222,28 +196,16 @@ process update_new_calls {
     '''
 }
 
-process clear_lock {
-    cpus 1
-    input:
-        file complete
-    shell:
-    '''
-    rm "!{params.flag_path}/recall_pangolin_running.lock"
-    '''
-}
-
 
 workflow {
-    set_lock()
-    get_new_versions(set_lock.out)
-    download_data(set_lock.out)
+    get_new_versions()
+    download_data()
     extract_new_records(download_data.out)
     transform_data(extract_new_records.out.splitText(file: true, by: 2500).filter{ it.size()>77 })
     pangolin_calls(get_new_versions.out[0], get_new_versions.out[1], transform_data.out)
     load_pangolin_data(pangolin_calls.out)
     update_current_calls(load_pangolin_data.out.collect())
     update_new_calls(update_current_calls.out)
-    clear_lock(update_new_calls.out)
 }
 
 workflow.onError {
@@ -270,8 +232,5 @@ workflow.onError {
         //get rid of "pipeline running" lock
         running_lock = file('${params.flag_path}/pangolin_update_running.lock')
         running_lock.delete()
-
-        pipeline_lock = file('${params.flag_path}/recall_pangolin_running.lock')
-        pipeline_lock.delete()
     }
 }
