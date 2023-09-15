@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-if ! ( set -o noclobber; : > !{params.flag_path}/recall_pangolin_running.lock ) &> /dev/null; then
+if ! ( set -o noclobber; : > "$BACKEND_SCRATCH_PATH/status/recall_pangolin_running.lock" ) &> /dev/null; then
     echo "Another recall_pangolin instance is running, aborting..." >&2
     exit 1;
 fi
@@ -25,4 +25,4 @@ run "$BACKEND_INSTALL_PATH/lib/pangolin_calls/recall_pangolin.nf" \
 -N "$NOTIFICATION_EMAILS" \
 -c "$BACKEND_INSTALL_PATH/lib/nextflow.config"
 
-rm "!{params.flag_path}/recall_pangolin_running.lock"
+rm "$BACKEND_SCRATCH_PATH/status/recall_pangolin_running.lock"

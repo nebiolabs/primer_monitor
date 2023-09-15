@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-if ! ( set -o noclobber; : > !{params.flag_path}/recomputing_primers.lock ) &> /dev/null; then
+if ! ( set -o noclobber; : > "$BACKEND_SCRATCH_PATH/status/recomputing_primers.lock" ) &> /dev/null; then
     echo "Another primer recomputation is running, aborting..." >&2
     exit 1;
 fi
@@ -34,4 +34,4 @@ fi
 
 rm "$new_primers_file";
 
-rm "!{params.flag_path}/recomputing_primers.lock"
+rm "$BACKEND_SCRATCH_PATH/status/recomputing_primers.lock"
