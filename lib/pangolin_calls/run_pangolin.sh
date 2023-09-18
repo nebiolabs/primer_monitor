@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 if (($# < 2)); then
-    echo "usage: ./run_pangolin.sh <input file name> <threads> [temp dir]" >&2;
+    echo "usage: ./run_pangolin.sh <input file name> <threads>" >&2;
     exit 1;
 fi
 

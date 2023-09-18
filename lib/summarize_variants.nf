@@ -219,7 +219,11 @@ process pangolin_calls {
         file "*.csv"
     shell:
     '''
-    !{primer_monitor_path}/lib/pangolin_calls/run_pangolin.sh !{fasta} 8 !{temp_dir}
+
+    TMPDIR="!{temp_dir}"
+    export TMPDIR
+
+    !{primer_monitor_path}/lib/pangolin_calls/run_pangolin.sh !{fasta} 8
     '''
 }
 
