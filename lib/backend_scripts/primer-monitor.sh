@@ -8,11 +8,7 @@ dotenv_path=$1
 # shellcheck source=../../.env
 source "$dotenv_path";
 
-if ! ( set -o noclobber; : > "$BACKEND_SCRATCH_PATH/status/summarize_variants_running.lock" ) &> /dev/null; then
-    echo "Another summarize_variants instance is running, aborting..." >&2
-    exit 1;
-fi
-
+# ensure this directory exists
 mkdir -p "$BACKEND_SCRATCH_PATH/status";
 
 export PATH="$PATH:$CONDA_BIN_PATH:$QSUB_PATH"
@@ -33,5 +29,3 @@ run "$BACKEND_INSTALL_PATH/lib/summarize_variants.nf" \
 --jump_proxy "$JUMP_PROXY" \
 --override_path "$BACKEND_INSTALL_PATH/igvstatic/2697049/overrides.txt" \
 -N "$NOTIFICATION_EMAILS";
-
-rm "$BACKEND_SCRATCH_PATH/status/summarize_variants_running.lock"

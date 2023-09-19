@@ -14,8 +14,6 @@ if ! ( set -o noclobber; : > "$BACKEND_SCRATCH_PATH/status/recomputing_primers.l
     exit 1;
 fi
 
-
-
 new_primers_file="$(mktemp)"
 
 "$PSQL_INSTALL_PATH" -h "$DB_HOST" -d "$DB_NAME" -U "$DB_USER_RO" \
@@ -26,6 +24,7 @@ line_count="$(wc -l < "$new_primers_file")"
 # only run the nextflow if there are actually primers, and no other conflicting script is running
 if [ "$line_count" -gt 0 ] && [ ! -e "$BACKEND_SCRATCH_PATH/status/loading_data.lock" ]; then
 
+  # ensure this directory exists
   mkdir -p "$BACKEND_SCRATCH_PATH/status";
 
   export PATH="$PATH:$CONDA_BIN_PATH:$QSUB_PATH"

@@ -8,11 +8,7 @@ dotenv_path=$1
 # shellcheck source=../../.env
 source "$dotenv_path";
 
-if ! ( set -o noclobber; : > "$BACKEND_SCRATCH_PATH/status/recall_pangolin_running.lock" ) &> /dev/null; then
-    echo "Another recall_pangolin instance is running, aborting..." >&2
-    exit 1;
-fi
-
+# ensure this directory exists
 mkdir -p "$BACKEND_SCRATCH_PATH/status";
 
 export PATH="$PATH:$CONDA_BIN_PATH:$QSUB_PATH"
@@ -31,5 +27,3 @@ run "$BACKEND_INSTALL_PATH/lib/pangolin_calls/recall_pangolin.nf" \
 --score-cutoff "$SCORE_CUTOFF" \
 -N "$NOTIFICATION_EMAILS" \
 -c "$BACKEND_INSTALL_PATH/lib/nextflow.config"
-
-rm "$BACKEND_SCRATCH_PATH/status/recall_pangolin_running.lock"
