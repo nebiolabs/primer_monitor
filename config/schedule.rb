@@ -25,20 +25,19 @@ every 1.day, at: ['7:00 am'], roles: [:app] do
   rake 'notifications:send'
 end
 
+# backend_path is specified through Whenever and does exist when this script is run
+
 every 1.day, at: ['2:00 am'], roles: [:backend] do
-  command "source #{backend_path}/.env && \
-  export SGE_QMASTER_PORT SGE_ROOT NXF_JAVA_HOME BACKEND_INSTALL_PATH BACKEND_SCRATCH_PATH QSUB_PATH && \
-  #{backend_path}/lib/backend_scripts/primer-monitor.sh", output: "\"$BACKEND_SCRATCH_PATH/download_cron.log\""
+  command "#{backend_path}/lib/backend_scripts/primer-monitor.sh \"#{backend_path}/.env\"", \
+          output: "\"$BACKEND_SCRATCH_PATH/download_cron.log\""
 end
 
 every 2.weeks, at: ['3:00 am'], roles: [:backend] do
-  command "source #{backend_path}/.env && \
-  export SGE_QMASTER_PORT SGE_ROOT NXF_JAVA_HOME BACKEND_INSTALL_PATH BACKEND_SCRATCH_PATH QSUB_PATH && \
-  #{backend_path}/lib/backend_scripts/recall-pangolin.sh", output: "\"$BACKEND_SCRATCH_PATH/pangolin_cron.log\""
+  command "#{backend_path}/lib/backend_scripts/recall-pangolin.sh \"#{backend_path}/.env\"", \
+          output: "\"$BACKEND_SCRATCH_PATH/pangolin_cron.log\""
 end
 
 every 1.minute, roles: [:backend] do
-  command "source #{backend_path}/.env && \
-  export SGE_QMASTER_PORT SGE_ROOT NXF_JAVA_HOME BACKEND_INSTALL_PATH BACKEND_SCRATCH_PATH QSUB_PATH && \
-  #{backend_path}/lib/backend_scripts/process-primer-sets.sh", output: "\"$BACKEND_SCRATCH_PATH/primers_cron.log\""
+  command "#{backend_path}/lib/backend_scripts/process-primer-sets.sh \"#{backend_path}/.env\"", \
+          output: "\"$BACKEND_SCRATCH_PATH/primers_cron.log\""
 end
