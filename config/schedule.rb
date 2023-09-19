@@ -40,6 +40,6 @@ every 2.weeks, at: ['3:00 am'], roles: [:backend] do
 end
 
 every 1.minute, roles: [:backend] do
-  command "#{backend_path}/lib/backend_scripts/process-primer-sets.sh \"#{backend_path}/.env\"", \
+  command "source #{backend_path}/.env && #{backend_path}/lib/backend_scripts/process-primer-sets.sh \"#{backend_path}/.env\"", \
           output: "\"$BACKEND_SCRATCH_PATH/primers_cron.log\""
 end
