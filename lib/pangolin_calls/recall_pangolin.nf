@@ -91,9 +91,13 @@ process extract_new_records {
     source "!{primer_monitor_path}/.env"
 
     date_today=$(date +%Y-%m-%d)
-    python !{primer_monitor_path}/lib/parse_ncbi.py <(zstd -d --long=30 < !{metadata_json}) \
+
+    python !{primer_monitor_path}/lib/parse_ncbi.py \
+    <(zstd -d --long=30 < !{metadata_json}) \
     <(psql -h "$DB_HOST" -d "$DB_NAME" -U "$DB_USER_RO" -c "SELECT genbank_accession FROM fasta_records;" --csv -t) \
-    <(zstd -d --long=30 < !{sequences_fasta} | seqtk seq | paste - -) ${date_today}.tsv True;
+    <(zstd -d --long=30 < !{sequences_fasta} | seqtk seq | paste - -) \
+    ${date_today}.tsv \
+    True;
     '''
 
 }
@@ -185,8 +189,6 @@ process update_new_calls {
 
     input:
         file all_done
-    output:
-        file 'finished.txt'
     shell:
     '''
     if [ ! -f "!{params.flag_path}/data_update_running.lock" ]; then
@@ -196,7 +198,6 @@ process update_new_calls {
     rm "!{params.flag_path}/pangolin_update_running.lock"
     rm "!{params.pangolin_version_path}.old"
     rm "!{params.pangolin_data_version_path}.old"
-    touch finished.txt
     '''
 }
 

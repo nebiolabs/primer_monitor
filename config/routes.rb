@@ -11,7 +11,6 @@ Rails.application.routes.draw do
   }
 
   root 'welcome#index'
-  # get 'help', to: 'help#show'
   get 'about', to: 'about#show'
   get 'history', to: 'history#show'
   resources :organisms, param: :name do

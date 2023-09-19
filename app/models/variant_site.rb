@@ -14,7 +14,7 @@ class VariantSite < ApplicationRecord
       accession, ref_pos, variant_type, variant = line.chomp.split("\t")
       next if variant.nil? # big insertions can push a variant off the end of the genome e.g. USA/VA-SU-SC_65/2021
 
-      variants << (parse_record accession, ref_pos, variant_type, variant)
+      variants << (build_variant_site accession, ref_pos, variant_type, variant)
     end
 
     raise "Unable to parse any records from #{variants_tsv}" if variants.empty?
@@ -22,7 +22,7 @@ class VariantSite < ApplicationRecord
     variants
   end
 
-  def self.parse_record(accession, ref_pos, variant_type, variant)
+  def self.build_variant_site(accession, ref_pos, variant_type, variant)
     fasta_record_id = FastaRecord.existing_fasta_accession_ids[accession]
     raise "Failed to find fasta record for accession: \"#{accession}\"" unless fasta_record_id
 
