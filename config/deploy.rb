@@ -69,7 +69,7 @@ namespace :backend do
 
   desc 'Install gems'
   task :bundle do
-    on roles(:backend) do
+    on roles(:backend, :cluster) do
       within fetch(:backend_deploy_to) do
           execute(:bundle, :install)
       end
