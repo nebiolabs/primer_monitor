@@ -40,13 +40,11 @@ update_loadPangolinData [label="load_pangolin_data"];
 update_collect2 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
 update_loadPangolinData -> update_collect2 [label="complete_files_pangolin"];
 
-update_updateNewCalls [label="update_new_calls"];
-update_collect1 -> update_updateNewCalls;
-
-update_collect2 -> update_updateNewCalls;
-
 update_recalculateDatabaseViews [label="recalculate_database_views"];
-update_updateNewCalls -> update_recalculateDatabaseViews [label="done"];
+
+update_collect1 -> update_recalculateDatabaseViews;
+
+update_collect2 -> update_recalculateDatabaseViews;
 
 update_recomputeAffectedPrimers [label="recompute_affected_primers"];
 update_recalculateDatabaseViews -> update_recomputeAffectedPrimers [label="complete"];

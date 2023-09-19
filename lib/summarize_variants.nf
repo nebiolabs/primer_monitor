@@ -3,8 +3,6 @@ nextflow.enable.dsl = 2
 ref = params.ref
 ref = file(ref).toAbsolutePath()
 
-params.flag_path =
-
 params.pct_cutoff =
 pct_cutoff = params.pct_cutoff
 
@@ -171,7 +169,6 @@ process load_to_db {
         file '*.complete'
     shell:
     '''
-    touch "!{params.flag_path}/loading_data.lock"
     RAILS_ENV=production ruby !{primer_monitor_path}/upload.rb \
         --import_seqs \
         --metadata_tsv !{metadata} \
@@ -192,20 +189,18 @@ process get_pangolin_version {
     shell:
     '''
     #! /usr/bin/env bash
-    touch "!{params.flag_path}/pangolin_version_mutex.lock"
+
+    source "!{primer_monitor_path}/.env"
+
+    touch "$LOCK_PATH/pangolin_version_mutex.lock"
     # gets a file descriptor for the lock file, opened for writing, and saves its number in $lock_fd
-    exec {lock_fd}>"!{params.flag_path}/pangolin_version_mutex.lock"
+    exec {lock_fd}>"$LOCK_PATH/pangolin_version_mutex.lock"
     flock $lock_fd
     use_pending="false"
-    if [ -f "!{params.flag_path}/data_update_running.lock" ]; then
-        use_pending="true"
-    fi
     pangolin_version=$(cat !{params.pangolin_version_path})
     pangolin_data_version=$(cat !{params.pangolin_data_version_path})
     # closes the file descriptor in $lock_fd
     exec {lock_fd}>&-
-    rm "!{params.flag_path}/pangolin_version_mutex.lock"
-    touch "!{params.flag_path}/data_update_running.lock"
     '''
     }
 
@@ -250,35 +245,15 @@ process load_pangolin_data {
     '''
 }
 
-process update_new_calls {
-    cpus 1
-
-    conda "'postgresql>=15'"
-
-    input:
-        //these files are to make sure all the load_to_db and load_pangolin_data tasks are done first
-        file seq_load_complete
-        file pangolin_calls_complete
-    output:
-        file 'done.txt'
-    shell:
-    '''
-    if [ ! -f "!{params.flag_path}/data_update_running.lock" ]; then
-        PGPASSFILE="!{primer_monitor_path}/config/.pgpass" !{primer_monitor_path}/lib/pangolin_calls/swap_new_calls.sh;
-    fi
-    touch done.txt;
-    rm !{params.flag_path}/data_update_running.lock
-    rm "!{params.flag_path}/loading_data.lock"
-    '''
-}
-
 process recalculate_database_views {
     cpus 1
     publishDir "${output_path}", mode: 'copy'
     errorStrategy 'retry'
     maxRetries 2
     input:
-        file calls_updated
+        //these files are to make sure all the load_to_db and load_pangolin_data tasks are done first
+        file seq_load_complete
+        file pangolin_calls_complete
     output:
         file 'refresh_complete.txt';
     shell:
@@ -300,12 +275,7 @@ process recompute_affected_primers {
     shell:
     '''
     # recompute the primer data for igvjs visualization
-    if ! ( set -o noclobber; : > !{params.flag_path}/recomputing_primers.lock ) &> /dev/null; then
-        echo "Another primer recomputation is running, aborting..." >&2
-        exit 1;
-    fi
     !{primer_monitor_path}/lib/visualization/recompute_affected_primers.sh !{primer_monitor_path} !{organism_dirname} !{pct_cutoff} !{score_cutoff} !{task.cpus} all !{override_path}
-    rm "!{params.flag_path}/recomputing_primers.lock"
     '''
 }
 
@@ -318,27 +288,6 @@ workflow {
     get_pangolin_version()
     pangolin_calls(get_pangolin_version.out[0], get_pangolin_version.out[1], transform_data.out)
     load_pangolin_data(pangolin_calls.out, load_to_db.out, get_pangolin_version.out[2])
-    update_new_calls(load_to_db.out.collect(), load_pangolin_data.out.collect())
-    recalculate_database_views(update_new_calls.out)
+    recalculate_database_views(load_to_db.out.collect(), load_pangolin_data.out.collect())
     recompute_affected_primers(recalculate_database_views.out)
-}
-
-workflow.onError {
-    println "removing lock files..."
-    //if it started loading the new seqs, it's not possible to automatically recover
-    if(!(file("${params.flag_path}/loading_data.lock").exists()))
-    {
-        //get rid of "pipeline running" lock
-        running_lock = file('${params.flag_path}/data_update_running.lock')
-        running_lock.delete()
-        if(running_lock.exists())
-        {
-            running_lock.delete()
-        }
-        recompute_lock = file('${params.flag_path}/recomputing_primers.lock')
-        if(recompute_lock.exists())
-        {
-            recompute_lock.delete()
-        }
-    }
 }
