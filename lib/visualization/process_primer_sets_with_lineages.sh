@@ -23,7 +23,6 @@ fi
 variants_bed="$$_variants.bed"
 variants_counts_bed="$$_variants_with_counts.bed";
 echo "$(date +'%b %d %H:%M:%S') - starting DB fetch"
-#echo "\"$(dirname "$0")/extract_all_variants.sh\" \"$cutoff_date\" > \"$variants_bed\";"
 "$(dirname "$0")/extract_all_variants.sh" "$cutoff_date" > "$variants_bed";
 echo "$(date +'%b %d %H:%M:%S') - DB fetch done"
 shift 7;

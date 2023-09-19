@@ -3,16 +3,16 @@ nextflow.enable.dsl = 2
 primer_names = params.primer_names
 primer_names = file(primer_names).toAbsolutePath()
 
-params.pct_cutoff = 1
+params.pct_cutoff =
 pct_cutoff = params.pct_cutoff
 
-params.score_cutoff = 80
+params.score_cutoff =
 score_cutoff = params.score_cutoff
 
-params.primer_monitor_path = '/mnt/bioinfo/prg/primer_monitor'
+params.primer_monitor_path =
 primer_monitor_path = params.primer_monitor_path
 
-params.organism_dirname = "2697049"
+params.organism_dirname =
 organism_dirname = params.organism_dirname
 
 params.override_path =

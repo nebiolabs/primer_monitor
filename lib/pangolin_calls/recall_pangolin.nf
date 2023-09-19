@@ -1,16 +1,16 @@
 nextflow.enable.dsl=2
 
-params.primer_monitor_path = '/mnt/bioinfo/prg/primer_monitor'
+params.primer_monitor_path =
 primer_monitor_path = params.primer_monitor_path
-params.output_path = '/mnt/hpc_scratch/primer_monitor'
+params.output_path =
 output_path = params.output_path
 
 params.pangolin_version_path =
 params.pangolin_data_version_path =
 
-params.flag_path = '/mnt/hpc_scratch/primer_monitor'
+params.flag_path =
 
-params.temp_dir = '/tmp'
+params.temp_dir =
 temp_dir = params.temp_dir
 
 process get_new_versions {

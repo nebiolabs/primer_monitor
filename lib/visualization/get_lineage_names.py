@@ -10,6 +10,7 @@ import sys
 import re
 import psycopg2
 import os
+import logging
 
 
 def get_relevant_aliases(search_string, aliases):
@@ -84,10 +85,10 @@ def process_aliases(alias_str, lineage_filename, search_string, db_conn):
                 line = [line_s.strip()]
             search_str = line[0] + "."  # adding trailing "." for same reason as above
             for alias in relevant_aliases_for_search:
-                # print(alias, search_str)
+                logging.debug(alias, search_str)
                 if search_str.startswith(alias):
                     output += (line[0] + "\n")
-                    # print("checking "+str(line))
+                    logging.debug("checking "+str(line))
                     lineage_data.append(line[0])
                     break  # break out of the inner loop and go to the next line
     num_seen = 0
@@ -103,9 +104,9 @@ def process_aliases(alias_str, lineage_filename, search_string, db_conn):
         INNER JOIN lineages ON lineages.id=pangolin_calls.lineage_id \
         WHERE lineages.name IN %s;', (tuple(lineage_data),))
         num_seen, min_date, max_date, median_date = cur.fetchone()
-        # print(num_seen, min_date, max_date, median_date)
+        logging.debug(num_seen, min_date, max_date, median_date)
         cur.close()
-    # print(str([output, num_seen, min_date, max_date, median_date]))
+    logging.debug(str([output, num_seen, min_date, max_date, median_date]))
     return [output, num_seen, min_date, max_date, median_date]
 
 

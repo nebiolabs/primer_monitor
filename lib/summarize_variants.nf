@@ -3,22 +3,22 @@ nextflow.enable.dsl = 2
 ref = params.ref
 ref = file(ref).toAbsolutePath()
 
-params.flag_path='/mnt/hpc_scratch/primer_monitor'
+params.flag_path =
 
-params.pct_cutoff = 1
+params.pct_cutoff =
 pct_cutoff = params.pct_cutoff
 
-params.score_cutoff = 3
+params.score_cutoff =
 score_cutoff = params.score_cutoff
 
-params.primer_monitor_path = '/mnt/bioinfo/prg/primer_monitor'
+params.primer_monitor_path =
 primer_monitor_path = params.primer_monitor_path
-params.output_path = '/mnt/hpc_scratch/primer_monitor'
+params.output_path =
 output_path = params.output_path
-params.igvstatic_path = '/var/www/igvstatic'
+params.igvstatic_path =
 igvstatic_path = params.igvstatic_path
 
-params.frontend_host = 'primer-monitor.neb.com'
+params.frontend_host =
 frontend_host = params.frontend_host
 
 params.override_path =
@@ -290,13 +290,12 @@ process recalculate_database_views {
 
 process recompute_affected_primers {
     cpus 8
+    //Wait and retry if another primer recomputation is running
     errorStrategy { sleep(120); return 'retry' }
     maxRetries 10
     conda "libiconv psycopg2 bedtools coreutils 'postgresql>=15' gawk bc"
     input:
         file complete
-    output:
-        file "done.txt"
     shell:
     '''
     # recompute the primer data for igvjs visualization
@@ -306,7 +305,6 @@ process recompute_affected_primers {
     fi
     !{primer_monitor_path}/lib/visualization/recompute_affected_primers.sh !{primer_monitor_path} !{organism_dirname} !{pct_cutoff} !{score_cutoff} !{task.cpus} all !{override_path}
     rm "!{params.flag_path}/recomputing_primers.lock"
-    touch done.txt
     '''
 }
 
