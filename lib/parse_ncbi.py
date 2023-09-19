@@ -4,7 +4,7 @@ Usage: ./parse_ncbi.py <metadata> <old accessions> <new sequences> <output filen
 """
 import sys
 import json
-
+import argparse
 
 def get_if_exists(cur_dict, *keys):
     """
@@ -17,6 +17,17 @@ def get_if_exists(cur_dict, *keys):
         return ""
     return cur_dict
 
+parser = argparse.ArgumentParser()
+parser.add_argument("new_metadata", help="The current day's NCBI metadata file.")
+parser.add_argument("new_sequences", help="The current day's NCBI sequences file.")
+parser.add_argument("old_accessions", help="A file with the list of accessions already in the database.")
+parser.add_argument("output_filename", help="The name of the output file.")
+
+# if True, only sequences present in the previous list will be output, instead of only seqs not present
+parser.add_argument("-e", "--output-existing", \
+    help="Outputs sequences already in the database instead of new sequences", action="store_true")
+
+args = parser.parse_args()
 
 # maps accession numbers to data
 output_lines = {}
@@ -27,27 +38,21 @@ prev_accessions = set()
 # accession numbers seen in current but not prev
 accessions = set()
 
-# if True, only sequences present in the previous list will be output, instead of only seqs not present
-output_existing_only = False
-
-if len(sys.argv) >= 6:
-    output_existing_only = (sys.argv[5].lower() == "true")
-
 # read prev metadata
-with open(sys.argv[2]) as f:
+# the prev metadata is just a list of accessions as it's output from a DB query
+with open(args.old_accessions) as f:
     for line_s in f:
-        # just a list of accessions, not a JSON file
         prev_accessions.add(line_s.strip())
 
 # read current metadata
-with open(sys.argv[1]) as f:
+with open(args.new_metadata) as f:
     for line_s in f:
         line = json.loads(line_s)
         accession = get_if_exists(line, "accession")
-        if accession == "" or (accession in prev_accessions and not output_existing_only) or (
-                accession not in prev_accessions and output_existing_only):
+        if accession == "" or (accession in prev_accessions and not args.output_existing) or (
+                accession not in prev_accessions and args.output_existing):
             # skipping anything with no accession number (should not ever happen)
-            # or that duplicates an old sequence (or that is new if output_existing_only is true)
+            # or that duplicates an old sequence (or that is new if args.output_existing is true)
             continue
         accessions.add(accession)
         loc = get_if_exists(line, "location", "geographicLocation")
@@ -67,8 +72,8 @@ with open(sys.argv[1]) as f:
         ]
 
 # read seqs
-with open(sys.argv[3]) as f:
-    with open(sys.argv[4], "w") as g:
+with open(args.new_sequences) as f:
+    with open(args.output_filename, "w") as g:
         accession = None
         for line_s in f:
             line = line_s.split("\t")
