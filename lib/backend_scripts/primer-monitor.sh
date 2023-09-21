@@ -15,6 +15,8 @@ export PATH="$PATH:$CONDA_BIN_PATH:$QSUB_PATH"
 export NXF_CONDA_CACHEDIR="$BACKEND_SCRATCH_PATH/conda_download"
 export NXF_JAVA_HOME
 
+export TMPDIR="${TEMP_DIR:-/tmp}"
+
 "$NEXTFLOW_INSTALL_PATH" -log "$BACKEND_SCRATCH_PATH/log_download-$(date +%F_%T)" \
 run "$BACKEND_INSTALL_PATH/lib/summarize_variants.nf" \
 --ref "$BACKEND_INSTALL_PATH/igvstatic/2697049/ref/NC_045512.2.fasta" \
@@ -28,4 +30,5 @@ run "$BACKEND_INSTALL_PATH/lib/summarize_variants.nf" \
 --frontend_host "$FRONTEND_HOST" \
 --jump_proxy "$JUMP_PROXY" \
 --override_path "$BACKEND_INSTALL_PATH/igvstatic/2697049/overrides.txt" \
+--temp-dir "$TMPDIR" \
 -N "$NOTIFICATION_EMAILS";

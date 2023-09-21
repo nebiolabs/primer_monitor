@@ -15,6 +15,8 @@ export PATH="$PATH:$CONDA_BIN_PATH:$QSUB_PATH"
 export NXF_CONDA_CACHEDIR="$BACKEND_SCRATCH_PATH/conda_pangolin"
 export NXF_JAVA_HOME
 
+export TMPDIR=${TEMP_DIR:-/tmp}
+
 "$NEXTFLOW_INSTALL_PATH" -log "$BACKEND_SCRATCH_PATH/log_pangolin-$(date +%F_%T)" \
 run "$BACKEND_INSTALL_PATH/lib/pangolin_calls/recall_pangolin.nf" \
 -w "$BACKEND_SCRATCH_PATH/work_pangolin/" \
@@ -25,5 +27,6 @@ run "$BACKEND_INSTALL_PATH/lib/pangolin_calls/recall_pangolin.nf" \
 --flag_path "$BACKEND_SCRATCH_PATH/status" \
 --pct-cutoff "$PCT_CUTOFF" \
 --score-cutoff "$SCORE_CUTOFF" \
+--temp-dir "$TMPDIR" \
 -N "$NOTIFICATION_EMAILS" \
 -c "$BACKEND_INSTALL_PATH/lib/nextflow.config"

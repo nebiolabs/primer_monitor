@@ -8,7 +8,7 @@ output_path = params.output_path
 params.pangolin_version_path =
 params.pangolin_data_version_path =
 
-params.temp_dir =
+params.temp_dir = '/tmp'
 temp_dir = params.temp_dir
 
 process get_new_versions {
