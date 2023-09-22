@@ -91,8 +91,8 @@ process extract_new_records {
     python !{primer_monitor_path}/lib/parse_ncbi.py \
     --output-existing \
     <(zstd -d --long=30 < !{metadata_json}) \
-    <(psql -h "$DB_HOST" -d "$DB_NAME" -U "$DB_USER_RO" -c "SELECT genbank_accession FROM fasta_records;" --csv -t) \
     <(zstd -d --long=30 < !{sequences_fasta} | seqtk seq | paste - -) \
+    <(psql -h "$DB_HOST" -d "$DB_NAME" -U "$DB_USER_RO" -c "SELECT genbank_accession FROM fasta_records;" --csv -t) \
     ${date_today}.tsv;
     '''
 
