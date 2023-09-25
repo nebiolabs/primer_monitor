@@ -12,7 +12,7 @@ source "$dotenv_path";
 mkdir -p "$BACKEND_SCRATCH_PATH/status";
 
 export PATH="$PATH:$MICROMAMBA_BIN_PATH:$CONDA_BIN_PATH:$QSUB_PATH"
-export NXF_CONDA_CACHEDIR="$BACKEND_SCRATCH_PATH/conda_pangolin"
+export NXF_CONDA_CACHEDIR="$BACKEND_SCRATCH_PATH/conda_envs"
 export NXF_JAVA_HOME
 
 export TMPDIR=${TEMP_DIR:-/tmp}
