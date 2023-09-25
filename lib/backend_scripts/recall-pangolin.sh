@@ -27,6 +27,6 @@ run "$BACKEND_INSTALL_PATH/lib/pangolin_calls/recall_pangolin.nf" \
 --flag_path "$BACKEND_SCRATCH_PATH/status" \
 --pct-cutoff "$PCT_CUTOFF" \
 --score-cutoff "$SCORE_CUTOFF" \
---temp-dir "$TMPDIR" \
+--temp_dir "$TMPDIR" \
 -N "$NOTIFICATION_EMAILS" \
 -c "$BACKEND_INSTALL_PATH/lib/nextflow.config"
