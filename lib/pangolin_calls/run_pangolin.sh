@@ -12,6 +12,6 @@ workdir="$(pwd)";
 
 pangolin "$workdir/$input_file" -t "$threads" -o "$workdir" \
 --outfile "$input_file.pangolin_calls.csv" \
-${temp_dir:+"--tempdir"} "$temp_dir"; # run pangolin
+${temp_dir:+"--tempdir $temp_dir"}; # run pangolin
 
 touch "$workdir/$input_file.$(basename "$PWD").pangolin_calls.done"; # create file to indicate this is done

@@ -40,14 +40,14 @@ mkdir -p "$organism_dirname/primer_sets_fasta"
 
 scp_proxy()
 {
-  scp ${JUMP_PROXY:+"-o"} ${JUMP_PROXY:+"ProxyJump=$JUMP_PROXY"} "$@"
+  scp ${JUMP_PROXY:+"-o ProxyJump=$JUMP_PROXY"} "$@"
 }
 
 ssh_proxy()
 {
   # shellcheck disable=SC2029
   # I actually want this expanded on the client side
-  ssh ${JUMP_PROXY:+"-J"} "${JUMP_PROXY:-''}" "$@"
+  ssh ${JUMP_PROXY:+"-J $JUMP_PROXY"} "$@"
 }
 
 echo "$(date +'%b %d %H:%M:%S') - getting primer sets"
