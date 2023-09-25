@@ -11,7 +11,7 @@ source "$dotenv_path";
 # ensure this directory exists
 mkdir -p "$BACKEND_SCRATCH_PATH/status";
 
-export PATH="$PATH:$CONDA_BIN_PATH:$QSUB_PATH"
+export PATH="$PATH:$MICROMAMBA_BIN_PATH:$CONDA_BIN_PATH:$QSUB_PATH"
 export NXF_CONDA_CACHEDIR="$BACKEND_SCRATCH_PATH/conda_download"
 export NXF_JAVA_HOME
 

@@ -27,7 +27,7 @@ if [ "$line_count" -gt 0 ] && [ ! -e "$BACKEND_SCRATCH_PATH/status/loading_data.
   # ensure this directory exists
   mkdir -p "$BACKEND_SCRATCH_PATH/status";
 
-  export PATH="$PATH:$CONDA_BIN_PATH:$QSUB_PATH"
+  export PATH="$PATH:$MICROMAMBA_BIN_PATH:$CONDA_BIN_PATH:$QSUB_PATH"
   export NXF_CONDA_CACHEDIR="$BACKEND_SCRATCH_PATH/conda_primers"
   export NXF_JAVA_HOME
 
