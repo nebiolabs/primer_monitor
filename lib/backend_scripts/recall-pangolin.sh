@@ -24,8 +24,8 @@ rollback_pangolin() {
   exit 1;
 }
 
-latest_pangolin=$("$CONDA_BIN_PATH/micromamba" search -c bioconda pangolin | grep -E "Version[[:blank:]]+[0-9]" | awk '{ print $2 }')
-latest_pangolin_data=$("$CONDA_BIN_PATH/micromamba" search -c bioconda pangolin-data | grep -E "Version[[:blank:]]+[0-9]" | awk '{ print $2 }')
+latest_pangolin=$("$MICROMAMBA_BIN_PATH/micromamba" search -c bioconda pangolin | grep -E "Version[[:blank:]]+[0-9]" | awk '{ print $2 }')
+latest_pangolin_data=$("$MICROMAMBA_BIN_PATH/micromamba" search -c bioconda pangolin-data | grep -E "Version[[:blank:]]+[0-9]" | awk '{ print $2 }')
 
 if [ "$latest_pangolin" = "" ] || [ "$latest_pangolin_data" = "" ]; then
   # if either version is blank, fail
