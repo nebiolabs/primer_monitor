@@ -11,7 +11,7 @@ params.pangolin_data_version_path =
 params.temp_dir = '/tmp'
 temp_dir = params.temp_dir
 
-process get_new_versions {
+process get_pangolin_version {
     cpus 1
     penv 'smp'
     conda "'bash>=4.1'"
@@ -26,20 +26,9 @@ process get_new_versions {
 
     source "!{primer_monitor_path}/.env"
 
-    touch "$LOCK_PATH/pangolin_version_mutex.lock"
-    # gets a file descriptor for the lock file, opened for writing, and saves its number in $lock_fd
-    exec {lock_fd}>"$LOCK_PATH/pangolin_version_mutex.lock"
-    flock $lock_fd
-    export latest_pangolin=$("$CONDA_BIN_PATH/micromamba" search -c bioconda pangolin | grep -E "Version[[:blank:]]+[0-9]" | awk '{ print $2 }')
-    export latest_pangolin_data=$("$CONDA_BIN_PATH/micromamba" search -c bioconda pangolin-data | grep -E "Version[[:blank:]]+[0-9]" | awk '{ print $2 }')
-
-    cp "!{params.pangolin_version_path}" "!{params.pangolin_version_path}.old"
-    cp "!{params.pangolin_data_version_path}" "!{params.pangolin_data_version_path}.old"
-
-    printf "$latest_pangolin" > "!{params.pangolin_version_path}"
-    printf "$latest_pangolin_data" > "!{params.pangolin_data_version_path}"
-    # closes the file descriptor in $lock_fd
-    exec {lock_fd}>&-
+    use_pending="false"
+    pangolin_version=$(cat !{params.pangolin_version_path})
+    pangolin_data_version=$(cat !{params.pangolin_data_version_path})
     '''
 }
 
@@ -194,11 +183,11 @@ process update_new_calls {
 
 
 workflow {
-    get_new_versions()
+    get_pangolin_version()
     download_data()
     extract_new_records(download_data.out)
     transform_data(extract_new_records.out.splitText(file: true, by: 2500).filter{ it.size()>77 })
-    pangolin_calls(get_new_versions.out[0], get_new_versions.out[1], transform_data.out)
+    pangolin_calls(get_pangolin_version.out[0], get_pangolin_version.out[1], transform_data.out)
     load_pangolin_data(pangolin_calls.out)
     update_current_calls(load_pangolin_data.out.collect())
     update_new_calls(update_current_calls.out)

@@ -29,9 +29,9 @@
      inkscape:deskcolor="#d1d1d1"
      inkscape:document-units="pt"
      showgrid="false"
-     inkscape:zoom="1.0323759"
-     inkscape:cx="537.11056"
-     inkscape:cy="1194.8167"
+     inkscape:zoom="1"
+     inkscape:cx="490.5"
+     inkscape:cy="291.5"
      inkscape:window-width="1920"
      inkscape:window-height="945"
      inkscape:window-x="0"
@@ -47,7 +47,7 @@
     <polygon
        fill="#ffffff"
        stroke="none"
-       points="-4,4 -4,-821 847.05,-821 847.05,4 "
+       points="847.05,-821 847.05,4 -4,4 -4,-821 "
        id="polygon4" />
     <!-- p0 -->
     <g
@@ -534,6 +534,29 @@
          id="text173"
          style="fill:#000000;fill-opacity:1;stroke:none;stroke-opacity:1">get_pangolin_version</text>
     </g>
+    <g
+       id="node9-6"
+       class="node"
+       transform="translate(127.84128,-176.96527)">
+      <title
+         id="title169-5">p6</title>
+      <ellipse
+         fill="none"
+         stroke="#000000"
+         cx="465.35999"
+         cy="-445"
+         rx="90.760002"
+         ry="18"
+         id="ellipse171-7" />
+      <text
+         text-anchor="middle"
+         x="465.35999"
+         y="-439.95001"
+         font-family="Times, serif"
+         font-size="14px"
+         id="text173-6"
+         style="fill:#000000;fill-opacity:1;stroke:none;stroke-opacity:1">get_pangolin_version</text>
+    </g>
     <!-- p6&#45;&gt;p8 -->
     <g
        id="edge11"
@@ -700,28 +723,6 @@
          style="fill:#000000;fill-opacity:1;stroke:none;stroke-opacity:1">complete</text>
     </g>
     <!-- p0b -->
-    <g
-       id="node14"
-       class="node">
-      <title
-         id="title226">p0b</title>
-      <ellipse
-         fill="none"
-         stroke="#000000"
-         cx="592.35999"
-         cy="-622"
-         rx="77.449997"
-         ry="18"
-         id="ellipse228" />
-      <text
-         text-anchor="middle"
-         x="592.35999"
-         y="-616.95001"
-         font-family="Times, serif"
-         font-size="14px"
-         id="text230"
-         style="fill:#000000;fill-opacity:1;stroke:none;stroke-opacity:1">get_new_versions</text>
-    </g>
     <!-- p4b -->
     <g
        id="node15"
@@ -1107,17 +1108,6 @@
   <text
      xml:space="preserve"
      style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:22.0013px;font-family:sans-serif;-inkscape-font-specification:sans-serif;fill:#1e26ff;fill-opacity:1;stroke:none;stroke-width:0.750044;stroke-opacity:1"
-     x="526.18121"
-     y="206.31305"
-     id="text562-71-8-2-8-01"><tspan
-       sodipodi:role="line"
-       id="tspan560-87-2-7-9-9"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:22.0013px;font-family:Times, serif;-inkscape-font-specification:'Times, serif';fill:#4964c5;fill-opacity:1;stroke:none;stroke-width:0.750044;stroke-opacity:1"
-       x="526.18121"
-       y="206.31305">&amp;</tspan></text>
-  <text
-     xml:space="preserve"
-     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:22.0013px;font-family:sans-serif;-inkscape-font-specification:sans-serif;fill:#1e26ff;fill-opacity:1;stroke:none;stroke-width:0.750044;stroke-opacity:1"
      x="386.64197"
      y="382.85794"
      id="text562-71-8-2-8-3"><tspan
@@ -1126,6 +1116,17 @@
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:22.0013px;font-family:Times, serif;-inkscape-font-specification:'Times, serif';fill:#4964c5;fill-opacity:1;stroke:none;stroke-width:0.750044;stroke-opacity:1"
        x="386.64197"
        y="382.85794">%</tspan></text>
+  <text
+     xml:space="preserve"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:22.0013px;font-family:sans-serif;-inkscape-font-specification:sans-serif;fill:#1e26ff;fill-opacity:1;stroke:none;stroke-width:0.750044;stroke-opacity:1"
+     x="515.11176"
+     y="206.00757"
+     id="text562-71-8-2-8-3-1"><tspan
+       sodipodi:role="line"
+       id="tspan560-87-2-7-9-7-4"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:22.0013px;font-family:Times, serif;-inkscape-font-specification:'Times, serif';fill:#4964c5;fill-opacity:1;stroke:none;stroke-width:0.750044;stroke-opacity:1"
+       x="515.11176"
+       y="206.00757">%</tspan></text>
   <text
      xml:space="preserve"
      style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.0007px;font-family:sans-serif;-inkscape-font-specification:sans-serif;fill:#1e26ff;fill-opacity:1;stroke-width:0.750044"
@@ -1170,18 +1171,13 @@
      y="975.68701"
      id="text14384"><tspan
        sodipodi:role="line"
-       id="tspan14382"
        style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.750044"
        x="47.95047"
-       y="975.68701">@ = Writes to DB</tspan><tspan
+       y="975.68701"
+       id="tspan14388">@ = Writes to DB</tspan><tspan
        sodipodi:role="line"
        style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.750044"
        x="47.95047"
        y="1003.1887"
-       id="tspan14388">&amp; = Writes Pangolin version files</tspan><tspan
-       sodipodi:role="line"
-       style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.750044"
-       x="47.95047"
-       y="1030.6903"
        id="tspan14392">% = Reads Pangolin version files</tspan></text>
 </svg>

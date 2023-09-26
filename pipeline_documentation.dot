@@ -54,10 +54,10 @@ update_recalculateDatabaseViews -> update_recomputeAffectedPrimers [label="compl
 
 digraph "recall_pangolin" {
 
-recall_getNewVersions [label="get_new_versions"];
+recall_getPangolinVersion [label="get_pangolin_version"];
 recall_pangolinCalls [label="pangolin_calls"];
 
-recall_getNewVersions -> recall_pangolinCalls [label="latest_pangolin"];
+recall_getPangolinVersion -> recall_pangolinCalls [label="latest_pangolin"];
 
 recall_extractNewRecords [label="extract_new_records"];
 recall_splitText [shape=circle,label="",fixedsize=true,width=0.1,xlabel="splitText"];

@@ -193,15 +193,9 @@ process get_pangolin_version {
 
     source "!{primer_monitor_path}/.env"
 
-    touch "$LOCK_PATH/pangolin_version_mutex.lock"
-    # gets a file descriptor for the lock file, opened for writing, and saves its number in $lock_fd
-    exec {lock_fd}>"$LOCK_PATH/pangolin_version_mutex.lock"
-    flock $lock_fd
     use_pending="false"
     pangolin_version=$(cat !{params.pangolin_version_path})
     pangolin_data_version=$(cat !{params.pangolin_data_version_path})
-    # closes the file descriptor in $lock_fd
-    exec {lock_fd}>&-
     '''
     }
 
