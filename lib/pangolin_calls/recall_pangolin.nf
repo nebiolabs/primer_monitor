@@ -17,8 +17,8 @@ process get_pangolin_version {
     conda "'bash>=4.1'"
 
     output:
-        env latest_pangolin
-        env latest_pangolin_data
+        env pangolin_version
+        env pangolin_data_version
 
     shell:
     '''
