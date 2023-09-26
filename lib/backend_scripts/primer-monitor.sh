@@ -28,6 +28,8 @@ run "$BACKEND_INSTALL_PATH/lib/summarize_variants.nf" \
 --flag_path "$BACKEND_SCRATCH_PATH/status" \
 --igvstatic_path "$FRONTEND_HOST" \
 --frontend_host "$FRONTEND_HOST" \
+--pct_cutoff "$PCT_CUTOFF" \
+--score_cutoff "$SCORE_CUTOFF" \
 --jump_proxy "$JUMP_PROXY" \
 --override_path "$BACKEND_INSTALL_PATH/igvstatic/2697049/overrides.txt" \
 --temp_dir "$TMPDIR" \
