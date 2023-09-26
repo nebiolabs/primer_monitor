@@ -24,9 +24,13 @@ rollback_pangolin() {
   exit 1;
 }
 
-
 latest_pangolin=$("$CONDA_BIN_PATH/micromamba" search -c bioconda pangolin | grep -E "Version[[:blank:]]+[0-9]" | awk '{ print $2 }')
 latest_pangolin_data=$("$CONDA_BIN_PATH/micromamba" search -c bioconda pangolin-data | grep -E "Version[[:blank:]]+[0-9]" | awk '{ print $2 }')
+
+if [ "$latest_pangolin" = "" ] || [ "$latest_pangolin_data" = "" ]; then
+  # if either version is blank, fail
+  exit 1;
+fi
 
 # back up the old pangolin versions before updating
 cp "$BACKEND_INSTALL_PATH/pangolin_ver.txt" "$BACKEND_INSTALL_PATH/pangolin_ver.txt.old"
