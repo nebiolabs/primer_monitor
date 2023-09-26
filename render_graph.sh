@@ -1,1 +1,3 @@
-gvpack -u pipeline_documentation.dot | dot $@
+#!/usr/bin/env bash
+
+gvpack -u pipeline_documentation.dot | dot "$@"
