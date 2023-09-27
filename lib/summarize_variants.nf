@@ -64,7 +64,7 @@ process download_data {
     export TMPDIR
 
     date_today=$(date +%Y-%m-%d)
-    datasets download virus genome taxon SARS-CoV-2 --complete-only --host human --filename tmp.zip
+    datasets download virus genome taxon 2697049 --complete-only --host human --filename tmp.zip
     unzip tmp.zip
     zstd --long=30 --ultra -22 -T!{task.cpus} ncbi_dataset/data/data_report.jsonl -o ${date_today}.metadata.zst
     zstd --long=30 --ultra -22 -T!{task.cpus} ncbi_dataset/data/genomic.fna -o ${date_today}.sequences.zst
