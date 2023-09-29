@@ -22,7 +22,7 @@ new_primers_file="$(mktemp)"
 line_count="$(wc -l < "$new_primers_file")"
 
 # only run the nextflow if there are actually primers, and no other conflicting script is running
-if [ "$line_count" -gt 0 ] && [ ! -e "$BACKEND_SCRATCH_PATH/status/loading_data.lock" ]; then
+if [ "$line_count" -gt 0 ]; then
 
   # ensure this directory exists
   mkdir -p "$BACKEND_SCRATCH_PATH/status";
