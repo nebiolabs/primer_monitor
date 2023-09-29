@@ -13,7 +13,7 @@ server 'hpc-sandbox', user: 'primer-monitor', roles: %w{cluster}, no_release: tr
 # Ensure this matches $BACKEND_INSTALL_PATH on the remote server
 set :backend_deploy_path, '/mnt/bioinfo/prg/primer_monitor_staging'
 
-set :rails_env, 'production'
+set :rails_env, 'staging'
 
 
 # role-based syntax
