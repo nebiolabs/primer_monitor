@@ -37,7 +37,7 @@ process recompute_affected_primers {
     cp !{primer_names_file} primers_done.txt
 
     # recompute the primer data for igvjs visualization
-    !{primer_monitor_path}/lib/visualization/recompute_affected_primers.sh -o !{override_path} -p !{primer_names_file} !{primer_monitor_path} !{organism_dirname} \
+    !{primer_monitor_path}/lib/visualization/recompute_affected_primers.sh -o !{override_path} -p "$(pwd)/!{primer_names_file}" !{primer_monitor_path} !{organism_dirname} \
     !{pct_cutoff} !{score_cutoff} !{task.cpus};
     '''
 }
