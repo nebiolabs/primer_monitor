@@ -25,20 +25,20 @@ process recompute_affected_primers {
     maxRetries 2
     conda "libiconv psycopg2 bedtools coreutils 'postgresql>=15' gawk"
     input:
-        file primer_names_file
+        path primer_names_file
     output:
-        file 'primers_done.txt'
+        path 'primers_done.txt'
     shell:
     '''
     #!/usr/bin/env bash
 
     set -e
 
+    cp !{primer_names_file} primers_done.txt
+
     # recompute the primer data for igvjs visualization
     !{primer_monitor_path}/lib/visualization/recompute_affected_primers.sh -o !{override_path} -p !{primer_names_file} !{primer_monitor_path} !{organism_dirname} \
     !{pct_cutoff} !{score_cutoff} !{task.cpus};
-
-    cp !{primer_names_file} primers_done.txt
     '''
 }
 
@@ -48,7 +48,7 @@ process update_db {
     maxRetries 2
     conda "'postgresql>=15'"
     input:
-        file completed_primers
+        path completed_primers
     shell:
     '''
     #!/usr/bin/env bash
