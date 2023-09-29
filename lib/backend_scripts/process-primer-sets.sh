@@ -31,9 +31,11 @@ if [ "$line_count" -gt 0 ]; then
   -w "$BACKEND_SCRATCH_PATH/work_primer_sets/" \
   --primer_monitor_path "$BACKEND_INSTALL_PATH" \
   --output_path "$BACKEND_SCRATCH_PATH" \
-  --pct-cutoff "$PCT_CUTOFF" \
-  --score-cutoff "$SCORE_CUTOFF" \
+  --pct_cutoff "$PCT_CUTOFF" \
+  --score_cutoff "$SCORE_CUTOFF" \
   --primer_names "$new_primers_file" \
+  --override_path "$BACKEND_INSTALL_PATH/igvstatic/2697049/overrides.txt" \
+  --organism_dirname "2697049" \
   -N "$NOTIFICATION_EMAILS";
 fi
 
