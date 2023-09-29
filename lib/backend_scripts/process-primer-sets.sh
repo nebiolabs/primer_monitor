@@ -26,7 +26,7 @@ if [ "$line_count" -gt 0 ]; then
   export NXF_CONDA_CACHEDIR="$BACKEND_SCRATCH_PATH/conda_envs"
   export NXF_JAVA_HOME
 
-  "$NEXTFLOW_INSTALL_PATH" -log "$BACKEND_SCRATCH_PATH/log_primer_sets/" \
+  "$NEXTFLOW_INSTALL_PATH" -log "$BACKEND_SCRATCH_PATH/log_primer_sets-$(date +%F_%T)/" \
   run "$BACKEND_INSTALL_PATH/lib/process_primer_sets.nf" \
   -w "$BACKEND_SCRATCH_PATH/work_primer_sets/" \
   --primer_monitor_path "$BACKEND_INSTALL_PATH" \
