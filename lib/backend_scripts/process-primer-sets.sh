@@ -33,10 +33,8 @@ if [ "$line_count" -gt 0 ]; then
   --output_path "$BACKEND_SCRATCH_PATH" \
   --pct-cutoff "$PCT_CUTOFF" \
   --score-cutoff "$SCORE_CUTOFF" \
-  --primer-names "$new_primers_file" \
+  --primer_names "$new_primers_file" \
   -N "$NOTIFICATION_EMAILS";
 fi
 
 rm "$new_primers_file";
-
-rm "$BACKEND_SCRATCH_PATH/status/recomputing_primers.lock"
