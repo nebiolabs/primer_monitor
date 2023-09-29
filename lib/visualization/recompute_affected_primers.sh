@@ -87,22 +87,23 @@ else
   echo "$(date +'%b %d %H:%M:%S') - lineage data downloaded"
 fi
 
+primer_sets_data_file="$(mktemp -p "$BACKEND_SCRATCH_PATH")"
 
 echo "$(date +'%b %d %H:%M:%S') - getting list of primer sets to process"
 if [ -z "$primer_sets_file" ]; then
-  find "$organism_dirname/primer_sets_bed" -name '*.bed' -exec basename -a "{}" + > primer_sets_data.txt
+  find "$organism_dirname/primer_sets_bed" -name '*.bed' -exec basename -a "{}" + > "$primer_sets_data_file";
 else
   while read -r primer_set; do
-    echo "$("$(dirname "$0")/urlify_name.sh" "$primer_set").bed" >> primer_sets_data.txt;
+    echo "$("$(dirname "$0")/urlify_name.sh" "$primer_set").bed" >> "$primer_sets_data_file";
   done < "$primer_sets_file"
 fi
 
 echo "$(date +'%b %d %H:%M:%S') - recomputing overlaps"
 cat <(ls "$organism_dirname/lineage_sets") <(echo "all.txt") \
 | xargs "$primer_monitor_path/lib/visualization/process_primer_sets_with_lineages.sh" - "./$organism_dirname" "$pct_cutoff" "$score_cutoff" \
-primer_sets_data.txt "./$organism_dirname" "$cpus"
+"$primer_sets_data_file" "./$organism_dirname" "$cpus"
 
-rm primer_sets_data.txt
+rm "$primer_sets_data_file"
 
 if [ -z "$primer_sets_file" ]; then
   # if full update, remove old files so this doesn't clutter up the directories
