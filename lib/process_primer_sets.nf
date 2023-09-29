@@ -65,6 +65,6 @@ process update_db {
 
 
 workflow {
-    recompute_affected_primers(params.primer_names)
+    recompute_affected_primers(primer_names)
     update_db(recompute_affected_primers.out)
 }
