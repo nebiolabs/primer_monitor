@@ -31,8 +31,8 @@ process recompute_affected_primers {
     shell:
     '''
     # recompute the primer data for igvjs visualization
-    !{primer_monitor_path}/lib/visualization/recompute_affected_primers.sh !{primer_monitor_path} !{organism_dirname} \
-    !{pct_cutoff} !{score_cutoff} !{task.cpus} !{primer_names_file} !{override_path};
+    !{primer_monitor_path}/lib/visualization/recompute_affected_primers.sh -o !{override_path} -p !{primer_names_file} !{primer_monitor_path} !{organism_dirname} \
+    !{pct_cutoff} !{score_cutoff} !{task.cpus};
 
     cp !{primer_names_file} primers_done.txt
     '''

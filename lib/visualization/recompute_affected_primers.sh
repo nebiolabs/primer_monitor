@@ -3,22 +3,30 @@
 # recompute the primer data for igvjs visualization
 set -e # fail on error
 
+while getopts ':p:o:' option_arg; do
+  case "$option_arg" in
+    "o")
+      # a file with a list of lineage groups to always show, one per line
+      overrides_path="$OPTARG"
+      ;;
+    "p")
+      # a list of primer sets to process
+      primer_sets_file="$OPTARG"
+      ;;
+    "*")
+      echo "invalid option -$option_arg" >&2;
+      exit 1;
+      ;;
+  esac
+done
+
+shift $((OPTIND - 1));
+
 primer_monitor_path="$1"
 organism_dirname="$2"
 pct_cutoff="$3"
 score_cutoff="$4"
 cpus="$5"
-primer_sets_file="$6"
-
-if (($# > 6)); then
-  # a file with a list of lineage groups to always show, one per line
-  overrides_path="$7"
-fi
-
-if [ "$primer_sets_file" = "all" ]; then
-  # unset the file if "all" is specified
-  unset primer_sets_file
-fi
 
 
 echo "$(date +'%b %d %H:%M:%S') - primer recomputation started"
