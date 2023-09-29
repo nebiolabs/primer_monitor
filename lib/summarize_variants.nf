@@ -40,7 +40,7 @@ if(params.jump_proxy)
 params.pangolin_version_path =
 params.pangolin_data_version_path =
 
-params.organism_dirname = "2697049"
+params.organism_dirname =
 organism_dirname = params.organism_dirname
 
 pangolin_version = file(params.pangolin_version_path).text

@@ -32,5 +32,6 @@ run "$BACKEND_INSTALL_PATH/lib/summarize_variants.nf" \
 --score_cutoff "$SCORE_CUTOFF" \
 --jump_proxy "$JUMP_PROXY" \
 --override_path "$BACKEND_INSTALL_PATH/igvstatic/2697049/overrides.txt" \
+--organism_dirname "2697049" \
 --temp_dir "$TMPDIR" \
 -N "$NOTIFICATION_EMAILS";
