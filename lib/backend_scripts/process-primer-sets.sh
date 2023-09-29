@@ -9,11 +9,6 @@ dotenv_path=$1
 # shellcheck source=../../.env
 source "$dotenv_path";
 
-if ! ( set -o noclobber; : > "$BACKEND_SCRATCH_PATH/status/recomputing_primers.lock" ) &> /dev/null; then
-    echo "Another primer recomputation is running, aborting..." >&2
-    exit 1;
-fi
-
 new_primers_file="$(mktemp)"
 
 "$PSQL_INSTALL_PATH" -h "$DB_HOST" -d "$DB_NAME" -U "$DB_USER_RO" \
