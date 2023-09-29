@@ -9,7 +9,7 @@ dotenv_path=$1
 # shellcheck source=../../.env
 source "$dotenv_path";
 
-new_primers_file="$(mktemp)"
+new_primers_file="$(mktemp -p "$BACKEND_SCRATCH_PATH")"
 
 "$PSQL_INSTALL_PATH" -h "$DB_HOST" -d "$DB_NAME" -U "$DB_USER_RO" \
 -c "SELECT name FROM primer_sets WHERE status='processing';" -t --csv > "$new_primers_file";
