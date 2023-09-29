@@ -209,6 +209,6 @@ for lineage_group in interesting_lineages:
         display_name = reversed_aliases[lineage_group][0] + "* (" + lineage_group + "*)"
     with open(output_path + "/" + lineage_group + ".txt", "w") as f:
         f.write(recorded_lineages)
-    print('"' + display_name + '": "' + lineage_group + '",')
+    print('"' + lineage_group + '": "' + display_name + '",')
 print('"all": "All"')
 print("}")
