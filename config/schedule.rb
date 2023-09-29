@@ -40,7 +40,7 @@ every 2.weeks, at: ['3:00 am'], roles: [:backend] do
 end
 
 every 1.minute, roles: [:backend] do
-  command "source #{backend_path}/.env && flock \"$LOCK_PATH/primer_monitor_update.lock\" \
+  command "source #{backend_path}/.env && flock -n \"$LOCK_PATH/primer_monitor_update.lock\" \
   #{backend_path}/lib/backend_scripts/process-primer-sets.sh \"#{backend_path}/.env\"", \
           output: "\"$BACKEND_SCRATCH_PATH/primers_cron.log\""
 end
