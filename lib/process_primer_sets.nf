@@ -58,7 +58,7 @@ process update_db {
     source "!{primer_monitor_path}/.env"
 
     while read -r primer_set; do
-        psql -h "$DB_HOST" -d "$DB_NAME" -U "$DB_USER_RO" -v "primer_set=$primer_set" <<< "UPDATE primer_sets SET status='complete' WHERE name=:'primer_set';";
+        PGPASSFILE="!{primer_monitor_path}/config/.pgpass" psql -h "$DB_HOST" -d "$DB_NAME" -U "$DB_USER" -v "primer_set=$primer_set" <<< "UPDATE primer_sets SET status='complete' WHERE name=:'primer_set';";
     done < !{completed_primers}
     '''
 }
