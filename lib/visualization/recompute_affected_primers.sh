@@ -46,9 +46,17 @@ mkdir -p "$organism_dirname/lineage_variants"
 mkdir -p "$organism_dirname/primer_sets_bed"
 mkdir -p "$organism_dirname/primer_sets_fasta"
 
-scp_params=${JUMP_PROXY:+"-o ProxyJump=$JUMP_PROXY"}
+scp_proxy()
+{
+  scp ${JUMP_PROXY:+"-o ProxyJump=$JUMP_PROXY"} "$@"
+}
 
-ssh_params=${JUMP_PROXY:+"-J $JUMP_PROXY"}
+ssh_proxy()
+{
+  # shellcheck disable=SC2029
+  # I actually want this expanded on the client side
+  ssh ${JUMP_PROXY:+"-J $JUMP_PROXY"} "$@"
+}
 
 echo "$(date +'%b %d %H:%M:%S') - getting primer sets"
 
@@ -74,9 +82,8 @@ else
   echo "$(date +'%b %d %H:%M:%S') - performing partial update"
   # download existing lineage sets from the data server
   echo "$(date +'%b %d %H:%M:%S') - downloading lineage data"
-  # $scp_params if $JUMP_PROXY is set, otherwise nothing
-  scp ${JUMP_PROXY:+"$scp_params"} -r "$FRONTEND_HOST:$IGVSTATIC_PATH/$organism_dirname/lineage_sets" "./$organism_dirname";
-  scp ${JUMP_PROXY:+"$scp_params"} -r "$FRONTEND_HOST:$IGVSTATIC_PATH/$organism_dirname/config/lineage_sets.json" "./$organism_dirname/config/lineage_sets.json";
+  scp_proxy -r "$FRONTEND_HOST:\"$IGVSTATIC_PATH/$organism_dirname/lineage_sets\"" "./$organism_dirname";
+  scp_proxy -r "$FRONTEND_HOST:\"$IGVSTATIC_PATH/$organism_dirname/config/lineage_sets.json\"" "./$organism_dirname/config/lineage_sets.json";
   echo "$(date +'%b %d %H:%M:%S') - lineage data downloaded"
 fi
 
@@ -102,27 +109,24 @@ rm "$primer_sets_data_file"
 if [ -z "$primer_sets_file" ]; then
   # if full update, remove old files so this doesn't clutter up the directories
   echo "$(date +'%b %d %H:%M:%S') - removing old files"
-  # $ssh_params if $JUMP_PROXY is set, otherwise nothing
-  ssh ${JUMP_PROXY:+"$ssh_params"} "$FRONTEND_HOST" "rm -rf $IGVSTATIC_PATH/$organism_dirname/primer_sets; \
+  ssh_proxy "$FRONTEND_HOST" "rm -rf $IGVSTATIC_PATH/$organism_dirname/primer_sets; \
   rm -f $IGVSTATIC_PATH/$organism_dirname/primer_sets_bed/* $IGVSTATIC_PATH/$organism_dirname/lineage_sets/* \
   $IGVSTATIC_PATH/$organism_dirname/lineage_variants/* $IGVSTATIC_PATH/$organism_dirname/primer_sets_fasta/*;"
 
   echo "$(date +'%b %d %H:%M:%S') - uploading new data"
   # copies over the new files
   # the * is intentionally not quoted so globbing works
-  # $scp_params if $JUMP_PROXY is set, otherwise nothing
-  scp ${JUMP_PROXY:+"$scp_params"} -r "./$organism_dirname/"* "$FRONTEND_HOST:$IGVSTATIC_PATH/$organism_dirname/";
+  scp_proxy -r "./$organism_dirname/"* "$FRONTEND_HOST:\"$IGVSTATIC_PATH/$organism_dirname/\"";
 
 else
   # copies over only the files changed for the new primer
   echo "$(date +'%b %d %H:%M:%S') - uploading new data"
   while read -r primer_set; do
     urlified_primer_set_name=$("$(dirname "$0")/urlify_name.sh" "$primer_set")
-    # $scp_params if $JUMP_PROXY is set, otherwise nothing
-    scp ${JUMP_PROXY:+"$scp_params"} -r "./$organism_dirname/config/tracks.json" "$FRONTEND_HOST:$IGVSTATIC_PATH/$organism_dirname/config/tracks.json";
-    scp ${JUMP_PROXY:+"$scp_params"} -r "./$organism_dirname/primer_sets_bed/${urlified_primer_set_name}.bed" "$FRONTEND_HOST:$IGVSTATIC_PATH/$organism_dirname/primer_sets_bed/${urlified_primer_set_name}.bed";
-    scp ${JUMP_PROXY:+"$scp_params"} -r "./$organism_dirname/primer_sets_fasta/${urlified_primer_set_name}.fasta" "$FRONTEND_HOST:$IGVSTATIC_PATH/$organism_dirname/primer_sets_fasta/${urlified_primer_set_name}.fasta";
-    scp ${JUMP_PROXY:+"$scp_params"} -r "./$organism_dirname/primer_sets_status/${urlified_primer_set_name}" "$FRONTEND_HOST:$IGVSTATIC_PATH/$organism_dirname/primer_sets_status/";
+    scp_proxy -r "./$organism_dirname/config/tracks.json" "$FRONTEND_HOST:\"$IGVSTATIC_PATH/$organism_dirname/config/tracks.json\"";
+    scp_proxy -r "./$organism_dirname/primer_sets_bed/${urlified_primer_set_name}.bed" "$FRONTEND_HOST:\"$IGVSTATIC_PATH/$organism_dirname/primer_sets_bed/${urlified_primer_set_name}.bed\"";
+    scp_proxy -r "./$organism_dirname/primer_sets_fasta/${urlified_primer_set_name}.fasta" "$FRONTEND_HOST:\"$IGVSTATIC_PATH/$organism_dirname/primer_sets_fasta/${urlified_primer_set_name}.fasta\"";
+    scp_proxy -r "./$organism_dirname/primer_sets_status/${urlified_primer_set_name}" "$FRONTEND_HOST:\"$IGVSTATIC_PATH/$organism_dirname/primer_sets_status/\"";
   done  < "$primer_sets_file"
 fi
 
