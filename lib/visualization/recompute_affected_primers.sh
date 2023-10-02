@@ -125,7 +125,7 @@ else
     scp_proxy -r "./$organism_dirname/config/tracks.json" "$FRONTEND_HOST:$IGVSTATIC_PATH/$organism_dirname/config/tracks.json";
     scp_proxy -r "./$organism_dirname/primer_sets_bed/${urlified_primer_set_name}.bed" "$FRONTEND_HOST:$IGVSTATIC_PATH/$organism_dirname/primer_sets_bed/${urlified_primer_set_name}.bed";
     scp_proxy -r "./$organism_dirname/primer_sets_fasta/${urlified_primer_set_name}.fasta" "$FRONTEND_HOST:$IGVSTATIC_PATH/$organism_dirname/primer_sets_fasta/${urlified_primer_set_name}.fasta";
-    scp_proxy -r "./$organism_dirname/primer_sets_status/${urlified_primer_set_name}" "$FRONTEND_HOST:$IGVSTATIC_PATH/$organism_dirname/primer_sets";
+    scp_proxy -r "./$organism_dirname/primer_sets_status/${urlified_primer_set_name}" "$FRONTEND_HOST:$IGVSTATIC_PATH/$organism_dirname/primer_sets_status/";
   done  < "$primer_sets_file"
 fi
 
