@@ -14,7 +14,7 @@ class PrimerSetMailerTest < ActionMailer::TestCase
 
     # Test the body of the sent email contains what we expect it to
     assert_equal ['me@example.com'], email.to
-    assert_equal ['primer-monitor@neb.com'], email.from
+    assert_equal [ENV['ADMIN_EMAIL']], email.from
     assert_equal 'Primer Set Created or Updated', email.subject
   end
 end

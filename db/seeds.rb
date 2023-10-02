@@ -8,7 +8,7 @@ admin = User.create_with(first: 'Admin', last: 'User',
                          password: Rails.application.credentials.admin_password,
                          password_confirmation: Rails.application.credentials.admin_password,
                          active: true, approved: true, confirmed: true)
-            .find_or_create_by!(email: 'primer-monitor@neb.com')
+            .find_or_create_by!(email: ENV['ADMIN_EMAIL'])
 
 %w[administrator pi operator participant].each do |role_name|
   Role.find_or_create_by!(name: role_name)
