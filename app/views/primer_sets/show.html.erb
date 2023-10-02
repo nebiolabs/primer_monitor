@@ -67,7 +67,7 @@
 
 <hr/>
 
-<% if @primer_set.status == PrimerSet.statuses[:complete] %>
+<% if @primer_set.status == PrimerSet.statuses[:complete] && @config.key?('primer_set_name') %>
 
 <a href="<%= "#{@config[:data_server]}/#{@config[:organism_taxid]}/primer_sets_bed/#{@config['primer_set_name']}.bed" %>">Download Primer Set BED</a>
 <br>
