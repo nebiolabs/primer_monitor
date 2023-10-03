@@ -70,18 +70,19 @@ def passes_filter(lineage, total, seqs_per_day, lineage_metadata):
     if (time_diff_newest > 90 and time_diff_median > 180) or time_diff_median > 360:
         old_adjustment = 100 + (max(time_diff_newest - 90, 0))
 
-    logging.debug("testing full: "+lineage+", seen: "+str(total)+", overall: "+str(total_seqs)\
-     +", cutoff:"+str(base_cutoff)+", from:"+str(lineage_data[lineage]['first_seen'])\
-     +", to:"+str(lineage_data[lineage]['last_seen']))
+    logging.debug("testing full: " + lineage + ", seen: " + str(total) + ", overall: " + str(total_seqs)
+                  + ", cutoff:" + str(base_cutoff) + ", from:" + str(lineage_data[lineage]['first_seen'])
+                  + ", to:" + str(lineage_data[lineage]['last_seen']))
 
-    logging.debug("testing after median: "+lineage+", seen: "+str(total/2)\
-     +", overall: "+str(seqs_after_median)+", cutoff:"+str(base_cutoff_after_median)
-     +", from:"+str(lineage_data[lineage]['median_date'])+", to:"+str(lineage_data[lineage]['last_seen']))
+    logging.debug("testing after median: " + lineage + ", seen: " + str(total / 2)
+                  + ", overall: " + str(seqs_after_median) + ", cutoff:" + str(base_cutoff_after_median)
+                  + ", from:" + str(lineage_data[lineage]['median_date']) + ", to:" + str(
+        lineage_data[lineage]['last_seen']))
 
     full_range = total > base_cutoff * old_adjustment and total >= MIN_SEQS
     after_median_range = total / 2 > base_cutoff_after_median * old_adjustment and total >= MIN_SEQS
 
-    logging.debug("result: "+str(full_range or after_median_range))
+    logging.debug("result: " + str(full_range or after_median_range))
 
     return full_range or after_median_range
 
@@ -174,8 +175,8 @@ overrides = []
 if len(sys.argv) >= 6:
     overrides_file = sys.argv[5]
     with open(overrides_file) as f:
-        for line in f:
-            overrides.append(line.strip())
+        for override_line in f:
+            overrides.append(override_line.strip())
 
 lineage_data = {}
 with open(sys.argv[2]) as f:
@@ -192,8 +193,8 @@ interesting_lineages = get_lineages(pango_aliases_data, lineage_list_file, base_
                                     lineage_data, db_conn)
 db_conn.close()
 
-for lineage in overrides:
-    interesting_lineages.add(lineage)
+for override_lineage in overrides:
+    interesting_lineages.add(override_lineage)
 
 lineage_groups = {}
 
@@ -203,9 +204,10 @@ reversed_aliases = get_lineage_names.reverse_aliases(aliases_data)
 print("{")
 for lineage_group in interesting_lineages:
     recorded_lineages = get_lineage_names.process_aliases(pango_aliases_data, lineage_list_file, lineage_group, None)[0]
-    # if this lineage group has a single alias name, and that name is not a recombinant lineage (starts with X), use that name
+    # if this lineage group has a single alias name that is not a recombinant lineage (starts with X), use that name
     display_name = lineage_group + "*"
-    if lineage_group in reversed_aliases and len(reversed_aliases[lineage_group]) == 1 and not reversed_aliases[lineage_group][0].startswith("X"):
+    if lineage_group in reversed_aliases and len(reversed_aliases[lineage_group]) == 1 and not \
+            reversed_aliases[lineage_group][0].startswith("X"):
         display_name = reversed_aliases[lineage_group][0] + "* (" + lineage_group + "*)"
     with open(output_path + "/" + lineage_group + ".txt", "w") as f:
         f.write(recorded_lineages)

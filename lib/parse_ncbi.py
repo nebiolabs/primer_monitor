@@ -2,9 +2,9 @@
 Filters duplicate sequences out of an NCBI dataset given a list of sequences in the database.
 Usage: ./parse_ncbi.py <metadata> <old accessions> <new sequences> <output filename>
 """
-import sys
 import json
 import argparse
+
 
 def get_if_exists(cur_dict, *keys):
     """
@@ -17,6 +17,7 @@ def get_if_exists(cur_dict, *keys):
         return ""
     return cur_dict
 
+
 parser = argparse.ArgumentParser()
 parser.add_argument("new_metadata", help="The current day's NCBI metadata file.")
 parser.add_argument("new_sequences", help="The current day's NCBI sequences file.")
@@ -24,8 +25,8 @@ parser.add_argument("old_accessions", help="A file with the list of accessions a
 parser.add_argument("output_filename", help="The name of the output file.")
 
 # if True, only sequences present in the previous list will be output, instead of only seqs not present
-parser.add_argument("-e", "--output-existing", \
-    help="Outputs sequences already in the database instead of new sequences", action="store_true")
+parser.add_argument("-e", "--output-existing",
+                    help="Outputs sequences already in the database instead of new sequences", action="store_true")
 
 args = parser.parse_args()
 
