@@ -8,6 +8,7 @@ import json
 import datetime
 import psycopg2
 import os
+import logging
 
 MIN_SEQS = 50
 
@@ -58,8 +59,7 @@ def passes_filter(lineage, total, seqs_per_day, lineage_metadata):
                                            lineage_metadata[lineage]['last_seen'])
 
     # increase cutoff for long-lasting lineages so they don't overwhelm new ones
-    # time_range = (((lineage_data[lineage]['last_seen']-lineage_data[lineage]['first_seen']).days)/90)
-    base_cutoff = 0.05 * total_seqs  # cutoff*max(time_range, 0.5)
+    base_cutoff = 0.05 * total_seqs
     base_cutoff_after_median = 0.05 * seqs_after_median
 
     time_diff_median = (today - lineage_metadata[lineage]['median_date']).days
@@ -70,18 +70,18 @@ def passes_filter(lineage, total, seqs_per_day, lineage_metadata):
     if (time_diff_newest > 90 and time_diff_median > 180) or time_diff_median > 360:
         old_adjustment = 100 + (max(time_diff_newest - 90, 0))
 
-    # print("testing full: "+lineage+", seen: "+str(total)+", overall: "+str(total_seqs)\
-    # +", cutoff:"+str(base_cutoff)+", from:"+str(lineage_data[lineage]['first_seen'])\
-    # +", to:"+str(lineage_data[lineage]['last_seen']))
+    logging.debug("testing full: "+lineage+", seen: "+str(total)+", overall: "+str(total_seqs)\
+     +", cutoff:"+str(base_cutoff)+", from:"+str(lineage_data[lineage]['first_seen'])\
+     +", to:"+str(lineage_data[lineage]['last_seen']))
 
-    # print("testing after median: "+lineage+", seen: "+str(total/2)\
-    # +", overall: "+str(seqs_after_median)+", cutoff:"+str(base_cutoff_after_median)
-    # +", from:"+str(lineage_data[lineage]['median_date'])+", to:"+str(lineage_data[lineage]['last_seen']))
+    logging.debug("testing after median: "+lineage+", seen: "+str(total/2)\
+     +", overall: "+str(seqs_after_median)+", cutoff:"+str(base_cutoff_after_median)
+     +", from:"+str(lineage_data[lineage]['median_date'])+", to:"+str(lineage_data[lineage]['last_seen']))
 
     full_range = total > base_cutoff * old_adjustment and total >= MIN_SEQS
     after_median_range = total / 2 > base_cutoff_after_median * old_adjustment and total >= MIN_SEQS
 
-    # print("result: "+str(full_range or after_median_range))
+    logging.debug("result: "+str(full_range or after_median_range))
 
     return full_range or after_median_range
 
