@@ -14,20 +14,24 @@ class VariantSite < ApplicationRecord
       accession, ref_pos, variant_type, variant = line.chomp.split("\t")
       next if variant.nil? # big insertions can push a variant off the end of the genome e.g. USA/VA-SU-SC_65/2021
 
-      fasta_record_id = FastaRecord.existing_fasta_accession_ids[accession]
-      raise "Failed to find fasta record for accession: \"#{accession}\"" unless fasta_record_id
-
-      ref_pos = Integer(ref_pos) - 1 # convert 1-based to 0-based
-
-      ref_end = ref_pos + variant.length
-      variant = "#{variant.length}-" if variant_type.include? 'D'
-      variant = "#{variant.length}N" if variant.include? 'N'
-      variants << VariantSite.new(ref_start: ref_pos.to_s, ref_end: ref_end, variant_type: variant_type,
-                                  variant: variant, fasta_record_id: fasta_record_id)
+      variants << (build_variant_site accession, ref_pos, variant_type, variant)
     end
 
     raise "Unable to parse any records from #{variants_tsv}" if variants.empty?
 
     variants
+  end
+
+  def self.build_variant_site(accession, ref_pos, variant_type, variant)
+    fasta_record_id = FastaRecord.existing_fasta_accession_ids[accession]
+    raise "Failed to find fasta record for accession: \"#{accession}\"" unless fasta_record_id
+
+    ref_pos = Integer(ref_pos) - 1 # convert 1-based to 0-based
+
+    ref_end = ref_pos + variant.length
+    variant = "#{variant.length}-" if variant_type.include? 'D'
+    variant = "#{variant.length}N" if variant.include? 'N'
+    VariantSite.new(ref_start: ref_pos.to_s, ref_end: ref_end, variant_type: variant_type,
+                    variant: variant, fasta_record_id: fasta_record_id)
   end
 end

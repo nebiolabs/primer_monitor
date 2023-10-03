@@ -2,7 +2,7 @@
 
 class Lineage < ApplicationRecord
   belongs_to :organism
-  has_many :pangolin_calls
+  has_many :pangolin_calls, dependent: :destroy
   has_many :fasta_records, through: :pangolin_calls
 
   def self.parse(pangolin_csv)
@@ -15,14 +15,8 @@ class Lineage < ApplicationRecord
       next if line.start_with?('taxon,')
 
       record_count += 1
-      if line.chomp.split("\t")[1].blank? || line.chomp.split(',')[1].nil?
-        ActiveRecord::Base.logger.info line.chomp.split(',')
-      end
-
-      # prevent trying to re-add lineages that are already in the database
-      next if Lineage.exists? name: line.chomp.split(',')[1]
-
-      new_lineage_names.add line.chomp.split(',')[1]
+      new_lineage = parse_record(line)
+      new_lineage_names.add new_lineage unless new_lineage.nil?
     end
 
     # if there are no records (not only pre-existing lineages, but nothing at all)
@@ -37,5 +31,18 @@ class Lineage < ApplicationRecord
     end
 
     new_lineages
+  end
+
+  def self.parse_record(line)
+    if line.chomp.split("\t")[1].blank? || line.chomp.split(',')[1].nil?
+      ActiveRecord::Base.logger.info line.chomp.split(',')
+    end
+
+    # prevent trying to re-add lineages that are already in the database
+    if Lineage.exists? name: line.chomp.split(',')[1]
+      nil
+    else
+      line.chomp.split(',')[1]
+    end
   end
 end

@@ -1,53 +1,68 @@
 nextflow.enable.dsl=2
 
-primer_monitor_path = '/mnt/bioinfo/prg/primer_monitor'
-output_path = '/mnt/hpc_scratch/primer_monitor'
+params.primer_monitor_path =
+primer_monitor_path = params.primer_monitor_path
+params.output_path =
+output_path = params.output_path
 
 params.pangolin_version_path =
 params.pangolin_data_version_path =
 
-params.flag_path = '/mnt/hpc_scratch/primer_monitor'
-
 params.temp_dir = '/tmp'
 temp_dir = params.temp_dir
 
-process get_new_versions {
+process get_pangolin_version {
     cpus 1
     penv 'smp'
     conda "'bash>=4.1'"
 
     output:
-    env latest_pangolin
-    env latest_pangolin_data
+        env pangolin_version
+        env pangolin_data_version
 
     shell:
     '''
     #! /usr/bin/env bash
-    touch "!{params.flag_path}/pangolin_version_mutex.lock"
-    # gets a file descriptor for the lock file, opened for writing, and saves its number in $lock_fd
-    exec {lock_fd}>"!{params.flag_path}/pangolin_version_mutex.lock"
-    flock $lock_fd
-    export latest_pangolin=$(conda search -q -c bioconda pangolin | awk '{ print $2 }' | tail -n 1)
-    export latest_pangolin_data=$(conda search -q -c bioconda pangolin-data | awk '{ print $2 }' | tail -n 1)
 
-    cp "!{params.pangolin_version_path}" "!{params.pangolin_version_path}.old"
-    cp "!{params.pangolin_data_version_path}" "!{params.pangolin_data_version_path}.old"
+    source "!{primer_monitor_path}/.env"
 
-    printf "$latest_pangolin" > "!{params.pangolin_version_path}"
-    printf "$latest_pangolin_data" > "!{params.pangolin_data_version_path}"
-    # closes the file descriptor in $lock_fd
-    exec {lock_fd}>&-
-    rm "!{params.flag_path}/pangolin_version_mutex.lock"
-    touch "!{params.flag_path}/recall_pangolin_running.lock";
+    use_pending="false"
+    pangolin_version=$(cat !{params.pangolin_version_path})
+    pangolin_data_version=$(cat !{params.pangolin_data_version_path})
     '''
+}
+
+process download_data {
+    // Downloads the full dataset
+    cpus 16
+    conda "ncbi-datasets-cli unzip zstd"
+    errorStrategy 'retry'
+    maxRetries 2
+
+    output:
+        tuple file('*.metadata.zst'), file('*.sequences.zst')
+
+    shell:
+    '''
+    date_today=$(date +%Y-%m-%d)
+    datasets download virus genome taxon 2697049 --complete-only --host human --filename tmp.zip
+    unzip tmp.zip
+    zstd --long=30 --ultra -22 -T!{task.cpus} ncbi_dataset/data/data_report.jsonl -o ${date_today}.metadata.zst
+    zstd --long=30 --ultra -22 -T!{task.cpus} ncbi_dataset/data/genomic.fna -o ${date_today}.sequences.zst
+    rm tmp.zip
+    rm -rf ncbi_dataset
+    '''
+
 }
 
 
 process extract_new_records {
-    // Get all (deduplicated) records as of yesterday's run
+    // Get all (deduplicated) records currently in the database
     cpus 1
-    conda "python=3.9 zstd seqtk"
+    conda "python=3.9 zstd seqtk 'postgresql>=15'"
 
+    input:
+        tuple file(metadata_json), file(sequences_fasta)
     output:
         file '*.tsv'
 
@@ -58,10 +73,16 @@ process extract_new_records {
     TMPDIR="!{temp_dir}"
     export TMPDIR
 
-    date_yesterday=$(date --date="yesterday" +%Y-%m-%d)
-    touch known_empty.json
-    python !{primer_monitor_path}/lib/parse_ncbi.py <(zstd -d --long=30 < !{output_path}/${date_yesterday}.metadata.zst) known_empty.json <(zstd -d --long=30 < !{output_path}/${date_yesterday}.sequences.zst | seqtk seq | paste - -) ${date_yesterday}.tsv
-    rm known_empty.json
+    source "!{primer_monitor_path}/.env"
+
+    date_today=$(date +%Y-%m-%d)
+
+    python !{primer_monitor_path}/lib/parse_ncbi.py \
+    --output-existing \
+    <(zstd -d --long=30 < !{metadata_json}) \
+    <(zstd -d --long=30 < !{sequences_fasta} | seqtk seq | paste - -) \
+    <(psql -h "$DB_HOST" -d "$DB_NAME" -U "$DB_USER_RO" -c "SELECT genbank_accession FROM fasta_records;" --csv -t) \
+    ${date_today}.tsv;
     '''
 
 }
@@ -79,11 +100,11 @@ process transform_data {
 
     shell:
     '''
-    date_yesterday=$(date --date="yesterday" +%Y-%m-%d)
+    date_today=$(date +%Y-%m-%d)
 
     # Create an empty FASTA in case there are no seqs
-    touch ${date_yesterday}.fasta
-    cat !{ncbi_tsv} | gawk -F'\t' -f !{primer_monitor_path}/lib/process_seqs.awk -v cur_date=${date_yesterday}
+    touch ${date_today}.fasta
+    cat !{ncbi_tsv} | gawk -F'\t' -f !{primer_monitor_path}/lib/process_seqs.awk -v cur_date=${date_today}
     '''
 
 }
@@ -140,7 +161,6 @@ process update_current_calls {
         file 'done.txt'
     shell:
     '''
-    touch "!{params.flag_path}/swapping_calls.lock"
     PGPASSFILE="!{primer_monitor_path}/config/.pgpass" !{primer_monitor_path}/lib/pangolin_calls/swap_current_calls.sh; touch done.txt;
     '''
 }
@@ -155,11 +175,7 @@ process update_new_calls {
         file all_done
     shell:
     '''
-    if [ ! -f "!{params.flag_path}/summarize_variants_running.lock" ]; then
-        PGPASSFILE="!{primer_monitor_path}/config/.pgpass" !{primer_monitor_path}/lib/pangolin_calls/swap_new_calls.sh; touch done.txt;
-    fi
-    rm "!{params.flag_path}/swapping_calls.lock"
-    rm "!{params.flag_path}/recall_pangolin_running.lock"
+    PGPASSFILE="!{primer_monitor_path}/config/.pgpass" !{primer_monitor_path}/lib/pangolin_calls/swap_new_calls.sh; touch done.txt;
     rm "!{params.pangolin_version_path}.old"
     rm "!{params.pangolin_data_version_path}.old"
     '''
@@ -167,38 +183,12 @@ process update_new_calls {
 
 
 workflow {
-    get_new_versions()
-    extract_new_records()
+    get_pangolin_version()
+    download_data()
+    extract_new_records(download_data.out)
     transform_data(extract_new_records.out.splitText(file: true, by: 2500).filter{ it.size()>77 })
-    pangolin_calls(get_new_versions.out[0], get_new_versions.out[1], transform_data.out)
+    pangolin_calls(get_pangolin_version.out[0], get_pangolin_version.out[1], transform_data.out)
     load_pangolin_data(pangolin_calls.out)
     update_current_calls(load_pangolin_data.out.collect())
     update_new_calls(update_current_calls.out)
-}
-
-workflow.onError {
-    println "removing lock files..."
-    //if it started swapping the calls, it's not possible to automatically recover
-    if(!(file("${params.flag_path}/swapping_calls.lock").exists()))
-    {
-        //if we've updated the pangolin version, roll it back
-        if(file("${params.pangolin_data_version_path}.old").exists())
-        {
-            pangolin_ver = file("${params.pangolin_version_path}")
-            pangolin_data_ver = file("${params.pangolin_data_version_path}")
-
-            pangolin_ver_old = file("${params.pangolin_version_path}.old")
-            pangolin_data_ver_old = file("${params.pangolin_data_version_path}.old")
-
-            pangolin_ver.delete()
-            pangolin_data_ver.delete()
-
-            pangolin_ver_old.renameTo("${params.pangolin_version_path}")
-            pangolin_data_ver_old.renameTo("${params.pangolin_data_version_path}")
-
-        }
-        //get rid of "pipeline running" lock
-        running_lock = file('${params.flag_path}/recall_pangolin_running.lock')
-        running_lock.delete()
-    }
 }

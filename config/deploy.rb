@@ -6,6 +6,8 @@ set :ssh_options, { forward_agent: true }
 set :repo_url, 'git@github.com:bwlang/primer_monitor.git'
 set :puma_service_name, 'puma'
 
+set :whenever_roles, [:app]
+
 # only migrate if there are migrations pending
 set :conditionally_migrate, true
 
@@ -13,6 +15,12 @@ set :conditionally_migrate, true
 # from https://coderwall.com/p/aridag/only-precompile-assets-when-necessary-rails-4-capistrano-3
 # set the locations that we will look for changed assets to determine whether to precompile
 set :assets_dependencies, %w[app/assets lib/assets vendor/assets Gemfile.lock config/routes.rb]
+
+set :backend_deploy_to, ->{ fetch(:backend_deploy_path) }
+
+# To get the backend path into whenever
+set :whenever_variables, ->{ "\"environment=#{fetch :whenever_environment}&backend_path=#{fetch(:backend_deploy_to)}\"" }
+set :whenever_identifier, ->{ "#{fetch(:application)}_#{fetch(:stage)}" }
 
 # clear the previous precompile task
 Rake::Task['deploy:assets:precompile'].clear_actions
@@ -27,6 +35,47 @@ append :linked_files, 'config/database.yml', 'config/master.key', '.env'
 append :linked_dirs,  'log', 'tmp/pids', 'tmp/cache', 'tmp/sockets', 'public/system'
 
 set :keep_releases, 10
+
+desc 'Deploy primer-monitor backend'
+task :backend do
+  set :whenever_roles, [:backend]
+  invoke 'backend:git'
+  invoke 'backend:bundle'
+  invoke 'backend:update_crontab'
+end
+
+namespace :backend do
+  desc 'Pull backend code from git'
+  task :git do
+    on roles(:backend) do
+      within fetch(:backend_deploy_to) do
+        execute("cd #{fetch(:backend_deploy_path)} && git pull && git checkout #{fetch(:branch)}")
+      end
+    end
+  end
+
+  desc 'Update the crontab on the backend'
+  # Apparently I can't change whenever_path per role, so I had to recreate the command here
+  task :update_crontab do
+    on roles(:backend) do
+      within fetch(:backend_deploy_to) do
+        with fetch(:whenever_command_environment_variables) do
+          args = fetch(:whenever_command)+[fetch(:whenever_update_flags), "--roles=backend", load_file]
+          execute(*args)
+        end
+      end
+    end
+  end
+
+  desc 'Install gems'
+  task :bundle do
+    on roles(:backend, :cluster) do
+      within fetch(:backend_deploy_to) do
+          execute(:bundle, :install)
+      end
+    end
+  end
+end
 
 namespace :deploy do
   desc 'Restart application'
@@ -140,5 +189,6 @@ namespace :deploy do
 
   after :published, :restart
   #after 'deploy:restart_services', 'deploy:seed'
+  after 'deploy:restart_services', 'backend'
 
 end

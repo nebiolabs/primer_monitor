@@ -19,6 +19,9 @@ Primer Monitor expects the data files hosted by the data server to be at the fol
 * `<organism taxid>/defaults.json`: A JSON file containing a key "tracks", with a value of a list of the internal names of the
   primer sets to select by default on initial page load.
 
+* `<organism taxid>/overrides.txt`: A plain text file containing the list of lineage groups (one per line) manually added to 
+  the visualization, whether they would have been auto-selected by the algorithm or not.
+
 * `<organism taxid>/config/tracks.json`: A JSON file with key-value pairs mapping the internal name of a primer set (used in URLs),
 to the name a user should see on the site (e.g. `"ARTIC_v4": "ARTIC v4"`). The list of available primer sets is
 also obtained from the list of key-value pairs in this file.
@@ -29,11 +32,14 @@ lineage sets is also obtained from the list of key-value pairs in this file.
 
 ### Primer sets
 
-* `<organism taxid>/primer_sets/<primer set name>/<lineage group name>.bed`: A BED file (minimum 9 columns) containing a record for
+* `<organism taxid>/primer_sets_status/<primer set name>/<lineage group name>.bed`: A BED file (minimum 9 columns) containing a record for
 each primer in the primer set. The color is used to mark whether the primer is affected by a variant in the specified
 lineage group.
 
-* `<organism taxid>/primer_sets_raw/<primer set name>.bed`: A BED file containing the raw primer annotations for
+* `<organism taxid>/primer_sets_bed/<primer set name>.bed`: A BED file containing the raw primer annotations for
+  each primer in the primer set.
+
+* `<organism taxid>/primer_sets_fasta/<primer set name>.fasta`: A FASTA file containing the raw primer sequences for
   each primer in the primer set.
 
 ### Lineage sets

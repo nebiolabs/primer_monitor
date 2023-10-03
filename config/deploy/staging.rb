@@ -6,9 +6,14 @@
 # server "example.com", user: "deploy", roles: %w{app db web}, my_property: :my_value
 # server "example.com", user: "deploy", roles: %w{app web}, other_property: :other_value
 # server "db.example.com", user: "deploy", roles: %w{db}
-server 'primer-monitor-extdev.neb.com', user: 'deploy', roles: %w{web app db}
+server 'primer-monitor-dev.neb.com', user: 'deploy', roles: %w{web app db}
+server 'hpc-g', user: 'primer-monitor', roles: %w{backend}, no_release: true
+server 'hpc-sandbox', user: 'primer-monitor', roles: %w{cluster}, no_release: true
 
-set :rails_env, 'production'
+# Ensure this matches $BACKEND_INSTALL_PATH on the remote server
+set :backend_deploy_path, '/mnt/bioinfo/prg/primer_monitor_staging'
+
+set :rails_env, 'staging'
 
 
 # role-based syntax

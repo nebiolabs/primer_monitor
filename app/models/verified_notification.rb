@@ -2,7 +2,7 @@
 
 class VerifiedNotification < ApplicationRecord
   belongs_to :user
-  has_many :proposed_notifications
+  has_many :proposed_notifications, dependent: :destroy
 
   # collects unsent notifications by user_id
   def self.find_or_create_verified_notifications!

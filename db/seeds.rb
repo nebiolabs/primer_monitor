@@ -8,7 +8,7 @@ admin = User.create_with(first: 'Admin', last: 'User',
                          password: Rails.application.credentials.admin_password,
                          password_confirmation: Rails.application.credentials.admin_password,
                          active: true, approved: true, confirmed: true)
-            .find_or_create_by!(email: 'primer-monitor@neb.com')
+            .find_or_create_by!(email: ENV['ADMIN_EMAIL'])
 
 %w[administrator pi operator participant].each do |role_name|
   Role.find_or_create_by!(name: role_name)
@@ -94,7 +94,7 @@ end
 # puts view_defs.keys
 conn = ActiveRecord::Base.connection
 # drops all views in views directory, reversed to deal with view interdependencies
-view_defs.keys.reverse.each do |v|
+view_defs.keys.reverse_each do |v|
   Rails.logger.info("dropping #{v}")
   conn.execute(
     view_defs[v][:view] && "drop view if exists #{v} CASCADE;" ||

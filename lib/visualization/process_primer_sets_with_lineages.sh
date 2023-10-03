@@ -12,7 +12,7 @@ primer_sets_list_path="$5";
 organism_path="$6";
 threads="$7"
 
-echo "$(date +'%b %d %H:%M:%S') - script started"
+echo "$(date +'%b %d %H:%M:%S') - overlap computation started"
 
 mkdir -p "$output_path"
 
@@ -23,7 +23,6 @@ fi
 variants_bed="$$_variants.bed"
 variants_counts_bed="$$_variants_with_counts.bed";
 echo "$(date +'%b %d %H:%M:%S') - starting DB fetch"
-echo "\"$(dirname "$0")/extract_all_variants.sh\" \"$cutoff_date\" > \"$variants_bed\";"
 "$(dirname "$0")/extract_all_variants.sh" "$cutoff_date" > "$variants_bed";
 echo "$(date +'%b %d %H:%M:%S') - DB fetch done"
 shift 7;
@@ -34,6 +33,6 @@ for lineage_set_path in "$@"; do
   "$(dirname "$0")/count_variants.sh" "$variants_bed" "$min_pct" "$organism_path/lineage_sets/$lineage_set_path" "$output_path" > "${lineage_set_name}_$variants_counts_bed";
   xargs "$(dirname "$0")/process_primer_sets.sh" "${lineage_set_name}_$variants_counts_bed" "$output_path" "$score_cutoff" "$threads" "$lineage_set_name" "$organism_path" < "$primer_sets_list_path";
 done
-echo "$(date +'%b %d %H:%M:%S') - script done"
+echo "$(date +'%b %d %H:%M:%S') - overlap computation done"
 
 rm "$$_variants.bed";

@@ -11,11 +11,10 @@ Rails.application.routes.draw do
   }
 
   root 'welcome#index'
-  get 'help', to: 'help#show'
   get 'about', to: 'about#show'
   get 'history', to: 'history#show'
-  get 'lineage_variants', to: 'lineage_variants#index'
   resources :organisms, param: :name do
+    get 'lineage_variants', to: 'lineage_variants#index'
     resources :lineages, param: :name, constraints: { name: /[A-Z]+(\.\d+)*/ }
   end
 

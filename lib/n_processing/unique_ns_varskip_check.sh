@@ -20,10 +20,10 @@ mkfifo $$_variants_new_novarskip;
 
 filename="$$_variants_new_varskip_wc"
 
-cat $$_variants_new_all_1 | grep "CDCBI-CRSP" | tee $$_variants_new_varskip > $filename &
+grep "CDCBI-CRSP" < $$_variants_new_all_1 | tee $$_variants_new_varskip > $filename &
 
 
-cat $$_variants_new_all_2 | grep -v "CDCBI-CRSP" | shuf | head -n "$(wc -l $filename | sed -E 's/^[[:space:]]*//g' | cut -f 1 -d ' ')" > $$_variants_new_novarskip &
+grep -v "CDCBI-CRSP" < $$_variants_new_all_2 | shuf | head -n "$(wc -l $filename | sed -E 's/^[[:space:]]*//g' | cut -f 1 -d ' ')" > $$_variants_new_novarskip &
 
 ./process_unique_region_ns.sh "$1" "$2" $$_variants_new_varskip "$4" > "$5";
 ./process_unique_region_ns.sh "$1" "$2" $$_variants_new_novarskip "$4" > "$6";

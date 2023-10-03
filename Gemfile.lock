@@ -106,6 +106,8 @@ GEM
     childprocess (4.1.0)
     chronic (0.10.2)
     cocoon (1.2.15)
+    composite_primary_keys (13.0.7)
+      activerecord (~> 6.1.0)
     concurrent-ruby (1.1.10)
     crass (1.0.6)
     devise (4.8.1)
@@ -347,6 +349,7 @@ DEPENDENCIES
   capistrano-rbenv (~> 2.2)
   capybara (>= 2.15)
   cocoon
+  composite_primary_keys
   devise (~> 4.8.1)
   dotenv-rails
   ed25519

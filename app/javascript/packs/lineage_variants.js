@@ -91,7 +91,7 @@ function loadPrimerSets(activePrimerSets, igvBrowser, activeLineageGroup)
             let primerSetData = primerSetsToNames[primerSetKey];
             const newTrack = {
                 "name": primerSetData[1],
-                "url": config['data_server']+"/"+config['organism_taxid']+"/primer_sets/"+encodeURIComponent(primerSetData[0])+"/"+encodeURIComponent(activeLineageGroup)+".bed",
+                "url": config['data_server']+"/"+config['organism_taxid']+"/primer_sets_status/"+encodeURIComponent(primerSetData[0])+"/"+encodeURIComponent(activeLineageGroup)+".bed",
                 "format": "bed",
                 "displayMode": "EXPANDED",
                 "autoHeight": true

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
 class ApplicationMailer < ActionMailer::Base
-  default from: 'primer-monitor@neb.com'
+  default from: ENV['ADMIN_EMAIL']
   layout 'mailer'
 end

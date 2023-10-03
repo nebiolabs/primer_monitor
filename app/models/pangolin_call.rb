@@ -4,7 +4,7 @@ require 'set'
 
 class PangolinCall < ApplicationRecord
   belongs_to :lineage
-  has_one :fasta_record
+  has_one :fasta_record, dependent: :nullify
 
   def self.parse(pangolin_csv)
     raise "Unable to find calls file #{pangolin_csv}" unless File.exist?(pangolin_csv)
@@ -16,7 +16,7 @@ class PangolinCall < ApplicationRecord
       next if line.start_with?('taxon,')
 
       record_count += 1
-      record = setup_pangolin_call(line)
+      record = build_pangolin_call(line)
       new_calls << record if record
     end
     raise "Unable to parse any records from #{pangolin_csv}" if record_count.zero?
@@ -24,7 +24,7 @@ class PangolinCall < ApplicationRecord
     new_calls
   end
 
-  def self.setup_pangolin_call(line)
+  def self.build_pangolin_call(line)
     (taxon, lineage, conflict, ambiguity_score, scorpio_call, scorpio_support, scorpio_conflict,
       scorpio_notes, version, pangolin_version, scorpio_version, constellation_version,
       is_designated, qc_status, qc_notes, note) = line.chomp.split(',')

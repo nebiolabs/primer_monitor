@@ -29,15 +29,15 @@
      inkscape:deskcolor="#d1d1d1"
      inkscape:document-units="pt"
      showgrid="false"
-     inkscape:zoom="1.0323759"
-     inkscape:cx="536.14192"
-     inkscape:cy="1116.3569"
+     inkscape:zoom="1"
+     inkscape:cx="490.5"
+     inkscape:cy="291.5"
      inkscape:window-width="1920"
      inkscape:window-height="945"
      inkscape:window-x="0"
      inkscape:window-y="25"
      inkscape:window-maximized="0"
-     inkscape:current-layer="edge15-8" />
+     inkscape:current-layer="svg348" />
   <g
      id="graph0"
      class="graph"
@@ -47,7 +47,7 @@
     <polygon
        fill="#ffffff"
        stroke="none"
-       points="-4,4 -4,-821 847.05,-821 847.05,4 "
+       points="847.05,-821 847.05,4 -4,4 -4,-821 "
        id="polygon4" />
     <!-- p0 -->
     <g
@@ -447,28 +447,6 @@
          style="fill:#000000;fill-opacity:1;stroke:none;stroke-opacity:1">complete_metadata_files</text>
     </g>
     <!-- p11 -->
-    <g
-       id="node12"
-       class="node">
-      <title
-         id="title139">p11</title>
-      <ellipse
-         fill="none"
-         stroke="#000000"
-         cx="140.36"
-         cy="-106.5"
-         rx="76.940002"
-         ry="18"
-         id="ellipse141" />
-      <text
-         text-anchor="middle"
-         x="140.36"
-         y="-101.45"
-         font-family="Times, serif"
-         font-size="14px"
-         id="text143"
-         style="fill:#000000;fill-opacity:1;stroke:none;stroke-opacity:1">update_new_calls</text>
-    </g>
     <!-- p9&#45;&gt;p11 -->
     <g
        id="edge13"
@@ -554,6 +532,29 @@
          font-family="Times, serif"
          font-size="14px"
          id="text173"
+         style="fill:#000000;fill-opacity:1;stroke:none;stroke-opacity:1">get_pangolin_version</text>
+    </g>
+    <g
+       id="node9-6"
+       class="node"
+       transform="translate(127.84128,-176.96527)">
+      <title
+         id="title169-5">p6</title>
+      <ellipse
+         fill="none"
+         stroke="#000000"
+         cx="465.35999"
+         cy="-445"
+         rx="90.760002"
+         ry="18"
+         id="ellipse171-7" />
+      <text
+         text-anchor="middle"
+         x="465.35999"
+         y="-439.95001"
+         font-family="Times, serif"
+         font-size="14px"
+         id="text173-6"
          style="fill:#000000;fill-opacity:1;stroke:none;stroke-opacity:1">get_pangolin_version</text>
     </g>
     <!-- p6&#45;&gt;p8 -->
@@ -651,7 +652,8 @@
     <!-- p12 -->
     <g
        id="node13"
-       class="node">
+       class="node"
+       transform="translate(0,-88.505193)">
       <title
          id="title210">p12</title>
       <ellipse
@@ -674,7 +676,7 @@
     <g
        id="node13-0"
        class="node"
-       transform="translate(0.35905226,89.210153)">
+       transform="translate(0.35905226,0.70496034)">
       <title
          id="title210-2">p12</title>
       <ellipse
@@ -696,33 +698,9 @@
     </g>
     <!-- p11&#45;&gt;p12 -->
     <g
-       id="edge15"
-       class="edge">
-      <title
-         id="title217">p11-&gt;p12</title>
-      <path
-         fill="none"
-         stroke="#000000"
-         d="m 140.36,-88.41 c 0,11.77 0,27.68 0,41.3"
-         id="path219" />
-      <polygon
-         fill="#000000"
-         stroke="#000000"
-         points="143.86,-47.35 140.36,-37.35 136.86,-47.35 "
-         id="polygon221" />
-      <text
-         text-anchor="middle"
-         x="154.9901"
-         y="-57.200001"
-         font-family="Times, serif"
-         font-size="14px"
-         id="text223"
-         style="fill:#000000;fill-opacity:1;stroke:none;stroke-opacity:1">done</text>
-    </g>
-    <g
        id="edge15-8"
        class="edge"
-       transform="translate(-1.4427443,89.036394)">
+       transform="translate(-1.4427443,0.53120134)">
       <title
          id="title217-1">p11-&gt;p12</title>
       <path
@@ -733,7 +711,7 @@
       <polygon
          fill="#000000"
          stroke="#000000"
-         points="136.86,-47.35 143.86,-47.35 140.36,-37.35 "
+         points="140.36,-37.35 136.86,-47.35 143.86,-47.35 "
          id="polygon221-7" />
       <text
          text-anchor="middle"
@@ -745,28 +723,6 @@
          style="fill:#000000;fill-opacity:1;stroke:none;stroke-opacity:1">complete</text>
     </g>
     <!-- p0b -->
-    <g
-       id="node14"
-       class="node">
-      <title
-         id="title226">p0b</title>
-      <ellipse
-         fill="none"
-         stroke="#000000"
-         cx="592.35999"
-         cy="-622"
-         rx="77.449997"
-         ry="18"
-         id="ellipse228" />
-      <text
-         text-anchor="middle"
-         x="592.35999"
-         y="-616.95001"
-         font-family="Times, serif"
-         font-size="14px"
-         id="text230"
-         style="fill:#000000;fill-opacity:1;stroke:none;stroke-opacity:1">get_new_versions</text>
-    </g>
     <!-- p4b -->
     <g
        id="node15"
@@ -1096,89 +1052,6 @@
   </g>
   <text
      xml:space="preserve"
-     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.0007px;font-family:sans-serif;-inkscape-font-specification:sans-serif;fill:#1e26ff;fill-opacity:1;stroke-width:0.750044"
-     x="571.07098"
-     y="192.9276"
-     id="text562-6"
-     inkscape:transform-center-x="25.686441"
-     inkscape:transform-center-y="-111.99288"><tspan
-       sodipodi:role="line"
-       id="tspan560-6"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.0007px;font-family:Times, serif;-inkscape-font-specification:'Times, serif';fill:#1e26ff;fill-opacity:1;stroke:none;stroke-width:0.750044;stroke-opacity:1"
-       x="571.07098"
-       y="192.9276">PR set</tspan></text>
-  <text
-     xml:space="preserve"
-     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.0007px;font-family:sans-serif;-inkscape-font-specification:sans-serif;fill:#1e26ff;fill-opacity:1;stroke-width:0.750044"
-     x="641.45178"
-     y="635.24817"
-     id="text562-7"
-     inkscape:transform-center-x="5.1372881"
-     inkscape:transform-center-y="-69.35339"><tspan
-       sodipodi:role="line"
-       id="tspan560-8"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.0007px;font-family:Times, serif;-inkscape-font-specification:'Times, serif';fill:#1e26ff;fill-opacity:1;stroke:none;stroke-width:0.750044;stroke-opacity:1"
-       x="641.45178"
-       y="635.24817">SR tested</tspan></text>
-  <text
-     xml:space="preserve"
-     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.0007px;font-family:sans-serif;-inkscape-font-specification:sans-serif;fill:#1e26ff;fill-opacity:1;stroke-width:0.750044"
-     x="630.66357"
-     y="656.82477"
-     id="text562-4"><tspan
-       sodipodi:role="line"
-       id="tspan560-1"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.0007px;font-family:Times, serif;-inkscape-font-specification:'Times, serif';fill:#1e26ff;fill-opacity:1;stroke:none;stroke-width:0.750044;stroke-opacity:1"
-       x="630.66357"
-       y="656.82477">PR, <tspan
-   style="fill:#e90000;fill-opacity:1"
-   id="tspan4996">SC</tspan> cleared</tspan></text>
-  <text
-     xml:space="preserve"
-     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.0007px;font-family:sans-serif;-inkscape-font-specification:sans-serif;fill:#1e26ff;fill-opacity:1;stroke-width:0.750044"
-     x="453.42703"
-     y="368.62283"
-     id="text562-71"><tspan
-       sodipodi:role="line"
-       id="tspan560-87"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.0007px;font-family:Times, serif;-inkscape-font-specification:'Times, serif';fill:#1e26ff;fill-opacity:1;stroke:none;stroke-width:0.750044;stroke-opacity:1"
-       x="453.42703"
-       y="368.62283">SR set</tspan></text>
-  <text
-     xml:space="preserve"
-     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:22.0013px;font-family:sans-serif;-inkscape-font-specification:sans-serif;fill:#1e26ff;fill-opacity:1;stroke-width:0.750044;stroke:none;stroke-opacity:1"
-     x="452.12064"
-     y="308.36438"
-     id="text562-71-8"><tspan
-       sodipodi:role="line"
-       id="tspan560-87-2"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:22.0013px;font-family:Times, serif;-inkscape-font-specification:'Times, serif';fill:#1e26ff;fill-opacity:1;stroke:none;stroke-width:0.750044;stroke-opacity:1"
-       x="452.12064"
-       y="308.36438">SR</tspan></text>
-  <text
-     xml:space="preserve"
-     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:22.0013px;font-family:sans-serif;-inkscape-font-specification:sans-serif;fill:#1e26ff;fill-opacity:1;stroke-width:0.750044;stroke:none;stroke-opacity:1"
-     x="570.35699"
-     y="158.38138"
-     id="text562-71-8-9"><tspan
-       sodipodi:role="line"
-       id="tspan560-87-2-2"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:22.0013px;font-family:Times, serif;-inkscape-font-specification:'Times, serif';fill:#1e26ff;fill-opacity:1;stroke:none;stroke-width:0.750044;stroke-opacity:1"
-       x="570.35699"
-       y="158.38138">PR</tspan></text>
-  <text
-     xml:space="preserve"
-     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:22.0013px;font-family:sans-serif;-inkscape-font-specification:sans-serif;fill:#e90000;fill-opacity:1;stroke:none;stroke-width:0.750044;stroke-opacity:1"
-     x="199.10411"
-     y="451.16986"
-     id="text562-71-8-2"><tspan
-       sodipodi:role="line"
-       id="tspan560-87-2-7"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:22.0013px;font-family:Times, serif;-inkscape-font-specification:'Times, serif';fill:#e90000;fill-opacity:1;stroke:none;stroke-width:0.750044;stroke-opacity:1"
-       x="199.10411"
-       y="451.16986">LD</tspan></text>
-  <text
-     xml:space="preserve"
      style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:22.0013px;font-family:sans-serif;-inkscape-font-specification:sans-serif;fill:#1e26ff;fill-opacity:1;stroke:none;stroke-width:0.750044;stroke-opacity:1"
      x="176.0529"
      y="560.8559"
@@ -1188,17 +1061,6 @@
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:22.0013px;font-family:Times, serif;-inkscape-font-specification:'Times, serif';fill:#4964c5;fill-opacity:1;stroke:none;stroke-width:0.750044;stroke-opacity:1"
        x="176.0529"
        y="560.8559">@</tspan></text>
-  <text
-     xml:space="preserve"
-     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:22.0013px;font-family:sans-serif;-inkscape-font-specification:sans-serif;fill:#1e26ff;fill-opacity:1;stroke:none;stroke-width:0.750044;stroke-opacity:1"
-     x="73.510887"
-     y="721.62665"
-     id="text562-71-8-2-8-4"><tspan
-       sodipodi:role="line"
-       id="tspan560-87-2-7-9-6"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:22.0013px;font-family:Times, serif;-inkscape-font-specification:'Times, serif';fill:#4964c5;fill-opacity:1;stroke:none;stroke-width:0.750044;stroke-opacity:1"
-       x="73.510887"
-       y="721.62665">@</tspan></text>
   <text
      xml:space="preserve"
      style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:22.0013px;font-family:sans-serif;-inkscape-font-specification:sans-serif;fill:#1e26ff;fill-opacity:1;stroke:none;stroke-width:0.750044;stroke-opacity:1"
@@ -1246,17 +1108,6 @@
   <text
      xml:space="preserve"
      style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:22.0013px;font-family:sans-serif;-inkscape-font-specification:sans-serif;fill:#1e26ff;fill-opacity:1;stroke:none;stroke-width:0.750044;stroke-opacity:1"
-     x="526.18121"
-     y="206.31305"
-     id="text562-71-8-2-8-01"><tspan
-       sodipodi:role="line"
-       id="tspan560-87-2-7-9-9"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:22.0013px;font-family:Times, serif;-inkscape-font-specification:'Times, serif';fill:#4964c5;fill-opacity:1;stroke:none;stroke-width:0.750044;stroke-opacity:1"
-       x="526.18121"
-       y="206.31305">&amp;</tspan></text>
-  <text
-     xml:space="preserve"
-     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:22.0013px;font-family:sans-serif;-inkscape-font-specification:sans-serif;fill:#1e26ff;fill-opacity:1;stroke:none;stroke-width:0.750044;stroke-opacity:1"
      x="386.64197"
      y="382.85794"
      id="text562-71-8-2-8-3"><tspan
@@ -1267,88 +1118,37 @@
        y="382.85794">%</tspan></text>
   <text
      xml:space="preserve"
-     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:22.0013px;font-family:sans-serif;-inkscape-font-specification:sans-serif;fill:#e90000;fill-opacity:1;stroke:none;stroke-width:0.750044;stroke-opacity:1"
-     x="607.40961"
-     y="323.30194"
-     id="text562-71-8-4"><tspan
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:22.0013px;font-family:sans-serif;-inkscape-font-specification:sans-serif;fill:#1e26ff;fill-opacity:1;stroke:none;stroke-width:0.750044;stroke-opacity:1"
+     x="515.11176"
+     y="206.00757"
+     id="text562-71-8-2-8-3-1"><tspan
        sodipodi:role="line"
-       id="tspan560-87-2-3"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:22.0013px;font-family:Times, serif;-inkscape-font-specification:'Times, serif';fill:#e90000;fill-opacity:1;stroke:none;stroke-width:0.750044;stroke-opacity:1"
-       x="607.40961"
-       y="323.30194">SC</tspan></text>
+       id="tspan560-87-2-7-9-7-4"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:22.0013px;font-family:Times, serif;-inkscape-font-specification:'Times, serif';fill:#4964c5;fill-opacity:1;stroke:none;stroke-width:0.750044;stroke-opacity:1"
+       x="515.11176"
+       y="206.00757">%</tspan></text>
   <text
      xml:space="preserve"
      style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.0007px;font-family:sans-serif;-inkscape-font-specification:sans-serif;fill:#1e26ff;fill-opacity:1;stroke-width:0.750044"
-     x="106.50774"
-     y="728.82288"
-     id="text562-71-5"><tspan
-       sodipodi:role="line"
-       id="tspan560-87-6"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.0007px;font-family:Times, serif;-inkscape-font-specification:'Times, serif';fill:#1e26ff;fill-opacity:1;stroke:none;stroke-width:0.750044;stroke-opacity:1"
-       x="106.50774"
-       y="728.82288">SR, <tspan
-   style="fill:#e90000;fill-opacity:1"
-   id="tspan8435">LD</tspan> cleared</tspan></text>
-  <text
-     xml:space="preserve"
-     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.0007px;font-family:sans-serif;-inkscape-font-specification:sans-serif;fill:#1e26ff;fill-opacity:1;stroke-width:0.750044"
-     x="123.46081"
-     y="709.30127"
-     id="text562-71-53"><tspan
-       sodipodi:role="line"
-       id="tspan560-87-0"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.0007px;font-family:Times, serif;-inkscape-font-specification:'Times, serif';fill:#1e26ff;fill-opacity:1;stroke:none;stroke-width:0.750044;stroke-opacity:1"
-       x="123.46081"
-       y="709.30127">PR tested</tspan></text>
-  <text
-     xml:space="preserve"
-     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.0007px;font-family:sans-serif;-inkscape-font-specification:sans-serif;fill:#1e26ff;fill-opacity:1;stroke-width:0.750044"
-     x="102.4735"
-     y="457.62393"
-     id="text562-71-53-2"><tspan
-       sodipodi:role="line"
-       id="tspan560-87-0-1"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.0007px;font-family:Times, serif;-inkscape-font-specification:'Times, serif';fill:#e90000;fill-opacity:1;stroke:none;stroke-width:0.750044;stroke-opacity:1"
-       x="102.4735"
-       y="457.62393">LD set</tspan><tspan
-       sodipodi:role="line"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.0007px;font-family:Times, serif;-inkscape-font-specification:'Times, serif';fill:#e90000;fill-opacity:1;stroke:none;stroke-width:0.750044;stroke-opacity:1"
-       x="102.4735"
-       y="473.07278"
-       id="tspan6107" /></text>
-  <text
-     xml:space="preserve"
-     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.0007px;font-family:sans-serif;-inkscape-font-specification:sans-serif;fill:#1e26ff;fill-opacity:1;stroke-width:0.750044"
-     x="174.87663"
+     x="202.48448"
      y="580.86908"
      id="text562-71-53-2-1"><tspan
        sodipodi:role="line"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.0007px;font-family:Times, serif;-inkscape-font-specification:'Times, serif';fill:#4964c5;fill-opacity:1;stroke:none;stroke-width:0.750044;stroke-opacity:1"
-       x="174.87663"
+       x="202.48448"
        y="580.86908"
-       id="tspan6107-0">writes to pending if use_pending</tspan></text>
+       id="tspan1218">writes to current</tspan></text>
   <text
      xml:space="preserve"
      style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.0007px;font-family:sans-serif;-inkscape-font-specification:sans-serif;fill:#1e26ff;fill-opacity:1;stroke-width:0.750044"
-     x="406.87445"
-     y="350.55942"
-     id="text562-71-53-2-1-4"><tspan
-       sodipodi:role="line"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.0007px;font-family:Times, serif;-inkscape-font-specification:'Times, serif';fill:#4964c5;fill-opacity:1;stroke:none;stroke-width:0.750044;stroke-opacity:1"
-       x="406.87445"
-       y="350.55942"
-       id="tspan6107-0-7">use_pending = true if PR</tspan></text>
-  <text
-     xml:space="preserve"
-     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.0007px;font-family:sans-serif;-inkscape-font-specification:sans-serif;fill:#1e26ff;fill-opacity:1;stroke-width:0.750044"
-     x="594.89917"
+     x="618.14789"
      y="405.52838"
      id="text562-71-53-2-1-8"><tspan
        sodipodi:role="line"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.0007px;font-family:Times, serif;-inkscape-font-specification:'Times, serif';fill:#4964c5;fill-opacity:1;stroke:none;stroke-width:0.750044;stroke-opacity:1"
-       x="594.89917"
+       x="618.14789"
        y="405.52838"
-       id="tspan6107-0-4">always writes to pending</tspan></text>
+       id="tspan6107-0-4">writes to pending</tspan></text>
   <text
      xml:space="preserve"
      style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.0007px;font-family:sans-serif;-inkscape-font-specification:sans-serif;fill:#1e26ff;fill-opacity:1;stroke-width:0.750044"
@@ -1359,117 +1159,25 @@
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.0007px;font-family:Times, serif;-inkscape-font-specification:'Times, serif';fill:#4964c5;fill-opacity:1;stroke:none;stroke-width:0.750044;stroke-opacity:1"
        x="614.93463"
        y="671.12616"
-       id="tspan6107-0-0">only runs if not SR</tspan></text>
-  <text
-     xml:space="preserve"
-     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.0007px;font-family:sans-serif;-inkscape-font-specification:sans-serif;fill:#1e26ff;fill-opacity:1;stroke-width:0.750044"
-     x="98.12339"
-     y="743.56195"
-     id="text562-71-53-2-1-6"><tspan
-       sodipodi:role="line"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.0007px;font-family:Times, serif;-inkscape-font-specification:'Times, serif';fill:#4964c5;fill-opacity:1;stroke:none;stroke-width:0.750044;stroke-opacity:1"
-       x="98.12339"
-       y="743.56195"
-       id="tspan6107-0-2">only runs if not PR</tspan></text>
-  <text
-     xml:space="preserve"
-     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.0007px;font-family:sans-serif;-inkscape-font-specification:sans-serif;fill:#1e26ff;fill-opacity:1;stroke-width:0.750044"
-     x="644.42474"
-     y="369.21283"
-     id="text562-71-53-2-7"><tspan
-       sodipodi:role="line"
-       id="tspan560-87-0-1-9"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.0007px;font-family:Times, serif;-inkscape-font-specification:'Times, serif';fill:#e90000;fill-opacity:1;stroke:none;stroke-width:0.750044;stroke-opacity:1"
-       x="644.42474"
-       y="369.21283">SC set</tspan><tspan
-       sodipodi:role="line"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.0007px;font-family:Times, serif;-inkscape-font-specification:'Times, serif';fill:#e90000;fill-opacity:1;stroke:none;stroke-width:0.750044;stroke-opacity:1"
-       x="644.42474"
-       y="384.66168"
-       id="tspan6107-4" /></text>
-  <text
-     xml:space="preserve"
-     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.0007px;font-family:sans-serif;-inkscape-font-specification:sans-serif;fill:#1e26ff;fill-opacity:1;stroke-width:0.750044"
-     x="449.31723"
-     y="391.74066"
-     id="text562-8"><tspan
-       sodipodi:role="line"
-       id="tspan560-7"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.0007px;font-family:Times, serif;-inkscape-font-specification:'Times, serif';fill:#1e26ff;fill-opacity:1;stroke:none;stroke-width:0.750044;stroke-opacity:1"
-       x="449.31723"
-       y="391.74066">PR tested</tspan></text>
+       id="tspan6107-0-0" /></text>
   <path
      style="fill:none;fill-opacity:1;stroke:none;stroke-width:0.750044;stroke-opacity:1"
      d="m 569.21154,167.45135 c 1.36994,0.34248 3.76735,2.3974 4.10983,1.02745 0.34249,-1.36994 -5.52194,-1.02745 -4.10983,-1.02745 4.54633,0 11.45824,2.02368 16.43933,1.02745 2.73372,-0.54674 5.49569,-1.37392 8.21965,-2.05491 2.98616,-0.74654 7.13661,0 10.27458,0 7.87718,0 15.75435,0 23.63153,0 2.62251,0 15.47326,-0.99676 17.46678,0 4.70227,2.35113 -4.35993,-0.42585 3.08237,2.05491 1.34799,0.44934 4.13114,0.0213 5.13729,1.02746 0.24218,0.24218 -0.24217,0.78529 0,1.02746 4.0099,4.00989 0.5518,-0.23783 3.08238,1.02746 4.27603,2.13801 -1.0984,-0.071 1.02745,2.05491 0.43055,0.43055 2.45967,0.71611 3.08238,1.02746 1.23294,0.61648 1.84942,2.4659 3.08237,3.08237 0.6227,0.31135 2.65182,0.59691 3.08237,1.02746 0.24218,0.24217 -0.24217,0.78529 0,1.02746 0.76582,0.76582 2.18124,0.42669 3.08237,1.02746 0.0943,0.0628 9.09014,11.54455 9.24712,12.32949 0.2015,1.00751 -0.32491,2.10764 0,3.08237 1.4362,4.30859 6.36028,6.55582 8.21967,10.27458 1.30863,2.61727 1.4592,5.78491 3.08237,8.21966 0.806,1.209 2.21054,1.91994 3.08237,3.08237 0.36263,0.48351 0.62799,2.68291 1.02746,3.08238 0.54152,0.54151 1.41771,0.60265 2.05491,1.02745 1.5807,1.05381 2.52913,3.05603 4.10984,4.10983 5.42315,3.61544 10.36507,6.4895 15.41186,10.27458 1.77428,1.33071 9.38659,5.41623 10.27457,7.1922 0.48435,0.9687 0.37764,2.21595 1.02746,3.08237 0.4595,0.61266 1.41772,0.60266 2.05492,1.02747 1.29751,0.865 2.24007,2.84637 3.08237,4.10983 0.34249,0.68497 0.68497,1.36994 1.02746,2.05491 0,0.34249 -0.15317,0.72113 0,1.02746 0.89309,1.78619 2.3999,3.2605 3.08237,5.13728 0.71194,1.95784 0.31552,4.20692 1.02746,6.16475 0.68247,1.87678 2.3407,3.2831 3.08237,5.13729 4.38878,4.6839 2.08217,11.1674 4.10983,16.43932 0.99122,2.57717 3.04783,4.6434 4.10983,7.1922 0.57636,1.38326 0.88671,6.46735 2.05495,8.21967 0.18998,0.28496 0.87425,-0.30633 1.02741,0 0.54798,1.09596 -0.54799,3.01387 0,4.10983 0.43322,0.86643 1.62174,1.18849 2.05497,2.05492 0.75319,1.50647 1.46288,4.38871 2.05489,6.16474 0.34915,1.04754 -0.60063,3.20895 0,4.10983 0.53733,0.80601 1.51757,1.24891 2.0549,2.05491 1.35225,2.02842 -0.10636,12.64852 -1.02749,15.41187 -0.15316,0.45949 -0.90995,0.55757 -1.02741,1.02746 -0.72529,2.90106 0.72522,6.34606 0,9.24712 -0.37149,1.48591 -1.68347,2.62392 -2.05489,4.10983 -0.59344,2.37353 -0.22239,3.74943 -1.02749,6.16474 -0.69446,2.08329 0.29522,10.86502 1.02749,12.32949 0.21653,0.43322 0.87425,0.56797 1.02741,1.02746 0.17123,0.51373 -0.0856,2.31178 0,3.08238 0.60146,5.41328 1.18184,10.17328 2.05489,15.41186 0.79385,4.76292 0,14.39473 0,17.46678 0,13.69943 0,27.39887 0,41.0983 0,5.07654 -0.42062,10.36418 0,15.41187 0.49481,5.93769 2.49427,11.58533 3.08238,17.46678 0.39048,3.90463 -0.0983,7.71337 2.05497,11.30203 0.49833,0.83066 1.62168,1.18849 2.0549,2.05492 0.63146,1.26302 0.39595,2.84681 1.02741,4.10983 0.43323,0.86643 1.51764,1.24892 2.05497,2.05492 0.56989,0.85489 -0.32492,2.10764 0,3.08237 0.15316,0.4595 0.87425,0.56797 1.02741,1.02746 2.43082,7.29246 0.80862,16.15347 2.05497,23.63153 0.4099,2.45941 1.72533,4.72074 2.0549,7.1922 0.36212,2.71585 -0.11408,5.48215 0,8.21966 0.22854,5.48571 0.58961,10.96634 1.02741,16.43932 1.75248,21.90536 0.37195,-4.69549 2.05497,20.54915 0.24954,3.74293 -0.33962,7.56682 0,11.30204 1.61664,17.78298 0.11341,-1.37428 3.08238,16.43932 0.78822,4.72957 0,9.58961 0,14.38441 0,4.7948 0.43405,9.6093 0,14.38441 -0.71037,7.81411 -5.38824,13.99977 -7.19225,21.57661 -1.21342,5.09655 -1.42561,10.44168 -3.08238,15.41186 -0.78094,2.34297 -2.78386,4.08116 -4.10979,6.16475 -3.47848,5.46618 -3.57351,6.75408 -8.21966,12.32949 -1.55034,1.86043 -3.60373,3.26296 -5.13727,5.13729 -1.56394,1.91144 -2.46908,4.31887 -4.10986,6.16474 -5.51362,6.20283 -14.10572,8.06098 -21.57661,10.27458 -7.56081,2.24024 -17.44267,6.22235 -25.68645,7.19221 -9.97806,1.17388 -19.80682,0.94497 -29.79627,2.05491 -14.31293,1.59032 6.15164,0.44221 -12.32949,3.08237 -9.80935,1.40134 -22.57199,0 -32.87865,0 -8.4315,0 -28.75589,1.62196 -36.98847,-3.08237 -1.2616,-0.72091 -1.8364,-2.33479 -3.08238,-3.08238 -5.98027,-3.58816 -12.83599,-3.97597 -18.49423,-8.21965 -3.09983,-2.32488 -5.36335,-5.60138 -8.21966,-8.21967 -2.32761,-2.13364 -4.95947,-3.93201 -7.1922,-6.16474 -5.84384,-5.84384 -12.79103,-16.61789 -17.46679,-23.63153 -1.02305,-1.53459 -1.07741,-3.57329 -2.05491,-5.13729 -0.90759,-1.45214 -2.23277,-2.62302 -3.08237,-4.10983 -2.73856,-4.79247 -3.23641,-10.34283 -5.1373,-15.41186 -0.53779,-1.43413 -1.51711,-2.67571 -2.05491,-4.10983 -2.5364,-6.76374 -2.49711,-13.52603 -3.08237,-20.54916 -0.14503,-1.7403 -0.86935,-3.39812 -1.02746,-5.13728 -0.50818,-5.58999 0,-11.87093 0,-17.46678 0,-3.42486 -0.83065,-6.95198 0,-10.27458 2.5007,-10.0028 2.7704,-5.46732 5.13729,-13.35695 1.70691,-5.6897 3.69526,-11.69867 5.13729,-17.46678 1.36971,-5.47883 1.87732,-15.17507 5.13729,-19.52169 1.45304,-1.9374 3.62443,-3.24623 5.13729,-5.1373 2.7317,-3.41462 5.43248,-8.96341 6.16474,-13.35695 2.05283,-12.31697 -3.69064,10.65274 1.02746,-8.21965 0.90097,-3.60389 2.95479,-6.80947 4.10983,-10.27458 0.41098,-1.23295 -0.41099,-2.87689 0,-4.10983 0.24217,-0.72652 0.84171,-1.31196 1.02746,-2.05492 1.65963,-6.63854 -0.99573,-15.63397 0,-22.60406 0.30633,-2.1443 1.74858,-4.02045 2.05491,-6.16475 0.43796,-3.06574 0.27661,-6.24374 1.02746,-9.24712 0.18574,-0.74296 0.68497,-1.36994 1.02745,-2.05492 0.3425,-1.02745 0.76479,-2.03167 1.02747,-3.08237 0.97664,-3.90659 1.84597,-9.64774 3.08237,-13.35695 0.15316,-0.45949 0.87429,-0.56797 1.02746,-1.02746 0.78008,-2.34024 -0.39924,-5.8242 0,-8.21966 1.01292,-6.07754 1.88144,-12.4896 3.08237,-18.49424 1.73017,-8.65086 0.0159,-0.0317 2.05491,-4.10983 0.4595,-0.91898 -0.24919,-2.08559 0,-3.08237 1.24039,-4.96154 0.48827,0.0509 2.05492,-3.08237 0.47043,-0.94086 -0.13364,-4.60271 0,-5.13729 0.11747,-0.46989 0.81085,-0.59424 1.02745,-1.02745 0.52271,-1.04541 -0.81456,-4.32273 0,-5.1373 0.24218,-0.24217 0.78529,0.24218 1.02747,0 0.0712,-0.0712 0,-20.96023 0,-21.57661 0,-17.40365 0.7897,-35.02691 0,-52.40034 -0.0793,-1.74454 -0.88244,-3.39697 -1.02747,-5.13728 -0.19909,-2.38913 0.42886,-4.83348 0,-7.19221 -0.27398,-1.50693 -1.63413,-2.63712 -2.05491,-4.10983 -0.28226,-0.98792 0.16891,-2.0689 0,-3.08237 -0.40885,-2.45306 -4.41104,-16.59885 -6.16474,-19.5217 -0.49839,-0.83065 -1.51758,-1.24891 -2.05492,-2.05492 -0.18997,-0.28496 0,-0.68497 0,-1.02745 -0.34249,-0.68497 -0.48594,-1.5134 -1.02746,-2.05492 -0.24217,-0.24217 -0.82196,0.27399 -1.02745,0 -1.83798,-2.45063 -2.53379,-5.59291 -4.10983,-8.21966 -0.96367,-1.6061 -3.7725,-2.74503 -5.13729,-4.10983 -3.42486,-3.42486 -6.71558,-6.98934 -10.27458,-10.27457 -2.34436,-2.16403 -2.83076,-1.69846 -5.13729,-3.08238 -3.68601,-2.21161 -7.85978,-4.61051 -11.30203,-7.1922 -1.52538,-1.14403 -2.52713,-3.0547 -4.10983,-4.10983 -1.8066,-1.2044 -4.64684,-2.59193 -6.16475,-4.10984 -0.87317,-0.87317 -1.314,-2.09449 -2.05491,-3.08236 -1.62188,-2.16251 -3.63943,-3.91796 -5.13729,-6.16475 -4.90948,-7.36422 -4.10983,-20.09225 -4.10983,-28.76882 0,-2.27432 -0.72634,-6.04066 0,-8.21966 0.15316,-0.45949 0.87429,-0.56796 1.02745,-1.02745 0.21661,-0.64982 -0.2166,-1.4051 0,-2.05492 1.49804,-4.49412 5.40599,-6.68637 9.24712,-9.24712 1.98304,-1.32202 5.31818,-0.0904 7.19221,-1.02746 4.9674,-2.4837 -9.20087,-0.13421 6.16474,-2.05491 3.35543,-0.41943 6.94185,0.55546 10.27458,0 1.5108,-0.2518 2.62392,-1.68344 4.10983,-2.05492 1.61169,-0.40292 3.52559,0.40293 5.13729,0 0.73213,-0.18303 4.69977,-1.94553 5.13729,-2.05491 2.70396,-0.676 4.51345,-0.13455 7.1922,-1.02746 1.40345,-0.46782 11.29405,1.01948 11.30203,1.02746 0.24217,0.24217 -0.24217,0.78528 0,1.02745 1.23485,1.23485 3.44309,-0.6039 5.13729,-1.02745 z"
      id="path9291" />
-  <path
-     style="fill:none;fill-opacity:1;stroke:#1e26ff;stroke-width:0.750044;stroke-opacity:1"
-     d="m 643.69874,169.98197 c -51.1683,-11.32626 -142.39837,-16.56114 -142.39837,53.03612 0,18.35162 12.78175,39.69592 26.1548,51.58308 55.45032,49.28917 42.1383,130.48509 42.1383,197.61406 0,21.98576 5.52758,52.43685 -1.45305,73.37875 -12.3518,37.05541 -21.72861,91.8743 -5.08565,129.32097 7.59352,17.08542 34.58576,31.82332 50.85656,39.95872 22.2852,11.14261 57.0298,15.67275 81.37049,8.71827 10.13076,-2.8945 19.85517,-12.17613 29.06089,-17.43654 91.9704,-52.5545 66.98448,-122.836 52.30957,-215.77712 C 767.96662,435.36865 789.80895,276.84017 740.3262,239.7281 723.04172,226.76474 703.28115,221.88183 686.56355,209.94068 667.35684,196.2216 668.947,173.13799 643.69874,169.98197 Z"
-     id="path10104" />
-  <path
-     style="fill:none;fill-opacity:1;stroke:#1e26ff;stroke-width:0.750044;stroke-opacity:1"
-     d="m 401.04029,325.45773 c -24.30064,15.95307 -20.13519,49.24794 -40.68524,64.66048 -18.58292,13.93719 -47.0015,13.6927 -67.56657,23.97523 -23.20251,11.60126 -43.47007,36.9718 -65.38701,51.58309 -19.53228,13.02152 -55.11059,8.57813 -70.47266,29.06089 -17.23098,22.97464 -14.19199,54.03112 -21.79567,80.64398 -2.91637,10.20732 -45.125997,45.93414 -57.395255,70.47265 -16.863094,33.72619 -51.357976,73.28665 -4.359135,104.61919 41.54493,27.69665 153.17961,29.05551 185.26318,-9.44476 25.41241,-30.49489 41.96656,-77.60909 74.10527,-101.71312 58.4547,-43.84103 121.33825,-77.01889 177.99796,-124.23532 47.70355,-39.75296 50.13004,-36.91547 50.13004,-118.42313 0,-18.82819 2.60112,-45.99962 -14.53045,-58.8483 -21.53536,-16.15152 -130.03577,-39.07108 -145.30446,-12.35088 z"
-     id="path10106" />
-  <path
-     style="fill:none;fill-opacity:1;stroke:#e90000;stroke-width:0.750044;stroke-opacity:1"
-     d="m 100.9866,435.1626 c 48.56203,-24.29872 95.99401,31.79697 143.85141,37.77915 12.57105,1.57138 32.57206,1.02906 43.59133,6.5387 13.31884,6.65942 13.18783,21.45856 21.06915,31.96698 18.10232,24.13642 86.42984,39.28483 63.93396,84.27659 -12.91595,25.83189 -54.19931,32.20628 -77.01136,50.13003 -17.39909,13.67071 -26.16399,30.6721 -38.50568,47.95047 -28.35718,39.70005 -49.83117,41.55433 -92.99485,55.94222 -21.11921,7.03977 -71.201411,3.63037 -86.456153,-11.62436 C 56.574635,716.23261 54.958467,688.67371 45.770904,661.11102 41.465305,648.19423 29.928064,638.87013 23.975235,626.96448 8.8974113,596.80883 -6.3944723,526.19825 10.171312,488.92524 33.20286,437.10426 63.610909,457.58801 100.9866,435.1626 Z"
-     id="path10120"
-     sodipodi:nodetypes="csssssssssssc" />
-  <path
-     style="fill:none;fill-opacity:1;stroke:#e90000;stroke-width:0.750044;stroke-opacity:1"
-     d="m 580.4913,350.15948 c -17.31752,29.4894 8.71826,60.25552 8.71826,89.36224 0,44.43754 -31.58909,141.4784 -21.06914,176.54492 16.58392,55.27972 27.81371,60.90315 79.91745,66.11353 67.47679,6.74768 91.5352,-3.60948 111.8844,-74.8318 4.73278,-16.56453 3.97234,-227.06177 -9.44475,-245.56453 C 726.24784,328.34247 610.9913,314.57615 580.4913,350.15948 Z"
-     id="path10169"
-     sodipodi:nodetypes="csssssc" />
   <text
      xml:space="preserve"
      style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:22.0013px;font-family:Times, serif;-inkscape-font-specification:'Times, serif';fill:#e90000;fill-opacity:1;stroke:#e90000;stroke-width:0.750044;stroke-opacity:1"
-     x="47.223949"
+     x="47.95047"
      y="975.68701"
      id="text14384"><tspan
        sodipodi:role="line"
-       id="tspan14382"
        style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.750044"
-       x="47.223949"
-       y="975.68701">@ = Writes to DB</tspan><tspan
+       x="47.95047"
+       y="975.68701"
+       id="tspan14388">@ = Writes to DB</tspan><tspan
        sodipodi:role="line"
        style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.750044"
-       x="47.223949"
+       x="47.95047"
        y="1003.1887"
-       id="tspan14388">&amp; = Writes Pangolin version files</tspan><tspan
-       sodipodi:role="line"
-       style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.750044"
-       x="47.223949"
-       y="1030.6903"
        id="tspan14392">% = Reads Pangolin version files</tspan></text>
-  <text
-     xml:space="preserve"
-     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:22.0013px;font-family:Times, serif;-inkscape-font-specification:'Times, serif';fill:#e90000;fill-opacity:1;stroke:#e90000;stroke-width:0.750044;stroke-opacity:1"
-     x="402.68353"
-     y="951.83521"
-     id="text14384-6"><tspan
-       sodipodi:role="line"
-       style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.750044"
-       x="402.68353"
-       y="951.83521"
-       id="tspan14392-9">SR = summarize_variants_running.lock</tspan><tspan
-       sodipodi:role="line"
-       style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.750044"
-       x="402.68353"
-       y="979.33685"
-       id="tspan14540">LD = loading_data.lock</tspan><tspan
-       sodipodi:role="line"
-       style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.750044"
-       x="402.68353"
-       y="1006.8384"
-       id="tspan14542">PR = recall_pangolin_running.lock</tspan><tspan
-       sodipodi:role="line"
-       style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.750044"
-       x="402.68353"
-       y="1034.3401"
-       id="tspan15270">SC = swapping_calls.lock </tspan><tspan
-       sodipodi:role="line"
-       style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.750044"
-       x="402.68353"
-       y="1061.8418"
-       id="tspan14538" /></text>
 </svg>

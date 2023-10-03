@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class PrimerSetMailer < ApplicationMailer
-  default from: 'NEB Primer Monitor <primer-monitor@neb.com>'
+  default from: "NEB Primer Monitor <#{ENV['ADMIN_EMAIL']}>"
 
   def updated_primer_set_email(email, primer_set)
     @url = primer_set_url(primer_set)

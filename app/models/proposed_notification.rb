@@ -26,7 +26,7 @@ class ProposedNotification < ApplicationRecord
   def self.new_proposed_notifications
     potential_notifications = []
 
-    IdentifyPrimersForNotification.includes(:detailed_geo_location).all.each do |primer_record|
+    IdentifyPrimersForNotification.includes(:detailed_geo_location).all.find_each do |primer_record|
       pn = construct_notification_record(primer_record)
 
       potential_notifications << pn unless existing_notification_cache.key?(pn.cache_key)

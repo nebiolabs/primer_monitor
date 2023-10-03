@@ -5,7 +5,7 @@ class LineageVariantsController < ApplicationController
   def index
     authorize! :index, LineageVariantsController
 
-    # note: hardcoding SARS-CoV-2 taxid
+    # NOTE: hardcoding SARS-CoV-2 taxid
     organism = Organism.find_by(ncbi_taxon_id: '2697049')
 
     @config = {
@@ -28,7 +28,5 @@ class LineageVariantsController < ApplicationController
     lineages_url = URI("#{@config[:data_server]}/#{@config[:organism_taxid]}/config/lineage_sets.json")
 
     @lineage_sets = JSON.parse(Net::HTTP.get(lineages_url))
-
-    puts @default_tracks
   end
 end

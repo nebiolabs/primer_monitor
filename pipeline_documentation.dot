@@ -1,96 +1,83 @@
-digraph "dag2023060551263985" {
-p0 [label="download_data"];
-p1 [label="extract_new_records"];
-p0 -> p1 [label="downloaded_data"];
+digraph "summarize_variants" {
 
-p1 [label="extract_new_records"];
-p2 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="splitText"];
-p1 -> p2 [label="filtered_data"];
+update_downloadData [label="download_data"];
 
-p2 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="splitText"];
-p3 [label="transform_data"];
-p2 -> p3;
 
-p3 [label="transform_data"];
-p4 [label="align"];
-p3 -> p4 [label="transformed_data"];
+update_extractNewRecords [label="extract_new_records"];
+update_downloadData -> update_extractNewRecords [label="downloaded_data"];
 
-p4 [label="align"];
-p5 [label="load_to_db"];
-p4 -> p5 [label="metadata_plus_variants"];
+update_splitText [shape=circle,label="",fixedsize=true,width=0.1,xlabel="splitText"];
+update_extractNewRecords -> update_splitText [label="filtered_data"];
 
-p5 [label="load_to_db"];
-p9 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p5 -> p9 [label="complete_metadata_files"];
+update_transformData [label="transform_data"];
+update_splitText -> update_transformData;
 
-p5 [label="load_to_db"];
-p8 [label="load_pangolin_data"];
-p5 -> p8 [label="complete_metadata_files"];
+update_align [label="align"];
+update_transformData -> update_align [label="transformed_data"];
 
-p6 [label="get_pangolin_version"];
-p7 [label="pangolin_calls"];
-p6 -> p7 [label="transformed_data"];
+update_loadToDB [label="load_to_db"];
+update_align -> update_loadToDB [label="metadata_plus_variants"];
 
-p3 -> p7 [label="transformed_data"];
+update_collect1 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
+update_loadToDB -> update_collect1 [label="complete_metadata_files"];
 
-p7 [label="pangolin_calls"];
-p8 [label="load_pangolin_data"];
-p7 -> p8 [label="pangolin_lineage_data"];
+update_loadPangolinData [label="load_pangolin_data"];
+update_loadToDB -> update_loadPangolinData [label="complete_metadata_files"];
 
-p6 [label="get_pangolin_version"];
-p8 [label="load_pangolin_data"];
-p6 -> p8 [label="use_pending"];
+update_getPangolinVersion [label="get_pangolin_version"];
 
-p8 [label="load_pangolin_data"];
-p10 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p8 -> p10 [label="complete_files_pangolin"];
+update_pangolinCalls [label="pangolin_calls"];
+update_getPangolinVersion -> update_pangolinCalls [label="transformed_data"];
 
-p9 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p11 [label="update_new_calls"];
-p9 -> p11;
+update_transformData -> update_pangolinCalls [label="transformed_data"];
 
-p10 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p11 [label="update_new_calls"];
-p10 -> p11;
+update_pangolinCalls -> update_loadPangolinData [label="pangolin_lineage_data"];
 
-p11 [label="update_new_calls"];
-p12 [label="recalculate_database_views"];
-p11 -> p12 [label="done"];
+update_loadPangolinData [label="load_pangolin_data"];
+update_getPangolinVersion -> update_loadPangolinData [label="use_pending"];
 
-p12 [label="recalculate_database_views"];
-p13 [label="recompute_affected_primers"];
-p12 -> p13 [label="complete"];
+update_loadPangolinData [label="load_pangolin_data"];
+update_collect2 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
+update_loadPangolinData -> update_collect2 [label="complete_files_pangolin"];
 
-p0b [label="get_new_versions"];
-p4b [label="pangolin_calls"];
-p0b -> p4b [label="latest_pangolin"];
+update_recalculateDatabaseViews [label="recalculate_database_views"];
 
-p1b [label="extract_new_records"];
-p2b [shape=circle,label="",fixedsize=true,width=0.1,xlabel="splitText"];
-p1b -> p2b;
+update_collect1 -> update_recalculateDatabaseViews;
 
-p2b [shape=circle,label="",fixedsize=true,width=0.1,xlabel="splitText"];
-p3b [label="transform_data"];
-p2b -> p3b;
+update_collect2 -> update_recalculateDatabaseViews;
 
-p3b [label="transform_data"];
-p4b [label="pangolin_calls"];
-p3b -> p4b;
+update_recomputeAffectedPrimers [label="recompute_affected_primers"];
+update_recalculateDatabaseViews -> update_recomputeAffectedPrimers [label="complete"];
 
-p4b [label="pangolin_calls"];
-p5b [label="load_pangolin_data"];
-p4b -> p5b;
 
-p5b [label="load_pangolin_data"];
-p6b [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p5b -> p6b;
+}
 
-p6b [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-p7b [label="update_current_calls"];
-p6b -> p7b;
+digraph "recall_pangolin" {
 
-p7b [label="update_current_calls"];
-p8b [label="update_new_calls"];
-p7b -> p8b;
+recall_getPangolinVersion [label="get_pangolin_version"];
+recall_pangolinCalls [label="pangolin_calls"];
+
+recall_getPangolinVersion -> recall_pangolinCalls [label="latest_pangolin"];
+
+recall_extractNewRecords [label="extract_new_records"];
+recall_splitText [shape=circle,label="",fixedsize=true,width=0.1,xlabel="splitText"];
+recall_extractNewRecords -> recall_splitText;
+
+recall_transformData [label="transform_data"];
+recall_splitText -> recall_transformData;
+
+recall_transformData -> recall_pangolinCalls;
+
+recall_loadPangolinData [label="load_pangolin_data"];
+recall_pangolinCalls -> recall_loadPangolinData;
+
+recall_collect [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
+recall_loadPangolinData -> recall_collect;
+
+recall_updateCurrentCalls [label="update_current_calls"];
+recall_collect -> recall_updateCurrentCalls;
+
+recall_updateNewCalls [label="update_new_calls"];
+recall_updateCurrentCalls -> recall_updateNewCalls;
 
 }

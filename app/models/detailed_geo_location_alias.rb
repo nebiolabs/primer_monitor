@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 class DetailedGeoLocationAlias < ApplicationRecord
-  has_many :subscribed_geo_locations, inverse_of: :detailed_geo_location_alias
-  has_many :detailed_geo_locations
+  has_many :subscribed_geo_locations, inverse_of: :detailed_geo_location_alias, dependent: :destroy
+  has_many :detailed_geo_locations, dependent: :destroy
   has_many :fasta_records, through: :detailed_geo_locations
 
   MIN_SEQUENCES_FOR_GEOLOCATION = 20
@@ -34,7 +34,7 @@ class DetailedGeoLocationAlias < ApplicationRecord
   end
 
   def to_s
-    if region.nil?
+    if region.nil? && subregion.nil? && division.nil? && subdivision.nil?
       world
     else
       [region, subregion, division, subdivision].compact.join('/')

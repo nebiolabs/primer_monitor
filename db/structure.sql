@@ -31,9 +31,10 @@ CREATE TYPE public.oligo_category AS ENUM (
 --
 
 CREATE TYPE public.primer_set_status AS ENUM (
-    'pending',
+    'created',
     'complete',
-    'failed'
+    'failed',
+    'processing'
 );
 
 
@@ -445,7 +446,7 @@ CREATE TABLE public.primer_sets (
     organism_id integer NOT NULL,
     created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL,
-    status public.primer_set_status DEFAULT 'pending'::public.primer_set_status,
+    status public.primer_set_status DEFAULT 'created'::public.primer_set_status,
     citation_url character varying,
     doi character varying,
     amplification_method_id bigint
@@ -1698,6 +1699,13 @@ CREATE UNIQUE INDEX index_primer_set_subscriptions_on_user_id_and_primer_set_id 
 
 
 --
+-- Name: index_primer_sets_on_name; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_primer_sets_on_name ON public.primer_sets USING btree (name);
+
+
+--
 -- Name: index_primer_sets_on_organism_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -2225,6 +2233,10 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20230714105625'),
 ('20230714172920'),
 ('20230718131700'),
-('20230721152550');
+('20230721152550'),
+('20230802152750'),
+('20230814161850'),
+('20230816160045'),
+('20230818095330');
 
 

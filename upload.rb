@@ -93,7 +93,6 @@ def import_pangolin(pangolin_csv, pending)
     @log.info("Loaded #{result_lineages.ids.size}/#{lineages.size} new lineages")
   end
 
-
   calls = PangolinCall.parse(pangolin_csv)
   result_calls = PangolinCall.import(calls, validate: false)
   result_calls.failed_instances.each { |rec| @log.error("Failed to insert pangolin call \"#{rec}\"") }
@@ -108,7 +107,6 @@ def main
 
   setup_db_connection
   ActiveRecord::Base.transaction do
-
     if opts[:import_seqs]
       import_metadata(opts[:metadata_tsv])
       import_variants(opts[:variants_tsv])

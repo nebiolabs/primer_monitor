@@ -2,8 +2,10 @@
 
 module Users
   class RegistrationsController < Devise::RegistrationsController
+    # rubocop:disable Rails/LexicallyScopedActionFilter
     before_action :configure_sign_up_params, only: [:create]
     before_action :configure_account_update_params, only: [:update]
+    # rubocop:enable Rails/LexicallyScopedActionFilter
 
     # GET /resource/sign_up
     # def new
@@ -61,7 +63,7 @@ module Users
 
     def update_resource(resource, params)
       # Require current password only if trying to change password.
-      return super unless params[:password].blank?
+      return super if params[:password].present?
 
       resource.update_without_password(params.except(:current_password))
     end

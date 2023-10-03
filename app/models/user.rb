@@ -11,7 +11,7 @@ class User < ApplicationRecord
   has_many :detailed_geo_location_aliases, through: :subscribed_geo_locations
   has_many :primer_set_subscriptions, dependent: :destroy
   has_many :primer_sets, through: :primer_set_subscriptions
-  has_many :verified_notifications
+  has_many :verified_notifications, dependent: :destroy
 
   accepts_nested_attributes_for :user_roles, reject_if: :all_blank, allow_destroy: true
 

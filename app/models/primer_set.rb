@@ -8,9 +8,15 @@ class PrimerSet < ApplicationRecord
   has_many :subscriptions, dependent: :destroy, class_name: 'PrimerSetSubscription'
   has_many :subscribers, through: :subscriptions, source: :user
 
-  enum status: { pending: 'pending', complete: 'complete', failed: 'failed' }
+  enum status: { created: 'created', complete: 'complete', failed: 'failed', processing: 'processing' }
 
   accepts_nested_attributes_for :oligos, reject_if: :all_blank, allow_destroy: true
+
+  validates :name, uniqueness: true, presence: true
+
+  validates :oligos, presence: true
+
+  validates_associated :oligos
 
   after_save :notify_admins_about_primer_set_update
 
@@ -19,11 +25,11 @@ class PrimerSet < ApplicationRecord
   end
 
   def display_url
-    citation_url || doi_url
+    citation_url.presence || doi_url
   end
 
   def doi_url
-    "https://doi.org/#{doi}" unless doi.blank?
+    "https://doi.org/#{doi}" if doi.present?
   end
 
   def subscription_for_user(user)
@@ -33,13 +39,15 @@ class PrimerSet < ApplicationRecord
   end
 
   def notify_admins_about_primer_set_update
-    PrimerSetMailer.updated_primer_set_email('primer-monitor@neb.com', self).deliver_later
+    Role.find_by(name: 'administrator').users.each do |user|
+      PrimerSetMailer.updated_primer_set_email(user.email, self).deliver_later unless user.email == ENV['ADMIN_EMAIL']
+    end
   end
 
   def align_primers
     pid = Process.spawn({ 'DB_HOST' => ENV['DB_HOST'], 'DB_NAME' => ENV['DB_NAME'], 'DB_USER' => ENV['DB_USER'] },
-                        Shellwords.join(['bash', 'lib/update_primers.sh', 'lib/cov_index/NC_045512.2',
-                                         id]))
+                        Shellwords.join(['bash', 'lib/update_primers.sh', 'bt2_indices/2697049/NC_045512.2',
+                                         id.to_s]))
     Process.detach pid # prevent zombie process
     pid
   end
