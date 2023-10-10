@@ -74,10 +74,10 @@ recall_pangolinCalls -> recall_loadPangolinData;
 recall_collect [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
 recall_loadPangolinData -> recall_collect;
 
-recall_updateCurrentCalls [label="update_current_calls"];
-recall_collect -> recall_updateCurrentCalls;
+recall_updateCalls [label="update_calls"];
+recall_collect -> recall_updateCalls;
 
-recall_updateNewCalls [label="update_new_calls"];
-recall_updateCurrentCalls -> recall_updateNewCalls;
+recall_recomputeAffectedPrimers [label="recompute_affected_primers"];
+recall_updateCalls -> recall_recomputeAffectedPrimers;
 
 }
