@@ -1,7 +1,17 @@
 nextflow.enable.dsl=2
 
+params.pct_cutoff =
+pct_cutoff = params.pct_cutoff
+
+params.score_cutoff =
+score_cutoff = params.score_cutoff
+
+params.organism_dirname =
+organism_dirname = params.organism_dirname
+
 params.primer_monitor_path =
 primer_monitor_path = params.primer_monitor_path
+
 params.output_path =
 output_path = params.output_path
 
@@ -10,6 +20,10 @@ params.pangolin_data_version_path =
 
 params.temp_dir = '/tmp'
 temp_dir = params.temp_dir
+
+params.override_path =
+override_path = params.override_path
+override_path = file(override_path).toAbsolutePath()
 
 process get_pangolin_version {
     cpus 1
@@ -181,6 +195,18 @@ process update_new_calls {
     '''
 }
 
+process recompute_affected_primers {
+    cpus 8
+    conda "libiconv psycopg2 bedtools coreutils 'postgresql>=15' gawk bc"
+    input:
+        file complete
+    shell:
+    '''
+    # recompute the primer data for igvjs visualization
+    !{primer_monitor_path}/lib/visualization/recompute_affected_primers.sh -o !{override_path} !{primer_monitor_path} !{organism_dirname} !{pct_cutoff} !{score_cutoff} !{task.cpus}
+    '''
+}
+
 
 workflow {
     get_pangolin_version()
@@ -191,4 +217,5 @@ workflow {
     load_pangolin_data(pangolin_calls.out)
     update_current_calls(load_pangolin_data.out.collect())
     update_new_calls(update_current_calls.out)
+    recompute_affected_primers(update_new_calls.out)
 }

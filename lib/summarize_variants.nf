@@ -11,8 +11,10 @@ score_cutoff = params.score_cutoff
 
 params.primer_monitor_path =
 primer_monitor_path = params.primer_monitor_path
+
 params.output_path =
 output_path = params.output_path
+
 params.igvstatic_path =
 igvstatic_path = params.igvstatic_path
 
@@ -261,9 +263,6 @@ process recalculate_database_views {
 
 process recompute_affected_primers {
     cpus 8
-    //Wait and retry if another primer recomputation is running
-    errorStrategy { sleep(120); return 'retry' }
-    maxRetries 10
     conda "libiconv psycopg2 bedtools coreutils 'postgresql>=15' gawk bc"
     input:
         file complete
