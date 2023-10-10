@@ -15,29 +15,12 @@ primer_monitor_path = params.primer_monitor_path
 params.output_path =
 output_path = params.output_path
 
-params.igvstatic_path =
-igvstatic_path = params.igvstatic_path
-
-params.frontend_host =
-frontend_host = params.frontend_host
-
 params.override_path =
 override_path = params.override_path
 override_path = file(override_path).toAbsolutePath()
 
-params.jump_proxy =
-
-ssh_opts = ""
-scp_opts = ""
-
 params.temp_dir = '/tmp'
 temp_dir = params.temp_dir
-
-if(params.jump_proxy)
-{
-    ssh_opts = "-J ${params.jump_proxy}"
-    scp_opts = "-o ProxyJump=${params.jump_proxy}"
-}
 
 params.pangolin_version_path =
 params.pangolin_data_version_path =
