@@ -217,7 +217,6 @@ process recalculate_database_views {
     input:
         //these files are to make sure all the load_to_db tasks are done first
         file seq_load_complete
-        file pangolin_calls_complete
     output:
         file 'refresh_complete.txt';
     shell:
