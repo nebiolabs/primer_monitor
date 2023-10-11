@@ -46,20 +46,6 @@ process get_pangolin_version {
     '''
 }
 
-process cleanup_old_calls {
-    cpus 1
-    penv 'smp'
-
-    conda "'postgresql>=15'"
-
-    output:
-        file 'cleanup_done.txt'
-    shell:
-    '''
-    PGPASSFILE="!{primer_monitor_path}/config/.pgpass" !{primer_monitor_path}/lib/pangolin_calls/cleanup_old_calls.sh; touch cleanup_done.txt;
-    '''
-}
-
 process download_data {
     // Downloads the full dataset
     cpus 16
@@ -185,12 +171,25 @@ process update_calls {
 
     input:
         file everything
-        file cleanup_done
     output:
         file 'done.txt'
     shell:
     '''
     PGPASSFILE="!{primer_monitor_path}/config/.pgpass" !{primer_monitor_path}/lib/pangolin_calls/swap_calls.sh; touch done.txt;
+    '''
+}
+
+process cleanup_old_calls {
+    cpus 1
+    penv 'smp'
+
+    conda "'postgresql>=15'"
+
+    input:
+        file update_done
+    shell:
+    '''
+    PGPASSFILE="!{primer_monitor_path}/config/.pgpass" !{primer_monitor_path}/lib/pangolin_calls/cleanup_old_calls.sh;
     '''
 }
 
@@ -209,12 +208,12 @@ process recompute_affected_primers {
 
 workflow {
     get_pangolin_version()
-    cleanup_old_calls()
     download_data()
     extract_new_records(download_data.out)
     transform_data(extract_new_records.out.splitText(file: true, by: 2500).filter{ it.size()>77 })
     pangolin_calls(get_pangolin_version.out[0], get_pangolin_version.out[1], transform_data.out)
     load_pangolin_data(pangolin_calls.out)
-    update_calls(load_pangolin_data.out.collect(), cleanup_old_calls.out)
+    update_calls(load_pangolin_data.out.collect())
+    cleanup_old_calls(update_calls.out)
     recompute_affected_primers(update_calls.out)
 }

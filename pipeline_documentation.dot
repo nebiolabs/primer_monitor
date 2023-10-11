@@ -68,12 +68,11 @@ recall_pangolinCalls -> recall_loadPangolinData;
 recall_collect [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
 recall_loadPangolinData -> recall_collect;
 
-recall_cleanupOldCalls [label="cleanup_old_calls"];
-
 recall_updateCalls [label="update_calls"];
-recall_cleanupOldCalls -> recall_updateCalls;
-
 recall_collect -> recall_updateCalls;
+
+recall_cleanupOldCalls [label="cleanup_old_calls"];
+recall_updateCalls -> recall_cleanupOldCalls;
 
 recall_recomputeAffectedPrimers [label="recompute_affected_primers"];
 recall_updateCalls -> recall_recomputeAffectedPrimers;

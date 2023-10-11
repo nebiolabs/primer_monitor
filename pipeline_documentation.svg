@@ -5,9 +5,9 @@
 <!-- Title: root Pages: 1 -->
 
 <svg
-   width="10.916667in"
-   height="14.128in"
-   viewBox="0 0 786.45002 1017.51"
+   width="11.583333in"
+   height="14.99in"
+   viewBox="0 0 833.57998 1079.9311"
    version="1.1"
    id="svg339"
    sodipodi:docname="graph.svg"
@@ -29,9 +29,9 @@
      inkscape:deskcolor="#d1d1d1"
      inkscape:document-units="pt"
      showgrid="false"
-     inkscape:zoom="0.86163295"
-     inkscape:cx="518.2021"
-     inkscape:cy="1018.4151"
+     inkscape:zoom="0.89932127"
+     inkscape:cx="550.97107"
+     inkscape:cy="1064.6918"
      inkscape:window-width="1390"
      inkscape:window-height="945"
      inkscape:window-x="0"
@@ -41,13 +41,13 @@
   <g
      id="graph0"
      class="graph"
-     transform="translate(4,688.2)">
+     transform="translate(4,659.4)">
     <title
        id="title2">root</title>
     <polygon
        fill="#ffffff"
        stroke="none"
-       points="782.45,-688.2 782.45,4 -4,4 -4,-688.2 "
+       points="829.58,-659.4 829.58,4 -4,4 -4,-659.4 "
        id="polygon4" />
     <!-- update_downloadData -->
     <g
@@ -59,14 +59,14 @@
          fill="none"
          stroke="#000000"
          cx="87.690002"
-         cy="-666.20001"
+         cy="-637.40002"
          rx="67.220001"
          ry="18"
          id="ellipse8" />
       <text
          text-anchor="middle"
          x="87.690002"
-         y="-661.15002"
+         y="-632.34998"
          font-family="Times, serif"
          font-size="14px"
          id="text10">download_data</text>
@@ -81,14 +81,14 @@
          fill="none"
          stroke="#000000"
          cx="87.690002"
-         cy="-577.70001"
+         cy="-548.90002"
          rx="87.690002"
          ry="18"
          id="ellipse15" />
       <text
          text-anchor="middle"
          x="87.690002"
-         y="-572.65002"
+         y="-543.84998"
          font-family="Times, serif"
          font-size="14px"
          id="text17">extract_new_records</text>
@@ -102,17 +102,17 @@
       <path
          fill="none"
          stroke="#000000"
-         d="m 87.69,-648.11 c 0,11.77 0,27.68 0,41.3"
+         d="m 87.69,-619.31 c 0,11.77 0,27.68 0,41.3"
          id="path22" />
       <polygon
          fill="#000000"
          stroke="#000000"
-         points="91.19,-607.05 87.69,-597.05 84.19,-607.05 "
+         points="91.19,-578.25 87.69,-568.25 84.19,-578.25 "
          id="polygon24" />
       <text
          text-anchor="middle"
          x="135.31"
-         y="-616.90002"
+         y="-588.09998"
          font-family="Times, serif"
          font-size="14px"
          id="text26">downloaded_data</text>
@@ -127,13 +127,13 @@
          fill="none"
          stroke="#000000"
          cx="87.690002"
-         cy="-503.60001"
+         cy="-474.79999"
          id="ellipse31"
          r="3.5999999" />
       <text
          text-anchor="middle"
          x="60.09"
-         y="-510.39999"
+         y="-481.60001"
          font-family="Times, serif"
          font-size="14px"
          id="text33">splitText</text>
@@ -147,17 +147,17 @@
       <path
          fill="none"
          stroke="#000000"
-         d="m 87.69,-559.25 c 0,12.7 0,29.65 0,41.28"
+         d="m 87.69,-530.45 c 0,12.7 0,29.65 0,41.28"
          id="path38" />
       <polygon
          fill="#000000"
          stroke="#000000"
-         points="91.19,-518.32 87.69,-508.32 84.19,-518.32 "
+         points="91.19,-489.52 87.69,-479.52 84.19,-489.52 "
          id="polygon40" />
       <text
          text-anchor="middle"
          x="121.81"
-         y="-528.40002"
+         y="-499.60001"
          font-family="Times, serif"
          font-size="14px"
          id="text42">filtered_data</text>
@@ -172,14 +172,14 @@
          fill="none"
          stroke="#000000"
          cx="87.690002"
-         cy="-445"
+         cy="-416.20001"
          rx="67.220001"
          ry="18"
          id="ellipse47" />
       <text
          text-anchor="middle"
          x="87.690002"
-         y="-439.95001"
+         y="-411.14999"
          font-family="Times, serif"
          font-size="14px"
          id="text49">transform_data</text>
@@ -193,12 +193,12 @@
       <path
          fill="none"
          stroke="#000000"
-         d="m 87.69,-499.56 c 0,4.93 0,15.12 0,25.31"
+         d="m 87.69,-470.76 c 0,4.93 0,15.12 0,25.31"
          id="path54" />
       <polygon
          fill="#000000"
          stroke="#000000"
-         points="91.19,-474.45 87.69,-464.45 84.19,-474.45 "
+         points="91.19,-445.65 87.69,-435.65 84.19,-445.65 "
          id="polygon56" />
     </g>
     <!-- update_align -->
@@ -211,14 +211,14 @@
          fill="none"
          stroke="#000000"
          cx="42.689999"
-         cy="-356.5"
+         cy="-327.70001"
          rx="29.34"
          ry="18"
          id="ellipse61" />
       <text
          text-anchor="middle"
          x="42.689999"
-         y="-351.45001"
+         y="-322.64999"
          font-family="Times, serif"
          font-size="14px"
          id="text63">align</text>
@@ -232,17 +232,17 @@
       <path
          fill="none"
          stroke="#000000"
-         d="m 41.86,-431.58 c -10.81,5.18 -21.03,12.45 -27.42,22.58 -5.85,9.28 -1.79,19.86 4.88,29.01"
+         d="m 41.86,-402.78 c -10.81,5.18 -21.03,12.45 -27.42,22.58 -5.85,9.28 -1.79,19.86 4.88,29.01"
          id="path68" />
       <polygon
          fill="#000000"
          stroke="#000000"
-         points="22.5,-382.65 26.28,-372.75 17.15,-378.14 "
+         points="22.5,-353.85 26.28,-343.95 17.15,-349.34 "
          id="polygon70" />
       <text
          text-anchor="middle"
          x="62.310001"
-         y="-395.70001"
+         y="-366.89999"
          font-family="Times, serif"
          font-size="14px"
          id="text72">transformed_data</text>
@@ -257,14 +257,14 @@
          fill="none"
          stroke="#000000"
          cx="215.69"
-         cy="-356.5"
+         cy="-327.70001"
          rx="64.660004"
          ry="18"
          id="ellipse77" />
       <text
          text-anchor="middle"
          x="215.69"
-         y="-351.45001"
+         y="-322.64999"
          font-family="Times, serif"
          font-size="14px"
          id="text79">pangolin_calls</text>
@@ -278,17 +278,17 @@
       <path
          fill="none"
          stroke="#000000"
-         d="m 101.46,-427.1 c 9.53,10.91 22.98,24.83 36.98,34.6 8.97,6.25 19.23,11.83 29.28,16.58"
+         d="m 101.46,-398.3 c 9.53,10.91 22.98,24.83 36.98,34.6 8.97,6.25 19.23,11.83 29.28,16.58"
          id="path84" />
       <polygon
          fill="#000000"
          stroke="#000000"
-         points="168.98,-378.74 176.65,-371.44 166.1,-372.36 "
+         points="168.98,-349.94 176.65,-342.64 166.1,-343.56 "
          id="polygon86" />
       <text
          text-anchor="middle"
          x="186.31"
-         y="-395.70001"
+         y="-366.89999"
          font-family="Times, serif"
          font-size="14px"
          id="text88">transformed_data</text>
@@ -303,14 +303,14 @@
          fill="none"
          stroke="#000000"
          cx="215.69"
-         cy="-268"
+         cy="-239.2"
          rx="52.380001"
          ry="18"
          id="ellipse93" />
       <text
          text-anchor="middle"
          x="215.69"
-         y="-262.95001"
+         y="-234.14999"
          font-family="Times, serif"
          font-size="14px"
          id="text95">load_to_db</text>
@@ -324,17 +324,17 @@
       <path
          fill="none"
          stroke="#000000"
-         d="m 51.68,-339.24 c 7.16,11.49 18.22,26.37 31.76,35.24 21.45,14.05 48.33,22.48 72.24,27.52"
+         d="m 51.68,-310.44 c 7.16,11.49 18.22,26.37 31.76,35.24 21.45,14.05 48.33,22.48 72.24,27.52"
          id="path100" />
       <polygon
          fill="#000000"
          stroke="#000000"
-         points="156.28,-279.73 165.43,-274.39 154.95,-272.86 "
+         points="156.28,-250.93 165.43,-245.59 154.95,-244.06 "
          id="polygon102" />
       <text
          text-anchor="middle"
          x="147.81"
-         y="-307.20001"
+         y="-278.39999"
          font-family="Times, serif"
          font-size="14px"
          id="text104">metadata_plus_variants</text>
@@ -348,17 +348,17 @@
       <path
          fill="none"
          stroke="#000000"
-         d="m 215.69,-338.41 c 0,11.77 0,27.68 0,41.3"
+         d="m 215.69,-309.61 c 0,11.77 0,27.68 0,41.3"
          id="path109" />
       <polygon
          fill="#000000"
          stroke="#000000"
-         points="219.19,-297.35 215.69,-287.35 212.19,-297.35 "
+         points="219.19,-268.55 215.69,-258.55 212.19,-268.55 "
          id="polygon111" />
       <text
          text-anchor="middle"
          x="276.81"
-         y="-307.20001"
+         y="-278.39999"
          font-family="Times, serif"
          font-size="14px"
          id="text113">pangolin_lineage_data</text>
@@ -373,13 +373,13 @@
          fill="none"
          stroke="#000000"
          cx="215.69"
-         cy="-179.5"
+         cy="-165.10001"
          id="ellipse118"
          r="3.5999999" />
       <text
          text-anchor="middle"
          x="194.09"
-         y="-186.3"
+         y="-171.89999"
          font-family="Times, serif"
          font-size="14px"
          id="text120">collect</text>
@@ -393,17 +393,17 @@
       <path
          fill="none"
          stroke="#000000"
-         d="m 215.69,-249.91 c 0,16.28 0,40.5 0,55.6"
+         d="m 215.69,-220.75 c 0,12.7 0,29.65 0,41.28"
          id="path125" />
       <polygon
          fill="#000000"
          stroke="#000000"
-         points="219.19,-194.5 215.69,-184.5 212.19,-194.5 "
+         points="219.19,-179.82 215.69,-169.82 212.19,-179.82 "
          id="polygon127" />
       <text
          text-anchor="middle"
          x="283.94"
-         y="-218.7"
+         y="-189.89999"
          font-family="Times, serif"
          font-size="14px"
          id="text129">complete_metadata_files</text>
@@ -439,12 +439,12 @@
       <path
          fill="none"
          stroke="#000000"
-         d="m 215.69,-175.45 c 0,6.92 0,24.41 0,39.92"
+         d="m 215.69,-161.06 c 0,4.93 0,15.12 0,25.31"
          id="path141" />
       <polygon
          fill="#000000"
          stroke="#000000"
-         points="219.19,-135.78 215.69,-125.78 212.19,-135.78 "
+         points="219.19,-135.95 215.69,-125.95 212.19,-135.95 "
          id="polygon143" />
     </g>
     <!-- update_getPangolinVersion -->
@@ -457,14 +457,14 @@
          fill="none"
          stroke="#000000"
          cx="293.69"
-         cy="-445"
+         cy="-416.20001"
          rx="90.760002"
          ry="18"
          id="ellipse148" />
       <text
          text-anchor="middle"
          x="293.69"
-         y="-439.95001"
+         y="-411.14999"
          font-family="Times, serif"
          font-size="14px"
          id="text150">get_pangolin_version</text>
@@ -478,17 +478,17 @@
       <path
          fill="none"
          stroke="#000000"
-         d="m 270.58,-427.38 c -6.86,5.47 -14.13,11.83 -20.14,18.38 -6.99,7.63 -13.62,16.76 -19.18,25.21"
+         d="m 270.58,-398.58 c -6.86,5.47 -14.13,11.83 -20.14,18.38 -6.99,7.63 -13.62,16.76 -19.18,25.21"
          id="path155" />
       <polygon
          fill="#000000"
          stroke="#000000"
-         points="233.79,-382.23 225.48,-375.66 227.87,-385.98 "
+         points="233.79,-353.43 225.48,-346.86 227.87,-357.18 "
          id="polygon157" />
       <text
          text-anchor="middle"
          x="298.31"
-         y="-395.70001"
+         y="-366.89999"
          font-family="Times, serif"
          font-size="14px"
          id="text159">transformed_data</text>
@@ -502,17 +502,17 @@
       <path
          fill="none"
          stroke="#000000"
-         d="m 327.83,-428.01 c 7.16,5.03 13.77,11.33 17.86,19.01 12.56,23.59 57.75,27.45 -4,105 -8.91,11.19 -39.58,19.85 -68.43,25.75"
+         d="m 327.83,-399.21 c 7.16,5.03 13.77,11.33 17.86,19.01 12.56,23.59 57.75,27.45 -4,105 -8.91,11.19 -39.58,19.85 -68.43,25.75"
          id="path164" />
       <polygon
          fill="#000000"
          stroke="#000000"
-         points="274.24,-274.68 263.75,-276.2 272.9,-281.55 "
+         points="274.24,-245.88 263.75,-247.4 272.9,-252.75 "
          id="polygon166" />
       <text
          text-anchor="middle"
          x="407.81"
-         y="-351.45001"
+         y="-322.64999"
          font-family="Times, serif"
          font-size="14px"
          id="text168">use_pending</text>
@@ -573,14 +573,14 @@
          fill="none"
          stroke="#000000"
          cx="511.69"
-         cy="-666.20001"
+         cy="-637.40002"
          rx="67.220001"
          ry="18"
          id="ellipse189" />
       <text
          text-anchor="middle"
          x="511.69"
-         y="-661.15002"
+         y="-632.34998"
          font-family="Times, serif"
          font-size="14px"
          id="text191">download_data</text>
@@ -595,14 +595,14 @@
          fill="none"
          stroke="#000000"
          cx="511.69"
-         cy="-577.70001"
+         cy="-548.90002"
          rx="87.690002"
          ry="18"
          id="ellipse196" />
       <text
          text-anchor="middle"
          x="511.69"
-         y="-572.65002"
+         y="-543.84998"
          font-family="Times, serif"
          font-size="14px"
          id="text198">extract_new_records</text>
@@ -616,17 +616,17 @@
       <path
          fill="none"
          stroke="#000000"
-         d="m 511.69,-648.11 c 0,11.77 0,27.68 0,41.3"
+         d="m 511.69,-619.31 c 0,11.77 0,27.68 0,41.3"
          id="path203" />
       <polygon
          fill="#000000"
          stroke="#000000"
-         points="515.19,-607.05 511.69,-597.05 508.19,-607.05 "
+         points="515.19,-578.25 511.69,-568.25 508.19,-578.25 "
          id="polygon205" />
       <text
          text-anchor="middle"
          x="559.31"
-         y="-616.90002"
+         y="-588.09998"
          font-family="Times, serif"
          font-size="14px"
          id="text207">downloaded_data</text>
@@ -641,13 +641,13 @@
          fill="none"
          stroke="#000000"
          cx="511.69"
-         cy="-503.60001"
+         cy="-474.79999"
          id="ellipse212"
          r="3.5999999" />
       <text
          text-anchor="middle"
          x="484.09"
-         y="-510.39999"
+         y="-481.60001"
          font-family="Times, serif"
          font-size="14px"
          id="text214">splitText</text>
@@ -661,12 +661,12 @@
       <path
          fill="none"
          stroke="#000000"
-         d="m 511.69,-559.25 c 0,12.7 0,29.65 0,41.28"
+         d="m 511.69,-530.45 c 0,12.7 0,29.65 0,41.28"
          id="path219" />
       <polygon
          fill="#000000"
          stroke="#000000"
-         points="515.19,-518.32 511.69,-508.32 508.19,-518.32 "
+         points="515.19,-489.52 511.69,-479.52 508.19,-489.52 "
          id="polygon221" />
     </g>
     <!-- recall_getPangolinVersion -->
@@ -679,14 +679,14 @@
          fill="none"
          stroke="#000000"
          cx="687.69"
-         cy="-445"
+         cy="-416.20001"
          rx="90.760002"
          ry="18"
          id="ellipse226" />
       <text
          text-anchor="middle"
          x="687.69"
-         y="-439.95001"
+         y="-411.14999"
          font-family="Times, serif"
          font-size="14px"
          id="text228">get_pangolin_version</text>
@@ -701,14 +701,14 @@
          fill="none"
          stroke="#000000"
          cx="560.69"
-         cy="-356.5"
+         cy="-327.70001"
          rx="64.660004"
          ry="18"
          id="ellipse233" />
       <text
          text-anchor="middle"
          x="560.69"
-         y="-351.45001"
+         y="-322.64999"
          font-family="Times, serif"
          font-size="14px"
          id="text235">pangolin_calls</text>
@@ -722,17 +722,17 @@
       <path
          fill="none"
          stroke="#000000"
-         d="m 663.2,-427.32 c -19.93,13.57 -48.23,32.85 -70.05,47.71"
+         d="m 663.2,-398.52 c -19.93,13.57 -48.23,32.85 -70.05,47.71"
          id="path240" />
       <polygon
          fill="#000000"
          stroke="#000000"
-         points="595.48,-376.28 585.24,-373.54 591.54,-382.06 "
+         points="595.48,-347.48 585.24,-344.74 591.54,-353.26 "
          id="polygon242" />
       <text
          text-anchor="middle"
          x="676.94"
-         y="-395.70001"
+         y="-366.89999"
          font-family="Times, serif"
          font-size="14px"
          id="text244">latest_pangolin</text>
@@ -747,14 +747,14 @@
          fill="none"
          stroke="#000000"
          cx="560.69"
-         cy="-268"
+         cy="-239.2"
          rx="83.599998"
          ry="18"
          id="ellipse249" />
       <text
          text-anchor="middle"
          x="560.69"
-         y="-262.95001"
+         y="-234.14999"
          font-family="Times, serif"
          font-size="14px"
          id="text251">load_pangolin_data</text>
@@ -768,12 +768,12 @@
       <path
          fill="none"
          stroke="#000000"
-         d="m 560.69,-338.41 c 0,11.77 0,27.68 0,41.3"
+         d="m 560.69,-309.61 c 0,11.77 0,27.68 0,41.3"
          id="path256" />
       <polygon
          fill="#000000"
          stroke="#000000"
-         points="564.19,-297.35 560.69,-287.35 557.19,-297.35 "
+         points="564.19,-268.55 560.69,-258.55 557.19,-268.55 "
          id="polygon258" />
     </g>
     <!-- recall_collect -->
@@ -786,13 +786,13 @@
          fill="none"
          stroke="#000000"
          cx="560.69"
-         cy="-179.5"
+         cy="-165.10001"
          id="ellipse263"
          r="3.5999999" />
       <text
          text-anchor="middle"
          x="539.09003"
-         y="-186.3"
+         y="-171.89999"
          font-family="Times, serif"
          font-size="14px"
          id="text265">collect</text>
@@ -806,12 +806,12 @@
       <path
          fill="none"
          stroke="#000000"
-         d="m 560.69,-249.91 c 0,16.28 0,40.5 0,55.6"
+         d="m 560.69,-220.75 c 0,12.7 0,29.65 0,41.28"
          id="path270" />
       <polygon
          fill="#000000"
          stroke="#000000"
-         points="564.19,-194.5 560.69,-184.5 557.19,-194.5 "
+         points="564.19,-179.82 560.69,-169.82 557.19,-179.82 "
          id="polygon272" />
     </g>
     <!-- recall_transformData -->
@@ -824,14 +824,14 @@
          fill="none"
          stroke="#000000"
          cx="511.69"
-         cy="-445"
+         cy="-416.20001"
          rx="67.220001"
          ry="18"
          id="ellipse277" />
       <text
          text-anchor="middle"
          x="511.69"
-         y="-439.95001"
+         y="-411.14999"
          font-family="Times, serif"
          font-size="14px"
          id="text279">transform_data</text>
@@ -845,12 +845,12 @@
       <path
          fill="none"
          stroke="#000000"
-         d="m 511.69,-499.56 c 0,4.93 0,15.12 0,25.31"
+         d="m 511.69,-470.76 c 0,4.93 0,15.12 0,25.31"
          id="path284" />
       <polygon
          fill="#000000"
          stroke="#000000"
-         points="515.19,-474.45 511.69,-464.45 508.19,-474.45 "
+         points="515.19,-445.65 511.69,-435.65 508.19,-445.65 "
          id="polygon286" />
     </g>
     <!-- recall_transformData&#45;&gt;recall_pangolinCalls -->
@@ -862,12 +862,12 @@
       <path
          fill="none"
          stroke="#000000"
-         d="m 521.37,-426.91 c 6.91,12.2 16.35,28.86 24.24,42.79"
+         d="m 521.37,-398.11 c 6.91,12.2 16.35,28.86 24.24,42.79"
          id="path291" />
       <polygon
          fill="#000000"
          stroke="#000000"
-         points="549.15,-385.98 551.03,-375.55 543.05,-382.53 "
+         points="549.15,-357.18 551.03,-346.75 543.05,-353.73 "
          id="polygon293" />
     </g>
     <!-- recall_updateCalls -->
@@ -879,14 +879,14 @@
       <ellipse
          fill="none"
          stroke="#000000"
-         cx="628.69"
+         cx="560.69"
          cy="-106.5"
          rx="56.98"
          ry="18"
          id="ellipse298" />
       <text
          text-anchor="middle"
-         x="628.69"
+         x="560.69"
          y="-101.45"
          font-family="Times, serif"
          font-size="14px"
@@ -901,211 +901,200 @@
       <path
          fill="none"
          stroke="#000000"
-         d="m 562.44,-175.99 c 2.4,3.39 6.92,9.59 11.25,14.49 9.05,10.24 19.62,20.9 29.07,30.02"
+         d="m 560.69,-161.06 c 0,4.93 0,15.12 0,25.31"
          id="path305" />
       <polygon
          fill="#000000"
          stroke="#000000"
-         points="604.88,-134.35 609.71,-124.92 600.06,-129.28 "
+         points="564.19,-135.95 560.69,-125.95 557.19,-135.95 "
          id="polygon307" />
-    </g>
-    <!-- recall_recomputeAffectedPrimers -->
-    <g
-       id="node22"
-       class="node">
-      <title
-         id="title310">recall_recomputeAffectedPrimers</title>
-      <ellipse
-         fill="none"
-         stroke="#000000"
-         cx="628.69"
-         cy="-18"
-         rx="117.89"
-         ry="18"
-         id="ellipse312" />
-      <text
-         text-anchor="middle"
-         x="628.69"
-         y="-12.95"
-         font-family="Times, serif"
-         font-size="14px"
-         id="text314">recompute_affected_primers</text>
-    </g>
-    <!-- recall_updateCalls&#45;&gt;recall_recomputeAffectedPrimers -->
-    <g
-       id="edge22"
-       class="edge">
-      <title
-         id="title317">recall_updateCalls-&gt;recall_recomputeAffectedPrimers</title>
-      <path
-         fill="none"
-         stroke="#000000"
-         d="m 628.69,-88.41 c 0,11.77 0,27.68 0,41.3"
-         id="path319" />
-      <polygon
-         fill="#000000"
-         stroke="#000000"
-         points="632.19,-47.35 628.69,-37.35 625.19,-47.35 "
-         id="polygon321" />
     </g>
     <!-- recall_cleanupOldCalls -->
     <g
        id="node21"
        class="node">
       <title
-         id="title324">recall_cleanupOldCalls</title>
+         id="title310">recall_cleanupOldCalls</title>
       <ellipse
          fill="none"
          stroke="#000000"
-         cx="659.69"
-         cy="-179.5"
+         cx="494.69"
+         cy="-18"
          rx="77.449997"
          ry="18"
-         id="ellipse326" />
+         id="ellipse312" />
       <text
          text-anchor="middle"
-         x="659.69"
-         y="-174.45"
+         x="494.69"
+         y="-12.95"
          font-family="Times, serif"
          font-size="14px"
-         id="text328">cleanup_old_calls</text>
+         id="text314">cleanup_old_calls</text>
     </g>
-    <!-- recall_cleanupOldCalls&#45;&gt;recall_updateCalls -->
+    <!-- recall_updateCalls&#45;&gt;recall_cleanupOldCalls -->
     <g
        id="edge21"
        class="edge">
       <title
-         id="title331">recall_cleanupOldCalls-&gt;recall_updateCalls</title>
+         id="title317">recall_updateCalls-&gt;recall_cleanupOldCalls</title>
       <path
          fill="none"
          stroke="#000000"
-         d="m 652.19,-161.31 c -3.51,8.02 -7.76,17.76 -11.68,26.74"
+         d="m 547.96,-88.82 c -9.55,12.52 -22.81,29.89 -33.7,44.18"
+         id="path319" />
+      <polygon
+         fill="#000000"
+         stroke="#000000"
+         points="516.68,-43.05 507.83,-37.22 511.11,-47.29 "
+         id="polygon321" />
+    </g>
+    <!-- recall_recomputeAffectedPrimers -->
+    <g
+       id="node22"
+       class="node">
+      <title
+         id="title324">recall_recomputeAffectedPrimers</title>
+      <ellipse
+         fill="none"
+         stroke="#000000"
+         cx="707.69"
+         cy="-18"
+         rx="117.89"
+         ry="18"
+         id="ellipse326" />
+      <text
+         text-anchor="middle"
+         x="707.69"
+         y="-12.95"
+         font-family="Times, serif"
+         font-size="14px"
+         id="text328">recompute_affected_primers</text>
+    </g>
+    <!-- recall_updateCalls&#45;&gt;recall_recomputeAffectedPrimers -->
+    <g
+       id="edge22"
+       class="edge">
+      <title
+         id="title331">recall_updateCalls-&gt;recall_recomputeAffectedPrimers</title>
+      <path
+         fill="none"
+         stroke="#000000"
+         d="m 586.63,-90.23 c 23.05,13.56 57.04,33.56 83.14,48.92"
          id="path333" />
       <polygon
          fill="#000000"
          stroke="#000000"
-         points="643.33,-133.29 636.12,-125.53 636.92,-136.09 "
+         points="671.15,-43.98 677.99,-35.89 667.6,-37.94 "
          id="polygon335" />
     </g>
   </g>
   <text
      xml:space="preserve"
-     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:22.0126px;font-family:sans-serif;-inkscape-font-specification:sans-serif;fill:#1e26ff;fill-opacity:1;stroke:none;stroke-width:0.75043;stroke-opacity:1"
-     x="117.11272"
-     y="676.93573"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:22.0133px;font-family:sans-serif;-inkscape-font-specification:sans-serif;fill:#1e26ff;fill-opacity:1;stroke:none;stroke-width:0.750453;stroke-opacity:1"
+     x="118.52132"
+     y="648.98077"
      id="text562-71-8-2-8-8-4-1-7-0"><tspan
        sodipodi:role="line"
        id="tspan560-87-2-7-9-3-80-4-9-5"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:22.0126px;font-family:Times, serif;-inkscape-font-specification:'Times, serif';fill:#4964c5;fill-opacity:1;stroke:none;stroke-width:0.75043;stroke-opacity:1"
-       x="117.11272"
-       y="676.93573">&amp;</tspan></text>
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:22.0133px;font-family:Times, serif;-inkscape-font-specification:'Times, serif';fill:#4964c5;fill-opacity:1;stroke:none;stroke-width:0.750453;stroke-opacity:1"
+       x="118.52132"
+       y="648.98077">&amp;</tspan></text>
   <text
      xml:space="preserve"
-     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:22.0126px;font-family:sans-serif;-inkscape-font-specification:sans-serif;fill:#1e26ff;fill-opacity:1;stroke:none;stroke-width:0.75043;stroke-opacity:1"
-     x="530.80853"
-     y="676.93567"
-     id="text562-71-8-2-8-8-4-1-7-2"><tspan
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:22.0133px;font-family:sans-serif;-inkscape-font-specification:sans-serif;fill:#1e26ff;fill-opacity:1;stroke:none;stroke-width:0.750453;stroke-opacity:1"
+     x="612.52484"
+     y="648.1463"
+     id="text562-71-8-2-8-8-4-1-7-0-9"><tspan
        sodipodi:role="line"
-       id="tspan560-87-2-7-9-3-80-4-9-2"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:22.0126px;font-family:Times, serif;-inkscape-font-specification:'Times, serif';fill:#4964c5;fill-opacity:1;stroke:none;stroke-width:0.75043;stroke-opacity:1"
-       x="530.80853"
-       y="676.93567">&amp;</tspan></text>
+       id="tspan560-87-2-7-9-3-80-4-9-5-0"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:22.0133px;font-family:Times, serif;-inkscape-font-specification:'Times, serif';fill:#4964c5;fill-opacity:1;stroke:none;stroke-width:0.750453;stroke-opacity:1"
+       x="612.52484"
+       y="648.1463">&amp;</tspan></text>
   <text
      xml:space="preserve"
-     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:22.0126px;font-family:sans-serif;-inkscape-font-specification:sans-serif;fill:#1e26ff;fill-opacity:1;stroke:none;stroke-width:0.75043;stroke-opacity:1"
-     x="610.93457"
-     y="250.17575"
-     id="text562-71-8-2-8-3"><tspan
-       sodipodi:role="line"
-       id="tspan560-87-2-7-9-7"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:22.0126px;font-family:Times, serif;-inkscape-font-specification:'Times, serif';fill:#4964c5;fill-opacity:1;stroke:none;stroke-width:0.75043;stroke-opacity:1"
-       x="610.93457"
-       y="250.17575">%</tspan></text>
-  <text
-     xml:space="preserve"
-     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:22.0126px;font-family:sans-serif;-inkscape-font-specification:sans-serif;fill:#1e26ff;fill-opacity:1;stroke:none;stroke-width:0.75043;stroke-opacity:1"
-     x="216.39938"
-     y="250.17577"
-     id="text562-71-8-2-8-3-4"><tspan
-       sodipodi:role="line"
-       id="tspan560-87-2-7-9-7-8"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:22.0126px;font-family:Times, serif;-inkscape-font-specification:'Times, serif';fill:#4964c5;fill-opacity:1;stroke:none;stroke-width:0.75043;stroke-opacity:1"
-       x="216.39938"
-       y="250.17577">%</tspan></text>
-  <text
-     xml:space="preserve"
-     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:22.0126px;font-family:sans-serif;-inkscape-font-specification:sans-serif;fill:#1e26ff;fill-opacity:1;stroke:none;stroke-width:0.75043;stroke-opacity:1"
-     x="168.49809"
-     y="427.84723"
-     id="text562-71-8-2-8-8-4-1-0"><tspan
-       sodipodi:role="line"
-       id="tspan560-87-2-7-9-3-80-4-2"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:22.0126px;font-family:Times, serif;-inkscape-font-specification:'Times, serif';fill:#4964c5;fill-opacity:1;stroke:none;stroke-width:0.75043;stroke-opacity:1"
-       x="168.49809"
-       y="427.84723">@</tspan></text>
-  <text
-     xml:space="preserve"
-     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:22.0126px;font-family:sans-serif;-inkscape-font-specification:sans-serif;fill:#1e26ff;fill-opacity:1;stroke:none;stroke-width:0.75043;stroke-opacity:1"
-     x="592.6452"
-     y="514.9411"
-     id="text562-71-8-2-8-8-4-1-3"><tspan
-       sodipodi:role="line"
-       id="tspan560-87-2-7-9-3-80-4-8"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:22.0126px;font-family:Times, serif;-inkscape-font-specification:'Times, serif';fill:#4964c5;fill-opacity:1;stroke:none;stroke-width:0.75043;stroke-opacity:1"
-       x="592.6452"
-       y="514.9411">@</tspan></text>
-  <text
-     xml:space="preserve"
-     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:22.0126px;font-family:sans-serif;-inkscape-font-specification:sans-serif;fill:#1e26ff;fill-opacity:1;stroke:none;stroke-width:0.75043;stroke-opacity:1"
-     x="577.83923"
-     y="588.97089"
-     id="text562-71-8-2-8-8-4-1-7"><tspan
-       sodipodi:role="line"
-       id="tspan560-87-2-7-9-3-80-4-9"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:22.0126px;font-family:Times, serif;-inkscape-font-specification:'Times, serif';fill:#4964c5;fill-opacity:1;stroke:none;stroke-width:0.75043;stroke-opacity:1"
-       x="577.83923"
-       y="588.97089">@</tspan></text>
-  <text
-     xml:space="preserve"
-     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:22.0126px;font-family:sans-serif;-inkscape-font-specification:sans-serif;fill:#1e26ff;fill-opacity:1;stroke:none;stroke-width:0.75043;stroke-opacity:1"
-     x="119.72556"
-     y="588.09998"
-     id="text562-71-8-2-8-8-4-1-7-3"><tspan
-       sodipodi:role="line"
-       id="tspan560-87-2-7-9-3-80-4-9-9"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:22.0126px;font-family:Times, serif;-inkscape-font-specification:'Times, serif';fill:#4964c5;fill-opacity:1;stroke:none;stroke-width:0.75043;stroke-opacity:1"
-       x="119.72556"
-       y="588.09998">@</tspan></text>
-  <text
-     xml:space="preserve"
-     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:22.0126px;font-family:sans-serif;-inkscape-font-specification:sans-serif;fill:#1e26ff;fill-opacity:1;stroke:none;stroke-width:0.75043;stroke-opacity:1"
-     x="488.13257"
-     y="426.97629"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:22.0133px;font-family:sans-serif;-inkscape-font-specification:sans-serif;fill:#1e26ff;fill-opacity:1;stroke:none;stroke-width:0.750453;stroke-opacity:1"
+     x="487.25241"
+     y="426.6011"
      id="text562-71-8-2-8-8-4-1"><tspan
        sodipodi:role="line"
        id="tspan560-87-2-7-9-3-80-4"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:22.0126px;font-family:Times, serif;-inkscape-font-specification:'Times, serif';fill:#4964c5;fill-opacity:1;stroke:none;stroke-width:0.75043;stroke-opacity:1"
-       x="488.13257"
-       y="426.97629">@</tspan></text>
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:22.0133px;font-family:Times, serif;-inkscape-font-specification:'Times, serif';fill:#4964c5;fill-opacity:1;stroke:none;stroke-width:0.750453;stroke-opacity:1"
+       x="487.25241"
+       y="426.6011">@</tspan></text>
   <text
      xml:space="preserve"
-     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:22.0126px;font-family:Times, serif;-inkscape-font-specification:'Times, serif';fill:#e90000;fill-opacity:1;stroke:#e90000;stroke-width:0.75043;stroke-opacity:1"
-     x="107.30888"
-     y="776.79004"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:22.0133px;font-family:sans-serif;-inkscape-font-specification:sans-serif;fill:#1e26ff;fill-opacity:1;stroke:none;stroke-width:0.750453;stroke-opacity:1"
+     x="510.2002"
+     y="560.53278"
+     id="text562-71-8-2-8-8-4-1-3"><tspan
+       sodipodi:role="line"
+       id="tspan560-87-2-7-9-3-80-4-8"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:22.0133px;font-family:Times, serif;-inkscape-font-specification:'Times, serif';fill:#4964c5;fill-opacity:1;stroke:none;stroke-width:0.750453;stroke-opacity:1"
+       x="510.2002"
+       y="560.53278">@</tspan></text>
+  <text
+     xml:space="preserve"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:22.0133px;font-family:sans-serif;-inkscape-font-specification:sans-serif;fill:#1e26ff;fill-opacity:1;stroke:none;stroke-width:0.750453;stroke-opacity:1"
+     x="428.42261"
+     y="648.98608"
+     id="text562-71-8-2-8-8-4-1-0"><tspan
+       sodipodi:role="line"
+       id="tspan560-87-2-7-9-3-80-4-2"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:22.0133px;font-family:Times, serif;-inkscape-font-specification:'Times, serif';fill:#4964c5;fill-opacity:1;stroke:none;stroke-width:0.750453;stroke-opacity:1"
+       x="428.42261"
+       y="648.98608">@</tspan></text>
+  <text
+     xml:space="preserve"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:22.0133px;font-family:sans-serif;-inkscape-font-specification:sans-serif;fill:#1e26ff;fill-opacity:1;stroke:none;stroke-width:0.750453;stroke-opacity:1"
+     x="168.90384"
+     y="427.85278"
+     id="text562-71-8-2-8-8-4-1-4"><tspan
+       sodipodi:role="line"
+       id="tspan560-87-2-7-9-3-80-4-83"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:22.0133px;font-family:Times, serif;-inkscape-font-specification:'Times, serif';fill:#4964c5;fill-opacity:1;stroke:none;stroke-width:0.750453;stroke-opacity:1"
+       x="168.90384"
+       y="427.85278">@</tspan></text>
+  <text
+     xml:space="preserve"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:22.0133px;font-family:sans-serif;-inkscape-font-specification:sans-serif;fill:#1e26ff;fill-opacity:1;stroke:none;stroke-width:0.750453;stroke-opacity:1"
+     x="216.50453"
+     y="250.11165"
+     id="text562-71-8-2-8-3-4"><tspan
+       sodipodi:role="line"
+       id="tspan560-87-2-7-9-7-8"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:22.0133px;font-family:Times, serif;-inkscape-font-specification:'Times, serif';fill:#4964c5;fill-opacity:1;stroke:none;stroke-width:0.750453;stroke-opacity:1"
+       x="216.50453"
+       y="250.11165">%</tspan></text>
+  <text
+     xml:space="preserve"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:22.0133px;font-family:sans-serif;-inkscape-font-specification:sans-serif;fill:#1e26ff;fill-opacity:1;stroke:none;stroke-width:0.750453;stroke-opacity:1"
+     x="611.20667"
+     y="250.11166"
+     id="text562-71-8-2-8-3-4-7"><tspan
+       sodipodi:role="line"
+       id="tspan560-87-2-7-9-7-8-9"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:22.0133px;font-family:Times, serif;-inkscape-font-specification:'Times, serif';fill:#4964c5;fill-opacity:1;stroke:none;stroke-width:0.750453;stroke-opacity:1"
+       x="611.20667"
+       y="250.11166">%</tspan></text>
+  <text
+     xml:space="preserve"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:22.0133px;font-family:Times, serif;-inkscape-font-specification:'Times, serif';fill:#e90000;fill-opacity:1;stroke:#e90000;stroke-width:0.750453;stroke-opacity:1"
+     x="101.46683"
+     y="731.11121"
      id="text14384"><tspan
        sodipodi:role="line"
-       style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.75043"
-       x="107.30888"
-       y="776.79004"
+       style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.750453"
+       x="101.46683"
+       y="731.11121"
        id="tspan14388">@ = Writes to DB</tspan><tspan
        sodipodi:role="line"
-       style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.75043"
-       x="107.30888"
-       y="804.30579"
+       style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.750453"
+       x="101.46683"
+       y="758.62781"
        id="tspan14392">% = Reads Pangolin version files</tspan><tspan
        sodipodi:role="line"
-       style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.75043"
-       x="107.30888"
-       y="831.82153"
+       style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.750453"
+       x="101.46683"
+       y="786.14447"
        id="tspan2743">&amp; = Writes igvstatic files</tspan></text>
 </svg>
