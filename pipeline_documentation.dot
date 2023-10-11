@@ -15,14 +15,7 @@ update_splitText -> update_transformData;
 update_align [label="align"];
 update_transformData -> update_align [label="transformed_data"];
 
-update_loadToDB [label="load_to_db"];
 update_align -> update_loadToDB [label="metadata_plus_variants"];
-
-update_collect1 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-update_loadToDB -> update_collect1 [label="complete_metadata_files"];
-
-update_loadPangolinData [label="load_pangolin_data"];
-update_loadToDB -> update_loadPangolinData [label="complete_metadata_files"];
 
 update_getPangolinVersion [label="get_pangolin_version"];
 
@@ -31,18 +24,15 @@ update_getPangolinVersion -> update_pangolinCalls [label="transformed_data"];
 
 update_transformData -> update_pangolinCalls [label="transformed_data"];
 
-update_pangolinCalls -> update_loadPangolinData [label="pangolin_lineage_data"];
+update_pangolinCalls -> update_loadToDB [label="pangolin_lineage_data"];
 
-update_loadPangolinData [label="load_pangolin_data"];
-update_getPangolinVersion -> update_loadPangolinData [label="use_pending"];
+update_loadToDB [label="load_to_db"];
+update_getPangolinVersion -> update_loadToDB [label="use_pending"];
 
-update_loadPangolinData [label="load_pangolin_data"];
 update_collect2 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
-update_loadPangolinData -> update_collect2 [label="complete_files_pangolin"];
+update_loadToDB -> update_collect2 [label="complete_metadata_files"];
 
 update_recalculateDatabaseViews [label="recalculate_database_views"];
-
-update_collect1 -> update_recalculateDatabaseViews;
 
 update_collect2 -> update_recalculateDatabaseViews;
 
@@ -54,12 +44,16 @@ update_recalculateDatabaseViews -> update_recomputeAffectedPrimers [label="compl
 
 digraph "recall_pangolin" {
 
+recall_downloadData [label="download_data"];
+
 recall_getPangolinVersion [label="get_pangolin_version"];
 recall_pangolinCalls [label="pangolin_calls"];
 
 recall_getPangolinVersion -> recall_pangolinCalls [label="latest_pangolin"];
 
 recall_extractNewRecords [label="extract_new_records"];
+recall_downloadData -> recall_extractNewRecords [label="downloaded_data"];
+
 recall_splitText [shape=circle,label="",fixedsize=true,width=0.1,xlabel="splitText"];
 recall_extractNewRecords -> recall_splitText;
 
@@ -74,7 +68,11 @@ recall_pangolinCalls -> recall_loadPangolinData;
 recall_collect [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
 recall_loadPangolinData -> recall_collect;
 
+recall_cleanupOldCalls [label="cleanup_old_calls"];
+
 recall_updateCalls [label="update_calls"];
+recall_cleanupOldCalls -> recall_updateCalls;
+
 recall_collect -> recall_updateCalls;
 
 recall_recomputeAffectedPrimers [label="recompute_affected_primers"];
