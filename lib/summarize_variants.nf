@@ -140,29 +140,6 @@ process align {
     '''
 }
 
-process load_to_db {
-    cpus 1
-    publishDir "${output_path}", mode: 'copy'
-    errorStrategy 'retry'
-    maxRetries 10
-    maxForks 1
-
-    conda 'postgresql>=15'
-
-    input:
-        tuple file(metadata), file(tsv)
-    output:
-        file '*.complete'
-    shell:
-    '''
-    RAILS_ENV=production ruby !{primer_monitor_path}/upload.rb \
-        --import_seqs \
-        --metadata_tsv !{metadata} \
-        --variants_tsv !{tsv} \
-        && mv !{metadata} !{metadata}.complete
-    '''
-}
-
 process get_pangolin_version {
     cpus 1
 
@@ -203,25 +180,32 @@ process pangolin_calls {
     '''
 }
 
-process load_pangolin_data {
+process load_to_db {
     cpus 1
+    publishDir "${output_path}", mode: 'copy'
+    errorStrategy 'retry'
+    maxRetries 10
+    maxForks 1
 
     conda "'postgresql>=15'"
 
     input:
+        tuple file(metadata), file(tsv)
         file csv
-        file complete
         val use_pending
         //the .complete is only here to make sure this happens *after* the main DB load
     output:
-        file '*.complete_pangolin'
+        file '*.complete'
     shell:
     '''
     RAILS_ENV=production ruby !{primer_monitor_path}/upload.rb \
             --import_calls \
+            --import_seqs \
             --pangolin_csv !{csv} \
             --pending !{use_pending} \
-            && mv !{csv} !{csv}.$(basename $PWD).complete_pangolin
+            --metadata_tsv !{metadata} \
+            --variants_tsv !{tsv} \
+            && mv !{metadata} !{metadata}.complete
     '''
 }
 
@@ -231,7 +215,7 @@ process recalculate_database_views {
     errorStrategy 'retry'
     maxRetries 2
     input:
-        //these files are to make sure all the load_to_db and load_pangolin_data tasks are done first
+        //these files are to make sure all the load_to_db tasks are done first
         file seq_load_complete
         file pangolin_calls_complete
     output:
@@ -261,10 +245,9 @@ workflow {
     extract_new_records(download_data.out)
     transform_data(extract_new_records.out.splitText(file: true, by: 10000).filter{ it.size()>77 })
     align(transform_data.out)
-    load_to_db(align.out)
     get_pangolin_version()
     pangolin_calls(get_pangolin_version.out[0], get_pangolin_version.out[1], transform_data.out)
-    load_pangolin_data(pangolin_calls.out, load_to_db.out, get_pangolin_version.out[2])
-    recalculate_database_views(load_to_db.out.collect(), load_pangolin_data.out.collect())
+    load_to_db(align.out, pangolin_calls.out, get_pangolin_version.out[2])
+    recalculate_database_views(load_to_db.out.collect())
     recompute_affected_primers(recalculate_database_views.out)
 }
