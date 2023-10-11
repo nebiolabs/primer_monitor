@@ -10,7 +10,7 @@
    viewBox="0 0 825.58001 1069.5569"
    version="1.1"
    id="svg667"
-   sodipodi:docname="graph.svg"
+   sodipodi:docname="pipeline_documentation.svg"
    inkscape:version="1.2.1 (9c6d41e4, 2022-07-14)"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
@@ -30,8 +30,8 @@
      inkscape:document-units="pt"
      showgrid="false"
      inkscape:zoom="0.89932127"
-     inkscape:cx="545.41132"
-     inkscape:cy="442"
+     inkscape:cx="540.96352"
+     inkscape:cy="443.11195"
      inkscape:window-width="1390"
      inkscape:window-height="945"
      inkscape:window-x="0"
@@ -1033,25 +1033,25 @@
   <text
      xml:space="preserve"
      style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:22.0133px;font-family:sans-serif;-inkscape-font-specification:sans-serif;fill:#1e26ff;fill-opacity:1;stroke:none;stroke-width:0.750453;stroke-opacity:1"
-     x="543.58124"
-     y="559.6983"
-     id="text562-71-8-2-8-8-4-1-0"><tspan
-       sodipodi:role="line"
-       id="tspan560-87-2-7-9-3-80-4-2"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:22.0133px;font-family:Times, serif;-inkscape-font-specification:'Times, serif';fill:#4964c5;fill-opacity:1;stroke:none;stroke-width:0.750453;stroke-opacity:1"
-       x="543.58124"
-       y="559.6983">@</tspan></text>
-  <text
-     xml:space="preserve"
-     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:22.0133px;font-family:sans-serif;-inkscape-font-specification:sans-serif;fill:#1e26ff;fill-opacity:1;stroke:none;stroke-width:0.750453;stroke-opacity:1"
-     x="420.91476"
+     x="420.08032"
      y="648.15167"
      id="text562-71-8-2-8-8-4-1-0-0"><tspan
        sodipodi:role="line"
        id="tspan560-87-2-7-9-3-80-4-2-4"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:22.0133px;font-family:Times, serif;-inkscape-font-specification:'Times, serif';fill:#4964c5;fill-opacity:1;stroke:none;stroke-width:0.750453;stroke-opacity:1"
-       x="420.91476"
+       x="420.08032"
        y="648.15167">@</tspan></text>
+  <text
+     xml:space="preserve"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:22.0133px;font-family:sans-serif;-inkscape-font-specification:sans-serif;fill:#1e26ff;fill-opacity:1;stroke:none;stroke-width:0.750453;stroke-opacity:1"
+     x="541.91229"
+     y="560.53284"
+     id="text562-71-8-2-8-8-4-1-0-0-8"><tspan
+       sodipodi:role="line"
+       id="tspan560-87-2-7-9-3-80-4-2-4-0"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:22.0133px;font-family:Times, serif;-inkscape-font-specification:'Times, serif';fill:#4964c5;fill-opacity:1;stroke:none;stroke-width:0.750453;stroke-opacity:1"
+       x="541.91229"
+       y="560.53284">@</tspan></text>
   <text
      xml:space="preserve"
      style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:22.0133px;font-family:sans-serif;-inkscape-font-specification:sans-serif;fill:#1e26ff;fill-opacity:1;stroke:none;stroke-width:0.750453;stroke-opacity:1"

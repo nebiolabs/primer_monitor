@@ -242,7 +242,7 @@ workflow {
     align(transform_data.out)
     get_pangolin_version()
     pangolin_calls(get_pangolin_version.out[0], get_pangolin_version.out[1], transform_data.out)
-    load_to_db(align.out, pangolin_calls.out, get_pangolin_version.out[2])
+    load_to_db(align.out, pangolin_calls.out)
     recalculate_database_views(load_to_db.out.collect())
     recompute_affected_primers(recalculate_database_views.out)
 }
