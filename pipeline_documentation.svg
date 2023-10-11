@@ -5,11 +5,11 @@
 <!-- Title: root Pages: 1 -->
 
 <svg
-   width="11.583333in"
-   height="14.99in"
-   viewBox="0 0 833.57998 1079.9311"
+   width="11.472222in"
+   height="14.846in"
+   viewBox="0 0 825.58001 1069.5569"
    version="1.1"
-   id="svg339"
+   id="svg667"
    sodipodi:docname="graph.svg"
    inkscape:version="1.2.1 (9c6d41e4, 2022-07-14)"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
@@ -17,9 +17,9 @@
    xmlns="http://www.w3.org/2000/svg"
    xmlns:svg="http://www.w3.org/2000/svg">
   <defs
-     id="defs343" />
+     id="defs671" />
   <sodipodi:namedview
-     id="namedview341"
+     id="namedview669"
      pagecolor="#ffffff"
      bordercolor="#000000"
      borderopacity="0.25"
@@ -30,31 +30,31 @@
      inkscape:document-units="pt"
      showgrid="false"
      inkscape:zoom="0.89932127"
-     inkscape:cx="550.97107"
-     inkscape:cy="1064.6918"
+     inkscape:cx="545.41132"
+     inkscape:cy="442"
      inkscape:window-width="1390"
      inkscape:window-height="945"
      inkscape:window-x="0"
      inkscape:window-y="25"
      inkscape:window-maximized="0"
-     inkscape:current-layer="svg339" />
+     inkscape:current-layer="svg667" />
   <g
      id="graph0"
      class="graph"
      transform="translate(4,659.4)">
     <title
-       id="title2">root</title>
+       id="title339">root</title>
     <polygon
        fill="#ffffff"
        stroke="none"
-       points="829.58,-659.4 829.58,4 -4,4 -4,-659.4 "
-       id="polygon4" />
+       points="821.58,-659.4 821.58,4 -4,4 -4,-659.4 "
+       id="polygon341" />
     <!-- update_downloadData -->
     <g
        id="node1"
        class="node">
       <title
-         id="title6">update_downloadData</title>
+         id="title343">update_downloadData</title>
       <ellipse
          fill="none"
          stroke="#000000"
@@ -62,21 +62,21 @@
          cy="-637.40002"
          rx="67.220001"
          ry="18"
-         id="ellipse8" />
+         id="ellipse345" />
       <text
          text-anchor="middle"
          x="87.690002"
          y="-632.34998"
          font-family="Times, serif"
          font-size="14px"
-         id="text10">download_data</text>
+         id="text347">download_data</text>
     </g>
     <!-- update_extractNewRecords -->
     <g
        id="node2"
        class="node">
       <title
-         id="title13">update_extractNewRecords</title>
+         id="title350">update_extractNewRecords</title>
       <ellipse
          fill="none"
          stroke="#000000"
@@ -84,51 +84,51 @@
          cy="-548.90002"
          rx="87.690002"
          ry="18"
-         id="ellipse15" />
+         id="ellipse352" />
       <text
          text-anchor="middle"
          x="87.690002"
          y="-543.84998"
          font-family="Times, serif"
          font-size="14px"
-         id="text17">extract_new_records</text>
+         id="text354">extract_new_records</text>
     </g>
     <!-- update_downloadData&#45;&gt;update_extractNewRecords -->
     <g
        id="edge1"
        class="edge">
       <title
-         id="title20">update_downloadData-&gt;update_extractNewRecords</title>
+         id="title357">update_downloadData-&gt;update_extractNewRecords</title>
       <path
          fill="none"
          stroke="#000000"
          d="m 87.69,-619.31 c 0,11.77 0,27.68 0,41.3"
-         id="path22" />
+         id="path359" />
       <polygon
          fill="#000000"
          stroke="#000000"
          points="91.19,-578.25 87.69,-568.25 84.19,-578.25 "
-         id="polygon24" />
+         id="polygon361" />
       <text
          text-anchor="middle"
          x="135.31"
          y="-588.09998"
          font-family="Times, serif"
          font-size="14px"
-         id="text26">downloaded_data</text>
+         id="text363">downloaded_data</text>
     </g>
     <!-- update_splitText -->
     <g
        id="node3"
        class="node">
       <title
-         id="title29">update_splitText</title>
+         id="title366">update_splitText</title>
       <circle
          fill="none"
          stroke="#000000"
          cx="87.690002"
          cy="-474.79999"
-         id="ellipse31"
+         id="ellipse368"
          r="3.5999999" />
       <text
          text-anchor="middle"
@@ -136,38 +136,38 @@
          y="-481.60001"
          font-family="Times, serif"
          font-size="14px"
-         id="text33">splitText</text>
+         id="text370">splitText</text>
     </g>
     <!-- update_extractNewRecords&#45;&gt;update_splitText -->
     <g
        id="edge2"
        class="edge">
       <title
-         id="title36">update_extractNewRecords-&gt;update_splitText</title>
+         id="title373">update_extractNewRecords-&gt;update_splitText</title>
       <path
          fill="none"
          stroke="#000000"
          d="m 87.69,-530.45 c 0,12.7 0,29.65 0,41.28"
-         id="path38" />
+         id="path375" />
       <polygon
          fill="#000000"
          stroke="#000000"
          points="91.19,-489.52 87.69,-479.52 84.19,-489.52 "
-         id="polygon40" />
+         id="polygon377" />
       <text
          text-anchor="middle"
          x="121.81"
          y="-499.60001"
          font-family="Times, serif"
          font-size="14px"
-         id="text42">filtered_data</text>
+         id="text379">filtered_data</text>
     </g>
     <!-- update_transformData -->
     <g
        id="node4"
        class="node">
       <title
-         id="title45">update_transformData</title>
+         id="title382">update_transformData</title>
       <ellipse
          fill="none"
          stroke="#000000"
@@ -175,284 +175,284 @@
          cy="-416.20001"
          rx="67.220001"
          ry="18"
-         id="ellipse47" />
+         id="ellipse384" />
       <text
          text-anchor="middle"
          x="87.690002"
          y="-411.14999"
          font-family="Times, serif"
          font-size="14px"
-         id="text49">transform_data</text>
+         id="text386">transform_data</text>
     </g>
     <!-- update_splitText&#45;&gt;update_transformData -->
     <g
        id="edge3"
        class="edge">
       <title
-         id="title52">update_splitText-&gt;update_transformData</title>
+         id="title389">update_splitText-&gt;update_transformData</title>
       <path
          fill="none"
          stroke="#000000"
          d="m 87.69,-470.76 c 0,4.93 0,15.12 0,25.31"
-         id="path54" />
+         id="path391" />
       <polygon
          fill="#000000"
          stroke="#000000"
          points="91.19,-445.65 87.69,-435.65 84.19,-445.65 "
-         id="polygon56" />
+         id="polygon393" />
     </g>
     <!-- update_align -->
     <g
        id="node5"
        class="node">
       <title
-         id="title59">update_align</title>
+         id="title396">update_align</title>
       <ellipse
          fill="none"
          stroke="#000000"
-         cx="42.689999"
+         cx="57.689999"
          cy="-327.70001"
          rx="29.34"
          ry="18"
-         id="ellipse61" />
+         id="ellipse398" />
       <text
          text-anchor="middle"
-         x="42.689999"
+         x="57.689999"
          y="-322.64999"
          font-family="Times, serif"
          font-size="14px"
-         id="text63">align</text>
+         id="text400">align</text>
     </g>
     <!-- update_transformData&#45;&gt;update_align -->
     <g
        id="edge4"
        class="edge">
       <title
-         id="title66">update_transformData-&gt;update_align</title>
+         id="title403">update_transformData-&gt;update_align</title>
       <path
          fill="none"
          stroke="#000000"
-         d="m 41.86,-402.78 c -10.81,5.18 -21.03,12.45 -27.42,22.58 -5.85,9.28 -1.79,19.86 4.88,29.01"
-         id="path68" />
+         d="m 69.87,-398.56 c -4.6,5.37 -8.95,11.68 -11.43,18.36 -2.72,7.32 -3.67,15.64 -3.74,23.43"
+         id="path405" />
       <polygon
          fill="#000000"
          stroke="#000000"
-         points="22.5,-353.85 26.28,-343.95 17.15,-349.34 "
-         id="polygon70" />
+         points="58.23,-357.05 55.12,-346.93 51.23,-356.78 "
+         id="polygon407" />
       <text
          text-anchor="middle"
-         x="62.310001"
+         x="106.31"
          y="-366.89999"
          font-family="Times, serif"
          font-size="14px"
-         id="text72">transformed_data</text>
+         id="text409">transformed_data</text>
     </g>
     <!-- update_pangolinCalls -->
     <g
        id="node6"
        class="node">
       <title
-         id="title75">update_pangolinCalls</title>
+         id="title412">update_pangolinCalls</title>
       <ellipse
          fill="none"
          stroke="#000000"
-         cx="215.69"
+         cx="208.69"
          cy="-327.70001"
          rx="64.660004"
          ry="18"
-         id="ellipse77" />
+         id="ellipse414" />
       <text
          text-anchor="middle"
-         x="215.69"
+         x="208.69"
          y="-322.64999"
          font-family="Times, serif"
          font-size="14px"
-         id="text79">pangolin_calls</text>
+         id="text416">pangolin_calls</text>
     </g>
     <!-- update_transformData&#45;&gt;update_pangolinCalls -->
     <g
        id="edge5"
        class="edge">
       <title
-         id="title82">update_transformData-&gt;update_pangolinCalls</title>
+         id="title419">update_transformData-&gt;update_pangolinCalls</title>
       <path
          fill="none"
          stroke="#000000"
-         d="m 101.46,-398.3 c 9.53,10.91 22.98,24.83 36.98,34.6 8.97,6.25 19.23,11.83 29.28,16.58"
-         id="path84" />
+         d="m 120.26,-400.1 c 10.99,5.65 23.09,12.51 33.43,19.9 3.39,2.42 17.06,15.21 29.91,27.44"
+         id="path421" />
       <polygon
          fill="#000000"
          stroke="#000000"
-         points="168.98,-349.94 176.65,-342.64 166.1,-343.56 "
-         id="polygon86" />
+         points="185.58,-355.75 190.41,-346.32 180.75,-350.69 "
+         id="polygon423" />
       <text
          text-anchor="middle"
-         x="186.31"
+         x="219.31"
          y="-366.89999"
          font-family="Times, serif"
          font-size="14px"
-         id="text88">transformed_data</text>
+         id="text425">transformed_data</text>
     </g>
     <!-- update_loadToDB -->
     <g
        id="node7"
        class="node">
       <title
-         id="title91">update_loadToDB</title>
+         id="title428">update_loadToDB</title>
       <ellipse
          fill="none"
          stroke="#000000"
-         cx="215.69"
+         cx="133.69"
          cy="-239.2"
          rx="52.380001"
          ry="18"
-         id="ellipse93" />
+         id="ellipse430" />
       <text
          text-anchor="middle"
-         x="215.69"
+         x="133.69"
          y="-234.14999"
          font-family="Times, serif"
          font-size="14px"
-         id="text95">load_to_db</text>
+         id="text432">load_to_db</text>
     </g>
     <!-- update_align&#45;&gt;update_loadToDB -->
     <g
        id="edge6"
        class="edge">
       <title
-         id="title98">update_align-&gt;update_loadToDB</title>
+         id="title435">update_align-&gt;update_loadToDB</title>
       <path
          fill="none"
          stroke="#000000"
-         d="m 51.68,-310.44 c 7.16,11.49 18.22,26.37 31.76,35.24 21.45,14.05 48.33,22.48 72.24,27.52"
-         id="path100" />
+         d="m 51.71,-309.61 c -2.63,10.71 -3.82,24.35 2.73,34.41 6.16,9.45 15.52,16.37 25.66,21.43"
+         id="path437" />
       <polygon
          fill="#000000"
          stroke="#000000"
-         points="156.28,-250.93 165.43,-245.59 154.95,-244.06 "
-         id="polygon102" />
+         points="81.22,-256.66 89,-249.47 78.43,-250.24 "
+         id="polygon439" />
       <text
          text-anchor="middle"
-         x="147.81"
+         x="118.81"
          y="-278.39999"
          font-family="Times, serif"
          font-size="14px"
-         id="text104">metadata_plus_variants</text>
+         id="text441">metadata_plus_variants</text>
     </g>
     <!-- update_pangolinCalls&#45;&gt;update_loadToDB -->
     <g
-       id="edge10"
+       id="edge9"
        class="edge">
       <title
-         id="title107">update_pangolinCalls-&gt;update_loadToDB</title>
+         id="title444">update_pangolinCalls-&gt;update_loadToDB</title>
       <path
          fill="none"
          stroke="#000000"
-         d="m 215.69,-309.61 c 0,11.77 0,27.68 0,41.3"
-         id="path109" />
+         d="m 204.15,-309.57 c -3.48,10.73 -9.11,24.37 -17.46,34.37 -4.45,5.33 -9.92,10.16 -15.64,14.41"
+         id="path446" />
       <polygon
          fill="#000000"
          stroke="#000000"
-         points="219.19,-268.55 215.69,-258.55 212.19,-268.55 "
-         id="polygon111" />
+         points="173.21,-257.34 162.97,-254.6 169.26,-263.13 "
+         id="polygon448" />
       <text
          text-anchor="middle"
-         x="276.81"
+         x="257.81"
          y="-278.39999"
          font-family="Times, serif"
          font-size="14px"
-         id="text113">pangolin_lineage_data</text>
+         id="text450">pangolin_lineage_data</text>
     </g>
     <!-- update_collect2 -->
     <g
        id="node8"
        class="node">
       <title
-         id="title116">update_collect2</title>
+         id="title453">update_collect2</title>
       <circle
          fill="none"
          stroke="#000000"
-         cx="215.69"
+         cx="133.69"
          cy="-165.10001"
-         id="ellipse118"
+         id="ellipse455"
          r="3.5999999" />
       <text
          text-anchor="middle"
-         x="194.09"
+         x="112.09"
          y="-171.89999"
          font-family="Times, serif"
          font-size="14px"
-         id="text120">collect</text>
+         id="text457">collect</text>
     </g>
     <!-- update_loadToDB&#45;&gt;update_collect2 -->
     <g
        id="edge7"
        class="edge">
       <title
-         id="title123">update_loadToDB-&gt;update_collect2</title>
+         id="title460">update_loadToDB-&gt;update_collect2</title>
       <path
          fill="none"
          stroke="#000000"
-         d="m 215.69,-220.75 c 0,12.7 0,29.65 0,41.28"
-         id="path125" />
+         d="m 133.69,-220.75 c 0,12.7 0,29.65 0,41.28"
+         id="path462" />
       <polygon
          fill="#000000"
          stroke="#000000"
-         points="219.19,-179.82 215.69,-169.82 212.19,-179.82 "
-         id="polygon127" />
+         points="137.19,-179.82 133.69,-169.82 130.19,-179.82 "
+         id="polygon464" />
       <text
          text-anchor="middle"
-         x="283.94"
+         x="201.94"
          y="-189.89999"
          font-family="Times, serif"
          font-size="14px"
-         id="text129">complete_metadata_files</text>
+         id="text466">complete_metadata_files</text>
     </g>
     <!-- update_recalculateDatabaseViews -->
     <g
        id="node10"
        class="node">
       <title
-         id="title132">update_recalculateDatabaseViews</title>
+         id="title469">update_recalculateDatabaseViews</title>
       <ellipse
          fill="none"
          stroke="#000000"
-         cx="215.69"
+         cx="133.69"
          cy="-106.5"
          rx="113.28"
          ry="18"
-         id="ellipse134" />
+         id="ellipse471" />
       <text
          text-anchor="middle"
-         x="215.69"
+         x="133.69"
          y="-101.45"
          font-family="Times, serif"
          font-size="14px"
-         id="text136">recalculate_database_views</text>
+         id="text473">recalculate_database_views</text>
     </g>
     <!-- update_collect2&#45;&gt;update_recalculateDatabaseViews -->
     <g
-       id="edge11"
+       id="edge10"
        class="edge">
       <title
-         id="title139">update_collect2-&gt;update_recalculateDatabaseViews</title>
+         id="title476">update_collect2-&gt;update_recalculateDatabaseViews</title>
       <path
          fill="none"
          stroke="#000000"
-         d="m 215.69,-161.06 c 0,4.93 0,15.12 0,25.31"
-         id="path141" />
+         d="m 133.69,-161.06 c 0,4.93 0,15.12 0,25.31"
+         id="path478" />
       <polygon
          fill="#000000"
          stroke="#000000"
-         points="219.19,-135.95 215.69,-125.95 212.19,-135.95 "
-         id="polygon143" />
+         points="137.19,-135.95 133.69,-125.95 130.19,-135.95 "
+         id="polygon480" />
     </g>
     <!-- update_getPangolinVersion -->
     <g
        id="node9"
        class="node">
       <title
-         id="title146">update_getPangolinVersion</title>
+         id="title483">update_getPangolinVersion</title>
       <ellipse
          fill="none"
          stroke="#000000"
@@ -460,641 +460,639 @@
          cy="-416.20001"
          rx="90.760002"
          ry="18"
-         id="ellipse148" />
+         id="ellipse485" />
       <text
          text-anchor="middle"
          x="293.69"
          y="-411.14999"
          font-family="Times, serif"
          font-size="14px"
-         id="text150">get_pangolin_version</text>
+         id="text487">get_pangolin_version</text>
     </g>
     <!-- update_getPangolinVersion&#45;&gt;update_pangolinCalls -->
-    <g
-       id="edge9"
-       class="edge">
-      <title
-         id="title153">update_getPangolinVersion-&gt;update_pangolinCalls</title>
-      <path
-         fill="none"
-         stroke="#000000"
-         d="m 270.58,-398.58 c -6.86,5.47 -14.13,11.83 -20.14,18.38 -6.99,7.63 -13.62,16.76 -19.18,25.21"
-         id="path155" />
-      <polygon
-         fill="#000000"
-         stroke="#000000"
-         points="233.79,-353.43 225.48,-346.86 227.87,-357.18 "
-         id="polygon157" />
-      <text
-         text-anchor="middle"
-         x="298.31"
-         y="-366.89999"
-         font-family="Times, serif"
-         font-size="14px"
-         id="text159">transformed_data</text>
-    </g>
-    <!-- update_getPangolinVersion&#45;&gt;update_loadToDB -->
     <g
        id="edge8"
        class="edge">
       <title
-         id="title162">update_getPangolinVersion-&gt;update_loadToDB</title>
+         id="title490">update_getPangolinVersion-&gt;update_pangolinCalls</title>
       <path
          fill="none"
          stroke="#000000"
-         d="m 327.83,-399.21 c 7.16,5.03 13.77,11.33 17.86,19.01 12.56,23.59 57.75,27.45 -4,105 -8.91,11.19 -39.58,19.85 -68.43,25.75"
-         id="path164" />
+         d="m 289.41,-397.85 c -3.38,10.82 -9,24.47 -17.72,34.15 -5.24,5.81 -11.68,10.88 -18.43,15.21"
+         id="path492" />
       <polygon
          fill="#000000"
          stroke="#000000"
-         points="274.24,-245.88 263.75,-247.4 272.9,-252.75 "
-         id="polygon166" />
+         points="255.36,-345.08 244.97,-343.04 251.82,-351.12 "
+         id="polygon494" />
       <text
          text-anchor="middle"
-         x="407.81"
-         y="-322.64999"
+         x="330.31"
+         y="-366.89999"
          font-family="Times, serif"
          font-size="14px"
-         id="text168">use_pending</text>
+         id="text496">transformed_data</text>
     </g>
     <!-- update_recomputeAffectedPrimers -->
     <g
        id="node11"
        class="node">
       <title
-         id="title171">update_recomputeAffectedPrimers</title>
+         id="title499">update_recomputeAffectedPrimers</title>
       <ellipse
          fill="none"
          stroke="#000000"
-         cx="215.69"
+         cx="133.69"
          cy="-18"
          rx="117.89"
          ry="18"
-         id="ellipse173" />
+         id="ellipse501" />
       <text
          text-anchor="middle"
-         x="215.69"
+         x="133.69"
          y="-12.95"
          font-family="Times, serif"
          font-size="14px"
-         id="text175">recompute_affected_primers</text>
+         id="text503">recompute_affected_primers</text>
     </g>
     <!-- update_recalculateDatabaseViews&#45;&gt;update_recomputeAffectedPrimers -->
     <g
-       id="edge12"
+       id="edge11"
        class="edge">
       <title
-         id="title178">update_recalculateDatabaseViews-&gt;update_recomputeAffectedPrimers</title>
+         id="title506">update_recalculateDatabaseViews-&gt;update_recomputeAffectedPrimers</title>
       <path
          fill="none"
          stroke="#000000"
-         d="m 215.69,-88.41 c 0,11.77 0,27.68 0,41.3"
-         id="path180" />
+         d="m 133.69,-88.41 c 0,11.77 0,27.68 0,41.3"
+         id="path508" />
       <polygon
          fill="#000000"
          stroke="#000000"
-         points="219.19,-47.35 215.69,-37.35 212.19,-47.35 "
-         id="polygon182" />
+         points="137.19,-47.35 133.69,-37.35 130.19,-47.35 "
+         id="polygon510" />
       <text
          text-anchor="middle"
-         x="240.81"
+         x="158.81"
          y="-57.200001"
          font-family="Times, serif"
          font-size="14px"
-         id="text184">complete</text>
+         id="text512">complete</text>
     </g>
     <!-- recall_downloadData -->
     <g
        id="node12"
        class="node">
       <title
-         id="title187">recall_downloadData</title>
+         id="title515">recall_downloadData</title>
       <ellipse
          fill="none"
          stroke="#000000"
-         cx="511.69"
+         cx="469.69"
          cy="-637.40002"
          rx="67.220001"
          ry="18"
-         id="ellipse189" />
+         id="ellipse517" />
       <text
          text-anchor="middle"
-         x="511.69"
+         x="469.69"
          y="-632.34998"
          font-family="Times, serif"
          font-size="14px"
-         id="text191">download_data</text>
+         id="text519">download_data</text>
     </g>
     <!-- recall_extractNewRecords -->
     <g
        id="node13"
        class="node">
       <title
-         id="title194">recall_extractNewRecords</title>
+         id="title522">recall_extractNewRecords</title>
       <ellipse
          fill="none"
          stroke="#000000"
-         cx="511.69"
+         cx="469.69"
          cy="-548.90002"
          rx="87.690002"
          ry="18"
-         id="ellipse196" />
+         id="ellipse524" />
       <text
          text-anchor="middle"
-         x="511.69"
+         x="469.69"
          y="-543.84998"
          font-family="Times, serif"
          font-size="14px"
-         id="text198">extract_new_records</text>
+         id="text526">extract_new_records</text>
     </g>
     <!-- recall_downloadData&#45;&gt;recall_extractNewRecords -->
     <g
-       id="edge13"
+       id="edge12"
        class="edge">
       <title
-         id="title201">recall_downloadData-&gt;recall_extractNewRecords</title>
+         id="title529">recall_downloadData-&gt;recall_extractNewRecords</title>
       <path
          fill="none"
          stroke="#000000"
-         d="m 511.69,-619.31 c 0,11.77 0,27.68 0,41.3"
-         id="path203" />
+         d="m 469.69,-619.31 c 0,11.77 0,27.68 0,41.3"
+         id="path531" />
       <polygon
          fill="#000000"
          stroke="#000000"
-         points="515.19,-578.25 511.69,-568.25 508.19,-578.25 "
-         id="polygon205" />
+         points="473.19,-578.25 469.69,-568.25 466.19,-578.25 "
+         id="polygon533" />
       <text
          text-anchor="middle"
-         x="559.31"
+         x="517.31"
          y="-588.09998"
          font-family="Times, serif"
          font-size="14px"
-         id="text207">downloaded_data</text>
+         id="text535">downloaded_data</text>
     </g>
     <!-- recall_splitText -->
     <g
        id="node17"
        class="node">
       <title
-         id="title210">recall_splitText</title>
+         id="title538">recall_splitText</title>
       <circle
          fill="none"
          stroke="#000000"
-         cx="511.69"
+         cx="469.69"
          cy="-474.79999"
-         id="ellipse212"
+         id="ellipse540"
          r="3.5999999" />
       <text
          text-anchor="middle"
-         x="484.09"
+         x="442.09"
          y="-481.60001"
          font-family="Times, serif"
          font-size="14px"
-         id="text214">splitText</text>
+         id="text542">splitText</text>
     </g>
     <!-- recall_extractNewRecords&#45;&gt;recall_splitText -->
     <g
-       id="edge16"
+       id="edge15"
        class="edge">
       <title
-         id="title217">recall_extractNewRecords-&gt;recall_splitText</title>
+         id="title545">recall_extractNewRecords-&gt;recall_splitText</title>
       <path
          fill="none"
          stroke="#000000"
-         d="m 511.69,-530.45 c 0,12.7 0,29.65 0,41.28"
-         id="path219" />
+         d="m 469.69,-530.45 c 0,12.7 0,29.65 0,41.28"
+         id="path547" />
       <polygon
          fill="#000000"
          stroke="#000000"
-         points="515.19,-489.52 511.69,-479.52 508.19,-489.52 "
-         id="polygon221" />
+         points="473.19,-489.52 469.69,-479.52 466.19,-489.52 "
+         id="polygon549" />
     </g>
     <!-- recall_getPangolinVersion -->
     <g
        id="node14"
        class="node">
       <title
-         id="title224">recall_getPangolinVersion</title>
+         id="title552">recall_getPangolinVersion</title>
       <ellipse
          fill="none"
          stroke="#000000"
-         cx="687.69"
+         cx="645.69"
          cy="-416.20001"
          rx="90.760002"
          ry="18"
-         id="ellipse226" />
+         id="ellipse554" />
       <text
          text-anchor="middle"
-         x="687.69"
+         x="645.69"
          y="-411.14999"
          font-family="Times, serif"
          font-size="14px"
-         id="text228">get_pangolin_version</text>
+         id="text556">get_pangolin_version</text>
     </g>
     <!-- recall_pangolinCalls -->
     <g
        id="node15"
        class="node">
       <title
-         id="title231">recall_pangolinCalls</title>
+         id="title559">recall_pangolinCalls</title>
       <ellipse
          fill="none"
          stroke="#000000"
-         cx="560.69"
+         cx="592.69"
          cy="-327.70001"
          rx="64.660004"
          ry="18"
-         id="ellipse233" />
+         id="ellipse561" />
       <text
          text-anchor="middle"
-         x="560.69"
+         x="592.69"
          y="-322.64999"
          font-family="Times, serif"
          font-size="14px"
-         id="text235">pangolin_calls</text>
+         id="text563">pangolin_calls</text>
     </g>
     <!-- recall_getPangolinVersion&#45;&gt;recall_pangolinCalls -->
     <g
-       id="edge14"
+       id="edge13"
        class="edge">
       <title
-         id="title238">recall_getPangolinVersion-&gt;recall_pangolinCalls</title>
+         id="title566">recall_getPangolinVersion-&gt;recall_pangolinCalls</title>
       <path
          fill="none"
          stroke="#000000"
-         d="m 663.2,-398.52 c -19.93,13.57 -48.23,32.85 -70.05,47.71"
-         id="path240" />
+         d="m 635.22,-398.11 c -7.55,12.32 -17.88,29.18 -26.47,43.2"
+         id="path568" />
       <polygon
          fill="#000000"
          stroke="#000000"
-         points="595.48,-347.48 585.24,-344.74 591.54,-353.26 "
-         id="polygon242" />
+         points="611.35,-353.45 603.14,-346.75 605.38,-357.11 "
+         id="polygon570" />
       <text
          text-anchor="middle"
-         x="676.94"
+         x="664.94"
          y="-366.89999"
          font-family="Times, serif"
          font-size="14px"
-         id="text244">latest_pangolin</text>
+         id="text572">latest_pangolin</text>
     </g>
     <!-- recall_loadPangolinData -->
     <g
        id="node16"
        class="node">
       <title
-         id="title247">recall_loadPangolinData</title>
+         id="title575">recall_loadPangolinData</title>
       <ellipse
          fill="none"
          stroke="#000000"
-         cx="560.69"
+         cx="592.69"
          cy="-239.2"
          rx="83.599998"
          ry="18"
-         id="ellipse249" />
+         id="ellipse577" />
       <text
          text-anchor="middle"
-         x="560.69"
+         x="592.69"
          y="-234.14999"
          font-family="Times, serif"
          font-size="14px"
-         id="text251">load_pangolin_data</text>
+         id="text579">load_pangolin_data</text>
     </g>
     <!-- recall_pangolinCalls&#45;&gt;recall_loadPangolinData -->
     <g
-       id="edge15"
+       id="edge14"
        class="edge">
       <title
-         id="title254">recall_pangolinCalls-&gt;recall_loadPangolinData</title>
+         id="title582">recall_pangolinCalls-&gt;recall_loadPangolinData</title>
       <path
          fill="none"
          stroke="#000000"
-         d="m 560.69,-309.61 c 0,11.77 0,27.68 0,41.3"
-         id="path256" />
+         d="m 592.69,-309.61 c 0,11.77 0,27.68 0,41.3"
+         id="path584" />
       <polygon
          fill="#000000"
          stroke="#000000"
-         points="564.19,-268.55 560.69,-258.55 557.19,-268.55 "
-         id="polygon258" />
+         points="596.19,-268.55 592.69,-258.55 589.19,-268.55 "
+         id="polygon586" />
     </g>
     <!-- recall_collect -->
     <g
        id="node19"
        class="node">
       <title
-         id="title261">recall_collect</title>
+         id="title589">recall_collect</title>
       <circle
          fill="none"
          stroke="#000000"
-         cx="560.69"
+         cx="592.69"
          cy="-165.10001"
-         id="ellipse263"
+         id="ellipse591"
          r="3.5999999" />
       <text
          text-anchor="middle"
-         x="539.09003"
+         x="571.09003"
          y="-171.89999"
          font-family="Times, serif"
          font-size="14px"
-         id="text265">collect</text>
+         id="text593">collect</text>
     </g>
     <!-- recall_loadPangolinData&#45;&gt;recall_collect -->
     <g
-       id="edge19"
+       id="edge18"
        class="edge">
       <title
-         id="title268">recall_loadPangolinData-&gt;recall_collect</title>
+         id="title596">recall_loadPangolinData-&gt;recall_collect</title>
       <path
          fill="none"
          stroke="#000000"
-         d="m 560.69,-220.75 c 0,12.7 0,29.65 0,41.28"
-         id="path270" />
+         d="m 592.69,-220.75 c 0,12.7 0,29.65 0,41.28"
+         id="path598" />
       <polygon
          fill="#000000"
          stroke="#000000"
-         points="564.19,-179.82 560.69,-169.82 557.19,-179.82 "
-         id="polygon272" />
+         points="596.19,-179.82 592.69,-169.82 589.19,-179.82 "
+         id="polygon600" />
     </g>
     <!-- recall_transformData -->
     <g
        id="node18"
        class="node">
       <title
-         id="title275">recall_transformData</title>
+         id="title603">recall_transformData</title>
       <ellipse
          fill="none"
          stroke="#000000"
-         cx="511.69"
+         cx="469.69"
          cy="-416.20001"
          rx="67.220001"
          ry="18"
-         id="ellipse277" />
+         id="ellipse605" />
       <text
          text-anchor="middle"
-         x="511.69"
+         x="469.69"
          y="-411.14999"
          font-family="Times, serif"
          font-size="14px"
-         id="text279">transform_data</text>
+         id="text607">transform_data</text>
     </g>
     <!-- recall_splitText&#45;&gt;recall_transformData -->
+    <g
+       id="edge16"
+       class="edge">
+      <title
+         id="title610">recall_splitText-&gt;recall_transformData</title>
+      <path
+         fill="none"
+         stroke="#000000"
+         d="m 469.69,-470.76 c 0,4.93 0,15.12 0,25.31"
+         id="path612" />
+      <polygon
+         fill="#000000"
+         stroke="#000000"
+         points="473.19,-445.65 469.69,-435.65 466.19,-445.65 "
+         id="polygon614" />
+    </g>
+    <!-- recall_transformData&#45;&gt;recall_pangolinCalls -->
     <g
        id="edge17"
        class="edge">
       <title
-         id="title282">recall_splitText-&gt;recall_transformData</title>
+         id="title617">recall_transformData-&gt;recall_pangolinCalls</title>
       <path
          fill="none"
          stroke="#000000"
-         d="m 511.69,-470.76 c 0,4.93 0,15.12 0,25.31"
-         id="path284" />
+         d="m 492.83,-398.93 c 19.15,13.47 46.57,32.76 67.84,47.71"
+         id="path619" />
       <polygon
          fill="#000000"
          stroke="#000000"
-         points="515.19,-445.65 511.69,-435.65 508.19,-445.65 "
-         id="polygon286" />
-    </g>
-    <!-- recall_transformData&#45;&gt;recall_pangolinCalls -->
-    <g
-       id="edge18"
-       class="edge">
-      <title
-         id="title289">recall_transformData-&gt;recall_pangolinCalls</title>
-      <path
-         fill="none"
-         stroke="#000000"
-         d="m 521.37,-398.11 c 6.91,12.2 16.35,28.86 24.24,42.79"
-         id="path291" />
-      <polygon
-         fill="#000000"
-         stroke="#000000"
-         points="549.15,-357.18 551.03,-346.75 543.05,-353.73 "
-         id="polygon293" />
+         points="562.49,-353.51 568.66,-344.9 558.46,-347.79 "
+         id="polygon621" />
     </g>
     <!-- recall_updateCalls -->
     <g
        id="node20"
        class="node">
       <title
-         id="title296">recall_updateCalls</title>
+         id="title624">recall_updateCalls</title>
       <ellipse
          fill="none"
          stroke="#000000"
-         cx="560.69"
+         cx="592.69"
          cy="-106.5"
          rx="56.98"
          ry="18"
-         id="ellipse298" />
+         id="ellipse626" />
       <text
          text-anchor="middle"
-         x="560.69"
+         x="592.69"
          y="-101.45"
          font-family="Times, serif"
          font-size="14px"
-         id="text300">update_calls</text>
+         id="text628">update_calls</text>
     </g>
     <!-- recall_collect&#45;&gt;recall_updateCalls -->
     <g
-       id="edge20"
+       id="edge19"
        class="edge">
       <title
-         id="title303">recall_collect-&gt;recall_updateCalls</title>
+         id="title631">recall_collect-&gt;recall_updateCalls</title>
       <path
          fill="none"
          stroke="#000000"
-         d="m 560.69,-161.06 c 0,4.93 0,15.12 0,25.31"
-         id="path305" />
+         d="m 592.69,-161.06 c 0,4.93 0,15.12 0,25.31"
+         id="path633" />
       <polygon
          fill="#000000"
          stroke="#000000"
-         points="564.19,-135.95 560.69,-125.95 557.19,-135.95 "
-         id="polygon307" />
+         points="596.19,-135.95 592.69,-125.95 589.19,-135.95 "
+         id="polygon635" />
     </g>
     <!-- recall_cleanupOldCalls -->
     <g
        id="node21"
        class="node">
       <title
-         id="title310">recall_cleanupOldCalls</title>
+         id="title638">recall_cleanupOldCalls</title>
       <ellipse
          fill="none"
          stroke="#000000"
-         cx="494.69"
+         cx="486.69"
          cy="-18"
          rx="77.449997"
          ry="18"
-         id="ellipse312" />
+         id="ellipse640" />
       <text
          text-anchor="middle"
-         x="494.69"
+         x="486.69"
          y="-12.95"
          font-family="Times, serif"
          font-size="14px"
-         id="text314">cleanup_old_calls</text>
+         id="text642">cleanup_old_calls</text>
     </g>
     <!-- recall_updateCalls&#45;&gt;recall_cleanupOldCalls -->
     <g
-       id="edge21"
+       id="edge20"
        class="edge">
       <title
-         id="title317">recall_updateCalls-&gt;recall_cleanupOldCalls</title>
+         id="title645">recall_updateCalls-&gt;recall_cleanupOldCalls</title>
       <path
          fill="none"
          stroke="#000000"
-         d="m 547.96,-88.82 c -9.55,12.52 -22.81,29.89 -33.7,44.18"
-         id="path319" />
+         d="m 572.75,-89.23 c -16.08,13.12 -38.92,31.76 -57.03,46.54"
+         id="path647" />
       <polygon
          fill="#000000"
          stroke="#000000"
-         points="516.68,-43.05 507.83,-37.22 511.11,-47.29 "
-         id="polygon321" />
+         points="518.22,-39.4 508.26,-35.79 513.8,-44.82 "
+         id="polygon649" />
     </g>
     <!-- recall_recomputeAffectedPrimers -->
     <g
        id="node22"
        class="node">
       <title
-         id="title324">recall_recomputeAffectedPrimers</title>
+         id="title652">recall_recomputeAffectedPrimers</title>
       <ellipse
          fill="none"
          stroke="#000000"
-         cx="707.69"
+         cx="699.69"
          cy="-18"
          rx="117.89"
          ry="18"
-         id="ellipse326" />
+         id="ellipse654" />
       <text
          text-anchor="middle"
-         x="707.69"
+         x="699.69"
          y="-12.95"
          font-family="Times, serif"
          font-size="14px"
-         id="text328">recompute_affected_primers</text>
+         id="text656">recompute_affected_primers</text>
     </g>
     <!-- recall_updateCalls&#45;&gt;recall_recomputeAffectedPrimers -->
     <g
-       id="edge22"
+       id="edge21"
        class="edge">
       <title
-         id="title331">recall_updateCalls-&gt;recall_recomputeAffectedPrimers</title>
+         id="title659">recall_updateCalls-&gt;recall_recomputeAffectedPrimers</title>
       <path
          fill="none"
          stroke="#000000"
-         d="m 586.63,-90.23 c 23.05,13.56 57.04,33.56 83.14,48.92"
-         id="path333" />
+         d="m 612.82,-89.23 c 16.12,13.04 38.99,31.52 57.21,46.25"
+         id="path661" />
       <polygon
          fill="#000000"
          stroke="#000000"
-         points="671.15,-43.98 677.99,-35.89 667.6,-37.94 "
-         id="polygon335" />
+         points="671.98,-45.09 677.56,-36.08 667.58,-39.65 "
+         id="polygon663" />
     </g>
   </g>
   <text
      xml:space="preserve"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.0072px;font-family:sans-serif;-inkscape-font-specification:sans-serif;fill:#1e26ff;fill-opacity:1;stroke-width:0.750453"
+     x="553.72247"
+     y="448.39529"
+     id="text562-71-53-2-1-8"><tspan
+       sodipodi:role="line"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.0072px;font-family:Times, serif;-inkscape-font-specification:'Times, serif';fill:#4964c5;fill-opacity:1;stroke:none;stroke-width:0.750453;stroke-opacity:1"
+       x="553.72247"
+       y="448.39529"
+       id="tspan6107-0-4">writes to pending</tspan></text>
+  <text
+     xml:space="preserve"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.0072px;font-family:sans-serif;-inkscape-font-specification:sans-serif;fill:#1e26ff;fill-opacity:1;stroke-width:0.750453"
+     x="95.252167"
+     y="447.93707"
+     id="text562-71-53-2-1"><tspan
+       sodipodi:role="line"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.0072px;font-family:Times, serif;-inkscape-font-specification:'Times, serif';fill:#4964c5;fill-opacity:1;stroke:none;stroke-width:0.750453;stroke-opacity:1"
+       x="95.252167"
+       y="447.93707"
+       id="tspan1218">writes to current</tspan></text>
+  <text
+     xml:space="preserve"
      style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:22.0133px;font-family:sans-serif;-inkscape-font-specification:sans-serif;fill:#1e26ff;fill-opacity:1;stroke:none;stroke-width:0.750453;stroke-opacity:1"
-     x="118.52132"
+     x="216.50694"
+     y="250.11168"
+     id="text562-71-8-2-8-3-4"><tspan
+       sodipodi:role="line"
+       id="tspan560-87-2-7-9-7-8"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:22.0133px;font-family:Times, serif;-inkscape-font-specification:'Times, serif';fill:#4964c5;fill-opacity:1;stroke:none;stroke-width:0.750453;stroke-opacity:1"
+       x="216.50694"
+       y="250.11168">%</tspan></text>
+  <text
+     xml:space="preserve"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:22.0133px;font-family:sans-serif;-inkscape-font-specification:sans-serif;fill:#1e26ff;fill-opacity:1;stroke:none;stroke-width:0.750453;stroke-opacity:1"
+     x="569.48584"
+     y="250.11168"
+     id="text562-71-8-2-8-3-4-6"><tspan
+       sodipodi:role="line"
+       id="tspan560-87-2-7-9-7-8-7"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:22.0133px;font-family:Times, serif;-inkscape-font-specification:'Times, serif';fill:#4964c5;fill-opacity:1;stroke:none;stroke-width:0.750453;stroke-opacity:1"
+       x="569.48584"
+       y="250.11168">%</tspan></text>
+  <text
+     xml:space="preserve"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:22.0133px;font-family:sans-serif;-inkscape-font-specification:sans-serif;fill:#1e26ff;fill-opacity:1;stroke:none;stroke-width:0.750453;stroke-opacity:1"
+     x="36.746094"
      y="648.98077"
      id="text562-71-8-2-8-8-4-1-7-0"><tspan
        sodipodi:role="line"
        id="tspan560-87-2-7-9-3-80-4-9-5"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:22.0133px;font-family:Times, serif;-inkscape-font-specification:'Times, serif';fill:#4964c5;fill-opacity:1;stroke:none;stroke-width:0.750453;stroke-opacity:1"
-       x="118.52132"
+       x="36.746094"
        y="648.98077">&amp;</tspan></text>
   <text
      xml:space="preserve"
      style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:22.0133px;font-family:sans-serif;-inkscape-font-specification:sans-serif;fill:#1e26ff;fill-opacity:1;stroke:none;stroke-width:0.750453;stroke-opacity:1"
-     x="612.52484"
+     x="600.01025"
      y="648.1463"
-     id="text562-71-8-2-8-8-4-1-7-0-9"><tspan
+     id="text562-71-8-2-8-8-4-1-7-0-4"><tspan
        sodipodi:role="line"
-       id="tspan560-87-2-7-9-3-80-4-9-5-0"
+       id="tspan560-87-2-7-9-3-80-4-9-5-8"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:22.0133px;font-family:Times, serif;-inkscape-font-specification:'Times, serif';fill:#4964c5;fill-opacity:1;stroke:none;stroke-width:0.750453;stroke-opacity:1"
-       x="612.52484"
+       x="600.01025"
        y="648.1463">&amp;</tspan></text>
   <text
      xml:space="preserve"
      style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:22.0133px;font-family:sans-serif;-inkscape-font-specification:sans-serif;fill:#1e26ff;fill-opacity:1;stroke:none;stroke-width:0.750453;stroke-opacity:1"
-     x="487.25241"
-     y="426.6011"
-     id="text562-71-8-2-8-8-4-1"><tspan
-       sodipodi:role="line"
-       id="tspan560-87-2-7-9-3-80-4"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:22.0133px;font-family:Times, serif;-inkscape-font-specification:'Times, serif';fill:#4964c5;fill-opacity:1;stroke:none;stroke-width:0.750453;stroke-opacity:1"
-       x="487.25241"
-       y="426.6011">@</tspan></text>
-  <text
-     xml:space="preserve"
-     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:22.0133px;font-family:sans-serif;-inkscape-font-specification:sans-serif;fill:#1e26ff;fill-opacity:1;stroke:none;stroke-width:0.750453;stroke-opacity:1"
-     x="510.2002"
-     y="560.53278"
-     id="text562-71-8-2-8-8-4-1-3"><tspan
-       sodipodi:role="line"
-       id="tspan560-87-2-7-9-3-80-4-8"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:22.0133px;font-family:Times, serif;-inkscape-font-specification:'Times, serif';fill:#4964c5;fill-opacity:1;stroke:none;stroke-width:0.750453;stroke-opacity:1"
-       x="510.2002"
-       y="560.53278">@</tspan></text>
-  <text
-     xml:space="preserve"
-     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:22.0133px;font-family:sans-serif;-inkscape-font-specification:sans-serif;fill:#1e26ff;fill-opacity:1;stroke:none;stroke-width:0.750453;stroke-opacity:1"
-     x="428.42261"
-     y="648.98608"
+     x="543.58124"
+     y="559.6983"
      id="text562-71-8-2-8-8-4-1-0"><tspan
        sodipodi:role="line"
        id="tspan560-87-2-7-9-3-80-4-2"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:22.0133px;font-family:Times, serif;-inkscape-font-specification:'Times, serif';fill:#4964c5;fill-opacity:1;stroke:none;stroke-width:0.750453;stroke-opacity:1"
-       x="428.42261"
-       y="648.98608">@</tspan></text>
+       x="543.58124"
+       y="559.6983">@</tspan></text>
   <text
      xml:space="preserve"
      style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:22.0133px;font-family:sans-serif;-inkscape-font-specification:sans-serif;fill:#1e26ff;fill-opacity:1;stroke:none;stroke-width:0.750453;stroke-opacity:1"
-     x="168.90384"
-     y="427.85278"
-     id="text562-71-8-2-8-8-4-1-4"><tspan
+     x="420.91476"
+     y="648.15167"
+     id="text562-71-8-2-8-8-4-1-0-0"><tspan
        sodipodi:role="line"
-       id="tspan560-87-2-7-9-3-80-4-83"
+       id="tspan560-87-2-7-9-3-80-4-2-4"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:22.0133px;font-family:Times, serif;-inkscape-font-specification:'Times, serif';fill:#4964c5;fill-opacity:1;stroke:none;stroke-width:0.750453;stroke-opacity:1"
-       x="168.90384"
+       x="420.91476"
+       y="648.15167">@</tspan></text>
+  <text
+     xml:space="preserve"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:22.0133px;font-family:sans-serif;-inkscape-font-specification:sans-serif;fill:#1e26ff;fill-opacity:1;stroke:none;stroke-width:0.750453;stroke-opacity:1"
+     x="521.05066"
+     y="427.85278"
+     id="text562-71-8-2-8-8-4-1-0-05"><tspan
+       sodipodi:role="line"
+       id="tspan560-87-2-7-9-3-80-4-2-7"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:22.0133px;font-family:Times, serif;-inkscape-font-specification:'Times, serif';fill:#4964c5;fill-opacity:1;stroke:none;stroke-width:0.750453;stroke-opacity:1"
+       x="521.05066"
        y="427.85278">@</tspan></text>
   <text
      xml:space="preserve"
      style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:22.0133px;font-family:sans-serif;-inkscape-font-specification:sans-serif;fill:#1e26ff;fill-opacity:1;stroke:none;stroke-width:0.750453;stroke-opacity:1"
-     x="216.50453"
-     y="250.11165"
-     id="text562-71-8-2-8-3-4"><tspan
+     x="86.294167"
+     y="427.85281"
+     id="text562-71-8-2-8-8-4-1-0-00"><tspan
        sodipodi:role="line"
-       id="tspan560-87-2-7-9-7-8"
+       id="tspan560-87-2-7-9-3-80-4-2-5"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:22.0133px;font-family:Times, serif;-inkscape-font-specification:'Times, serif';fill:#4964c5;fill-opacity:1;stroke:none;stroke-width:0.750453;stroke-opacity:1"
-       x="216.50453"
-       y="250.11165">%</tspan></text>
-  <text
-     xml:space="preserve"
-     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:22.0133px;font-family:sans-serif;-inkscape-font-specification:sans-serif;fill:#1e26ff;fill-opacity:1;stroke:none;stroke-width:0.750453;stroke-opacity:1"
-     x="611.20667"
-     y="250.11166"
-     id="text562-71-8-2-8-3-4-7"><tspan
-       sodipodi:role="line"
-       id="tspan560-87-2-7-9-7-8-9"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:22.0133px;font-family:Times, serif;-inkscape-font-specification:'Times, serif';fill:#4964c5;fill-opacity:1;stroke:none;stroke-width:0.750453;stroke-opacity:1"
-       x="611.20667"
-       y="250.11166">%</tspan></text>
+       x="86.294167"
+       y="427.85281">@</tspan></text>
   <text
      xml:space="preserve"
      style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:22.0133px;font-family:Times, serif;-inkscape-font-specification:'Times, serif';fill:#e90000;fill-opacity:1;stroke:#e90000;stroke-width:0.750453;stroke-opacity:1"
-     x="101.46683"
-     y="731.11121"
+     x="29.705029"
+     y="706.07739"
      id="text14384"><tspan
        sodipodi:role="line"
        style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.750453"
-       x="101.46683"
-       y="731.11121"
+       x="29.705029"
+       y="706.07739"
        id="tspan14388">@ = Writes to DB</tspan><tspan
        sodipodi:role="line"
        style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.750453"
-       x="101.46683"
-       y="758.62781"
+       x="29.705029"
+       y="733.59399"
        id="tspan14392">% = Reads Pangolin version files</tspan><tspan
        sodipodi:role="line"
        style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.750453"
-       x="101.46683"
-       y="786.14447"
+       x="29.705029"
+       y="761.11066"
        id="tspan2743">&amp; = Writes igvstatic files</tspan></text>
 </svg>

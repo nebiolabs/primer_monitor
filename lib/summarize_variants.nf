@@ -148,7 +148,6 @@ process get_pangolin_version {
     output:
         env pangolin_version
         env pangolin_data_version
-        env use_pending
     shell:
     '''
     #! /usr/bin/env bash
@@ -192,8 +191,6 @@ process load_to_db {
     input:
         tuple file(metadata), file(tsv)
         file csv
-        val use_pending
-        //the .complete is only here to make sure this happens *after* the main DB load
     output:
         file '*.complete'
     shell:
@@ -202,7 +199,6 @@ process load_to_db {
             --import_calls \
             --import_seqs \
             --pangolin_csv !{csv} \
-            --pending !{use_pending} \
             --metadata_tsv !{metadata} \
             --variants_tsv !{tsv} \
             && mv !{metadata} !{metadata}.complete

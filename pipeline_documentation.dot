@@ -27,7 +27,6 @@ update_transformData -> update_pangolinCalls [label="transformed_data"];
 update_pangolinCalls -> update_loadToDB [label="pangolin_lineage_data"];
 
 update_loadToDB [label="load_to_db"];
-update_getPangolinVersion -> update_loadToDB [label="use_pending"];
 
 update_collect2 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="collect"];
 update_loadToDB -> update_collect2 [label="complete_metadata_files"];

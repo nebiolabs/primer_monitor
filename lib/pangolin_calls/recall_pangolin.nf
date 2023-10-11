@@ -158,7 +158,7 @@ process load_pangolin_data {
     RAILS_ENV=production ruby !{primer_monitor_path}/upload.rb \
             --import_calls \
             --pangolin_csv !{csv} \
-            --pending true \
+            --pending \
             && mv !{csv} !{csv}.$(basename $PWD).complete_pangolin
     '''
 }
