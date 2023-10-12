@@ -238,7 +238,7 @@ workflow {
     download_data()
     extract_new_records(download_data.out)
     index = 0
-    transform_data(extract_new_records.out.splitText(file: true, by: 10000).filter{ it.size()>77 }.map{ [index++, it[0], it[1]] })
+    transform_data(extract_new_records.out.splitText(file: true, by: 10000).filter{ it.size()>77 }.map{ [index++, it] })
     align(transform_data.out)
     get_pangolin_version()
     pangolin_calls(get_pangolin_version.out[0], get_pangolin_version.out[1], transform_data.out)
