@@ -146,6 +146,8 @@ process pangolin_calls {
 process load_pangolin_data {
     cpus 1
     penv 'smp'
+    errorStrategy 'retry'
+    maxRetries 10
 
     conda "'postgresql>=15'"
 
