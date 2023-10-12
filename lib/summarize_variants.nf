@@ -117,9 +117,9 @@ process align {
     publishDir "${output_path}", mode: 'copy', pattern: '*.bam', overwrite: true
 
     input:
-        tuple file(metadata), file(fasta)
+        tuple val(index), file(metadata), file(fasta)
     output:
-        tuple file('*.metadata'), file('*.tsv')
+        tuple val(index), file('*.metadata'), file('*.tsv')
 
     shell:
     '''
@@ -166,9 +166,9 @@ process pangolin_calls {
     input:
         val pangolin_version
         val pangolin_data_version
-        tuple file(metadata), file(fasta)
+        tuple val(index), file(metadata), file(fasta)
     output:
-        file "*.csv"
+        tuple val(index), file("*.csv")
     shell:
     '''
 
@@ -189,8 +189,7 @@ process load_to_db {
     conda "'postgresql>=15'"
 
     input:
-        tuple file(metadata), file(tsv)
-        file csv
+        tuple val(index), file(metadata), file(tsv), file(csv)
     output:
         file '*.complete'
     shell:
@@ -238,11 +237,16 @@ process recompute_affected_primers {
 workflow {
     download_data()
     extract_new_records(download_data.out)
-    transform_data(extract_new_records.out.splitText(file: true, by: 10000).filter{ it.size()>77 })
+    index = 0
+    transform_data(extract_new_records.out.splitText(file: true, by: 10000).filter{ it.size()>77 }.map{ [index++, it[0], it[1]] })
     align(transform_data.out)
     get_pangolin_version()
     pangolin_calls(get_pangolin_version.out[0], get_pangolin_version.out[1], transform_data.out)
-    load_to_db(align.out, pangolin_calls.out)
+
+    //ensure batches of alignments and pangolin calls stay in sync for DB load
+    seq_recs = align.out.join(pangolin_calls.out)
+
+    load_to_db(seq_recs)
     recalculate_database_views(load_to_db.out.collect())
     recompute_affected_primers(recalculate_database_views.out)
 }
