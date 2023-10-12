@@ -95,10 +95,10 @@ process transform_data {
     conda "gawk"
 
     input:
-        file ncbi_tsv
+        tuple val(index), file(ncbi_tsv)
 
     output:
-        tuple file('*.metadata'), file('*.fasta')
+        tuple val(index), file('*.metadata'), file('*.fasta')
 
     shell:
     '''
