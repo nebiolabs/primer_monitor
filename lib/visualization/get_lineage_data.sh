@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+# gets lineages from the DB in CSV format
+
 # you need to export DB_HOST, DB_NAME, and DB_USER_RO before running this
 
 set -e

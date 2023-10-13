@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 
-# counts occurrences of variants
+# counts occurrences of variants in the DB
+
+# Usage: count_variants.sh <variants_bed> <min occurrence %> <lineage set file> <output path>
 
 set -e
 

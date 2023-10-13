@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 
+# output color-coded BED for affected/unaffected primers for a single primer set
+
+# Usage: primers_affected.sh <variant counts bed> <primer set bed> <output path> <score cutoff> <threads>
+
 set -e
 
 variants_counts_bed="$1";

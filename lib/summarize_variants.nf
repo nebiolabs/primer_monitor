@@ -222,7 +222,7 @@ process recalculate_database_views {
 }
 
 
-process recompute_affected_primers {
+process update_visualization_data {
     cpus 8
     conda "libiconv psycopg2 bedtools coreutils 'postgresql>=15' gawk bc"
     input:
@@ -230,7 +230,7 @@ process recompute_affected_primers {
     shell:
     '''
     # recompute the primer data for igvjs visualization
-    !{primer_monitor_path}/lib/visualization/recompute_affected_primers.sh -o !{override_path} !{primer_monitor_path} !{organism_dirname} !{pct_cutoff} !{score_cutoff} !{task.cpus}
+    !{primer_monitor_path}/lib/visualization/update_visualization_data.sh -o !{override_path} !{primer_monitor_path} !{organism_dirname} !{pct_cutoff} !{score_cutoff} !{task.cpus}
     '''
 }
 
@@ -248,5 +248,5 @@ workflow {
 
     load_to_db(seq_recs)
     recalculate_database_views(load_to_db.out.collect())
-    recompute_affected_primers(recalculate_database_views.out)
+    update_visualization_data(recalculate_database_views.out)
 }

@@ -2,6 +2,10 @@
 
 set -e
 
+# Classifies primers as affected/unaffected for a single primer set
+
+# Usage: classify_overlaps.sh <variant counts bed> <primers bed> <score cutoff> <threads> <affected output filename> <unaffected output filename>
+
 variants_counts_bed="$1";
 primer_bed="$2";
 score_cutoff="$3";

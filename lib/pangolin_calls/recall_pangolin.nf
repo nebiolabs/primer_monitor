@@ -195,7 +195,7 @@ process cleanup_old_calls {
     '''
 }
 
-process recompute_affected_primers {
+process update_visualization_data {
     cpus 8
     conda "libiconv psycopg2 bedtools coreutils 'postgresql>=15' gawk bc"
     input:
@@ -203,7 +203,7 @@ process recompute_affected_primers {
     shell:
     '''
     # recompute the primer data for igvjs visualization
-    !{primer_monitor_path}/lib/visualization/recompute_affected_primers.sh -o !{override_path} !{primer_monitor_path} !{organism_dirname} !{pct_cutoff} !{score_cutoff} !{task.cpus}
+    !{primer_monitor_path}/lib/visualization/update_visualization_data.sh -o !{override_path} !{primer_monitor_path} !{organism_dirname} !{pct_cutoff} !{score_cutoff} !{task.cpus}
     '''
 }
 
@@ -217,5 +217,5 @@ workflow {
     load_pangolin_data(pangolin_calls.out)
     update_calls(load_pangolin_data.out.collect())
     cleanup_old_calls(update_calls.out)
-    recompute_affected_primers(update_calls.out)
+    update_visualization_data(update_calls.out)
 }
