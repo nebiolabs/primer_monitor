@@ -23,7 +23,7 @@ def define_options
     o.string '--metadata_tsv', 'TSV file containing metadata information'
     o.string '--variants_tsv', 'TSV file containing variants information'
     o.string '--pangolin_csv', 'CSV file containing pangolin calls'
-    o.string '--pending', 'Save calls as pending', default: false
+    o.bool '--pending', 'Save calls as pending', default: false
     o.bool '--import_calls', 'Performs pangolin data import', default: false
     o.bool '--import_seqs', 'Performs sequence/variant data import', default: false
     o.bool '--rebuild_views', 'Rebuilds materialized views', default: false

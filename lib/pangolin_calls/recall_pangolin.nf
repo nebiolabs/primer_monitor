@@ -1,7 +1,17 @@
 nextflow.enable.dsl=2
 
+params.pct_cutoff =
+pct_cutoff = params.pct_cutoff
+
+params.score_cutoff =
+score_cutoff = params.score_cutoff
+
+params.organism_dirname =
+organism_dirname = params.organism_dirname
+
 params.primer_monitor_path =
 primer_monitor_path = params.primer_monitor_path
+
 params.output_path =
 output_path = params.output_path
 
@@ -10,6 +20,10 @@ params.pangolin_data_version_path =
 
 params.temp_dir = '/tmp'
 temp_dir = params.temp_dir
+
+params.override_path =
+override_path = params.override_path
+override_path = file(override_path).toAbsolutePath()
 
 process get_pangolin_version {
     cpus 1
@@ -132,6 +146,8 @@ process pangolin_calls {
 process load_pangolin_data {
     cpus 1
     penv 'smp'
+    errorStrategy 'retry'
+    maxRetries 10
 
     conda "'postgresql>=15'"
 
@@ -144,12 +160,12 @@ process load_pangolin_data {
     RAILS_ENV=production ruby !{primer_monitor_path}/upload.rb \
             --import_calls \
             --pangolin_csv !{csv} \
-            --pending true \
+            --pending \
             && mv !{csv} !{csv}.$(basename $PWD).complete_pangolin
     '''
 }
 
-process update_current_calls {
+process update_calls {
     cpus 1
     penv 'smp'
 
@@ -161,23 +177,33 @@ process update_current_calls {
         file 'done.txt'
     shell:
     '''
-    PGPASSFILE="!{primer_monitor_path}/config/.pgpass" !{primer_monitor_path}/lib/pangolin_calls/swap_current_calls.sh; touch done.txt;
+    PGPASSFILE="!{primer_monitor_path}/config/.pgpass" !{primer_monitor_path}/lib/pangolin_calls/swap_calls.sh; touch done.txt;
     '''
 }
 
-process update_new_calls {
+process cleanup_old_calls {
     cpus 1
     penv 'smp'
 
     conda "'postgresql>=15'"
 
     input:
-        file all_done
+        file update_done
     shell:
     '''
-    PGPASSFILE="!{primer_monitor_path}/config/.pgpass" !{primer_monitor_path}/lib/pangolin_calls/swap_new_calls.sh; touch done.txt;
-    rm "!{params.pangolin_version_path}.old"
-    rm "!{params.pangolin_data_version_path}.old"
+    PGPASSFILE="!{primer_monitor_path}/config/.pgpass" !{primer_monitor_path}/lib/pangolin_calls/cleanup_old_calls.sh;
+    '''
+}
+
+process update_visualization_data {
+    cpus 8
+    conda "libiconv psycopg2 bedtools coreutils 'postgresql>=15' gawk bc"
+    input:
+        file complete
+    shell:
+    '''
+    # recompute the primer data for igvjs visualization
+    !{primer_monitor_path}/lib/visualization/update_visualization_data.sh -o !{override_path} !{primer_monitor_path} !{organism_dirname} !{pct_cutoff} !{score_cutoff} !{task.cpus}
     '''
 }
 
@@ -189,6 +215,7 @@ workflow {
     transform_data(extract_new_records.out.splitText(file: true, by: 2500).filter{ it.size()>77 })
     pangolin_calls(get_pangolin_version.out[0], get_pangolin_version.out[1], transform_data.out)
     load_pangolin_data(pangolin_calls.out)
-    update_current_calls(load_pangolin_data.out.collect())
-    update_new_calls(update_current_calls.out)
+    update_calls(load_pangolin_data.out.collect())
+    cleanup_old_calls(update_calls.out)
+    update_visualization_data(update_calls.out)
 }

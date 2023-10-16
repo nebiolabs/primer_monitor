@@ -1,4 +1,10 @@
 #!/usr/bin/awk -f
+
+# filter sequences by lineage
+
+# Usage: cat <variants bed file> | filter_variants.awk <lineage set file> <sequences file>
+# Variants bed file must be passed on stdin (shown above with cat for clarity)
+
 BEGIN {
     all = 0
     if(ARGV[1] == "all")

@@ -1,6 +1,8 @@
 """
 Scores overlaps between primers and variants and determines
 if the primer is likely affected by the overlap.
+
+Usage: classify_overlaps.py <all overlaps> <overlaps passing filter> <overlaps not passing filter> <score cutoff>
 """
 import sys
 import math

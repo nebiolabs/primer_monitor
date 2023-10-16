@@ -56,8 +56,10 @@ run "$BACKEND_INSTALL_PATH/lib/pangolin_calls/recall_pangolin.nf" \
 --pangolin_version_path "$BACKEND_INSTALL_PATH/pangolin_ver.txt" \
 --pangolin_data_version_path "$BACKEND_INSTALL_PATH/pangolin_data_ver.txt" \
 --flag_path "$BACKEND_SCRATCH_PATH/status" \
---pct-cutoff "$PCT_CUTOFF" \
---score-cutoff "$SCORE_CUTOFF" \
+--pct_cutoff "$PCT_CUTOFF" \
+--score_cutoff "$SCORE_CUTOFF" \
+--override_path "$BACKEND_INSTALL_PATH/igvstatic/2697049/overrides.txt" \
+--organism_dirname "2697049" \
 --temp_dir "$TMPDIR" \
 -N "$NOTIFICATION_EMAILS" \
 -c "$BACKEND_INSTALL_PATH/lib/nextflow.config"

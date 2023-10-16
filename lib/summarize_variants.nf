@@ -11,31 +11,16 @@ score_cutoff = params.score_cutoff
 
 params.primer_monitor_path =
 primer_monitor_path = params.primer_monitor_path
+
 params.output_path =
 output_path = params.output_path
-params.igvstatic_path =
-igvstatic_path = params.igvstatic_path
-
-params.frontend_host =
-frontend_host = params.frontend_host
 
 params.override_path =
 override_path = params.override_path
 override_path = file(override_path).toAbsolutePath()
 
-params.jump_proxy =
-
-ssh_opts = ""
-scp_opts = ""
-
 params.temp_dir = '/tmp'
 temp_dir = params.temp_dir
-
-if(params.jump_proxy)
-{
-    ssh_opts = "-J ${params.jump_proxy}"
-    scp_opts = "-o ProxyJump=${params.jump_proxy}"
-}
 
 params.pangolin_version_path =
 params.pangolin_data_version_path =
@@ -110,10 +95,10 @@ process transform_data {
     conda "gawk"
 
     input:
-        file ncbi_tsv
+        tuple val(index), file(ncbi_tsv)
 
     output:
-        tuple file('*.metadata'), file('*.fasta')
+        tuple val(index), file('*.metadata'), file('*.fasta')
 
     shell:
     '''
@@ -132,9 +117,9 @@ process align {
     publishDir "${output_path}", mode: 'copy', pattern: '*.bam', overwrite: true
 
     input:
-        tuple file(metadata), file(fasta)
+        tuple val(index), file(metadata), file(fasta)
     output:
-        tuple file('*.metadata'), file('*.tsv')
+        tuple val(index), file('*.metadata'), file('*.tsv')
 
     shell:
     '''
@@ -155,29 +140,6 @@ process align {
     '''
 }
 
-process load_to_db {
-    cpus 1
-    publishDir "${output_path}", mode: 'copy'
-    errorStrategy 'retry'
-    maxRetries 10
-    maxForks 1
-
-    conda 'postgresql>=15'
-
-    input:
-        tuple file(metadata), file(tsv)
-    output:
-        file '*.complete'
-    shell:
-    '''
-    RAILS_ENV=production ruby !{primer_monitor_path}/upload.rb \
-        --import_seqs \
-        --metadata_tsv !{metadata} \
-        --variants_tsv !{tsv} \
-        && mv !{metadata} !{metadata}.complete
-    '''
-}
-
 process get_pangolin_version {
     cpus 1
 
@@ -186,7 +148,6 @@ process get_pangolin_version {
     output:
         env pangolin_version
         env pangolin_data_version
-        env use_pending
     shell:
     '''
     #! /usr/bin/env bash
@@ -205,9 +166,9 @@ process pangolin_calls {
     input:
         val pangolin_version
         val pangolin_data_version
-        tuple file(metadata), file(fasta)
+        tuple val(index), file(metadata), file(fasta)
     output:
-        file "*.csv"
+        tuple val(index), file("*.csv")
     shell:
     '''
 
@@ -218,25 +179,28 @@ process pangolin_calls {
     '''
 }
 
-process load_pangolin_data {
+process load_to_db {
     cpus 1
+    publishDir "${output_path}", mode: 'copy'
+    errorStrategy 'retry'
+    maxRetries 10
+    maxForks 1
 
     conda "'postgresql>=15'"
 
     input:
-        file csv
-        file complete
-        val use_pending
-        //the .complete is only here to make sure this happens *after* the main DB load
+        tuple val(index), file(metadata), file(tsv), file(csv)
     output:
-        file '*.complete_pangolin'
+        file '*.complete'
     shell:
     '''
     RAILS_ENV=production ruby !{primer_monitor_path}/upload.rb \
             --import_calls \
+            --import_seqs \
             --pangolin_csv !{csv} \
-            --pending !{use_pending} \
-            && mv !{csv} !{csv}.$(basename $PWD).complete_pangolin
+            --metadata_tsv !{metadata} \
+            --variants_tsv !{tsv} \
+            && mv !{metadata} !{metadata}.complete
     '''
 }
 
@@ -246,9 +210,8 @@ process recalculate_database_views {
     errorStrategy 'retry'
     maxRetries 2
     input:
-        //these files are to make sure all the load_to_db and load_pangolin_data tasks are done first
+        //these files are to make sure all the load_to_db tasks are done first
         file seq_load_complete
-        file pangolin_calls_complete
     output:
         file 'refresh_complete.txt';
     shell:
@@ -259,30 +222,31 @@ process recalculate_database_views {
 }
 
 
-process recompute_affected_primers {
+process update_visualization_data {
     cpus 8
-    //Wait and retry if another primer recomputation is running
-    errorStrategy { sleep(120); return 'retry' }
-    maxRetries 10
     conda "libiconv psycopg2 bedtools coreutils 'postgresql>=15' gawk bc"
     input:
         file complete
     shell:
     '''
     # recompute the primer data for igvjs visualization
-    !{primer_monitor_path}/lib/visualization/recompute_affected_primers.sh -o !{override_path} !{primer_monitor_path} !{organism_dirname} !{pct_cutoff} !{score_cutoff} !{task.cpus}
+    !{primer_monitor_path}/lib/visualization/update_visualization_data.sh -o !{override_path} !{primer_monitor_path} !{organism_dirname} !{pct_cutoff} !{score_cutoff} !{task.cpus}
     '''
 }
 
 workflow {
     download_data()
     extract_new_records(download_data.out)
-    transform_data(extract_new_records.out.splitText(file: true, by: 10000).filter{ it.size()>77 })
+    index = 0
+    transform_data(extract_new_records.out.splitText(file: true, by: 10000).filter{ it.size()>77 }.map{ [index++, it] })
     align(transform_data.out)
-    load_to_db(align.out)
     get_pangolin_version()
     pangolin_calls(get_pangolin_version.out[0], get_pangolin_version.out[1], transform_data.out)
-    load_pangolin_data(pangolin_calls.out, load_to_db.out, get_pangolin_version.out[2])
-    recalculate_database_views(load_to_db.out.collect(), load_pangolin_data.out.collect())
-    recompute_affected_primers(recalculate_database_views.out)
+
+    //ensure batches of alignments and pangolin calls stay in sync for DB load
+    seq_recs = align.out.join(pangolin_calls.out)
+
+    load_to_db(seq_recs)
+    recalculate_database_views(load_to_db.out.collect())
+    update_visualization_data(recalculate_database_views.out)
 }

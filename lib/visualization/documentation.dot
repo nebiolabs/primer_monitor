@@ -1,0 +1,35 @@
+digraph "update_visualization_data" {
+
+update_visualization_data [label="update_visualization_data.sh"];
+recompute_affected_primers [label="recompute_affected_primers.sh"];
+classify_overlaps_py [label="classify_overlaps.py"];
+classify_overlaps_sh [label="classify_overlaps.sh"];
+count_variants [label="count_variants.sh"];
+extract_all_variants [label="extract_all_variants.sh"];
+filter_variants [label="filter_variants.awk"];
+get_lineage_data [label="get_lineage_data.sh"];
+get_lineages_to_show [label="get_lineages_to_show.py"];
+get_primer_sets [label="get_primer_sets.sh"];
+primers_affected [label="primers_affected.sh"];
+process_primer_sets [label="process_primer_sets.sh"];
+
+
+
+update_visualization_data -> get_primer_sets;
+update_visualization_data -> get_lineage_data;
+update_visualization_data -> get_lineages_to_show;
+update_visualization_data -> recompute_affected_primers;
+
+recompute_affected_primers -> extract_all_variants;
+recompute_affected_primers -> count_variants;
+recompute_affected_primers -> process_primer_sets;
+
+count_variants -> filter_variants;
+
+process_primer_sets -> primers_affected;
+
+primers_affected -> classify_overlaps_sh;
+
+classify_overlaps_sh -> classify_overlaps_py;
+
+}
