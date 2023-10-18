@@ -19,7 +19,7 @@ params.override_path =
 override_path = params.override_path
 override_path = file(override_path).toAbsolutePath()
 
-process recompute_affected_primers {
+process update_visualization_data {
     cpus 8
     errorStrategy 'retry'
     maxRetries 2
@@ -37,7 +37,7 @@ process recompute_affected_primers {
     cp !{primer_names_file} primers_done.txt
 
     # recompute the primer data for igvjs visualization
-    !{primer_monitor_path}/lib/visualization/recompute_affected_primers.sh -o !{override_path} -p "$(pwd)/!{primer_names_file}" !{primer_monitor_path} !{organism_dirname} \
+    !{primer_monitor_path}/lib/visualization/update_visualization_data.sh -o !{override_path} -p "$(pwd)/!{primer_names_file}" !{primer_monitor_path} !{organism_dirname} \
     !{pct_cutoff} !{score_cutoff} !{task.cpus};
     '''
 }
@@ -65,6 +65,6 @@ process update_db {
 
 
 workflow {
-    recompute_affected_primers(primer_names)
-    update_db(recompute_affected_primers.out)
+    update_visualization_data(primer_names)
+    update_db(update_visualization_data.out)
 }
