@@ -19,7 +19,7 @@ params.override_path =
 override_path = params.override_path
 override_path = file(override_path).toAbsolutePath()
 
-process update_visualization_data {
+process compute_visualization_data {
     cpus 8
     errorStrategy 'retry'
     maxRetries 2
@@ -65,6 +65,6 @@ process update_db {
 
 
 workflow {
-    update_visualization_data(primer_names)
-    update_db(update_visualization_data.out)
+    compute_visualization_data(primer_names)
+    update_db(compute_visualization_data.out)
 }
