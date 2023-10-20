@@ -29,8 +29,9 @@ for id in "$@"; do
 
   psql -h "$DB_HOST" -d "$DB_NAME" -U "$DB_USER" -c "SELECT id, sequence FROM oligos WHERE primer_set_id=$id $null_check;" --csv -t |
     awk 'BEGIN { FS="," }; {print ">" $1 "\n" $2}' |
-    micromamba run -p "$conda_env_path" bowtie2 -f --end-to-end --score-min L,-0.6,-1.5 -L 8 -x "$bt2_index" -U - |
-    micromamba run -p "$conda_env_path" samtools view -b | micromamba run -p "$conda_env_path" bedtools bamtobed -i - | awk '{print $4 "," $2 "," $3}' >>"$db_csv"
+    "$MICROMAMBA_BIN_PATH/micromamba" run -p "$conda_env_path" bowtie2 -f --end-to-end --score-min L,-0.6,-1.5 -L 8 -x "$bt2_index" -U - |
+    "$MICROMAMBA_BIN_PATH/micromamba" run -p "$conda_env_path" samtools view -b | \
+    "$MICROMAMBA_BIN_PATH/micromamba" run -p "$conda_env_path" bedtools bamtobed -i - | awk '{print $4 "," $2 "," $3}' >>"$db_csv"
 
 done
 
