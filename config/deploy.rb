@@ -203,7 +203,8 @@ namespace :deploy do
 
   end
 
-  after :published, :restart
+  after :published, :setup_conda
+  after :setup_conda, :restart
   #after 'deploy:restart_services', 'deploy:seed'
   after 'deploy:restart_services', 'backend'
 
