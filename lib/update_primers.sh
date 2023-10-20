@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 if (($# < 1)); then # if bowtie2 index missing
-  echo "usage: get_primers.sh <bowtie2 index> [primer_set_ids...]" >&2
+  echo "usage: get_primers.sh <conda env path> <bowtie2 index> [primer_set_ids...]" >&2
   exit 1
 fi
 
@@ -10,7 +10,8 @@ if (($# < 2)); then # if primer set IDs missing
   exit 1
 fi
 
-bt2_index=$1
+conda_env_path="$1"
+bt2_index="$2"
 shift
 
 # you need to export DB_HOST, DB_NAME, and DB_USER before running this
@@ -28,8 +29,8 @@ for id in "$@"; do
 
   psql -h "$DB_HOST" -d "$DB_NAME" -U "$DB_USER" -c "SELECT id, sequence FROM oligos WHERE primer_set_id=$id $null_check;" --csv -t |
     awk 'BEGIN { FS="," }; {print ">" $1 "\n" $2}' |
-    bowtie2 -f --end-to-end --score-min L,-0.6,-1.5 -L 8 -x "$bt2_index" -U - |
-    samtools view -b | bedtools bamtobed -i - | awk '{print $4 "," $2 "," $3}' >>"$db_csv"
+    micromamba run -p "$conda_env_path" bowtie2 -f --end-to-end --score-min L,-0.6,-1.5 -L 8 -x "$bt2_index" -U - |
+    micromamba run -p "$conda_env_path" samtools view -b | micromamba run -p "$conda_env_path" bedtools bamtobed -i - | awk '{print $4 "," $2 "," $3}' >>"$db_csv"
 
 done
 

@@ -22,6 +22,10 @@ set :backend_deploy_to, ->{ fetch(:backend_deploy_path) }
 set :whenever_variables, ->{ "\"environment=#{fetch :whenever_environment}&backend_path=#{fetch(:backend_deploy_to)}\"" }
 set :whenever_identifier, ->{ "#{fetch(:application)}_#{fetch(:stage)}" }
 
+set :samtools_version, '1.18'
+set :bedtools_version, '2.31.0'
+set :bowtie2_version, '2.5.2'
+
 # clear the previous precompile task
 Rake::Task['deploy:assets:precompile'].clear_actions
 class PrecompileRequired < StandardError
@@ -78,6 +82,18 @@ namespace :backend do
 end
 
 namespace :deploy do
+  desc 'Setup conda envs'
+  task :setup_conda do
+    on roles(:app) do
+      within release_path do
+        # remove the env if it exists
+        execute("[ -d #{shared_path}/alignment_env ] && micromamba env remove -p #{shared_path}/alignment_env")
+        # create the env
+        execute("micromamba create -p #{shared_path}/alignment_env 'samtools=#{fetch(:samtools_version)}' 'bedtools=#{fetch(:bedtools_version)}' 'bowtie2=#{fetch(:bowtie2_version)}'")
+      end
+    end
+  end
+
   desc 'Restart application'
   task :restart do
     on roles(:app), in: :sequence, wait: 5 do
