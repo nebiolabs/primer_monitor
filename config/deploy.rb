@@ -88,9 +88,9 @@ namespace :deploy do
       within release_path do
         # remove the env if it exists, else do nothing
         #  the || true invokes true (a do-nothing command) if the test fails just so the whole command returns 0
-        execute("source #{shared_path}/.env && [ -d #{shared_path}/alignment_env ] && \"$MICROMAMBA_BIN_PATH/micromamba\" env remove -p #{shared_path}/alignment_env || true")
+        execute("source #{shared_path}/.env && [ -d #{shared_path}/alignment_env ] && \"$MICROMAMBA_BIN_PATH/micromamba\" env remove -y -q -p #{shared_path}/alignment_env || true")
         # create the env
-        execute("source #{shared_path}/.env && \"$MICROMAMBA_BIN_PATH/micromamba\" create -y -p #{shared_path}/alignment_env 'samtools=#{fetch(:samtools_version)}' 'bedtools=#{fetch(:bedtools_version)}' 'bowtie2=#{fetch(:bowtie2_version)}'")
+        execute("source #{shared_path}/.env && \"$MICROMAMBA_BIN_PATH/micromamba\" create -y -q -p #{shared_path}/alignment_env 'samtools=#{fetch(:samtools_version)}' 'bedtools=#{fetch(:bedtools_version)}' 'bowtie2=#{fetch(:bowtie2_version)}'")
       end
     end
   end
