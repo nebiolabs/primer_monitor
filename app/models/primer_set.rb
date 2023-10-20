@@ -46,7 +46,8 @@ class PrimerSet < ApplicationRecord
 
   def align_primers
     pid = Process.spawn({ 'DB_HOST' => ENV['DB_HOST'], 'DB_NAME' => ENV['DB_NAME'], 'DB_USER' => ENV['DB_USER'],
-                          'MICROMAMBA_BIN_PATH' => ENV['MICROMAMBA_BIN_PATH'] },
+                          'MICROMAMBA_BIN_PATH' => ENV['MICROMAMBA_BIN_PATH'],
+                          'PGPASSFILE' => "#{ENV['DEPLOY_SHARED_DIR']}/config/.pgpass" },
                         Shellwords.join(['bash', 'lib/update_primers.sh', "#{ENV['DEPLOY_SHARED_DIR']}/alignment_env",
                                          'bt2_indices/2697049/NC_045512.2', id.to_s]) +
                           " >> \"#{ENV['FRONTEND_LOG_PATH']}/primer_alignment.log\" 2>&1")

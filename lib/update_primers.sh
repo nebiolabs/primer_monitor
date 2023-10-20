@@ -27,15 +27,15 @@ fi
 for id in "$@"; do
   echo "Processing $id..." >&2
 
-  psql -h "$DB_HOST" -d "$DB_NAME" -U "$DB_USER" -c "SELECT id, sequence FROM oligos WHERE primer_set_id=$id $null_check;" --csv -t |
-    awk 'BEGIN { FS="," }; {print ">" $1 "\n" $2}' |
-    "$MICROMAMBA_BIN_PATH/micromamba" run -p "$conda_env_path" bowtie2 -f --end-to-end --score-min L,-0.6,-1.5 -L 8 -x "$bt2_index" -U - |
-    "$MICROMAMBA_BIN_PATH/micromamba" run -p "$conda_env_path" samtools view -b | \
-    "$MICROMAMBA_BIN_PATH/micromamba" run -p "$conda_env_path" bedtools bamtobed -i - | awk '{print $4 "," $2 "," $3}' >>"$db_csv"
+  psql -h "$DB_HOST" -d "$DB_NAME" -U "$DB_USER_RO" -c "SELECT id, sequence FROM oligos WHERE primer_set_id=$id $null_check;" --csv -t | \
+  awk 'BEGIN { FS="," }; {print ">" $1 "\n" $2}' | \
+  "$MICROMAMBA_BIN_PATH/micromamba" run -p "$conda_env_path" bowtie2 -f --end-to-end --score-min L,-0.6,-1.5 -L 8 -x "$bt2_index" -U - | \
+  "$MICROMAMBA_BIN_PATH/micromamba" run -p "$conda_env_path" samtools view -b | \
+  "$MICROMAMBA_BIN_PATH/micromamba" run -p "$conda_env_path" bedtools bamtobed -i - | awk '{print $4 "," $2 "," $3}' >>"$db_csv"
 
 done
 
-psql -h "$DB_HOST" -d "$DB_NAME" -U "$DB_USER" >&2 <<CMDS
+PGPASSFILE="$PGPASSFILE" psql -h "$DB_HOST" -d "$DB_NAME" -U "$DB_USER" >&2 <<CMDS
 create temporary table tmp_oligo_positions (seq_id integer, ref_start integer, ref_end integer);
 \copy tmp_oligo_positions from '$db_csv' with (format csv);
 update oligos set ref_start=top.ref_start, ref_end=top.ref_end from tmp_oligo_positions top where oligos.id=top.seq_id;
