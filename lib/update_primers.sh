@@ -12,7 +12,7 @@ fi
 
 conda_env_path="$1"
 bt2_index="$2"
-shift
+shift 2
 
 # you need to export DB_HOST, DB_NAME, and DB_USER before running this
 
