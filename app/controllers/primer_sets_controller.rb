@@ -14,21 +14,7 @@ class PrimerSetsController < ApplicationController
   # GET /primer_sets/1
   # GET /primer_sets/1.json
   def show
-    @config = {
-      "data_server": ENV['IGV_DATA_SERVER'],
-      "organism_taxid": @primer_set.organism.ncbi_taxon_id,
-      "organism_name": @primer_set.organism.name,
-      "reference_accession": @primer_set.organism.reference_accession
-    }
-
-    tracks_url = URI("#{@config[:data_server]}/#{@config[:organism_taxid]}/config/tracks.json")
-
-    begin
-      primer_sets = JSON.parse(Net::HTTP.get(tracks_url)).invert
-    rescue JSON::ParserError
-      # cannot parse JSON properly, treat it as empty
-      primer_sets = {}
-    end
+    @config, primer_sets = @primer_set.organism.primer_sets_config
 
     return unless primer_sets.key? @primer_set.name
 

@@ -14,6 +14,8 @@ class OrganismsController < ApplicationController
   # GET /organisms/1.json
   def show
     @subscriptions = PrimerSetSubscription.subscriptions_for_user_by_primer_set(current_user)
+
+    @config, @primer_sets = @organism.primer_sets_config
   end
 
   # GET /organisms/new

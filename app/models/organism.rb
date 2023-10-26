@@ -11,4 +11,24 @@ class Organism < ApplicationRecord
   def full_name
     name + (self.alias.blank? ? '' : " (#{self.alias})")
   end
+
+  def primer_sets_config
+    config = {
+      "data_server": ENV['IGV_DATA_SERVER'],
+      "organism_taxid": ncbi_taxon_id,
+      "organism_name": name,
+      "reference_accession": reference_accession
+    }
+
+    tracks_url = URI("#{config[:data_server]}/#{config[:organism_taxid]}/config/tracks.json")
+
+    begin
+      primer_sets = JSON.parse(Net::HTTP.get(tracks_url)).invert
+    rescue JSON::ParserError
+      # cannot parse JSON properly, treat it as empty
+      primer_sets = {}
+    end
+
+    [config, primer_sets]
+  end
 end

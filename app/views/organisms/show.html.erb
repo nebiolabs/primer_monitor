@@ -14,7 +14,8 @@
     <th data-priority="4">Amp. Method</th>
     <th data-priority="1">Primer Set</th>
     <th data-priority="2">Source</th>
-    <th data-priority="3">Oligos</th>
+    <th data-priority="3">FASTA</th>
+    <th data-priority="3">BED</th>
     <th data-priority="1">Subscription</th>
   </tr>
   </thead>
@@ -29,7 +30,13 @@
           <%= link_to 'Source', primer_set.display_url %>
         <% end %>
       </td>
-      <td><%= primer_set.oligos.length > 12 ? primer_set.oligos[..11].join(", ")+'...' : primer_set.oligos.join(", ") %></td>
+      <% if @primer_sets.key? primer_set.name %>
+        <td><a href="<%= "#{@config[:data_server]}/#{@config[:organism_taxid]}/primer_sets_fasta/#{@primer_sets[primer_set.name]}.fasta" %>">Download FASTA</a></td>
+        <td><a href="<%= "#{@config[:data_server]}/#{@config[:organism_taxid]}/primer_sets_bed/#{@primer_sets[primer_set.name]}.bed" %>">Download BED</a></td>
+      <% else %>
+        <td>Pending</td>
+        <td>Pending</td>
+      <% end %>
       <td>
         <%= render '/primer_sets/primer_set_subscription', user: current_user, primer_set: primer_set, primer_set_subscription: @subscriptions[primer_set.id] %>
       </td>
