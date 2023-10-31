@@ -139,7 +139,8 @@ process pangolin_calls {
     TMPDIR="!{temp_dir}"
     export TMPDIR
 
-    !{primer_monitor_path}/lib/pangolin_calls/run_pangolin.sh !{fasta} 8
+    !{primer_monitor_path}/lib/pangolin_calls/run_pangolin.sh !{fasta} 8 && \
+    touch "$(pwd)/!{fasta}.$(basename "$PWD").pangolin_calls.done"; # create file to indicate this is done
     '''
 }
 

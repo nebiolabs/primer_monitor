@@ -198,8 +198,8 @@ CREATE TABLE public.fasta_records (
     date_submitted date,
     pangolin_lineage text,
     pangolin_version text,
-    pangolin_call_id bigint,
-    pending_pangolin_call_id bigint
+    lineage_call_id bigint,
+    pending_lineage_call_id bigint
 );
 
 
@@ -863,6 +863,73 @@ CREATE VIEW public.join_subscribed_location_to_id AS
 
 
 --
+-- Name: lineage_callers; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.lineage_callers (
+    id bigint NOT NULL,
+    name character varying NOT NULL,
+    version_specifiers character varying,
+    script_name character varying NOT NULL,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: lineage_callers_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.lineage_callers_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: lineage_callers_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.lineage_callers_id_seq OWNED BY public.lineage_callers.id;
+
+
+--
+-- Name: lineage_calls; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.lineage_calls (
+    id bigint NOT NULL,
+    taxon character varying NOT NULL,
+    lineage_id bigint,
+    lineage_callers_id bigint,
+    metadata character varying,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: lineage_calls_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.lineage_calls_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: lineage_calls_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.lineage_calls_id_seq OWNED BY public.lineage_calls.id;
+
+
+--
 -- Name: lineages; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -927,17 +994,50 @@ CREATE TABLE public.oligos_test (
 
 
 --
+-- Name: organism_taxa; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.organism_taxa (
+    id bigint NOT NULL,
+    name character varying NOT NULL,
+    reference_accession character varying NOT NULL,
+    organism_id bigint NOT NULL,
+    caller_id character varying,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL,
+    ncbi_taxon_id integer
+);
+
+
+--
+-- Name: organism_taxa_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.organism_taxa_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: organism_taxa_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.organism_taxa_id_seq OWNED BY public.organism_taxa.id;
+
+
+--
 -- Name: organisms; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.organisms (
     id bigint NOT NULL,
-    ncbi_taxon_id integer NOT NULL,
     name character varying NOT NULL,
     created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL,
-    alias character varying,
-    reference_accession character varying
+    alias character varying
 );
 
 
@@ -958,53 +1058,6 @@ CREATE SEQUENCE public.organisms_id_seq
 --
 
 ALTER SEQUENCE public.organisms_id_seq OWNED BY public.organisms.id;
-
-
---
--- Name: pangolin_calls; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.pangolin_calls (
-    id bigint NOT NULL,
-    taxon character varying NOT NULL,
-    _lineage_name character varying,
-    conflict character varying,
-    ambiguity_score double precision,
-    scorpio_call character varying,
-    scorpio_support numeric,
-    scorpio_conflict numeric,
-    scorpio_notes text,
-    version character varying NOT NULL,
-    pangolin_version character varying NOT NULL,
-    scorpio_version character varying NOT NULL,
-    constellation_version character varying NOT NULL,
-    is_designated character varying NOT NULL,
-    qc_status character varying,
-    qc_notes character varying,
-    note character varying,
-    created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL,
-    lineage_id bigint
-);
-
-
---
--- Name: pangolin_calls_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE public.pangolin_calls_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: pangolin_calls_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE public.pangolin_calls_id_seq OWNED BY public.pangolin_calls.id;
 
 
 --
@@ -1289,6 +1342,20 @@ ALTER TABLE ONLY public.genomic_features ALTER COLUMN id SET DEFAULT nextval('pu
 
 
 --
+-- Name: lineage_callers id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.lineage_callers ALTER COLUMN id SET DEFAULT nextval('public.lineage_callers_id_seq'::regclass);
+
+
+--
+-- Name: lineage_calls id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.lineage_calls ALTER COLUMN id SET DEFAULT nextval('public.lineage_calls_id_seq'::regclass);
+
+
+--
 -- Name: lineages id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -1303,17 +1370,17 @@ ALTER TABLE ONLY public.oligos ALTER COLUMN id SET DEFAULT nextval('public.oligo
 
 
 --
+-- Name: organism_taxa id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.organism_taxa ALTER COLUMN id SET DEFAULT nextval('public.organism_taxa_id_seq'::regclass);
+
+
+--
 -- Name: organisms id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.organisms ALTER COLUMN id SET DEFAULT nextval('public.organisms_id_seq'::regclass);
-
-
---
--- Name: pangolin_calls id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.pangolin_calls ALTER COLUMN id SET DEFAULT nextval('public.pangolin_calls_id_seq'::regclass);
 
 
 --
@@ -1398,8 +1465,8 @@ CREATE MATERIALIZED VIEW public.lineage_info AS
     COALESCE(max(fasta_records.date_collected), max(fasta_records.date_submitted)) AS last_seen,
     COALESCE(min(fasta_records.date_collected), min(fasta_records.date_submitted)) AS first_seen
    FROM ((public.lineages
-     JOIN public.pangolin_calls ON ((pangolin_calls.lineage_id = lineages.id)))
-     JOIN public.fasta_records ON ((fasta_records.pangolin_call_id = pangolin_calls.id)))
+     JOIN public.lineage_calls ON ((lineage_calls.lineage_id = lineages.id)))
+     JOIN public.fasta_records ON ((fasta_records.lineage_call_id = lineage_calls.id)))
   GROUP BY lineages.id
   WITH NO DATA;
 
@@ -1469,6 +1536,22 @@ ALTER TABLE ONLY public.genomic_features
 
 
 --
+-- Name: lineage_callers lineage_callers_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.lineage_callers
+    ADD CONSTRAINT lineage_callers_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: lineage_calls lineage_calls_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.lineage_calls
+    ADD CONSTRAINT lineage_calls_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: oligos oligos_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -1477,19 +1560,19 @@ ALTER TABLE ONLY public.oligos
 
 
 --
+-- Name: organism_taxa organism_taxa_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.organism_taxa
+    ADD CONSTRAINT organism_taxa_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: organisms organisms_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.organisms
     ADD CONSTRAINT organisms_pkey PRIMARY KEY (id);
-
-
---
--- Name: pangolin_calls pangolin_calls_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.pangolin_calls
-    ADD CONSTRAINT pangolin_calls_pkey PRIMARY KEY (id);
 
 
 --
@@ -1629,17 +1712,17 @@ CREATE INDEX index_fasta_records_on_detailed_geo_location_id ON public.fasta_rec
 
 
 --
--- Name: index_fasta_records_on_pangolin_call_id; Type: INDEX; Schema: public; Owner: -
+-- Name: index_fasta_records_on_lineage_call_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_fasta_records_on_pangolin_call_id ON public.fasta_records USING btree (pangolin_call_id);
+CREATE INDEX index_fasta_records_on_lineage_call_id ON public.fasta_records USING btree (lineage_call_id);
 
 
 --
--- Name: index_fasta_records_on_pending_pangolin_call_id; Type: INDEX; Schema: public; Owner: -
+-- Name: index_fasta_records_on_pending_lineage_call_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_fasta_records_on_pending_pangolin_call_id ON public.fasta_records USING btree (pending_pangolin_call_id);
+CREATE INDEX index_fasta_records_on_pending_lineage_call_id ON public.fasta_records USING btree (pending_lineage_call_id);
 
 
 --
@@ -1647,6 +1730,20 @@ CREATE INDEX index_fasta_records_on_pending_pangolin_call_id ON public.fasta_rec
 --
 
 CREATE INDEX index_genomic_features_on_organism_id ON public.genomic_features USING btree (organism_id);
+
+
+--
+-- Name: index_lineage_calls_on_lineage_callers_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_lineage_calls_on_lineage_callers_id ON public.lineage_calls USING btree (lineage_callers_id);
+
+
+--
+-- Name: index_lineage_calls_on_lineage_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_lineage_calls_on_lineage_id ON public.lineage_calls USING btree (lineage_id);
 
 
 --
@@ -1671,10 +1768,10 @@ CREATE INDEX index_oligos_on_primer_set_id ON public.oligos USING btree (primer_
 
 
 --
--- Name: index_pangolin_calls_on_lineage_id; Type: INDEX; Schema: public; Owner: -
+-- Name: index_organism_taxa_on_organism_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_pangolin_calls_on_lineage_id ON public.pangolin_calls USING btree (lineage_id);
+CREATE INDEX index_organism_taxa_on_organism_id ON public.organism_taxa USING btree (organism_id);
 
 
 --
@@ -1895,20 +1992,6 @@ CREATE INDEX variant_sites_usable_insertion_idx ON public.variant_sites USING bt
 
 
 --
--- Name: pangolin_calls init_dates; Type: TRIGGER; Schema: public; Owner: -
---
-
-CREATE TRIGGER init_dates BEFORE INSERT ON public.pangolin_calls FOR EACH ROW EXECUTE FUNCTION public.init_dates_for_pangolin_calls();
-
-
---
--- Name: pangolin_calls update_date; Type: TRIGGER; Schema: public; Owner: -
---
-
-CREATE TRIGGER update_date BEFORE UPDATE ON public.pangolin_calls FOR EACH ROW EXECUTE FUNCTION public.update_date_for_pangolin_calls();
-
-
---
 -- Name: proposed_notifications fk_rails_03fe9a3c07; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -1973,6 +2056,14 @@ ALTER TABLE ONLY public.proposed_notifications
 
 
 --
+-- Name: lineage_calls fk_rails_51310c3c3b; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.lineage_calls
+    ADD CONSTRAINT fk_rails_51310c3c3b FOREIGN KEY (lineage_id) REFERENCES public.lineages(id);
+
+
+--
 -- Name: primer_sets fk_rails_52b9cf4012; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -2002,6 +2093,14 @@ ALTER TABLE ONLY public.genomic_features
 
 ALTER TABLE ONLY public.verified_notifications
     ADD CONSTRAINT fk_rails_660c55653c FOREIGN KEY (user_id) REFERENCES public.users(id);
+
+
+--
+-- Name: organism_taxa fk_rails_7181a117a9; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.organism_taxa
+    ADD CONSTRAINT fk_rails_7181a117a9 FOREIGN KEY (organism_id) REFERENCES public.organisms(id);
 
 
 --
@@ -2053,6 +2152,22 @@ ALTER TABLE ONLY public.detailed_geo_locations
 
 
 --
+-- Name: fasta_records fk_rails_8c673121b0; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.fasta_records
+    ADD CONSTRAINT fk_rails_8c673121b0 FOREIGN KEY (pending_lineage_call_id) REFERENCES public.lineage_calls(id);
+
+
+--
+-- Name: fasta_records fk_rails_94bad69efe; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.fasta_records
+    ADD CONSTRAINT fk_rails_94bad69efe FOREIGN KEY (lineage_call_id) REFERENCES public.lineage_calls(id);
+
+
+--
 -- Name: primer_set_subscriptions fk_rails_99041872f6; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -2066,14 +2181,6 @@ ALTER TABLE ONLY public.primer_set_subscriptions
 
 ALTER TABLE ONLY public.primer_sets
     ADD CONSTRAINT fk_rails_a78cff2c70 FOREIGN KEY (user_id) REFERENCES public.users(id);
-
-
---
--- Name: fasta_records fk_rails_b603fc708f; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.fasta_records
-    ADD CONSTRAINT fk_rails_b603fc708f FOREIGN KEY (pending_pangolin_call_id) REFERENCES public.pangolin_calls(id);
 
 
 --
@@ -2101,11 +2208,11 @@ ALTER TABLE ONLY public.proposed_notifications
 
 
 --
--- Name: fasta_records fk_rails_db801c5c92; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: lineage_calls fk_rails_dee6109632; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.fasta_records
-    ADD CONSTRAINT fk_rails_db801c5c92 FOREIGN KEY (pangolin_call_id) REFERENCES public.pangolin_calls(id);
+ALTER TABLE ONLY public.lineage_calls
+    ADD CONSTRAINT fk_rails_dee6109632 FOREIGN KEY (lineage_callers_id) REFERENCES public.lineage_callers(id);
 
 
 --
@@ -2237,6 +2344,13 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20230802152750'),
 ('20230814161850'),
 ('20230816160045'),
-('20230818095330');
+('20230818095330'),
+('20231030170830'),
+('20231030171645'),
+('20231031100050'),
+('20231031151130'),
+('20231031151300'),
+('20231031152630'),
+('20231031152920');
 
 
