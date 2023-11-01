@@ -6,8 +6,8 @@ pct_cutoff = params.pct_cutoff
 params.score_cutoff =
 score_cutoff = params.score_cutoff
 
-params.organism_dirname =
-organism_dirname = params.organism_dirname
+params.organism =
+organism = params.organism
 
 params.primer_monitor_path =
 primer_monitor_path = params.primer_monitor_path
@@ -15,11 +15,11 @@ primer_monitor_path = params.primer_monitor_path
 params.output_path =
 output_path = params.output_path
 
-params.pangolin_version_path =
-params.pangolin_data_version_path =
-
 params.taxon_id =
 taxon_id = params.taxon_id
+
+params.lineage_caller =
+lineage_caller = params.lineage_caller
 
 params.temp_dir = '/tmp'
 temp_dir = params.temp_dir
@@ -28,26 +28,23 @@ params.override_path =
 override_path = params.override_path
 override_path = file(override_path).toAbsolutePath()
 
-process get_pangolin_version {
+process get_caller_version {
     cpus 1
-    penv 'smp'
+
     conda "'bash>=4.1'"
 
     output:
-        env pangolin_version
-        env pangolin_data_version
-
+        env version_spec
     shell:
     '''
     #! /usr/bin/env bash
 
     source "!{primer_monitor_path}/.env"
 
-    use_pending="false"
-    pangolin_version=$(cat !{params.pangolin_version_path})
-    pangolin_data_version=$(cat !{params.pangolin_data_version_path})
+    version_spec=$(PGPASSFILE="!{primer_monitor_path}/config/.pgpass" psql -h "$DB_HOST" -d "$DB_NAME" -U "$DB_USER" \
+    -v "caller_name=!{caller_name}" <<< "SELECT pending_version_specifiers FROM lineage_callers WHERE name=:'caller_name';" -t --csv);
     '''
-}
+    }
 
 process download_data {
     // Downloads the full dataset
@@ -125,13 +122,12 @@ process transform_data {
 
 }
 
-process pangolin_calls {
+process lineage_calls {
     cpus 8
     penv 'smp'
-    conda "pangolin==$pangolin_version pangolin-data==$pangolin_data_version"
+    conda "$version_spec"
     input:
-        val pangolin_version
-        val pangolin_data_version
+        val version_spec
         tuple file(metadata), file(fasta)
     output:
         file "*.csv"
@@ -141,12 +137,11 @@ process pangolin_calls {
     TMPDIR="!{temp_dir}"
     export TMPDIR
 
-    !{primer_monitor_path}/lib/pangolin_calls/run_pangolin.sh !{fasta} 8 && \
-    touch "$(pwd)/!{fasta}.$(basename "$PWD").pangolin_calls.done"; # create file to indicate this is done
+    !{primer_monitor_path}/lib/lineage_calling/caller_wrappers/!{lineage_caller}.sh !{fasta} 8
     '''
 }
 
-process load_pangolin_data {
+process load_lineage_data {
     cpus 1
     penv 'smp'
     errorStrategy 'retry'
@@ -157,14 +152,14 @@ process load_pangolin_data {
     input:
         file csv
     output:
-        file '*.complete_pangolin'
+        file '*.complete_lineages'
     shell:
     '''
     RAILS_ENV=production ruby !{primer_monitor_path}/upload.rb \
             --import_calls \
-            --pangolin_csv !{csv} \
+            --lineage_csv !{csv} \
             --pending \
-            && mv !{csv} !{csv}.$(basename $PWD).complete_pangolin
+            && mv !{csv} !{csv}.$(basename $PWD).complete_lineages
     '''
 }
 
@@ -180,7 +175,7 @@ process update_calls {
         file 'done.txt'
     shell:
     '''
-    PGPASSFILE="!{primer_monitor_path}/config/.pgpass" !{primer_monitor_path}/lib/pangolin_calls/swap_calls.sh; touch done.txt;
+    PGPASSFILE="!{primer_monitor_path}/config/.pgpass" !{primer_monitor_path}/lib/lineage_calling/swap_calls.sh; touch done.txt;
     '''
 }
 
@@ -194,7 +189,7 @@ process cleanup_old_calls {
         file update_done
     shell:
     '''
-    PGPASSFILE="!{primer_monitor_path}/config/.pgpass" !{primer_monitor_path}/lib/pangolin_calls/cleanup_old_calls.sh;
+    PGPASSFILE="!{primer_monitor_path}/config/.pgpass" !{primer_monitor_path}/lib/lineage_calling/cleanup_old_calls.sh;
     '''
 }
 
@@ -206,19 +201,20 @@ process update_visualization_data {
     shell:
     '''
     # recompute the primer data for igvjs visualization
-    !{primer_monitor_path}/lib/visualization/update_visualization_data.sh -o !{override_path} !{primer_monitor_path} !{organism_dirname} !{pct_cutoff} !{score_cutoff} !{task.cpus}
+    !{primer_monitor_path}/lib/visualization/update_visualization_data.sh -o !{override_path} !{primer_monitor_path} \
+    !{organism} !{pct_cutoff} !{score_cutoff} !{task.cpus}
     '''
 }
 
 
 workflow {
-    get_pangolin_version()
+    get_caller_version()
     download_data()
     extract_new_records(download_data.out)
     transform_data(extract_new_records.out.splitText(file: true, by: 2500).filter{ it.size()>77 })
-    pangolin_calls(get_pangolin_version.out[0], get_pangolin_version.out[1], transform_data.out)
-    load_pangolin_data(pangolin_calls.out)
-    update_calls(load_pangolin_data.out.collect())
+    lineage_calls(get_caller_version.out, transform_data.out)
+    load_lineage_data(lineage_calls.out)
+    update_calls(load_lineage_data.out.collect())
     cleanup_old_calls(update_calls.out)
     update_visualization_data(update_calls.out)
 }

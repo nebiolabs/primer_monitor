@@ -8,70 +8,75 @@ dotenv_path=$1
 # shellcheck source=../../.env
 source "$dotenv_path";
 
-# ensure this directory exists
-mkdir -p "$BACKEND_SCRATCH_PATH/status";
-
 export PATH="$PATH:$MICROMAMBA_BIN_PATH:$CONDA_BIN_PATH:$QSUB_PATH"
 export NXF_CONDA_CACHEDIR="$BACKEND_SCRATCH_PATH/conda_envs"
 export NXF_JAVA_HOME
 
 export TMPDIR=${TEMP_DIR:-/tmp}
 
-# roll back pangolin update and exit
-rollback_pangolin() {
-  mv "$BACKEND_INSTALL_PATH/pangolin_ver.txt.old" "$BACKEND_INSTALL_PATH/pangolin_ver.txt";
-  mv "$BACKEND_INSTALL_PATH/pangolin_data_ver.txt.old" "$BACKEND_INSTALL_PATH/pangolin_data_ver.txt";
-  exit 1;
-}
+while read -r taxon; do
+  organism_slug="$(cut -f 1 -d "," <<< "$taxon")"
+  caller_name="$(cut -f 2 -d "," <<< "$taxon")"
+  caller_version="$(cut -f 3 -d "," <<< "$taxon")"
+  taxon_id="$(cut -f 4 -d "," <<< "$taxon")"
 
-latest_pangolin=$("$MICROMAMBA_BIN_PATH/micromamba" search -c bioconda pangolin | grep -E "Version[[:blank:]]+[0-9]" | awk '{ print $2 }')
-latest_pangolin_data=$("$MICROMAMBA_BIN_PATH/micromamba" search -c bioconda pangolin-data | grep -E "Version[[:blank:]]+[0-9]" | awk '{ print $2 }')
+  new_caller_version=""
 
-if [ "$latest_pangolin" = "" ] || [ "$latest_pangolin_data" = "" ]; then
-  # if either version is blank, fail
-  exit 1;
-fi
+  echo "Starting $caller_name version update"
 
-# back up the old pangolin versions before updating
-cp "$BACKEND_INSTALL_PATH/pangolin_ver.txt" "$BACKEND_INSTALL_PATH/pangolin_ver.txt.old"
-cp "$BACKEND_INSTALL_PATH/pangolin_data_ver.txt" "$BACKEND_INSTALL_PATH/pangolin_data_ver.txt.old"
+  while read -d " " -r version; do
+    # if this isn't a version, stop
+    if ! grep "=" <<< "$version"; then
+      break
+    fi
+    package_name="$(cut -f 1 -d "=")"
+    latest_version=$("$MICROMAMBA_BIN_PATH/micromamba" search -c bioconda "$package_name" | grep -E "Version[[:blank:]]+[0-9]" | awk '{ print $2 }')
+    if [ "$latest_version" = "" ]; then
+      # skip this entire taxon and email an error
+      echo "Error: Got blank version string when trying to update package '$package_name' of caller '$caller_name' \
+      for taxon '$taxon_id' of organism '$organism_slug'. Skipping this taxon." | \
+      mail -r "$ADMIN_EMAIL" -s "Lineage caller update error ($caller_name:$package_name - $organism_slug)" "$NOTIFICATION_EMAILS"
+      continue 2;
+    fi
+    # append version to $new_caller_version
+    new_caller_version="$new_caller_version $package_name==$latest_version"
+  done < <(echo "$caller_version ")
+  # trailing space is intentional to make sure read gets the last word in the string
 
-echo "Starting Pangolin version update"
+  # trim leading space
+  new_caller_version="$(sed -E "s/^ //" <<< "$new_caller_version")"
 
-# roll back the pangolin version update before exiting if something fails or it receives sigterm
-trap rollback_pangolin ERR SIGTERM;
+  # set pending version
+  PGPASSFILE="$BACKEND_INSTALL_PATH/config/.pgpass" "$PSQL_INSTALL_PATH" -h "$DB_HOST" -d "$DB_NAME" -U "$DB_USER" \
+  -v "new_caller_version=$new_caller_version" -v "caller_name=$caller_name" \
+  <<< "UPDATE lineage_callers SET pending_version_specifiers=$'new_caller_version' WHERE name=$'caller_name';"
 
-# fix this to update all lineage callers
+  echo "$caller_name version updated to $new_caller_version"
 
-# update the pangolin version
-printf "%s" "$latest_pangolin" > "$BACKEND_INSTALL_PATH/pangolin_ver.txt"
-printf "%s" "$latest_pangolin_data" > "$BACKEND_INSTALL_PATH/pangolin_data_ver.txt"
+  # run the pipeline
+  "$NEXTFLOW_INSTALL_PATH" -log "$BACKEND_SCRATCH_PATH/log_pangolin-$(date +%F_%T)" \
+  run "$BACKEND_INSTALL_PATH/lib/pangolin_calls/recall_pangolin.nf" \
+  -w "$BACKEND_SCRATCH_PATH/work_pangolin/" \
+  --primer_monitor_path "$BACKEND_INSTALL_PATH" \
+  --output_path "$BACKEND_SCRATCH_PATH" \
+  --lineage_caller "$caller_name" \
+  --pct_cutoff "$PCT_CUTOFF" \
+  --score_cutoff "$SCORE_CUTOFF" \
+  --override_path "$BACKEND_INSTALL_PATH/igvstatic/$organism_slug/overrides.txt" \
+  --organism "$organism_slug" \
+  --taxon_id "$taxon_id" \
+  --temp_dir "$TMPDIR" \
+  -N "$NOTIFICATION_EMAILS" \
+  -c "$BACKEND_INSTALL_PATH/lib/nextflow.config"
+  success="$?"
 
-echo "Pangolin version updated to $latest_pangolin (data $latest_pangolin_data)"
+  if [ "$success" -eq 0 ]; then
+      # update actual version
+      PGPASSFILE="$BACKEND_INSTALL_PATH/config/.pgpass" "$PSQL_INSTALL_PATH" -h "$DB_HOST" -d "$DB_NAME" -U "$DB_USER" \
+      -v "caller_name=$caller_name" <<< "UPDATE lineage_callers SET version_specifiers=pending_version_specifiers WHERE name=$'caller_name';"
+  fi
 
-# loop over organisms/taxa
-
-# run the pipeline
-"$NEXTFLOW_INSTALL_PATH" -log "$BACKEND_SCRATCH_PATH/log_pangolin-$(date +%F_%T)" \
-run "$BACKEND_INSTALL_PATH/lib/pangolin_calls/recall_pangolin.nf" \
--w "$BACKEND_SCRATCH_PATH/work_pangolin/" \
---primer_monitor_path "$BACKEND_INSTALL_PATH" \
---output_path "$BACKEND_SCRATCH_PATH" \
---pangolin_version_path "$BACKEND_INSTALL_PATH/pangolin_ver.txt" \
---pangolin_data_version_path "$BACKEND_INSTALL_PATH/pangolin_data_ver.txt" \
---flag_path "$BACKEND_SCRATCH_PATH/status" \
---pct_cutoff "$PCT_CUTOFF" \
---score_cutoff "$SCORE_CUTOFF" \
---override_path "$BACKEND_INSTALL_PATH/igvstatic/$organism_slug/overrides.txt" \
---organism_dirname "$organism_slug" \
---taxon_id "$taxon_id" \
---temp_dir "$TMPDIR" \
--N "$NOTIFICATION_EMAILS" \
--c "$BACKEND_INSTALL_PATH/lib/nextflow.config"
-
-# unset the trap since the update was successful
-trap - ERR SIGTERM;
-
-# since the pipeline succeeded, remove the .old files
-rm "$BACKEND_INSTALL_PATH/pangolin_ver.txt.old"
-rm "$BACKEND_INSTALL_PATH/pangolin_data_ver.txt.old"
+done < <("$PSQL_INSTALL_PATH" -h "$DB_HOST" -d "$DB_NAME" -U "$DB_USER_RO" \
+-c "SELECT o.slug,lc.name,lc.version_specifiers,ot.ncbi_taxon_id \
+FROM organisms o INNER JOIN organism_taxa ot ON ot.organism_id=o.id LEFT JOIN lineage_callers lc \
+ON ot.caller_id=lc.id;" -t --csv);

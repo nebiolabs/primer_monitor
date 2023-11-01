@@ -22,17 +22,14 @@ override_path = file(override_path).toAbsolutePath()
 params.temp_dir = '/tmp'
 temp_dir = params.temp_dir
 
-params.pangolin_version_path =
-params.pangolin_data_version_path =
+params.lineage_caller =
+lineage_caller = params.lineage_caller
 
 params.taxon_id =
 taxon_id = params.taxon_id
 
-params.organism_dirname =
-organism_dirname = params.organism_dirname
-
-pangolin_version = file(params.pangolin_version_path).text
-pangolin_data_version = file(params.pangolin_data_version_path).text
+params.organism =
+organism = params.organism
 
 process download_data {
     // Downloads the full dataset
@@ -143,32 +140,31 @@ process align {
     '''
 }
 
-process get_pangolin_version {
+process get_caller_version {
     cpus 1
 
     conda "'bash>=4.1'"
 
     output:
-        env pangolin_version
-        env pangolin_data_version
+        env version_spec
     shell:
     '''
     #! /usr/bin/env bash
 
     source "!{primer_monitor_path}/.env"
 
-    use_pending="false"
-    pangolin_version=$(cat !{params.pangolin_version_path})
-    pangolin_data_version=$(cat !{params.pangolin_data_version_path})
+    export PGPASSFILE="!{primer_monitor_path}/config/.pgpass"
+
+    version_spec=$(PGPASSFILE="!{primer_monitor_path}/config/.pgpass" psql -h "$DB_HOST" -d "$DB_NAME" -U "$DB_USER" \
+    -v "caller_name=!{caller_name}" <<< "SELECT pending_version_specifiers FROM lineage_callers WHERE name=:'caller_name';" -t --csv);
     '''
     }
 
-process pangolin_calls {
+process lineage_calls {
     cpus 8
-    conda "pangolin==$pangolin_version pangolin-data==$pangolin_data_version"
+    conda "$version_spec"
     input:
-        val pangolin_version
-        val pangolin_data_version
+        val version_spec
         tuple val(index), file(metadata), file(fasta)
     output:
         tuple val(index), file("*.csv")
@@ -178,7 +174,7 @@ process pangolin_calls {
     TMPDIR="!{temp_dir}"
     export TMPDIR
 
-    !{primer_monitor_path}/lib/pangolin_calls/run_pangolin.sh !{fasta} 8
+    !{primer_monitor_path}/lib/lineage_calling/caller_wrappers/!{lineage_caller}.sh !{fasta} 8
     '''
 }
 
@@ -200,9 +196,10 @@ process load_to_db {
     RAILS_ENV=production ruby !{primer_monitor_path}/upload.rb \
             --import_calls \
             --import_seqs \
-            --pangolin_csv !{csv} \
+            --lineage_csv !{csv} \
             --metadata_tsv !{metadata} \
             --variants_tsv !{tsv} \
+            --organism !{organism} \
             && mv !{metadata} !{metadata}.complete
     '''
 }
@@ -233,7 +230,8 @@ process update_visualization_data {
     shell:
     '''
     # recompute the primer data for igvjs visualization
-    !{primer_monitor_path}/lib/visualization/update_visualization_data.sh -o !{override_path} !{primer_monitor_path} !{organism_dirname} !{pct_cutoff} !{score_cutoff} !{task.cpus}
+    !{primer_monitor_path}/lib/visualization/update_visualization_data.sh -o !{override_path} !{primer_monitor_path} \
+    !{organism} !{pct_cutoff} !{score_cutoff} !{task.cpus}
     '''
 }
 
@@ -243,11 +241,11 @@ workflow {
     index = 0
     transform_data(extract_new_records.out.splitText(file: true, by: 10000).filter{ it.size()>77 }.map{ [index++, it] })
     align(transform_data.out)
-    get_pangolin_version()
-    pangolin_calls(get_pangolin_version.out[0], get_pangolin_version.out[1], transform_data.out)
+    get_caller_version()
+    lineage_calls(get_caller_version.out, transform_data.out)
 
-    //ensure batches of alignments and pangolin calls stay in sync for DB load
-    seq_recs = align.out.join(pangolin_calls.out)
+    //ensure batches of alignments and lineage calls stay in sync for DB load
+    seq_recs = align.out.join(lineage_calls.out)
 
     load_to_db(seq_recs)
     recalculate_database_views(load_to_db.out.collect())

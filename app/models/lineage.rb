@@ -2,10 +2,10 @@
 
 class Lineage < ApplicationRecord
   belongs_to :organism
-  has_many :pangolin_calls, dependent: :destroy
+  has_many :lineage_calls, dependent: :destroy
   has_many :fasta_records, through: :pangolin_calls
 
-  def self.parse(pangolin_csv)
+  def self.parse(pangolin_csv, organism)
     raise "Unable to find calls file #{pangolin_csv}" unless File.exist?(pangolin_csv)
 
     new_lineage_names = Set[] # new empty set
@@ -24,10 +24,10 @@ class Lineage < ApplicationRecord
 
     new_lineages = []
 
-    sarscov2_id = Organism.find_by(ncbi_taxon_id: 2_697_049).id # hardcoded SARS-CoV-2 id for now
+    organism_id = Organism.find_by(slug: organism).id
 
     new_lineage_names.each do |lineage_name|
-      new_lineages << Lineage.new(name: lineage_name, caller_name: 'pangolin', organism_id: sarscov2_id)
+      new_lineages << Lineage.new(name: lineage_name, caller_name: 'pangolin', organism_id: organism_id)
     end
 
     new_lineages

@@ -9,21 +9,7 @@ dotenv_path=$1
 # shellcheck source=../../.env
 source "$dotenv_path";
 
-new_primers_file="$(mktemp -p "$BACKEND_SCRATCH_PATH")"
-
-# select all primer sets with status "processing" for which all oligos are aligned (have a ref_start pos),
-# because only aligned primer sets can be processed properly
-"$PSQL_INSTALL_PATH" -h "$DB_HOST" -d "$DB_NAME" -U "$DB_USER_RO" \
--c "SELECT name FROM primer_sets WHERE status='processing' AND NOT EXISTS \
-(SELECT 1 FROM oligos WHERE oligos.primer_set_id=primer_sets.id AND oligos.ref_start IS NULL);" -t --csv > "$new_primers_file";
-
-line_count="$(wc -l < "$new_primers_file")"
-
-# only run the nextflow if there are actually primers, and no other conflicting script is running
-if [ "$line_count" -gt 0 ]; then
-
-  # ensure this directory exists
-  mkdir -p "$BACKEND_SCRATCH_PATH/status";
+while read -r organism_slug; do
 
   export PATH="$PATH:$MICROMAMBA_BIN_PATH:$CONDA_BIN_PATH:$QSUB_PATH"
   export NXF_CONDA_CACHEDIR="$BACKEND_SCRATCH_PATH/conda_envs"
@@ -31,17 +17,35 @@ if [ "$line_count" -gt 0 ]; then
 
   # loop over organisms with primer sets to process
 
-  "$NEXTFLOW_INSTALL_PATH" -log "$BACKEND_SCRATCH_PATH/log_primer_sets-$(date +%F_%T)/" \
-  run "$BACKEND_INSTALL_PATH/lib/process_primer_sets.nf" \
-  -w "$BACKEND_SCRATCH_PATH/work_primer_sets/" \
-  --primer_monitor_path "$BACKEND_INSTALL_PATH" \
-  --output_path "$BACKEND_SCRATCH_PATH" \
-  --pct_cutoff "$PCT_CUTOFF" \
-  --score_cutoff "$SCORE_CUTOFF" \
-  --primer_names "$new_primers_file" \
-  --override_path "$BACKEND_INSTALL_PATH/igvstatic/$organism_slug/overrides.txt" \
-  --organism_dirname "$organism_slug" \
-  -N "$NOTIFICATION_EMAILS";
-fi
+  new_primers_file="$(mktemp -p "$BACKEND_SCRATCH_PATH")"
 
-rm "$new_primers_file";
+
+  line_count="$(wc -l < "$new_primers_file")"
+
+    # only run the nextflow if there are actually primers, and no other conflicting script is running
+  if [ "$line_count" -gt 0 ]; then
+
+    # select all primer sets with status "processing" for which all oligos are aligned (have a ref_start pos),
+    # because only aligned primer sets can be processed properly
+    "$PSQL_INSTALL_PATH" -h "$DB_HOST" -d "$DB_NAME" -U "$DB_USER_RO" <<< "SELECT name FROM primer_sets WHERE \
+    status='processing' AND organism= AND NOT EXISTS (SELECT 1 FROM oligos WHERE oligos.primer_set_id=primer_sets.id \
+    AND oligos.ref_start IS NULL);" -t --csv > "$new_primers_file";
+
+
+    "$NEXTFLOW_INSTALL_PATH" -log "$BACKEND_SCRATCH_PATH/log_primer_sets-$(date +%F_%T)/" \
+    run "$BACKEND_INSTALL_PATH/lib/process_primer_sets.nf" \
+    -w "$BACKEND_SCRATCH_PATH/work_primer_sets/" \
+    --primer_monitor_path "$BACKEND_INSTALL_PATH" \
+    --output_path "$BACKEND_SCRATCH_PATH" \
+    --pct_cutoff "$PCT_CUTOFF" \
+    --score_cutoff "$SCORE_CUTOFF" \
+    --primer_names "$new_primers_file" \
+    --override_path "$BACKEND_INSTALL_PATH/igvstatic/$organism_slug/overrides.txt" \
+    --organism "$organism_slug" \
+    -N "$NOTIFICATION_EMAILS";
+  fi
+
+  rm "$new_primers_file";
+
+done < <("$PSQL_INSTALL_PATH" -h "$DB_HOST" -d "$DB_NAME" -U "$DB_USER_RO" \
+-c "SELECT o.slug FROM organisms o;" -t --csv);

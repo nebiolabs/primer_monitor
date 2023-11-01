@@ -2,7 +2,7 @@
 
 require 'set'
 
-class PangolinCall < ApplicationRecord
+class LineageCall < ApplicationRecord
   belongs_to :lineage
   has_one :fasta_record, dependent: :nullify
 
@@ -37,13 +37,13 @@ class PangolinCall < ApplicationRecord
 
     raise "Failed to find lineage #{lineage}" if lineage_rec.nil?
 
-    PangolinCall.new(taxon: taxon, lineage_id: lineage_rec.id, conflict: conflict,
-                     ambiguity_score: ambiguity_score, scorpio_call: scorpio_call,
-                     scorpio_support: scorpio_support, scorpio_conflict: scorpio_conflict,
-                     scorpio_notes: scorpio_notes, version: version, pangolin_version: pangolin_version,
-                     scorpio_version: scorpio_version, constellation_version: constellation_version,
-                     is_designated: is_designated,
-                     qc_status: qc_status, qc_notes: qc_notes, note: note)
+    LineageCall.new(taxon: taxon, lineage_id: lineage_rec.id, conflict: conflict,
+                    ambiguity_score: ambiguity_score, scorpio_call: scorpio_call,
+                    scorpio_support: scorpio_support, scorpio_conflict: scorpio_conflict,
+                    scorpio_notes: scorpio_notes, version: version, pangolin_version: pangolin_version,
+                    scorpio_version: scorpio_version, constellation_version: constellation_version,
+                    is_designated: is_designated,
+                    qc_status: qc_status, qc_notes: qc_notes, note: note)
   end
 
   def self.update_fasta_recs(pending)

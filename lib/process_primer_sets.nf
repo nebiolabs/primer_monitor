@@ -12,8 +12,8 @@ score_cutoff = params.score_cutoff
 params.primer_monitor_path =
 primer_monitor_path = params.primer_monitor_path
 
-params.organism_dirname =
-organism_dirname = params.organism_dirname
+params.organism =
+organism = params.organism
 
 params.override_path =
 override_path = params.override_path
@@ -37,7 +37,8 @@ process compute_visualization_data {
     cp !{primer_names_file} primers_done.txt
 
     # recompute the primer data for igvjs visualization
-    !{primer_monitor_path}/lib/visualization/update_visualization_data.sh -o !{override_path} -p "$(pwd)/!{primer_names_file}" !{primer_monitor_path} !{organism_dirname} \
+    !{primer_monitor_path}/lib/visualization/update_visualization_data.sh -o !{override_path} \
+    -p "$(pwd)/!{primer_names_file}" !{primer_monitor_path} !{organism} \
     !{pct_cutoff} !{score_cutoff} !{task.cpus};
     '''
 }
@@ -58,7 +59,8 @@ process update_db {
     source "!{primer_monitor_path}/.env"
 
     while read -r primer_set; do
-        PGPASSFILE="!{primer_monitor_path}/config/.pgpass" psql -h "$DB_HOST" -d "$DB_NAME" -U "$DB_USER" -v "primer_set=$primer_set" <<< "UPDATE primer_sets SET status='complete' WHERE name=:'primer_set';";
+        PGPASSFILE="!{primer_monitor_path}/config/.pgpass" psql -h "$DB_HOST" -d "$DB_NAME" -U "$DB_USER" \
+        -v "primer_set=$primer_set" <<< "UPDATE primer_sets SET status='complete' WHERE name=:'primer_set';";
     done < !{completed_primers}
     '''
 }

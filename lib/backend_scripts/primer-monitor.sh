@@ -8,9 +8,6 @@ dotenv_path=$1
 # shellcheck source=../../.env
 source "$dotenv_path";
 
-# ensure this directory exists
-mkdir -p "$BACKEND_SCRATCH_PATH/status";
-
 export PATH="$PATH:$MICROMAMBA_BIN_PATH:$CONDA_BIN_PATH:$QSUB_PATH"
 export NXF_CONDA_CACHEDIR="$BACKEND_SCRATCH_PATH/conda_envs"
 export NXF_JAVA_HOME
@@ -34,7 +31,7 @@ while read -r taxon; do
   --pct_cutoff "$PCT_CUTOFF" \
   --score_cutoff "$SCORE_CUTOFF" \
   --override_path "$BACKEND_INSTALL_PATH/igvstatic/$organism_slug/overrides.txt" \
-  --organism_dirname "$organism_slug" \
+  --organism "$organism_slug" \
   --taxon_id "$taxon_id" \
   --temp_dir "$TMPDIR" \
   -N "$NOTIFICATION_EMAILS";
