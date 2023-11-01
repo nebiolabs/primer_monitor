@@ -1002,10 +1002,10 @@ CREATE TABLE public.organism_taxa (
     name character varying NOT NULL,
     reference_accession character varying NOT NULL,
     organism_id bigint NOT NULL,
-    caller_id character varying,
     created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL,
-    ncbi_taxon_id integer
+    ncbi_taxon_id integer,
+    caller_id bigint
 );
 
 
@@ -1037,7 +1037,8 @@ CREATE TABLE public.organisms (
     name character varying NOT NULL,
     created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL,
-    alias character varying
+    alias character varying,
+    slug character varying
 );
 
 
@@ -1768,6 +1769,13 @@ CREATE INDEX index_oligos_on_primer_set_id ON public.oligos USING btree (primer_
 
 
 --
+-- Name: index_organism_taxa_on_caller_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_organism_taxa_on_caller_id ON public.organism_taxa USING btree (caller_id);
+
+
+--
 -- Name: index_organism_taxa_on_organism_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -2152,6 +2160,14 @@ ALTER TABLE ONLY public.detailed_geo_locations
 
 
 --
+-- Name: organism_taxa fk_rails_8c4a73ac21; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.organism_taxa
+    ADD CONSTRAINT fk_rails_8c4a73ac21 FOREIGN KEY (caller_id) REFERENCES public.lineage_callers(id);
+
+
+--
 -- Name: fasta_records fk_rails_8c673121b0; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -2351,6 +2367,9 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20231031151130'),
 ('20231031151300'),
 ('20231031152630'),
-('20231031152920');
+('20231031152920'),
+('20231031164710'),
+('202311011012530'),
+('20231101101700');
 
 

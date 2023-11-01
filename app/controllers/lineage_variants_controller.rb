@@ -5,8 +5,7 @@ class LineageVariantsController < ApplicationController
   def index
     authorize! :index, LineageVariantsController
 
-    # NOTE: hardcoding SARS-CoV-2 taxid
-    organism = Organism.find_by(ncbi_taxon_id: '2697049')
+    organism = Organism.find_by(slug: params[:organism_name])
 
     @config = {
       "data_server": ENV['IGV_DATA_SERVER'],

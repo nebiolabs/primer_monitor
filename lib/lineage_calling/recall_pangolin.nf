@@ -18,6 +18,9 @@ output_path = params.output_path
 params.pangolin_version_path =
 params.pangolin_data_version_path =
 
+params.taxon_id =
+taxon_id = params.taxon_id
+
 params.temp_dir = '/tmp'
 temp_dir = params.temp_dir
 
@@ -52,14 +55,13 @@ process download_data {
     conda "ncbi-datasets-cli unzip zstd"
     errorStrategy 'retry'
     maxRetries 2
-
     output:
         tuple file('*.metadata.zst'), file('*.sequences.zst')
 
     shell:
     '''
     date_today=$(date +%Y-%m-%d)
-    datasets download virus genome taxon 2697049 --complete-only --host human --filename tmp.zip
+    datasets download virus genome taxon !{taxon_id} --complete-only --host human --filename tmp.zip
     unzip tmp.zip
     zstd --long=30 --ultra -22 -T!{task.cpus} ncbi_dataset/data/data_report.jsonl -o ${date_today}.metadata.zst
     zstd --long=30 --ultra -22 -T!{task.cpus} ncbi_dataset/data/genomic.fna -o ${date_today}.sequences.zst

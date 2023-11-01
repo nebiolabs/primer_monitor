@@ -17,18 +17,31 @@ export NXF_JAVA_HOME
 
 export TMPDIR="${TEMP_DIR:-/tmp}"
 
-"$NEXTFLOW_INSTALL_PATH" -log "$BACKEND_SCRATCH_PATH/log_download-$(date +%F_%T)" \
-run "$BACKEND_INSTALL_PATH/lib/summarize_variants.nf" \
---ref "$BACKEND_INSTALL_PATH/igvstatic/2697049/ref/NC_045512.2.fasta" \
--w "$BACKEND_SCRATCH_PATH/work_download/" \
---primer_monitor_path "$BACKEND_INSTALL_PATH" \
---output_path "$BACKEND_SCRATCH_PATH" \
---pangolin_version_path "$BACKEND_INSTALL_PATH/pangolin_ver.txt" \
---pangolin_data_version_path "$BACKEND_INSTALL_PATH/pangolin_data_ver.txt" \
---flag_path "$BACKEND_SCRATCH_PATH/status" \
---pct_cutoff "$PCT_CUTOFF" \
---score_cutoff "$SCORE_CUTOFF" \
---override_path "$BACKEND_INSTALL_PATH/igvstatic/2697049/overrides.txt" \
---organism_dirname "2697049" \
---temp_dir "$TMPDIR" \
--N "$NOTIFICATION_EMAILS";
+while read -r taxon; do
+  organism_slug="$(cut -f 1 -d "," <<< "$taxon")"
+  ref_accession="$(cut -f 2 -d "," <<< "$taxon")"
+  caller_name="$(cut -f 3 -d "," <<< "$taxon")"
+  taxon_id="$(cut -f 4 -d "," <<< "$taxon")"
+
+
+  "$NEXTFLOW_INSTALL_PATH" -log "$BACKEND_SCRATCH_PATH/log_download-$(date +%F_%T)" \
+  run "$BACKEND_INSTALL_PATH/lib/summarize_variants.nf" \
+  --ref "$BACKEND_INSTALL_PATH/igvstatic/$organism_slug/ref/$ref_accession.fasta" \
+  -w "$BACKEND_SCRATCH_PATH/work_download/" \
+  --primer_monitor_path "$BACKEND_INSTALL_PATH" \
+  --output_path "$BACKEND_SCRATCH_PATH" \
+  --lineage_caller "$caller_name" \
+  --pct_cutoff "$PCT_CUTOFF" \
+  --score_cutoff "$SCORE_CUTOFF" \
+  --override_path "$BACKEND_INSTALL_PATH/igvstatic/$organism_slug/overrides.txt" \
+  --organism_dirname "$organism_slug" \
+  --taxon_id "$taxon_id" \
+  --temp_dir "$TMPDIR" \
+  -N "$NOTIFICATION_EMAILS";
+
+
+done < <("$PSQL_INSTALL_PATH" -h "$DB_HOST" -d "$DB_NAME" -U "$DB_USER_RO" \
+-c "SELECT o.slug,ot.reference_accession,lc.name,ot.ncbi_taxon_id \
+FROM organisms o INNER JOIN organism_taxa ot ON ot.organism_id=o.id LEFT JOIN lineage_callers lc \
+ON ot.caller_id=lc.id;" -t --csv);
+

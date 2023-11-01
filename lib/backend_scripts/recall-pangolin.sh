@@ -41,11 +41,15 @@ echo "Starting Pangolin version update"
 # roll back the pangolin version update before exiting if something fails or it receives sigterm
 trap rollback_pangolin ERR SIGTERM;
 
+# fix this to update all lineage callers
+
 # update the pangolin version
 printf "%s" "$latest_pangolin" > "$BACKEND_INSTALL_PATH/pangolin_ver.txt"
 printf "%s" "$latest_pangolin_data" > "$BACKEND_INSTALL_PATH/pangolin_data_ver.txt"
 
 echo "Pangolin version updated to $latest_pangolin (data $latest_pangolin_data)"
+
+# loop over organisms/taxa
 
 # run the pipeline
 "$NEXTFLOW_INSTALL_PATH" -log "$BACKEND_SCRATCH_PATH/log_pangolin-$(date +%F_%T)" \
@@ -58,8 +62,9 @@ run "$BACKEND_INSTALL_PATH/lib/pangolin_calls/recall_pangolin.nf" \
 --flag_path "$BACKEND_SCRATCH_PATH/status" \
 --pct_cutoff "$PCT_CUTOFF" \
 --score_cutoff "$SCORE_CUTOFF" \
---override_path "$BACKEND_INSTALL_PATH/igvstatic/2697049/overrides.txt" \
---organism_dirname "2697049" \
+--override_path "$BACKEND_INSTALL_PATH/igvstatic/$organism_slug/overrides.txt" \
+--organism_dirname "$organism_slug" \
+--taxon_id "$taxon_id" \
 --temp_dir "$TMPDIR" \
 -N "$NOTIFICATION_EMAILS" \
 -c "$BACKEND_INSTALL_PATH/lib/nextflow.config"

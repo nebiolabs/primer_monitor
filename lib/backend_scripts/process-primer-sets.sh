@@ -29,6 +29,8 @@ if [ "$line_count" -gt 0 ]; then
   export NXF_CONDA_CACHEDIR="$BACKEND_SCRATCH_PATH/conda_envs"
   export NXF_JAVA_HOME
 
+  # loop over organisms with primer sets to process
+
   "$NEXTFLOW_INSTALL_PATH" -log "$BACKEND_SCRATCH_PATH/log_primer_sets-$(date +%F_%T)/" \
   run "$BACKEND_INSTALL_PATH/lib/process_primer_sets.nf" \
   -w "$BACKEND_SCRATCH_PATH/work_primer_sets/" \
@@ -37,8 +39,8 @@ if [ "$line_count" -gt 0 ]; then
   --pct_cutoff "$PCT_CUTOFF" \
   --score_cutoff "$SCORE_CUTOFF" \
   --primer_names "$new_primers_file" \
-  --override_path "$BACKEND_INSTALL_PATH/igvstatic/2697049/overrides.txt" \
-  --organism_dirname "2697049" \
+  --override_path "$BACKEND_INSTALL_PATH/igvstatic/$organism_slug/overrides.txt" \
+  --organism_dirname "$organism_slug" \
   -N "$NOTIFICATION_EMAILS";
 fi
 
