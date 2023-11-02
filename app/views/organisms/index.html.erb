@@ -14,7 +14,7 @@
     <% @organisms.each do |organism| %>
       <tr>
         <td><%= organism.full_name %></td>
-        <td><%= organism.ncbi_taxon_id %></td>
+        <td>TODO</td>
         <td><%= link_to 'Show', organism_path(organism.name) %></td>
         <td><%= link_to 'Edit', edit_organism_path(organism.name) %></td>
         <td><%= link_to 'Destroy', organism_path(organism.name), method: :delete, data: { confirm: 'Are you sure?' } %></td>

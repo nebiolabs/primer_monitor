@@ -78,7 +78,7 @@ function loadPrimerSets(activePrimerSets, igvBrowser, activeLineageGroup)
 
     const variantsTrack = {
         "name": lineageSetNameMap[activeLineageGroup]+" Variants",
-        "url": config['data_server']+"/"+config['organism_taxid']+"/lineage_variants/"+encodeURIComponent(activeLineageGroup)+".bed",
+        "url": config['data_server']+"/"+config['organism_slug']+"/lineage_variants/"+encodeURIComponent(activeLineageGroup)+".bed",
         "format": "bed",
         "color": "#575757",
         "displayMode": "COLLAPSED",
@@ -91,7 +91,7 @@ function loadPrimerSets(activePrimerSets, igvBrowser, activeLineageGroup)
             let primerSetData = primerSetsToNames[primerSetKey];
             const newTrack = {
                 "name": primerSetData[1],
-                "url": config['data_server']+"/"+config['organism_taxid']+"/primer_sets_status/"+encodeURIComponent(primerSetData[0])+"/"+encodeURIComponent(activeLineageGroup)+".bed",
+                "url": config['data_server']+"/"+config['organism_slug']+"/primer_sets_status/"+encodeURIComponent(primerSetData[0])+"/"+encodeURIComponent(activeLineageGroup)+".bed",
                 "format": "bed",
                 "displayMode": "EXPANDED",
                 "autoHeight": true
@@ -117,15 +117,15 @@ function initBrowser() {
     const browserConfig =
         {
             reference: {
-                "id": config['reference_accession'],
-                "name": config['organism_name']+" ("+config['reference_accession']+")",
-                "fastaURL": config['data_server']+"/"+config['organism_taxid']+"/ref/"+config['reference_accession']+".fasta",
-                "indexURL": config['data_server']+"/"+config['organism_taxid']+"/ref/"+config['reference_accession']+".fasta.fai",
+                "id": config['organism_slug'],
+                "name": config['organism_name'],
+                "fastaURL": config['data_server']+"/"+config['organism_slug']+"/ref/"+config['organism_slug']+".fasta",
+                "indexURL": config['data_server']+"/"+config['organism_slug']+"/ref/"+config['organism_slug']+".fasta.fai",
                 tracks: [
                     {
                         "name": "Genes",
                         "type": "annotation",
-                        "url": config['data_server']+"/"+config['organism_taxid']+"/ref/"+config['reference_accession']+".gff3",
+                        "url": config['data_server']+"/"+config['organism_slug']+"/ref/"+config['organism_slug']+".gff3",
                         "format": "gff3",
                         "filterTypes": ['CDS', 'mature_protein_region_of_CDS', 'region', 'stem_loop', 'five_prime_UTR', 'three_prime_UTR'],
                         "displayMode": "EXPANDED",

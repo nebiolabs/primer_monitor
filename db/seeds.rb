@@ -16,7 +16,8 @@ end
 
 admin.roles << Role.find_by(name: 'administrator') if admin.roles.size.zero?
 
-sars = Organism.find_or_create_by!(name: 'SARS-CoV-2', ncbi_taxon_id: 2_697_049)
+sars = Organism.find_or_create_by!(name: 'SARS-CoV-2', slug: 'sars-cov-2')
+OrganismTaxon.find_or_create_by!(ncbi_taxon_id: 2_697_049, organism_id: sars.id)
 lamp = AmplificationMethod.find_or_create_by!(name: 'LAMP')
 qpcr = AmplificationMethod.find_or_create_by!(name: 'qPCR')
 

@@ -26,7 +26,7 @@
   <div id="navbarBasicExample" class="navbar-menu">
     <div class="navbar-start">
 
-      <% sarscov2 = Organism.find_by(ncbi_taxon_id: 2_697_049).name %>
+      <% sarscov2 = Organism.find_by(slug: 'sars-cov-2').name %>
 
       <%= link_to 'Primer Variant Summary', root_path, class: 'navbar-item' %>
 

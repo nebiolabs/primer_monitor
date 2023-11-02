@@ -1,8 +1,12 @@
 <h1 class="title">Organism: <%= @organism.full_name %> </h1>
 
 <div class="tile">
-    <strong>NCBI Taxonomy ID: </strong>
-    <%= link_to @organism.ncbi_taxon_id, "https://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?id=#{@organism.ncbi_taxon_id}" %>
+    <strong>NCBI Taxonomy IDs: </strong>
+    <ul>
+      <% @organism.organism_taxa.each do |organism_taxon| %>
+        <li><%= link_to organism_taxon.ncbi_taxon_id, "https://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?id=#{organism_taxon.ncbi_taxon_id}" %></li>
+      <% end %>
+    </ul>
 </div>
 
 <hr/>
@@ -31,8 +35,8 @@
         <% end %>
       </td>
       <% if @primer_sets.key? primer_set.name %>
-        <td><a href="<%= "#{@config[:data_server]}/#{@config[:organism_taxid]}/primer_sets_fasta/#{@primer_sets[primer_set.name]}.fasta" %>">Download FASTA</a></td>
-        <td><a href="<%= "#{@config[:data_server]}/#{@config[:organism_taxid]}/primer_sets_bed/#{@primer_sets[primer_set.name]}.bed" %>">Download BED</a></td>
+        <td><a href="<%= "#{@config[:data_server]}/#{@config[:organism_slug]}/primer_sets_fasta/#{@primer_sets[primer_set.name]}.fasta" %>">Download FASTA</a></td>
+        <td><a href="<%= "#{@config[:data_server]}/#{@config[:organism_slug]}/primer_sets_bed/#{@primer_sets[primer_set.name]}.bed" %>">Download BED</a></td>
       <% else %>
         <td>Pending</td>
         <td>Pending</td>
