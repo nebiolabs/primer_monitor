@@ -156,7 +156,7 @@ process get_caller_version {
     export PGPASSFILE="!{primer_monitor_path}/config/.pgpass"
 
     version_spec=$(PGPASSFILE="!{primer_monitor_path}/config/.pgpass" psql -h "$DB_HOST" -d "$DB_NAME" -U "$DB_USER" \
-    -v "caller_name=!{caller_name}" <<< "SELECT pending_version_specifiers FROM lineage_callers WHERE name=:'caller_name';" -t --csv);
+    -v "caller_name=!{lineage_caller}" <<< "SELECT pending_version_specifiers FROM lineage_callers WHERE name=:'caller_name';" -t --csv);
     '''
     }
 
