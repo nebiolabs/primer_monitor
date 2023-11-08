@@ -4,9 +4,9 @@
 
 #"interesting" = "has at least <cutoff> seqs in it"
 
-#Usage: get_lineages_to_show.py <caller name> <root lineages> <lineages CSV> <seq counts CSV> <lineage sets path> [overrides path]
+#Usage: get_lineages_to_show.py <organism slug> <root lineages> <lineages CSV> <seq counts CSV> <lineage sets path> [overrides path]
 
-# caller name: the name of the lineage caller used here
+# organism slug: the organism slug (to determine which script to run)
 
 #root lineages: a comma-separated string of root lineage names from which to start the tree traversal (e.g. A,B)
 
@@ -19,16 +19,16 @@
 #overrides path: a path to a file listing a set of Pango lineage names to always consider "interesting"
 
 
-caller_name="$1"
+organism_slug="$1"
 shift;
 
-case "$caller_name" in
-  pangolin)
+case "$organism_slug" in
+  "sars-cov-2")
     curl -Ssf https://raw.githubusercontent.com/cov-lineages/pango-designation/master/pango_designation/alias_key.json \
-      | python "$(dirname "$0")/per_caller_scripts/pangolin/get_lineages_to_show.py" "$@"
+      | python "$(dirname "$0")/per_organism_scripts/sars-cov-2/get_lineages_to_show.py" A,B "$@"
     ;;
   *)
-    python "$(dirname "$0")/per_caller_scripts/default/get_lineages_to_show.py" "$@"
+    python "$(dirname "$0")/per_organism_scripts/default/get_lineages_to_show.py" "$@"
     ;;
 esac
 

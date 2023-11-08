@@ -9,7 +9,9 @@ dotenv_path=$1
 # shellcheck source=../../.env
 source "$dotenv_path";
 
-while read -r organism_slug; do
+while read -r taxon; do
+  organism_slug="$(cut -f 1 -d "," <<< "$taxon")"
+  caller_name="$(cut -f 2 -d "," <<< "$taxon")"
 
   export PATH="$PATH:$MICROMAMBA_BIN_PATH:$CONDA_BIN_PATH:$QSUB_PATH"
   export NXF_CONDA_CACHEDIR="$BACKEND_SCRATCH_PATH/conda_envs"
@@ -48,4 +50,6 @@ while read -r organism_slug; do
   rm "$new_primers_file";
 
 done < <("$PSQL_INSTALL_PATH" -h "$DB_HOST" -d "$DB_NAME" -U "$DB_USER_RO" \
--c "SELECT o.slug FROM organisms o;" -t --csv);
+-c "SELECT o.slug,lc.name \
+FROM organisms o INNER JOIN organism_taxa ot ON ot.organism_id=o.id LEFT JOIN lineage_callers lc \
+ON ot.caller_id=lc.id;" -t --csv);

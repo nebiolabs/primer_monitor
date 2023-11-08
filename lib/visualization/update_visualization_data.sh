@@ -19,7 +19,7 @@ while getopts ':p:o:h' option_arg; do
       # help
       cat << HELPMSG
 Usage: update_visualization_data.sh [-o OVERRIDES_PATH] [-p PRIMER_SETS_FILE] [-h] <primer_monitor_path> \
-<organism_dirname> <pct_cutoff> <score_cutoff> <cpus>
+<organism_slug> <pct_cutoff> <score_cutoff> <cpus>
 HELPMSG
       exit 0;
       ;;
@@ -34,9 +34,10 @@ shift $((OPTIND - 1));
 
 primer_monitor_path="$1"
 organism_dirname="$2"
-pct_cutoff="$3"
-score_cutoff="$4"
-cpus="$5"
+lineage_caller="$3"
+pct_cutoff="$4"
+score_cutoff="$5"
+cpus="$6"
 
 
 echo "$(date +'%b %d %H:%M:%S') - primer recomputation started"
@@ -85,7 +86,7 @@ if [ -z "$primer_sets_file" ]; then
   FROM fasta_records GROUP BY COALESCE(date_collected, date_submitted);" --csv -t > seq_counts.csv
 
   echo "$(date +'%b %d %H:%M:%S') - calculating lineage groups of interest"
-  "$primer_monitor_path/lib/visualization/get_lineages_to_show.sh" A,B lineages.csv seq_counts.csv "$organism_dirname/lineage_sets" "$overrides_path" > "$organism_dirname/config/lineage_sets.json"
+  "$primer_monitor_path/lib/visualization/get_lineages_to_show.sh" "$lineage_caller" lineages.csv seq_counts.csv "$organism_dirname/lineage_sets" "$overrides_path" > "$organism_dirname/config/lineage_sets.json"
   echo "$(date +'%b %d %H:%M:%S') - done calculating lineage groups"
 else
   echo "$(date +'%b %d %H:%M:%S') - performing partial update"
