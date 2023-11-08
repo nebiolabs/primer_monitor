@@ -35,8 +35,8 @@ end
 
 every 2.weeks, at: ['3:00 am'], roles: [:backend] do
   command "source #{backend_path}/.env && flock \"$LOCK_PATH/primer_monitor_update_$ENV_NAME.lock\" \
-  #{backend_path}/lib/backend_scripts/recall-pangolin.sh \"#{backend_path}/.env\"", \
-          output: "\"$BACKEND_SCRATCH_PATH/pangolin_cron.log\""
+  #{backend_path}/lib/backend_scripts/recall-lineages.sh \"#{backend_path}/.env\"", \
+          output: "\"$BACKEND_SCRATCH_PATH/lineages_cron.log\""
 end
 
 every 1.minute, roles: [:backend] do

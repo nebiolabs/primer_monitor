@@ -3,15 +3,15 @@
 class Lineage < ApplicationRecord
   belongs_to :organism
   has_many :lineage_calls, dependent: :destroy
-  has_many :fasta_records, through: :pangolin_calls
+  has_many :fasta_records, through: :lineage_calls
 
-  def self.parse(pangolin_csv, organism)
-    raise "Unable to find calls file #{pangolin_csv}" unless File.exist?(pangolin_csv)
+  def self.parse(calls_csv, organism, caller_id)
+    raise "Unable to find calls file #{calls_csv}" unless File.exist?(calls_csv)
 
     new_lineage_names = Set[] # new empty set
     record_count = 0
 
-    File.readlines(pangolin_csv).each do |line|
+    File.readlines(calls_csv).each do |line|
       next if line.start_with?('taxon,')
 
       record_count += 1
@@ -20,14 +20,15 @@ class Lineage < ApplicationRecord
     end
 
     # if there are no records (not only pre-existing lineages, but nothing at all)
-    raise "Unable to parse any records from #{pangolin_csv}" if record_count.zero?
+    raise "Unable to parse any records from #{calls_csv}" if record_count.zero?
 
     new_lineages = []
 
     organism_id = Organism.find_by(slug: organism).id
 
     new_lineage_names.each do |lineage_name|
-      new_lineages << Lineage.new(name: lineage_name, caller_name: 'pangolin', organism_id: organism_id)
+      new_lineages << Lineage.new(name: lineage_name, caller_name: LineageCaller.find_by(id: caller_id).name,
+                                  organism_id: organism_id)
     end
 
     new_lineages

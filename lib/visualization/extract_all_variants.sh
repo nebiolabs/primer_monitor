@@ -16,8 +16,8 @@ psql -h "$DB_HOST" -d "$DB_NAME" -U "$DB_USER_RO" -c "SELECT organisms.reference
 fasta_records.genbank_accession, lineages.name, fasta_records.date_collected, variant_sites.variant_type, \
 variant_sites.variant FROM variant_sites \
 INNER JOIN fasta_records ON fasta_records.id=variant_sites.fasta_record_id \
-INNER JOIN pangolin_calls ON fasta_records.pangolin_call_id=pangolin_calls.id \
-INNER JOIN lineages ON pangolin_calls.lineage_id=lineages.id \
+INNER JOIN lineage_calls ON fasta_records.lineage_call_id=lineage_calls.id \
+INNER JOIN lineages ON lineage_calls.lineage_id=lineages.id \
 INNER JOIN organisms ON organisms.id=lineages.organism_id \
 WHERE (date_collected >= '$1
 ' OR (date_collected IS NULL AND date_submitted >= '$1')) \

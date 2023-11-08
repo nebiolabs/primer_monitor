@@ -100,8 +100,8 @@ def process_aliases(alias_str, lineage_filename, search_string, db_conn):
         cur.execute('SELECT COUNT(fasta_records.id) AS num_seen, min(fasta_records.date_submitted) AS first_seen, \
         max(fasta_records.date_submitted) AS last_seen, to_timestamp(percentile_cont(0.5) WITHIN GROUP \
         (ORDER BY cast(extract(epoch FROM date_submitted) AS integer)))::date AS median_date \
-        FROM fasta_records INNER JOIN pangolin_calls ON pangolin_calls.id=fasta_records.pangolin_call_id \
-        INNER JOIN lineages ON lineages.id=pangolin_calls.lineage_id \
+        FROM fasta_records INNER JOIN lineage_calls ON lineage_calls.id=fasta_records.lineage_call_id \
+        INNER JOIN lineages ON lineages.id=lineage_calls.lineage_id \
         WHERE lineages.name IN %s;', (tuple(lineage_data),))
         num_seen, min_date, max_date, median_date = cur.fetchone()
         logging.debug(num_seen, min_date, max_date, median_date)

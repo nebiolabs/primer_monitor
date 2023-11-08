@@ -87,7 +87,7 @@ def import_lineages(lineage_csv, pending, organism, caller_id)
 
   @log.info("starting import: #{lineage_csv}: ")
 
-  lineages = Lineage.parse(lineage_csv, organism)
+  lineages = Lineage.parse(lineage_csv, organism, caller_id)
   ActiveRecord::Base.transaction do
     ActiveRecord::Base.connection.execute('LOCK lineages IN ROW EXCLUSIVE MODE')
     result_lineages = Lineage.import(lineages, on_duplicate_key_ignore: true)
