@@ -6,7 +6,7 @@ class LineageCall < ApplicationRecord
   belongs_to :lineage
   has_one :fasta_record, dependent: :nullify
 
-  def self.parse(pangolin_csv)
+  def self.parse(pangolin_csv, caller_id)
     raise "Unable to find calls file #{pangolin_csv}" unless File.exist?(pangolin_csv)
 
     new_calls = []
@@ -16,7 +16,7 @@ class LineageCall < ApplicationRecord
       next if line.start_with?('taxon,')
 
       record_count += 1
-      record = build_pangolin_call(line)
+      record = build_pangolin_call(line, caller_id)
       new_calls << record if record
     end
     raise "Unable to parse any records from #{pangolin_csv}" if record_count.zero?
@@ -24,26 +24,16 @@ class LineageCall < ApplicationRecord
     new_calls
   end
 
-  def self.build_pangolin_call(line)
-    (taxon, lineage, conflict, ambiguity_score, scorpio_call, scorpio_support, scorpio_conflict,
-      scorpio_notes, version, pangolin_version, scorpio_version, constellation_version,
-      is_designated, qc_status, qc_notes, note) = line.chomp.split(',')
+  def self.build_pangolin_call(line, caller_id)
+    (taxon, lineage, metadata) = line.chomp.split(',', 3)
 
-    unless taxon && lineage && version && pangolin_version && scorpio_version && constellation_version && is_designated
-      return
-    end
+    return unless taxon && lineage
 
     lineage_rec = Lineage.find_by(name: lineage)
 
     raise "Failed to find lineage #{lineage}" if lineage_rec.nil?
 
-    LineageCall.new(taxon: taxon, lineage_id: lineage_rec.id, conflict: conflict,
-                    ambiguity_score: ambiguity_score, scorpio_call: scorpio_call,
-                    scorpio_support: scorpio_support, scorpio_conflict: scorpio_conflict,
-                    scorpio_notes: scorpio_notes, version: version, pangolin_version: pangolin_version,
-                    scorpio_version: scorpio_version, constellation_version: constellation_version,
-                    is_designated: is_designated,
-                    qc_status: qc_status, qc_notes: qc_notes, note: note)
+    LineageCall.new(taxon: taxon, lineage_id: lineage_rec.id, lineage_callers_id: caller_id, metadata: metadata)
   end
 
   def self.update_fasta_recs(pending)

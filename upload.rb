@@ -24,6 +24,7 @@ def define_options
     o.string '--variants_tsv', 'TSV file containing variants information'
     o.string '--lineage_csv', 'CSV file containing lineage calls'
     o.string '--organism', 'Organism slug for finding organism ID'
+    o.string '--caller', 'Lineage caller name'
     o.bool '--pending', 'Save calls as pending', default: false
     o.bool '--import_calls', 'Performs lineage data import', default: false
     o.bool '--import_seqs', 'Performs sequence/variant data import', default: false
@@ -81,7 +82,7 @@ def create_new_notifications!
   ProposedNotification.import(new_proposed_notifications, validate: false)
 end
 
-def import_lineages(lineage_csv, pending, organism)
+def import_lineages(lineage_csv, pending, organism, caller_id)
   return unless lineage_csv
 
   @log.info("starting import: #{lineage_csv}: ")
@@ -94,7 +95,7 @@ def import_lineages(lineage_csv, pending, organism)
     @log.info("Loaded #{result_lineages.ids.size}/#{lineages.size} new lineages")
   end
 
-  calls = LineageCall.parse(lineage_csv)
+  calls = LineageCall.parse(lineage_csv, caller_id)
   result_calls = LineageCall.import(calls, validate: false)
   result_calls.failed_instances.each { |rec| @log.error("Failed to insert lineage call \"#{rec}\"") }
   @log.info("Loaded #{result_calls.size}/#{calls.size} new lineage calls")
@@ -112,7 +113,9 @@ def main
       import_metadata(opts[:metadata_tsv], opts[:organism])
       import_variants(opts[:variants_tsv], opts[:organism])
     end
-    import_lineages(opts[:lineage_csv], opts[:pending], opts[:organism]) if opts[:import_calls]
+    if opts[:import_calls]
+      import_lineages(opts[:lineage_csv], opts[:pending], opts[:organism], LineageCaller.find_by(name: opts[:caller]))
+    end
     if opts[:rebuild_views]
       %w[variant_overlaps counts time_counts oligo_variant_overlaps
          identify_primers_for_notifications initial_score lineage_info].each do |view|
