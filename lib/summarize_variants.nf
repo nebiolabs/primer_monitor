@@ -143,7 +143,7 @@ process align {
 process get_caller_version {
     cpus 1
 
-    conda "'bash>=4.1'"
+    conda "'bash>=4.1' 'postgresql>=15'"
 
     output:
         env version_spec
@@ -162,7 +162,7 @@ process get_caller_version {
 
 process lineage_calls {
     cpus 8
-    conda "$version_spec"
+    conda "${version_spec}"
     input:
         val version_spec
         tuple val(index), file(metadata), file(fasta)
