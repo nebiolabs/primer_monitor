@@ -199,7 +199,7 @@ process load_to_db {
             --lineage_csv !{csv} \
             --metadata_tsv !{metadata} \
             --variants_tsv !{tsv} \
-            --organism !{organism} \
+            --taxon !{taxon_id} \
             && mv !{metadata} !{metadata}.complete
     '''
 }
