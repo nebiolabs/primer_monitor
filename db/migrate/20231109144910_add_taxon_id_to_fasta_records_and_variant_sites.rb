@@ -7,4 +7,3 @@ class AddTaxonIdToFastaRecordsAndVariantSites < ActiveRecord::Migration[6.1]
     add_reference :variant_sites,  :organism_taxa, foreign_key: true, null:true
   end
 end
-d
