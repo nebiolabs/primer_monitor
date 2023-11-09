@@ -34,10 +34,9 @@ shift $((OPTIND - 1));
 
 primer_monitor_path="$1"
 organism_dirname="$2"
-lineage_caller="$3"
-pct_cutoff="$4"
-score_cutoff="$5"
-cpus="$6"
+pct_cutoff="$3"
+score_cutoff="$4"
+cpus="$5"
 
 
 echo "$(date +'%b %d %H:%M:%S') - primer recomputation started"
