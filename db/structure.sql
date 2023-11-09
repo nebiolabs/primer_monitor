@@ -200,7 +200,7 @@ CREATE TABLE public.fasta_records (
     pangolin_version text,
     lineage_call_id bigint,
     pending_lineage_call_id bigint,
-    organism_taxa_id bigint
+    organism_taxon_id bigint
 );
 
 
@@ -534,7 +534,7 @@ CREATE TABLE public.variant_sites (
     ref_end integer NOT NULL,
     usable_del_or_snp boolean GENERATED ALWAYS AS (((((variant_type)::text = 'D'::text) OR ((variant_type)::text = 'X'::text)) AND ((variant)::text !~~ '%N%'::text))) STORED,
     usable_insertion boolean GENERATED ALWAYS AS ((((variant_type)::text = 'I'::text) AND ((variant)::text !~~ '%N%'::text))) STORED,
-    organism_taxa_id bigint
+    organism_taxon_id bigint
 );
 
 
@@ -1724,10 +1724,10 @@ CREATE INDEX index_fasta_records_on_lineage_call_id ON public.fasta_records USIN
 
 
 --
--- Name: index_fasta_records_on_organism_taxa_id; Type: INDEX; Schema: public; Owner: -
+-- Name: index_fasta_records_on_organism_taxon_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_fasta_records_on_organism_taxa_id ON public.fasta_records USING btree (organism_taxa_id);
+CREATE INDEX index_fasta_records_on_organism_taxon_id ON public.fasta_records USING btree (organism_taxon_id);
 
 
 --
@@ -1955,10 +1955,10 @@ CREATE INDEX index_variant_sites_on_fasta_record_id ON public.variant_sites USIN
 
 
 --
--- Name: index_variant_sites_on_organism_taxa_id; Type: INDEX; Schema: public; Owner: -
+-- Name: index_variant_sites_on_organism_taxon_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_variant_sites_on_organism_taxa_id ON public.variant_sites USING btree (organism_taxa_id);
+CREATE INDEX index_variant_sites_on_organism_taxon_id ON public.variant_sites USING btree (organism_taxon_id);
 
 
 --
@@ -2165,7 +2165,7 @@ ALTER TABLE ONLY public.subscribed_geo_locations
 --
 
 ALTER TABLE ONLY public.variant_sites
-    ADD CONSTRAINT fk_rails_7a3a7f1da3 FOREIGN KEY (organism_taxa_id) REFERENCES public.organism_taxa(id);
+    ADD CONSTRAINT fk_rails_7a3a7f1da3 FOREIGN KEY (organism_taxon_id) REFERENCES public.organism_taxa(id);
 
 
 --
@@ -2253,7 +2253,7 @@ ALTER TABLE ONLY public.blast_hits
 --
 
 ALTER TABLE ONLY public.fasta_records
-    ADD CONSTRAINT fk_rails_b985a32672 FOREIGN KEY (organism_taxa_id) REFERENCES public.organism_taxa(id);
+    ADD CONSTRAINT fk_rails_b985a32672 FOREIGN KEY (organism_taxon_id) REFERENCES public.organism_taxa(id);
 
 
 --
@@ -2426,6 +2426,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20231109091310'),
 ('20231109091800'),
 ('20231109092320'),
-('20231109144910');
+('20231109144910'),
+('20231109151545');
 
 
