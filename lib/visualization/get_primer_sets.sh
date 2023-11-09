@@ -24,7 +24,7 @@ primer_sets_tmp=$(mktemp)
 psql -h "$DB_HOST" -d "$DB_NAME" -U "$DB_USER_RO" -c "SELECT primer_sets.name, organism_taxa.reference_accession, \
 oligos.ref_start,oligos.ref_end, regexp_replace(oligos.name, '\s', '_', 'g'), '0' AS score, \
 COALESCE(oligos.strand, '.') AS strand FROM oligos INNER JOIN primer_sets \
-ON oligos.primer_set_id=primer_sets.id INNER JOIN organisms ON organisms.id=primer_sets.organism_id \
+ON oligos.primer_set_id=primer_sets.id \
 INNER JOIN organism_taxa ON organism_taxa.id=oligos.organism_taxon_id \
 WHERE (primer_sets.status='complete' ${primer_sets_file:+"OR primer_sets.status='processing'"}) AND oligos.ref_start IS NOT NULL;" --csv -t | tr "," "\t" > "$primer_sets_tmp"
 
