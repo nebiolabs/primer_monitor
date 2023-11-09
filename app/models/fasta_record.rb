@@ -4,7 +4,7 @@ class FastaRecord < ApplicationRecord
   belongs_to :detailed_geo_location
   belongs_to :lineage_call, optional: true
 
-  def self.parse(metadata_tsv, organism)
+  def self.parse(metadata_tsv, taxon)
     raise "Unable to find counts file #{metadata_tsv}" unless File.exist?(metadata_tsv)
 
     new_fasta_records = []
@@ -15,7 +15,7 @@ class FastaRecord < ApplicationRecord
       next if line.start_with?("accession\t")
 
       record_count += 1
-      record = build_fasta_record(line, organism)
+      record = build_fasta_record(line, taxon)
       new_fasta_records << record if record
     end
     @existing_fasta_accession_ids = nil # invalidates cache since any new records would not be present
@@ -28,7 +28,7 @@ class FastaRecord < ApplicationRecord
     @existing_fasta_accession_ids ||= Hash[FastaRecord.pluck(:genbank_accession, :id)]
   end
 
-  def self.build_fasta_record(line, organism)
+  def self.build_fasta_record(line, taxon)
     (accession, strain, date, region, country, division, date_submitted) = line.chomp.split("\t")
 
     return unless strain && accession && region && country && division && date
@@ -41,11 +41,10 @@ class FastaRecord < ApplicationRecord
     find_or_create_dg_id(region, nil, nil, nil)
     find_or_create_dg_id(region, country, nil, nil)
     dg_id = find_or_create_dg_id(region, country, division, nil)
-    organism_id = Organism.find_by(slug: organism).id
 
     FastaRecord.new(strain: strain,
                     genbank_accession: accession, detailed_geo_location_id: dg_id,
-                    date_collected: date, date_submitted: date_submitted, organism_id: organism_id)
+                    date_collected: date, date_submitted: date_submitted, organism_taxon_id: taxon.id)
   end
 
   # fetches detailed geolocation record for the specified parameters, creates if necessary
