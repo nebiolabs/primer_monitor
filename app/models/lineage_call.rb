@@ -33,7 +33,7 @@ class LineageCall < ApplicationRecord
 
     raise "Failed to find lineage #{lineage}" if lineage_rec.nil?
 
-    LineageCall.new(taxon: taxon, lineage_id: lineage_rec.id, lineage_callers_id: caller_id, metadata: metadata)
+    LineageCall.new(taxon: taxon, lineage_id: lineage_rec.id, lineage_caller_id: caller_id, metadata: metadata)
   end
 
   def self.update_fasta_recs(pending)

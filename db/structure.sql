@@ -432,7 +432,8 @@ CREATE TABLE public.oligos (
     ref_start bigint,
     ref_end bigint,
     short_name character varying,
-    strand character varying
+    strand character varying,
+    organism_taxon_id bigint
 );
 
 
@@ -906,7 +907,7 @@ CREATE TABLE public.lineage_calls (
     id bigint NOT NULL,
     taxon character varying NOT NULL,
     lineage_id bigint,
-    lineage_callers_id bigint,
+    lineage_caller_id bigint,
     metadata character varying,
     created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL
@@ -1744,10 +1745,10 @@ CREATE INDEX index_genomic_features_on_organism_id ON public.genomic_features US
 
 
 --
--- Name: index_lineage_calls_on_lineage_callers_id; Type: INDEX; Schema: public; Owner: -
+-- Name: index_lineage_calls_on_lineage_caller_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_lineage_calls_on_lineage_callers_id ON public.lineage_calls USING btree (lineage_callers_id);
+CREATE INDEX index_lineage_calls_on_lineage_caller_id ON public.lineage_calls USING btree (lineage_caller_id);
 
 
 --
@@ -1769,6 +1770,13 @@ CREATE UNIQUE INDEX index_lineages_on_name ON public.lineages USING btree (name)
 --
 
 CREATE INDEX index_lineages_on_organism_id ON public.lineages USING btree (organism_id);
+
+
+--
+-- Name: index_oligos_on_organism_taxon_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_oligos_on_organism_taxon_id ON public.oligos USING btree (organism_taxon_id);
 
 
 --
@@ -2033,6 +2041,14 @@ ALTER TABLE ONLY public.primer_sets
 
 
 --
+-- Name: oligos fk_rails_1e8971b599; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.oligos
+    ADD CONSTRAINT fk_rails_1e8971b599 FOREIGN KEY (organism_taxon_id) REFERENCES public.organism_taxa(id);
+
+
+--
 -- Name: blast_hits fk_rails_1f04a34db0; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -2261,7 +2277,7 @@ ALTER TABLE ONLY public.proposed_notifications
 --
 
 ALTER TABLE ONLY public.lineage_calls
-    ADD CONSTRAINT fk_rails_dee6109632 FOREIGN KEY (lineage_callers_id) REFERENCES public.lineage_callers(id);
+    ADD CONSTRAINT fk_rails_dee6109632 FOREIGN KEY (lineage_caller_id) REFERENCES public.lineage_callers(id);
 
 
 --
@@ -2406,6 +2422,9 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20231101102530'),
 ('20231101152545'),
 ('20231101171500'),
-('20231103173645');
+('20231103173645'),
+('20231109091310'),
+('20231109091800'),
+('20231109092320');
 
 
