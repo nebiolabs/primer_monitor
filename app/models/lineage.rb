@@ -24,11 +24,9 @@ class Lineage < ApplicationRecord
 
     new_lineages = []
 
-    organism_id = Organism.find_by(slug: organism).id
-
     new_lineage_names.each do |lineage_name|
       new_lineages << Lineage.new(name: lineage_name, caller_name: LineageCaller.find_by(id: caller_id).name,
-                                  organism_id: organism_id)
+                                  organism_id: organism.id)
     end
 
     new_lineages
