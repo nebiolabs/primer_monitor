@@ -54,9 +54,9 @@ while read -r taxon; do
   echo "$caller_name version updated to $new_caller_version"
 
   # run the pipeline
-  "$NEXTFLOW_INSTALL_PATH" -log "$BACKEND_SCRATCH_PATH/log_pangolin-$(date +%F_%T)" \
-  run "$BACKEND_INSTALL_PATH/lib/pangolin_calls/recall_pangolin.nf" \
-  -w "$BACKEND_SCRATCH_PATH/work_pangolin/" \
+  "$NEXTFLOW_INSTALL_PATH" -log "$BACKEND_SCRATCH_PATH/log_lineages-$(date +%F_%T)" \
+  run "$BACKEND_INSTALL_PATH/lib/lineage_calling/recall_lineages.nf" \
+  -w "$BACKEND_SCRATCH_PATH/work_lineages/" \
   --primer_monitor_path "$BACKEND_INSTALL_PATH" \
   --output_path "$BACKEND_SCRATCH_PATH" \
   --lineage_caller "$caller_name" \
