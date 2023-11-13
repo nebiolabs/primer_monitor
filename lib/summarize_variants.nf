@@ -75,9 +75,9 @@ process extract_new_records {
     TMPDIR="!{temp_dir}"
     export TMPDIR
 
-    date_today=$(date +%Y-%m-%d)
-
     source "!{primer_monitor_path}/.env"
+
+    date_today=$(date +%Y-%m-%d)
 
     python !{primer_monitor_path}/lib/parse_ncbi.py \
     <(zstd -d --long=30 < !{metadata_json}) \

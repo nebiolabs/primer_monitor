@@ -31,7 +31,7 @@ override_path = file(override_path).toAbsolutePath()
 process get_caller_version {
     cpus 1
 
-    conda "'bash>=4.1'"
+    conda "'bash>=4.1' 'postgresql>=15'"
 
     output:
         env version_spec
@@ -40,6 +40,8 @@ process get_caller_version {
     #! /usr/bin/env bash
 
     source "!{primer_monitor_path}/.env"
+
+    export PGPASSFILE="!{primer_monitor_path}/config/.pgpass"
 
     version_spec=$(PGPASSFILE="!{primer_monitor_path}/config/.pgpass" psql -h "$DB_HOST" -d "$DB_NAME" -U "$DB_USER" \
     -v "caller_name=!{lineage_caller}" <<< "SELECT pending_version_specifiers FROM lineage_callers WHERE name=:'caller_name';" -t --csv);
@@ -57,6 +59,10 @@ process download_data {
 
     shell:
     '''
+
+    TMPDIR="!{temp_dir}"
+    export TMPDIR
+
     date_today=$(date +%Y-%m-%d)
     datasets download virus genome taxon !{taxon_id} --complete-only --host human --filename tmp.zip
     unzip tmp.zip
@@ -78,7 +84,6 @@ process extract_new_records {
         tuple file(metadata_json), file(sequences_fasta)
     output:
         file '*.tsv'
-
 
     shell:
     '''
@@ -124,8 +129,7 @@ process transform_data {
 
 process lineage_calls {
     cpus 8
-    penv 'smp'
-    conda "$version_spec"
+    conda "${version_spec}"
     input:
         val version_spec
         tuple file(metadata), file(fasta)
@@ -143,7 +147,6 @@ process lineage_calls {
 
 process load_lineage_data {
     cpus 1
-    penv 'smp'
     errorStrategy 'retry'
     maxRetries 10
 
@@ -159,6 +162,7 @@ process load_lineage_data {
             --import_calls \
             --lineage_csv !{csv} \
             --pending \
+            --taxon !{taxon_id} \
             && mv !{csv} !{csv}.$(basename $PWD).complete_lineages
     '''
 }
@@ -175,7 +179,7 @@ process update_calls {
         file 'done.txt'
     shell:
     '''
-    PGPASSFILE="!{primer_monitor_path}/config/.pgpass" !{primer_monitor_path}/lib/lineage_calling/swap_calls.sh; touch done.txt;
+    PGPASSFILE="!{primer_monitor_path}/config/.pgpass" !{primer_monitor_path}/lib/lineage_calling/swap_calls.sh !{taxon_id}; touch done.txt;
     '''
 }
 
@@ -189,7 +193,7 @@ process cleanup_old_calls {
         file update_done
     shell:
     '''
-    PGPASSFILE="!{primer_monitor_path}/config/.pgpass" !{primer_monitor_path}/lib/lineage_calling/cleanup_old_calls.sh;
+    PGPASSFILE="!{primer_monitor_path}/config/.pgpass" !{primer_monitor_path}/lib/lineage_calling/cleanup_old_calls.sh !{taxon_id};
     '''
 }
 
