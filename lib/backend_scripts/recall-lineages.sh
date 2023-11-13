@@ -29,7 +29,7 @@ while read -r taxon; do
     if ! grep "=" <<< "$version"; then
       break
     fi
-    package_name="$(cut -f 1 -d "=")"
+    package_name="$(cut -f 1 -d "=" <<< "$version")"
     latest_version=$("$MICROMAMBA_BIN_PATH/micromamba" search -c bioconda "$package_name" | grep -E "Version[[:blank:]]+[0-9]" | awk '{ print $2 }')
     if [ "$latest_version" = "" ]; then
       # skip this entire taxon and email an error
