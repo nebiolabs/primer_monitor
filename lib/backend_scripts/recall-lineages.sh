@@ -49,7 +49,7 @@ while read -r taxon; do
   # set pending version
   PGPASSFILE="$BACKEND_INSTALL_PATH/config/.pgpass" "$PSQL_INSTALL_PATH" -h "$DB_HOST" -d "$DB_NAME" -U "$DB_USER" \
   -v "new_caller_version=$new_caller_version" -v "caller_name=$caller_name" \
-  <<< "UPDATE lineage_callers SET pending_version_specifiers=$'new_caller_version' WHERE name=$'caller_name';"
+  <<< "UPDATE lineage_callers SET pending_version_specifiers=:'new_caller_version' WHERE name=:'caller_name';"
 
   echo "$caller_name version updated to $new_caller_version"
 
@@ -73,7 +73,7 @@ while read -r taxon; do
   if [ "$success" -eq 0 ]; then
       # update actual version
       PGPASSFILE="$BACKEND_INSTALL_PATH/config/.pgpass" "$PSQL_INSTALL_PATH" -h "$DB_HOST" -d "$DB_NAME" -U "$DB_USER" \
-      -v "caller_name=$caller_name" <<< "UPDATE lineage_callers SET version_specifiers=pending_version_specifiers WHERE name=$'caller_name';"
+      -v "caller_name=$caller_name" <<< "UPDATE lineage_callers SET version_specifiers=pending_version_specifiers WHERE name=:'caller_name';"
   fi
 
 done < <("$PSQL_INSTALL_PATH" -h "$DB_HOST" -d "$DB_NAME" -U "$DB_USER_RO" \
