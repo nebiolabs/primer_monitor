@@ -1,4 +1,4 @@
-<h1 class="title"><%= params[:organism_name] %> Lineage Variant Summary</h1>
+<h1 class="title"><%= Organism.find_by(slug: params[:organism_name]).name %> Lineage Variant Summary</h1>
 
 <% primer_sets_map = {} %>
 <% default_tracks_map = {} %>
