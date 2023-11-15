@@ -4,7 +4,7 @@ class LineagesController < ApplicationController
   def index
     authorize! :index, LineagesController
     if params.key? :organism_name
-      @organism = Organism.find_by(name: params[:organism_name])
+      @organism = Organism.find_by(slug: params[:organism_name])
 
       query = <<-SQL
         SELECT name, times_seen, last_seen FROM lineage_info WHERE organism_id=?;

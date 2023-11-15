@@ -10,43 +10,18 @@
 </div>
 
 <hr/>
-<h2 class="title">Primer Sets:</h2>
+<h2 class="title">IGV Visualization:</h2>
 
-<table>
-  <thead>
-  <tr>
-    <th data-priority="4">Amp. Method</th>
-    <th data-priority="1">Primer Set</th>
-    <th data-priority="2">Source</th>
-    <th data-priority="3">FASTA</th>
-    <th data-priority="3">BED</th>
-    <th data-priority="1">Subscription</th>
-  </tr>
-  </thead>
+<p id="config" class="invisible"><%= @config.to_json %></p>
 
-  <tbody>
-  <% @organism.primer_sets.accessible_by(Ability.new(current_user)).each do |primer_set| %>
-    <tr>
-      <td><%= link_to primer_set.amplification_method, primer_set.amplification_method.description_url %></td>
-      <td><%= link_to primer_set.name, primer_set %></td>
-      <td>
-        <% if primer_set.display_url %>
-          <%= link_to 'Source', primer_set.display_url %>
-        <% end %>
-      </td>
-      <% if @primer_sets.key? primer_set.name %>
-        <td><a href="<%= "#{@config[:data_server]}/#{@config[:organism_slug]}/primer_sets_fasta/#{@primer_sets[primer_set.name]}.fasta" %>">Download FASTA</a></td>
-        <td><a href="<%= "#{@config[:data_server]}/#{@config[:organism_slug]}/primer_sets_bed/#{@primer_sets[primer_set.name]}.bed" %>">Download BED</a></td>
-      <% else %>
-        <td>Pending</td>
-        <td>Pending</td>
-      <% end %>
-      <td>
-        <%= render '/primer_sets/primer_set_subscription', user: current_user, primer_set: primer_set, primer_set_subscription: @subscriptions[primer_set.id] %>
-      </td>
-    </tr>
-  <% end %>
-  </tbody>
-</table>
+<div id="igv" class="igv_div"></div>
 
-<%= link_to 'New Primer Set', new_primer_set_path %>
+<% unless @config[:variants_exist] %>
+  <p>Variants will be shown once they are processed.</p>
+<% end %>
+
+<hr/>
+
+<%= link_to 'Primer Sets', organism_primer_sets_path(@organism.slug) %>
+
+<%= javascript_pack_tag "organisms_show" %>

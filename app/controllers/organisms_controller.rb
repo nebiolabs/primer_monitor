@@ -13,9 +13,15 @@ class OrganismsController < ApplicationController
   # GET /organisms/1
   # GET /organisms/1.json
   def show
-    @subscriptions = PrimerSetSubscription.subscriptions_for_user_by_primer_set(current_user)
+    @organism = Organism.find_by(slug: params[:name])
 
     @config, @primer_sets = @organism.primer_sets_config
+
+    variants_url = URI("#{@config[:data_server]}/#{@config[:organism_slug]}/lineage_variants/all.bed")
+
+    @config[:variants_exist] = (Net::HTTP.get_response(URI(variants_url)).code == '200')
+
+
   end
 
   # GET /organisms/new

@@ -1042,7 +1042,8 @@ CREATE TABLE public.organisms (
     created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL,
     alias character varying,
-    slug character varying
+    slug character varying,
+    public boolean
 );
 
 
@@ -2427,6 +2428,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20231109091800'),
 ('20231109092320'),
 ('20231109144910'),
-('20231109151545');
+('20231109151545'),
+('2023114143320');
 
 

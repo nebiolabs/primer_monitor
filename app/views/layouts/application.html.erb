@@ -28,15 +28,20 @@
 
       <% sarscov2 = Organism.find_by(slug: 'sars-cov-2').name %>
 
-      <%= link_to 'Primer Variant Summary', root_path, class: 'navbar-item' %>
+      <% Organism.where(public:true).each do |organism| %>
+        <div class="navbar-item has-dropdown is-hoverable">
+        <a class="navbar-link"><%=organism.name%></a>
+          <div class="navbar-dropdown">
+            <%= link_to 'Organism', organism_url(organism.slug), class: 'navbar-item' %>
+            <hr class="navbar-divider">
+            <%= link_to 'Lineages', organism_lineages_url(organism.slug), class: 'navbar-item' %>
 
-      <% if can? :index, PrimerSet %>
-        <%= link_to "Primer Sets", primer_sets_path, class: 'navbar-item' %>
+            <%= link_to 'Lineage Variants', organism_lineage_variants_path(organism.slug), class: 'navbar-item' %>
+
+            <%= link_to 'Primer Variant Summary', root_path, class: 'navbar-item' %>
+          </div>
+        </div>
       <% end %>
-
-      <%= link_to 'Lineages', organism_lineages_url(sarscov2), class: 'navbar-item' %>
-
-      <%= link_to 'Lineage Variants', organism_lineage_variants_path(sarscov2), class: 'navbar-item' %>
 
       <%= link_to 'About', about_path, class: 'navbar-item' %>
     </div>

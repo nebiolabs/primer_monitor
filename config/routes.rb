@@ -16,12 +16,13 @@ Rails.application.routes.draw do
   resources :organisms, param: :name do
     get 'lineage_variants', to: 'lineage_variants#index'
     resources :lineages, param: :name, constraints: { name: /[A-Z]+(\.\d+)*/ }
+    resources :primer_sets, only: [:index]
   end
 
   get 'lineages', to: 'lineages#index'
 
   resources :oligos
-  resources :primer_sets
   resources :users
   resources :primer_set_subscriptions, only: [:create, :destroy]
+  resources :primer_sets, only: [:new, :show, :create, :destroy, :update]
 end

@@ -7,8 +7,12 @@ class PrimerSetsController < ApplicationController
   # GET /primer_sets
   # GET /primer_sets.json
   def index
-    # hardcoded SARS-CoV-2
-    redirect_to organism_path(Organism.find_by(slug: 'sars-cov-2').name), status: :temporary_redirect
+
+    @organism = Organism.find_by(slug: params[:organism_name])
+
+    @subscriptions = PrimerSetSubscription.subscriptions_for_user_by_primer_set(current_user)
+
+    @config, @primer_sets = @organism.primer_sets_config
   end
 
   # GET /primer_sets/1
