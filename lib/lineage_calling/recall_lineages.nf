@@ -163,6 +163,7 @@ process load_lineage_data {
             --lineage_csv !{csv} \
             --pending \
             --taxon !{taxon_id} \
+            --caller !{lineage_caller} \
             && mv !{csv} !{csv}.$(basename $PWD).complete_lineages
     '''
 }

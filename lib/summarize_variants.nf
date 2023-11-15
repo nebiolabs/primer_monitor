@@ -200,6 +200,7 @@ process load_to_db {
             --metadata_tsv !{metadata} \
             --variants_tsv !{tsv} \
             --taxon !{taxon_id} \
+            --caller !{lineage_caller} \
             && mv !{metadata} !{metadata}.complete
     '''
 }
