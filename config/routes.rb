@@ -17,6 +17,7 @@ Rails.application.routes.draw do
     get 'lineage_variants', to: 'lineage_variants#index'
     resources :lineages, param: :name, constraints: { name: /[A-Z]+(\.\d+)*/ }
     resources :primer_sets, only: [:index]
+    resources :primer_variant_summaries, only: [:index]
   end
 
   get 'lineages', to: 'lineages#index'
