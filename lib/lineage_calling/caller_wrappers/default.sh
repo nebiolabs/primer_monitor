@@ -14,5 +14,5 @@ workdir="$(pwd)";
 
 while read -r line; do
   # name (but not desc) from FASTA header as taxon, lineage of "Unknown", metadata of "default no-op lineage caller"
-  echo "$(echo "$line" | cut -f 1 -d " "),Unknown,default no-op lineage caller" >> "$input_file.lineage_calls.csv"
+  echo "$(echo "$line" | cut -f 1 -d " " | sed -E 's/^>//'),Unknown,default no-op lineage caller" >> "$input_file.lineage_calls.csv"
 done < <(grep ">" "$workdir/$input_file")
