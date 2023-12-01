@@ -11,21 +11,34 @@
 
 <h1 class="title is-4 is-spaced">Organisms Overview</h1>
 
-<% Organism.all.each do |organism| %>
-  <hr>
-  <h1 class="subtitle"><%= organism.name %></h1>
-  <aside class="menu">
-    <p class="menu-label">
-      Tools
-    </p>
-  <ul class="menu-list">
-    <li><a href="<%= organism_url(organism.slug) %>">Overview</a></li>
-    <li><a href="<%= organism_primer_sets_url(organism.slug) %>">Primer Sets (<%=PrimerSet.where(organism_id: organism.id).count %>)</a></li>
-    <li><a href="<%= organism_lineages_url(organism.slug) %>">Lineages (<%=Lineage.where(organism_id: organism.id).count %>)</a></li>
-    <li><a href="<%= organism_lineage_variants_url(organism.slug) %>">Lineage Variants</a></li>
-    <li><a href="<%= organism_url(organism.slug) %>">Primer Variant Summary</a></li>
-  </ul>
-  </aside>
-<% end %>
+<hr>
+<div class="columns">
+
+  <% i=0 %>
+
+  <% Organism.all.each do |organism| %>
+      <% if i%3 == 0 # start a new row every 3 %>
+        </div>
+        <hr>
+        <div class="columns">
+      <% end %>
+      <div class="column">
+        <h1 class="subtitle"><%= organism.name %></h1>
+        <aside class="menu">
+          <p class="menu-label">
+            Tools
+          </p>
+          <ul class="menu-list">
+            <li><a href="<%= organism_url(organism.slug) %>">Overview</a></li>
+            <li><a href="<%= organism_primer_sets_url(organism.slug) %>">Primer Sets (<%=PrimerSet.where(organism_id: organism.id).count %>)</a></li>
+            <li><a href="<%= organism_lineages_url(organism.slug) %>">Lineages (<%=Lineage.where(organism_id: organism.id).count %>)</a></li>
+            <li><a href="<%= organism_lineage_variants_url(organism.slug) %>">Lineage Variants</a></li>
+            <li><a href="<%= organism_url(organism.slug) %>">Primer Variant Summary</a></li>
+          </ul>
+        </aside>
+        <% i=i+1 %>
+      </div>
+  <% end %>
+</div>
 
 
