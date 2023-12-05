@@ -43,9 +43,17 @@
   </div>
   <button id="select_all_primers" disabled="disabled">Select All</button> <button id="unselect_all_primers" disabled="disabled">Clear All</button>
   <br><br><button class="button is-small is-primary" id="apply" disabled="disabled">Update Tracks</button>
+  <button class="button is-small" id="show_link">Shareable Link</button>
 </form>
+<div id="link_div_wrapper" class="invisible">
+  <br>
+  <div class="notification is-gray" id="link_div">
+    <p>You can share your current selection of tracks using this link: <a href="" id="link"></a></p>
+  </div>
+</div>
 <p id="primer_set_json" class="invisible"><%= primer_sets_map.to_json %></p>
 <p id="default_tracks_json" class="invisible"><%= default_tracks_map.to_json %></p>
+<p id="default_lineage" class="invisible"><%= @default_lineage %></p>
 <p id="config" class="invisible"><%= @config.to_json %></p>
 <p id="lineage_set_json" class="invisible"><%= lineage_sets_map.to_json %></p>
 <div id="igv" class="igv_div"></div>

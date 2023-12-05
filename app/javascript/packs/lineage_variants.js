@@ -8,12 +8,17 @@ let lineageSetsToNames = {};
 let defaultCheckboxStatus = {};
 let config = {};
 let lineageSetNameMap = {};
+let defaultLineage = "";
+
+let activeLineageGroup = null;
+let activeSets = [];
 
 function loadConfig()
 {
     primerSetsToNames = JSON.parse($('#primer_set_json')[0].innerHTML);
     lineageSetsToNames = JSON.parse($('#lineage_set_json')[0].innerHTML);
     defaultCheckboxStatus = JSON.parse($('#default_tracks_json')[0].innerHTML);
+    defaultLineage = $('#default_lineage')[0].innerHTML;
     config = JSON.parse($('#config')[0].innerHTML);
 
     for (let lineageSetKey in lineageSetsToNames) {
@@ -49,12 +54,40 @@ function setSelectFormDisabled(state)
     }
 }
 
+function updateLink()
+{
+    let link_div_wrapper = $('#link_div_wrapper');
+    if(link_div_wrapper.hasClass('invisible')) {
+        let base_link = location.protocol + '//' + location.host + location.pathname;
+        let primerSets = [];
+        activeSets.forEach(function (activeSet) {
+            primerSets.push(primerSetsToNames[activeSet][0]);
+        });
+        let full_link = base_link + "?primer_sets=" + (primerSets.join(",")) + ";lineage=" + activeLineageGroup;
+        let link_element = $('#link')[0];
+        link_element.innerHTML = full_link;
+        link_element.href = full_link;
+        link_div_wrapper.removeClass('invisible');
+        $('#show_link')[0].innerHTML = 'Hide Link';
+    }
+    else
+    {
+        link_div_wrapper.addClass('invisible');
+        $('#show_link')[0].innerHTML = 'Shareable Link';
+    }
+
+}
+
 function updatePrimerSets()
 {
-    const activeLineageGroup = lineageSetsToNames[$('input[name=lineage]:checked').val()][0];
+    $('#link_div_wrapper').addClass('invisible');
+    let link_element = $('#link')[0];
+    link_element.innerHTML = "";
+    link_element.href = "";
+    activeLineageGroup = lineageSetsToNames[$('input[name=lineage]:checked').val()][0];
 
     if(igvBrowser != null) { //if it's been loaded
-        let activeSets = [];
+        activeSets = [];
         $('.primer_set_checkbox').each(function (index, element) {
             if (element.checked) {
                 activeSets.push(element.name);
@@ -145,7 +178,7 @@ function initBrowser() {
     igv.createBrowser(browser_div, browserConfig).then(function (theBrowser) {
         igvBrowser = theBrowser;
         initCheckboxes();
-        setRadiobuttons("XBB");
+        setRadiobuttons(defaultLineage);
         updatePrimerSets();
     });
 
@@ -187,6 +220,10 @@ $(document).ready(function(){
 
     $('#apply').on("click", function(){
         updatePrimerSets();
+    });
+
+    $('#show_link').on("click", function(){
+        updateLink();
     });
 
     $('#primer_set_selection').on("submit", function(event){

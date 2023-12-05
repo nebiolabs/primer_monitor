@@ -23,7 +23,20 @@ class LineageVariantsController < ApplicationController
 
     defaults_url = URI("#{@config[:data_server]}/#{@config[:organism_slug]}/defaults.json")
     defaults_data = Net::HTTP.get_response(defaults_url)
-    @default_tracks = JSON.parse(defaults_data.body)['tracks'] if defaults_data.code == '200'
+    defaults_parsed = JSON.parse(defaults_data.body)
+    @default_tracks = defaults_parsed['tracks'] if defaults_data.code == '200'
+    @default_lineage = defaults_parsed['lineage'] if defaults_data.code == '200'
+
+    if params.key? 'lineage'
+      Rails.logger.warn params[:lineage]
+      @default_lineage = params[:lineage]
+    end
+
+    if params.key? 'primer_sets'
+      Rails.logger.warn params[:primer_sets]
+      @default_tracks = params[:primer_sets].split(',')
+    end
+
 
     lineages_url = URI("#{@config[:data_server]}/#{@config[:organism_slug]}/config/lineage_sets.json")
     lineages_data = Net::HTTP.get_response(lineages_url)
