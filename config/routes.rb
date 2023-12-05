@@ -13,14 +13,16 @@ Rails.application.routes.draw do
   root 'welcome#index'
   get 'about', to: 'about#show'
   get 'history', to: 'history#show'
+
+  # hardcoded legacy redirect
+  get 'lineages', to: 'lineages#index'
+
   resources :organisms, param: :name do
-    get 'lineage_variants', to: 'lineage_variants#index'
+    resources :lineage_variants, only: [:index]
     resources :lineages, param: :name, constraints: { name: /[A-z0-9.]+/ }
     resources :primer_sets, only: [:index]
     resources :primer_variant_summaries, only: [:index]
   end
-
-  get 'lineages', to: 'lineages#index'
 
   resources :oligos
   resources :users

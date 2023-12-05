@@ -11,7 +11,8 @@ class LineagesController < ApplicationController
       SQL
       @lineages = ActiveRecord::Base.connection.execute(ActiveRecord::Base.sanitize_sql([query, @organism.id])).to_a
     else
-      redirect_to lineage_variants_url, status: :moved_permanently
+      # hardcoded legacy redirect
+      redirect_to organism_lineage_variants_url(Organism.find_by(slug: 'sars-cov-2').slug), status: :moved_permanently
     end
   end
 
