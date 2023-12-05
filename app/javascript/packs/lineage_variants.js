@@ -81,6 +81,7 @@ function updateLink()
 function updatePrimerSets()
 {
     $('#link_div_wrapper').addClass('invisible');
+    $('#show_link')[0].innerHTML = 'Shareable Link';
     let link_element = $('#link')[0];
     link_element.innerHTML = "";
     link_element.href = "";
