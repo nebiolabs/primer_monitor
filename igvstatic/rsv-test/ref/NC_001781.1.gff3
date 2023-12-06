@@ -1,0 +1,50 @@
+##gff-version 3
+#!gff-spec-version 1.21
+#!processor NCBI annotwriter
+##sequence-region NC_001781.1 1 15225
+##species https://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?id=11250
+NC_001781.1	RefSeq	region	1	15225	.	+	.	ID=NC_001781.1:1..15225;Dbxref=taxon:11250;gb-acronym=HRSV;gbkey=Src;genome=genomic;mol_type=genomic RNA;note=wildtype;old-name=Human respiratory syncytial virus;strain=B1
+NC_001781.1	RefSeq	five_prime_UTR	1	44	.	+	.	ID=id-NC_001781.1:1..44;function=Leader region 5'UTR;gbkey=5'UTR
+NC_001781.1	RefSeq	gene	45	577	.	+	.	ID=gene-HRSVgp01;Dbxref=GeneID:1489818;Name=NS1;gbkey=Gene;gene=NS1;gene_biotype=protein_coding;locus_tag=HRSVgp01
+NC_001781.1	RefSeq	mRNA	45	577	.	+	.	ID=rna-HRSVgp01;Parent=gene-HRSVgp01;Dbxref=GeneID:1489818;gbkey=mRNA;gene=NS1;locus_tag=HRSVgp01
+NC_001781.1	RefSeq	exon	45	577	.	+	.	ID=exon-HRSVgp01-1;Parent=rna-HRSVgp01;Dbxref=GeneID:1489818;gbkey=mRNA;gene=NS1;locus_tag=HRSVgp01
+NC_001781.1	RefSeq	CDS	99	518	.	+	0	ID=cds-NP_056856.1;Parent=rna-HRSVgp01;Dbxref=GenBank:NP_056856.1,GeneID:1489818;Name=NP_056856.1;gbkey=CDS;gene=NS1;locus_tag=HRSVgp01;product=nonstructural protein 1;protein_id=NP_056856.1
+NC_001781.1	RefSeq	gene	594	1098	.	+	.	ID=gene-HRSVgp02;Dbxref=GeneID:1489819;Name=NS2;gbkey=Gene;gene=NS2;gene_biotype=protein_coding;locus_tag=HRSVgp02
+NC_001781.1	RefSeq	mRNA	594	1098	.	+	.	ID=rna-HRSVgp02;Parent=gene-HRSVgp02;Dbxref=GeneID:1489819;gbkey=mRNA;gene=NS2;locus_tag=HRSVgp02
+NC_001781.1	RefSeq	exon	594	1098	.	+	.	ID=exon-HRSVgp02-1;Parent=rna-HRSVgp02;Dbxref=GeneID:1489819;gbkey=mRNA;gene=NS2;locus_tag=HRSVgp02
+NC_001781.1	RefSeq	CDS	626	1000	.	+	0	ID=cds-NP_056857.1;Parent=rna-HRSVgp02;Dbxref=GenBank:NP_056857.1,GeneID:1489819;Name=NP_056857.1;gbkey=CDS;gene=NS2;locus_tag=HRSVgp02;product=nonstructural protein 2;protein_id=NP_056857.1
+NC_001781.1	RefSeq	gene	1125	2327	.	+	.	ID=gene-HRSVgp03;Dbxref=GeneID:1489820;Name=N;gbkey=Gene;gene=N;gene_biotype=protein_coding;locus_tag=HRSVgp03
+NC_001781.1	RefSeq	mRNA	1125	2327	.	+	.	ID=rna-HRSVgp03;Parent=gene-HRSVgp03;Dbxref=GeneID:1489820;gbkey=mRNA;gene=N;locus_tag=HRSVgp03
+NC_001781.1	RefSeq	exon	1125	2327	.	+	.	ID=exon-HRSVgp03-1;Parent=rna-HRSVgp03;Dbxref=GeneID:1489820;gbkey=mRNA;gene=N;locus_tag=HRSVgp03
+NC_001781.1	RefSeq	CDS	1140	2315	.	+	0	ID=cds-NP_056858.1;Parent=rna-HRSVgp03;Dbxref=GenBank:NP_056858.1,GeneID:1489820;Name=NP_056858.1;gbkey=CDS;gene=N;locus_tag=HRSVgp03;product=nucleoprotein;protein_id=NP_056858.1
+NC_001781.1	RefSeq	gene	2331	3244	.	+	.	ID=gene-HRSVgp04;Dbxref=GeneID:1489821;Name=P;gbkey=Gene;gene=P;gene_biotype=protein_coding;locus_tag=HRSVgp04
+NC_001781.1	RefSeq	mRNA	2331	3244	.	+	.	ID=rna-HRSVgp04;Parent=gene-HRSVgp04;Dbxref=GeneID:1489821;gbkey=mRNA;gene=P;locus_tag=HRSVgp04
+NC_001781.1	RefSeq	exon	2331	3244	.	+	.	ID=exon-HRSVgp04-1;Parent=rna-HRSVgp04;Dbxref=GeneID:1489821;gbkey=mRNA;gene=P;locus_tag=HRSVgp04
+NC_001781.1	RefSeq	CDS	2348	3073	.	+	0	ID=cds-NP_056859.1;Parent=rna-HRSVgp04;Dbxref=GenBank:NP_056859.1,GeneID:1489821;Name=NP_056859.1;gbkey=CDS;gene=P;locus_tag=HRSVgp04;product=phosphoprotein;protein_id=NP_056859.1
+NC_001781.1	RefSeq	gene	3254	4208	.	+	.	ID=gene-HRSVgp05;Dbxref=GeneID:1489822;Name=M;gbkey=Gene;gene=M;gene_biotype=protein_coding;locus_tag=HRSVgp05
+NC_001781.1	RefSeq	mRNA	3254	4208	.	+	.	ID=rna-HRSVgp05;Parent=gene-HRSVgp05;Dbxref=GeneID:1489822;gbkey=mRNA;gene=M;locus_tag=HRSVgp05
+NC_001781.1	RefSeq	exon	3254	4208	.	+	.	ID=exon-HRSVgp05-1;Parent=rna-HRSVgp05;Dbxref=GeneID:1489822;gbkey=mRNA;gene=M;locus_tag=HRSVgp05
+NC_001781.1	RefSeq	CDS	3263	4033	.	+	0	ID=cds-NP_056860.1;Parent=rna-HRSVgp05;Dbxref=GenBank:NP_056860.1,GeneID:1489822;Name=NP_056860.1;gbkey=CDS;gene=M;locus_tag=HRSVgp05;product=matrix protein;protein_id=NP_056860.1
+NC_001781.1	RefSeq	gene	4218	4630	.	+	.	ID=gene-HRSVgp06;Dbxref=GeneID:1489823;Name=SH;gbkey=Gene;gene=SH;gene_biotype=protein_coding;locus_tag=HRSVgp06
+NC_001781.1	RefSeq	mRNA	4218	4630	.	+	.	ID=rna-HRSVgp06;Parent=gene-HRSVgp06;Dbxref=GeneID:1489823;gbkey=mRNA;gene=SH;locus_tag=HRSVgp06
+NC_001781.1	RefSeq	exon	4218	4630	.	+	.	ID=exon-HRSVgp06-1;Parent=rna-HRSVgp06;Dbxref=GeneID:1489823;gbkey=mRNA;gene=SH;locus_tag=HRSVgp06
+NC_001781.1	RefSeq	CDS	4303	4500	.	+	0	ID=cds-NP_056861.1;Parent=rna-HRSVgp06;Dbxref=GenBank:NP_056861.1,GeneID:1489823;Name=NP_056861.1;gbkey=CDS;gene=SH;locus_tag=HRSVgp06;product=small hydrophobic protein;protein_id=NP_056861.1
+NC_001781.1	RefSeq	gene	4675	5600	.	+	.	ID=gene-HRSVgp07;Dbxref=GeneID:1489824;Name=G;gbkey=Gene;gene=G;gene_biotype=protein_coding;locus_tag=HRSVgp07
+NC_001781.1	RefSeq	mRNA	4675	5600	.	+	.	ID=rna-HRSVgp07;Parent=gene-HRSVgp07;Dbxref=GeneID:1489824;gbkey=mRNA;gene=G;locus_tag=HRSVgp07
+NC_001781.1	RefSeq	exon	4675	5600	.	+	.	ID=exon-HRSVgp07-1;Parent=rna-HRSVgp07;Dbxref=GeneID:1489824;gbkey=mRNA;gene=G;locus_tag=HRSVgp07
+NC_001781.1	RefSeq	CDS	4690	5589	.	+	0	ID=cds-NP_056862.1;Parent=rna-HRSVgp07;Dbxref=GenBank:NP_056862.1,GeneID:1489824;Name=NP_056862.1;gbkey=CDS;gene=G;locus_tag=HRSVgp07;product=attachment glycoprotein;protein_id=NP_056862.1
+NC_001781.1	RefSeq	gene	5653	7552	.	+	.	ID=gene-HRSVgp08;Dbxref=GeneID:1489825;Name=F;gbkey=Gene;gene=F;gene_biotype=protein_coding;locus_tag=HRSVgp08
+NC_001781.1	RefSeq	mRNA	5653	7552	.	+	.	ID=rna-HRSVgp08;Parent=gene-HRSVgp08;Dbxref=GeneID:1489825;gbkey=mRNA;gene=F;locus_tag=HRSVgp08
+NC_001781.1	RefSeq	exon	5653	7552	.	+	.	ID=exon-HRSVgp08-1;Parent=rna-HRSVgp08;Dbxref=GeneID:1489825;gbkey=mRNA;gene=F;locus_tag=HRSVgp08
+NC_001781.1	RefSeq	CDS	5666	7390	.	+	0	ID=cds-NP_056863.1;Parent=rna-HRSVgp08;Dbxref=GenBank:NP_056863.1,GeneID:1489825;Name=NP_056863.1;gbkey=CDS;gene=F;locus_tag=HRSVgp08;product=fusion glycoprotein;protein_id=NP_056863.1
+NC_001781.1	RefSeq	gene	7609	8568	.	+	.	ID=gene-HRSVgp09;Dbxref=GeneID:1489826;Name=M2;gbkey=Gene;gene=M2;gene_biotype=protein_coding;locus_tag=HRSVgp09
+NC_001781.1	RefSeq	mRNA	7609	8568	.	+	.	ID=rna-HRSVgp09;Parent=gene-HRSVgp09;Dbxref=GeneID:1489826;gbkey=mRNA;gene=M2;locus_tag=HRSVgp09
+NC_001781.1	RefSeq	exon	7609	8568	.	+	.	ID=exon-HRSVgp09-1;Parent=rna-HRSVgp09;Dbxref=GeneID:1489826;gbkey=mRNA;gene=M2;locus_tag=HRSVgp09
+NC_001781.1	RefSeq	CDS	7618	8205	.	+	0	ID=cds-NP_056864.1;Parent=rna-HRSVgp09;Dbxref=GenBank:NP_056864.1,GeneID:1489826;Name=NP_056864.1;gbkey=CDS;gene=M2;locus_tag=HRSVgp09;product=M2-1 protein;protein_id=NP_056864.1
+NC_001781.1	RefSeq	CDS	8171	8443	.	+	0	ID=cds-NP_056865.3;Parent=rna-HRSVgp09;Dbxref=GenBank:NP_056865.3,GeneID:1489826;Name=NP_056865.3;gbkey=CDS;gene=M2;locus_tag=HRSVgp09;product=M2-2 protein;protein_id=NP_056865.3
+NC_001781.1	RefSeq	gene	8501	15080	.	+	.	ID=gene-HRSVgp10;Dbxref=GeneID:1489827;Name=L;gbkey=Gene;gene=L;gene_biotype=protein_coding;locus_tag=HRSVgp10
+NC_001781.1	RefSeq	mRNA	8501	15080	.	+	.	ID=rna-HRSVgp10;Parent=gene-HRSVgp10;Dbxref=GeneID:1489827;gbkey=mRNA;gene=L;locus_tag=HRSVgp10
+NC_001781.1	RefSeq	exon	8501	15080	.	+	.	ID=exon-HRSVgp10-1;Parent=rna-HRSVgp10;Dbxref=GeneID:1489827;gbkey=mRNA;gene=L;locus_tag=HRSVgp10
+NC_001781.1	RefSeq	CDS	8509	15009	.	+	0	ID=cds-NP_056866.1;Parent=rna-HRSVgp10;Dbxref=GenBank:NP_056866.1,GeneID:1489827;Name=NP_056866.1;gbkey=CDS;gene=L;locus_tag=HRSVgp10;product=polymerase protein;protein_id=NP_056866.1
+NC_001781.1	RefSeq	three_prime_UTR	15081	15225	.	+	.	ID=id-NC_001781.1:15081..15225;function=Trailer region 3'UTR;gbkey=3'UTR
+
