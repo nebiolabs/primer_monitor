@@ -37,6 +37,7 @@ organism_dirname="$2"
 pct_cutoff="$3"
 score_cutoff="$4"
 cpus="$5"
+taxon_id="$6"
 
 
 echo "$(date +'%b %d %H:%M:%S') - primer recomputation started"
@@ -78,7 +79,7 @@ if [ -z "$primer_sets_file" ]; then
   echo "$(date +'%b %d %H:%M:%S') - performing full update"
   # if full update, recompute lineage sets
   echo "$(date +'%b %d %H:%M:%S') - getting all lineages"
-  "$primer_monitor_path/lib/visualization/get_lineage_data.sh" > lineages.csv;
+  "$primer_monitor_path/lib/visualization/get_lineage_data.sh" "$taxon_id" > lineages.csv;
 
   echo "$(date +'%b %d %H:%M:%S') - getting daily seq counts"
   psql -h "$DB_HOST" -d "$DB_NAME" -U "$DB_USER_RO" -c "SELECT COALESCE(date_collected, date_submitted), COUNT(*) \

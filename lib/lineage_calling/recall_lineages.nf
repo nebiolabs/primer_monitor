@@ -207,7 +207,7 @@ process update_visualization_data {
     '''
     # recompute the primer data for igvjs visualization
     !{primer_monitor_path}/lib/visualization/update_visualization_data.sh -o !{override_path} !{primer_monitor_path} \
-    !{organism} !{pct_cutoff} !{score_cutoff} !{task.cpus}
+    !{organism} !{pct_cutoff} !{score_cutoff} !{task.cpus} !{taxon_id}
     '''
 }
 
