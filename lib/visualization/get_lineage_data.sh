@@ -11,9 +11,9 @@ COUNT(fasta_records.id) AS num_seen, min(fasta_records.date_submitted) AS first_
 max(fasta_records.date_submitted) AS last_seen, \
 to_timestamp(percentile_cont(0.5) WITHIN GROUP (ORDER BY cast(extract(epoch FROM date_submitted) AS integer)))::date \
 AS median_date FROM fasta_records \
+INNER JOIN organism_taxa ON organism_taxa.id=fasta_records.organism_taxon_id \
 INNER JOIN lineage_calls ON lineage_calls.id=fasta_records.lineage_call_id \
 INNER JOIN lineages ON lineages.id=lineage_calls.lineage_id GROUP BY lineages.id \
-INNER JOIN organism_taxa ON organism_taxa.id=fasta_records.organism_taxon_id \
 WHERE organism_taxa.ncbi_taxon_id=:'taxon_id';" --csv -t
 
 
