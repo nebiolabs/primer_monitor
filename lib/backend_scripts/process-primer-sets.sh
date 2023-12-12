@@ -29,8 +29,8 @@ while read -r taxon; do
 
     # select all primer sets with status "processing" for which all oligos are aligned (have a ref_start pos),
     # because only aligned primer sets can be processed properly
-    "$PSQL_INSTALL_PATH" -h "$DB_HOST" -d "$DB_NAME" -U "$DB_USER_RO" <<< "SELECT name FROM primer_sets WHERE \
-    status='processing' AND organism= AND NOT EXISTS (SELECT 1 FROM oligos WHERE oligos.primer_set_id=primer_sets.id \
+    "$PSQL_INSTALL_PATH" -h "$DB_HOST" -d "$DB_NAME" -U "$DB_USER_RO" -v "organism=$organism_slug" <<< "SELECT name FROM primer_sets WHERE \
+    status='processing' AND organism_id=(select id from organisms where organisms.slug=:'organism') AND NOT EXISTS (SELECT 1 FROM oligos WHERE oligos.primer_set_id=primer_sets.id \
     AND oligos.ref_start IS NULL);" -t --csv > "$new_primers_file";
 
 
