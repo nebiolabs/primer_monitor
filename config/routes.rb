@@ -27,5 +27,5 @@ Rails.application.routes.draw do
   resources :oligos
   resources :users
   resources :primer_set_subscriptions, only: [:create, :destroy]
-  resources :primer_sets, only: [:new, :show, :create, :destroy, :update]
+  resources :primer_sets, only: [:new, :show, :create, :destroy, :update, :edit]
 end
