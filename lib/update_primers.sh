@@ -31,14 +31,14 @@ for id in "$@"; do
   awk 'BEGIN { FS="," }; {print ">" $1 "\n" $2}' | \
   "$MICROMAMBA_BIN_PATH/micromamba" run -p "$conda_env_path" bowtie2 -f --end-to-end --score-min L,-0.6,-1.5 -L 8 -x "$bt2_index" -U - | \
   "$MICROMAMBA_BIN_PATH/micromamba" run -p "$conda_env_path" samtools view -b | \
-  "$MICROMAMBA_BIN_PATH/micromamba" run -p "$conda_env_path" bedtools bamtobed -i - | awk '{print $4 "," $2 "," $3}' >>"$db_csv"
+  "$MICROMAMBA_BIN_PATH/micromamba" run -p "$conda_env_path" bedtools bamtobed -i - | awk '{print $1 "," $2 "," $3 "," $4}' >>"$db_csv"
 
 done
 
 PGPASSFILE="$PGPASSFILE" psql -h "$DB_HOST" -d "$DB_NAME" -U "$DB_USER" >&2 <<CMDS
-create temporary table tmp_oligo_positions (seq_id integer, ref_start integer, ref_end integer);
+create temporary table tmp_oligo_positions (ref_name string, ref_start integer, ref_end integer, seq_id integer);
 \copy tmp_oligo_positions from '$db_csv' with (format csv);
-update oligos set ref_start=top.ref_start, ref_end=top.ref_end from tmp_oligo_positions top where oligos.id=top.seq_id;
+update oligos set ref_start=top.ref_start, ref_end=top.ref_end, organism_taxon_id=(select id from organism_taxa where organism_taxa.reference_accession=top.ref_name) from tmp_oligo_positions top where oligos.id=top.seq_id;
 CMDS
 
 rm "$db_csv"
