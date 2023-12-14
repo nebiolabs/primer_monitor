@@ -967,6 +967,40 @@ ALTER SEQUENCE public.lineages_id_seq OWNED BY public.lineages.id;
 
 
 --
+-- Name: oligo_alignment_positions; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.oligo_alignment_positions (
+    id bigint NOT NULL,
+    organism_taxon_id bigint NOT NULL,
+    oligo_id bigint NOT NULL,
+    ref_start integer NOT NULL,
+    ref_end integer NOT NULL,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: oligo_alignment_positions_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.oligo_alignment_positions_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: oligo_alignment_positions_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.oligo_alignment_positions_id_seq OWNED BY public.oligo_alignment_positions.id;
+
+
+--
 -- Name: oligos_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
@@ -1369,6 +1403,13 @@ ALTER TABLE ONLY public.lineages ALTER COLUMN id SET DEFAULT nextval('public.lin
 
 
 --
+-- Name: oligo_alignment_positions id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.oligo_alignment_positions ALTER COLUMN id SET DEFAULT nextval('public.oligo_alignment_positions_id_seq'::regclass);
+
+
+--
 -- Name: oligos id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -1555,6 +1596,14 @@ ALTER TABLE ONLY public.lineage_callers
 
 ALTER TABLE ONLY public.lineage_calls
     ADD CONSTRAINT lineage_calls_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: oligo_alignment_positions oligo_alignment_positions_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.oligo_alignment_positions
+    ADD CONSTRAINT oligo_alignment_positions_pkey PRIMARY KEY (id);
 
 
 --
@@ -1771,6 +1820,20 @@ CREATE UNIQUE INDEX index_lineages_on_name ON public.lineages USING btree (name)
 --
 
 CREATE INDEX index_lineages_on_organism_id ON public.lineages USING btree (organism_id);
+
+
+--
+-- Name: index_oligo_alignment_positions_on_oligo_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_oligo_alignment_positions_on_oligo_id ON public.oligo_alignment_positions USING btree (oligo_id);
+
+
+--
+-- Name: index_oligo_alignment_positions_on_organism_taxon_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_oligo_alignment_positions_on_organism_taxon_id ON public.oligo_alignment_positions USING btree (organism_taxon_id);
 
 
 --
@@ -2122,6 +2185,14 @@ ALTER TABLE ONLY public.oligos
 
 
 --
+-- Name: oligo_alignment_positions fk_rails_5af8993443; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.oligo_alignment_positions
+    ADD CONSTRAINT fk_rails_5af8993443 FOREIGN KEY (oligo_id) REFERENCES public.oligos(id);
+
+
+--
 -- Name: genomic_features fk_rails_65e85371d4; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -2290,6 +2361,14 @@ ALTER TABLE ONLY public.primer_set_subscriptions
 
 
 --
+-- Name: oligo_alignment_positions fk_rails_eee2f0a8c8; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.oligo_alignment_positions
+    ADD CONSTRAINT fk_rails_eee2f0a8c8 FOREIGN KEY (organism_taxon_id) REFERENCES public.organism_taxa(id);
+
+
+--
 -- Name: proposed_notifications fk_rails_f9871ce32b; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -2429,6 +2508,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20231109092320'),
 ('20231109144910'),
 ('20231109151545'),
-('2023114143320');
+('2023114143320'),
+('20231214164630');
 
 

@@ -36,9 +36,11 @@ for id in "$@"; do
 done
 
 PGPASSFILE="$PGPASSFILE" psql -h "$DB_HOST" -d "$DB_NAME" -U "$DB_USER" >&2 <<CMDS
-create temporary table tmp_oligo_positions (ref_name string, ref_start integer, ref_end integer, seq_id integer);
-\copy tmp_oligo_positions from '$db_csv' with (format csv);
-update oligos set ref_start=top.ref_start, ref_end=top.ref_end, organism_taxon_id=(select id from organism_taxa where organism_taxa.reference_accession=top.ref_name) from tmp_oligo_positions top where oligos.id=top.seq_id;
+create temporary table temp_oligo_alignment_positions (ref_name text, ref_start integer, ref_end integer, seq_id integer);
+\copy temp_oligo_alignment_positions from '$db_csv' with (format csv);
+insert into oligo_alignment_positions set (oligo_id, organism_taxon_id, ref_start, ref_end, created_at, updated_at)
+select seq_id, (select id from organism_taxa where organism_taxa.reference_accession=ref_name), ref_start, ref_end, NOW(), NOW()
+from tmp_oligo_alignment_positions top where oligos.id=top.seq_id;
 CMDS
 
 rm "$db_csv"
