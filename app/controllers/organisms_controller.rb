@@ -20,8 +20,6 @@ class OrganismsController < ApplicationController
     variants_url = URI("#{@config[:data_server]}/#{@config[:organism_slug]}/lineage_variants/all.bed")
 
     @config[:variants_exist] = (Net::HTTP.get_response(URI(variants_url)).code == '200')
-
-
   end
 
   # GET /organisms/new

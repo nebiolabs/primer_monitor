@@ -7,7 +7,6 @@ class PrimerSetsController < ApplicationController
   # GET /primer_sets
   # GET /primer_sets.json
   def index
-
     @organism = Organism.find_by(slug: params[:organism_name])
 
     @subscriptions = PrimerSetSubscription.subscriptions_for_user_by_primer_set(current_user)

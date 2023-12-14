@@ -37,10 +37,8 @@ class LineageVariantsController < ApplicationController
       @default_tracks = params[:primer_sets].split(',')
     end
 
-
     lineages_url = URI("#{@config[:data_server]}/#{@config[:organism_slug]}/config/lineage_sets.json")
     lineages_data = Net::HTTP.get_response(lineages_url)
     @lineage_sets = JSON.parse(lineages_data.body) if lineages_data.code == '200'
-
   end
 end

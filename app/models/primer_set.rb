@@ -49,7 +49,8 @@ class PrimerSet < ApplicationRecord
                           'MICROMAMBA_BIN_PATH' => ENV['MICROMAMBA_BIN_PATH'],
                           'PGPASSFILE' => "#{ENV['DEPLOY_SHARED_DIR']}/config/.pgpass" },
                         Shellwords.join(['bash', 'lib/update_primers.sh', "#{ENV['DEPLOY_SHARED_DIR']}/alignment_env",
-                                         "bt2_indices/#{organism.name.parameterize}/#{organism.name.parameterize}", id.to_s]) +
+                                         "bt2_indices/#{organism.name.parameterize}/#{organism.name.parameterize}",
+                                         id.to_s]) +
                           " >> \"#{ENV['FRONTEND_LOG_PATH']}/primer_alignment.log\" 2>&1")
     Process.detach pid # prevent zombie process
     pid
