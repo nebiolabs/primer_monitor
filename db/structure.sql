@@ -417,6 +417,21 @@ CREATE VIEW public.join_subscribed_location_to_ids AS
 
 
 --
+-- Name: oligo_alignment_positions; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.oligo_alignment_positions (
+    id bigint NOT NULL,
+    organism_taxon_id bigint NOT NULL,
+    oligo_id bigint NOT NULL,
+    ref_start integer NOT NULL,
+    ref_end integer NOT NULL,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
 -- Name: oligos; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -429,11 +444,8 @@ CREATE TABLE public.oligos (
     updated_at timestamp(6) without time zone NOT NULL,
     locus character varying,
     category public.oligo_category,
-    ref_start bigint,
-    ref_end bigint,
     short_name character varying,
-    strand character varying,
-    organism_taxon_id bigint
+    strand character varying
 );
 
 
@@ -545,8 +557,9 @@ CREATE TABLE public.variant_sites (
 CREATE MATERIALIZED VIEW public.variant_overlaps AS
  SELECT oligos.id AS oligo_id,
     oligos.name AS oligo_name,
-    oligos.ref_start AS oligo_start,
-    oligos.ref_end AS oligo_end,
+    oligo_alignment_positions.ref_start AS oligo_start,
+    oligo_alignment_positions.ref_end AS oligo_end,
+    oligo_alignment_positions.organism_taxon_id AS alignment_organism_taxon_id,
     oligos.short_name AS oligo_short_name,
     oligos.locus AS oligo_locus_name,
     oligos.category AS oligo_primer_type,
@@ -563,18 +576,19 @@ CREATE MATERIALIZED VIEW public.variant_overlaps AS
     COALESCE(detailed_geo_locations.subdivision, ''::character varying) AS subdivision,
     detailed_geo_locations.id AS detailed_geo_location_id,
     COALESCE(fasta_records.date_collected, '1900-01-01'::date) AS date_collected
-   FROM ((((public.variant_sites
-     JOIN public.fasta_records ON (((variant_sites.fasta_record_id = fasta_records.id) AND (fasta_records.date_collected > ( SELECT (max(fr.date_collected) - '168 days'::interval)
-           FROM public.fasta_records fr)))))
+   FROM (((((public.variant_sites
+     JOIN public.fasta_records ON ((variant_sites.fasta_record_id = fasta_records.id)))
      JOIN public.detailed_geo_locations ON ((fasta_records.detailed_geo_location_id = detailed_geo_locations.id)))
-     JOIN public.oligos ON ((NOT ((oligos.ref_start >= variant_sites.ref_end) OR (oligos.ref_end <= variant_sites.ref_start)))))
-     JOIN public.primer_sets ON (((oligos.primer_set_id = primer_sets.id) AND (primer_sets.status = 'complete'::public.primer_set_status))))
+     JOIN public.oligo_alignment_positions ON (((NOT ((oligo_alignment_positions.ref_start >= variant_sites.ref_end) OR (oligo_alignment_positions.ref_end <= variant_sites.ref_start))) AND (fasta_records.organism_taxon_id = oligo_alignment_positions.organism_taxon_id))))
+     JOIN public.oligos ON ((oligos.id = oligo_alignment_positions.oligo_id)))
+     JOIN public.primer_sets ON ((oligos.primer_set_id = primer_sets.id)))
   WHERE (variant_sites.usable_del_or_snp = true)
 UNION ALL
  SELECT oligos.id AS oligo_id,
     oligos.name AS oligo_name,
-    oligos.ref_start AS oligo_start,
-    oligos.ref_end AS oligo_end,
+    oligo_alignment_positions.ref_start AS oligo_start,
+    oligo_alignment_positions.ref_end AS oligo_end,
+    oligo_alignment_positions.organism_taxon_id AS alignment_organism_taxon_id,
     oligos.short_name AS oligo_short_name,
     oligos.locus AS oligo_locus_name,
     oligos.category AS oligo_primer_type,
@@ -591,12 +605,12 @@ UNION ALL
     COALESCE(detailed_geo_locations.subdivision, ''::character varying) AS subdivision,
     detailed_geo_locations.id AS detailed_geo_location_id,
     COALESCE(fasta_records.date_collected, '1900-01-01'::date) AS date_collected
-   FROM ((((public.variant_sites
-     JOIN public.fasta_records ON (((variant_sites.fasta_record_id = fasta_records.id) AND (fasta_records.date_collected > ( SELECT (max(fr.date_collected) - '168 days'::interval)
-           FROM public.fasta_records fr)))))
+   FROM (((((public.variant_sites
+     JOIN public.fasta_records ON ((variant_sites.fasta_record_id = fasta_records.id)))
      JOIN public.detailed_geo_locations ON ((fasta_records.detailed_geo_location_id = detailed_geo_locations.id)))
-     JOIN public.oligos ON (((variant_sites.ref_start > oligos.ref_start) AND (variant_sites.ref_start <= oligos.ref_end))))
-     JOIN public.primer_sets ON (((oligos.primer_set_id = primer_sets.id) AND (primer_sets.status = 'complete'::public.primer_set_status))))
+     JOIN public.oligo_alignment_positions ON (((NOT ((oligo_alignment_positions.ref_start >= variant_sites.ref_end) OR (oligo_alignment_positions.ref_end <= variant_sites.ref_start))) AND (fasta_records.organism_taxon_id = oligo_alignment_positions.organism_taxon_id))))
+     JOIN public.oligos ON ((oligos.id = oligo_alignment_positions.oligo_id)))
+     JOIN public.primer_sets ON ((oligos.primer_set_id = primer_sets.id)))
   WHERE (variant_sites.usable_insertion = true)
   WITH NO DATA;
 
@@ -610,6 +624,7 @@ CREATE MATERIALIZED VIEW public.oligo_variant_overlaps AS
     variant_overlaps.oligo_name,
     variant_overlaps.oligo_start,
     variant_overlaps.oligo_end,
+    variant_overlaps.alignment_organism_taxon_id,
     variant_overlaps.oligo_short_name,
     variant_overlaps.oligo_locus_name,
     variant_overlaps.oligo_primer_type,
@@ -644,6 +659,7 @@ UNION ALL
     variant_overlaps.oligo_name,
     variant_overlaps.oligo_start,
     variant_overlaps.oligo_end,
+    variant_overlaps.alignment_organism_taxon_id,
     variant_overlaps.oligo_short_name,
     variant_overlaps.oligo_locus_name,
     variant_overlaps.oligo_primer_type,
@@ -761,9 +777,9 @@ CREATE MATERIALIZED VIEW public.identify_primers_for_notifications AS
              JOIN public.oligo_variant_overlaps ON ((oligo_variant_overlaps.oligo_id = oligos.id)))
              JOIN public.join_subscribed_location_to_ids ON (((join_subscribed_location_to_ids.user_id = primer_set_subscriptions.user_id) AND (join_subscribed_location_to_ids.detailed_geo_location_id = oligo_variant_overlaps.detailed_geo_location_id))))
              JOIN public.users ON ((users.id = primer_set_subscriptions.user_id)))
-          WHERE ((oligo_variant_overlaps.date_collected >= (CURRENT_DATE - users.lookback_days)) AND (primer_set_subscriptions.active = true))
+          WHERE (oligo_variant_overlaps.date_collected >= (CURRENT_DATE - users.lookback_days))
           GROUP BY primer_set_subscriptions.user_id, primer_set_subscriptions.primer_set_id, primer_sets.name, oligos.id, oligos.name, join_subscribed_location_to_ids.detailed_geo_location_id, users.lookback_days, users.variant_fraction_threshold, oligo_variant_overlaps.region, oligo_variant_overlaps.subregion, oligo_variant_overlaps.division, oligo_variant_overlaps.subdivision, oligo_variant_overlaps.coords, oligo_variant_overlaps.detailed_geo_location_id
-        ), total_sequences_for_denominator AS (
+        ), second_query AS (
          SELECT fasta_records.detailed_geo_location_id,
             count(fasta_records.id) AS records_count,
             users.lookback_days
@@ -785,13 +801,13 @@ CREATE MATERIALIZED VIEW public.identify_primers_for_notifications AS
     first_query.subdivision,
     first_query.coords,
     first_query.variant_count,
-    total_sequences_for_denominator.records_count,
     first_query.variant_fraction_threshold,
-    total_sequences_for_denominator.detailed_geo_location_id,
-    ((first_query.variant_count)::numeric / (total_sequences_for_denominator.records_count)::numeric) AS fraction_variant
+    second_query.detailed_geo_location_id,
+    second_query.records_count,
+    ((first_query.variant_count)::numeric / (second_query.records_count)::numeric) AS fraction_variant
    FROM (first_query
-     JOIN total_sequences_for_denominator ON (((total_sequences_for_denominator.detailed_geo_location_id = first_query.detailed_geo_location_id) AND (total_sequences_for_denominator.lookback_days = first_query.lookback_days))))
-  WHERE ((((first_query.variant_count)::numeric / (total_sequences_for_denominator.records_count)::numeric))::double precision >= first_query.variant_fraction_threshold)
+     JOIN second_query ON ((second_query.detailed_geo_location_id = first_query.detailed_geo_location_id)))
+  WHERE ((((first_query.variant_count)::numeric / (second_query.records_count)::numeric))::double precision >= first_query.variant_fraction_threshold)
   WITH NO DATA;
 
 
@@ -964,21 +980,6 @@ CREATE SEQUENCE public.lineages_id_seq
 --
 
 ALTER SEQUENCE public.lineages_id_seq OWNED BY public.lineages.id;
-
-
---
--- Name: oligo_alignment_positions; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.oligo_alignment_positions (
-    id bigint NOT NULL,
-    organism_taxon_id bigint NOT NULL,
-    oligo_id bigint NOT NULL,
-    ref_start integer NOT NULL,
-    ref_end integer NOT NULL,
-    created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL
-);
 
 
 --
@@ -1837,13 +1838,6 @@ CREATE INDEX index_oligo_alignment_positions_on_organism_taxon_id ON public.olig
 
 
 --
--- Name: index_oligos_on_organism_taxon_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_oligos_on_organism_taxon_id ON public.oligos USING btree (organism_taxon_id);
-
-
---
 -- Name: index_oligos_on_primer_set_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -2033,24 +2027,17 @@ CREATE INDEX index_verified_notifications_on_user_id ON public.verified_notifica
 
 
 --
--- Name: oligo_variant_overlaps_date_collected_idx; Type: INDEX; Schema: public; Owner: -
+-- Name: oligo_variant_overlaps_primer_set_name_idx; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX oligo_variant_overlaps_date_collected_idx ON public.oligo_variant_overlaps USING btree (date_collected);
-
-
---
--- Name: oligo_variant_overlaps_detailed_geo_location_id_idx; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX oligo_variant_overlaps_detailed_geo_location_id_idx ON public.oligo_variant_overlaps USING btree (detailed_geo_location_id);
+CREATE INDEX oligo_variant_overlaps_primer_set_name_idx ON public.oligo_variant_overlaps USING btree (primer_set_name);
 
 
 --
--- Name: oligo_variant_overlaps_oligo_id_idx; Type: INDEX; Schema: public; Owner: -
+-- Name: oligo_variant_overlaps_region_subregion_division_subdivisio_idx; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX oligo_variant_overlaps_oligo_id_idx ON public.oligo_variant_overlaps USING btree (oligo_id);
+CREATE INDEX oligo_variant_overlaps_region_subregion_division_subdivisio_idx ON public.oligo_variant_overlaps USING btree (region, subregion, division, subdivision, date_collected);
 
 
 --
@@ -2068,10 +2055,10 @@ CREATE INDEX tmp ON public.subscribed_geo_locations USING btree (detailed_geo_lo
 
 
 --
--- Name: variant_overlaps_variant_type_idx; Type: INDEX; Schema: public; Owner: -
+-- Name: variant_overlaps_region_subregion_division_subdivision_date_idx; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX variant_overlaps_variant_type_idx ON public.variant_overlaps USING btree (variant_type);
+CREATE INDEX variant_overlaps_region_subregion_division_subdivision_date_idx ON public.variant_overlaps USING btree (region, subregion, division, subdivision, date_collected);
 
 
 --
@@ -2102,14 +2089,6 @@ ALTER TABLE ONLY public.proposed_notifications
 
 ALTER TABLE ONLY public.primer_sets
     ADD CONSTRAINT fk_rails_06b1f0d34e FOREIGN KEY (amplification_method_id) REFERENCES public.amplification_methods(id);
-
-
---
--- Name: oligos fk_rails_1e8971b599; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.oligos
-    ADD CONSTRAINT fk_rails_1e8971b599 FOREIGN KEY (organism_taxon_id) REFERENCES public.organism_taxa(id);
 
 
 --
@@ -2509,6 +2488,8 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20231109144910'),
 ('20231109151545'),
 ('2023114143320'),
-('20231214164630');
+('20231214164630'),
+('20231215134050'),
+('20231215144315');
 
 

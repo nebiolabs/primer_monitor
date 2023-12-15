@@ -18,22 +18,18 @@ shift 2
 
 db_csv=$(mktemp)
 
-null_check="AND ref_start IS NULL"
-
-if [ -n "$REALIGN" ]; then
-  null_check=""
-fi
-
 for id in "$@"; do
   echo "Processing $id..." >&2
 
-  psql -h "$DB_HOST" -d "$DB_NAME" -U "$DB_USER_RO" -c "SELECT id, sequence FROM oligos WHERE primer_set_id=$id $null_check;" --csv -t | \
+  psql -h "$DB_HOST" -d "$DB_NAME" -U "$DB_USER_RO" -c "SELECT id, sequence FROM oligos WHERE primer_set_id=$id;" --csv -t | \
   awk 'BEGIN { FS="," }; {print ">" $1 "\n" $2}' | \
   "$MICROMAMBA_BIN_PATH/micromamba" run -p "$conda_env_path" bowtie2 -f --end-to-end --score-min L,-0.6,-1.5 -L 8 -x "$bt2_index" -U - | \
   "$MICROMAMBA_BIN_PATH/micromamba" run -p "$conda_env_path" samtools view -b | \
   "$MICROMAMBA_BIN_PATH/micromamba" run -p "$conda_env_path" bedtools bamtobed -i - | awk '{print $1 "," $2 "," $3 "," $4}' >>"$db_csv"
 
 done
+
+cat "$db_csv" >&2
 
 PGPASSFILE="$PGPASSFILE" psql -h "$DB_HOST" -d "$DB_NAME" -U "$DB_USER" >&2 <<CMDS
 create temporary table tmp_oligo_alignment_positions (ref_name text, ref_start integer, ref_end integer, seq_id integer);
