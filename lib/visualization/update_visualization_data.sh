@@ -71,7 +71,7 @@ ssh_proxy()
 
 echo "$(date +'%b %d %H:%M:%S') - getting primer sets"
 
-"$primer_monitor_path/lib/visualization/get_primer_sets.sh" "$organism_dirname/primer_sets_bed" "$organism_dirname/primer_sets_fasta" "$primer_sets_file" > "$organism_dirname/config/tracks.json"
+"$primer_monitor_path/lib/visualization/get_primer_sets.sh" "$organism_dirname/primer_sets_bed" "$organism_dirname/primer_sets_fasta" "$organism_dirname" "$primer_sets_file" > "$organism_dirname/config/tracks.json"
 
 echo "$(date +'%b %d %H:%M:%S') - done getting primer sets"
 
