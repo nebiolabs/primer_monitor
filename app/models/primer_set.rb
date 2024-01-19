@@ -4,7 +4,7 @@ class PrimerSet < ApplicationRecord
   belongs_to :user
   belongs_to :organism
   belongs_to :amplification_method
-  has_many :oligos, -> { order('oligos.ref_start') }, dependent: :destroy, inverse_of: :primer_set
+  has_many :oligos, -> { order('oligos.name') }, dependent: :destroy, inverse_of: :primer_set
   has_many :subscriptions, dependent: :destroy, class_name: 'PrimerSetSubscription'
   has_many :subscribers, through: :subscriptions, source: :user
 
