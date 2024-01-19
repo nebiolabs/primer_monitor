@@ -23,7 +23,8 @@ fi
 primer_sets_tmp=$(mktemp)
 
 psql -h "$DB_HOST" -d "$DB_NAME" -U "$DB_USER_RO" -v "organism_slug=$organism_slug" <<< "SELECT primer_sets.name, \
-organism_taxa.reference_accession, oligos.ref_start,oligos.ref_end, \
+organism_taxa.reference_accession, oligo_alignment_positions.ref_start, \
+oligo_alignment_positions.ref_end, \
 regexp_replace(oligos.name, '\s', '_', 'g'), '0' AS score, \
 COALESCE(oligos.strand, '.') AS strand FROM oligos \
 INNER JOIN primer_sets ON oligos.primer_set_id=primer_sets.id \
