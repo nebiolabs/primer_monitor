@@ -25,7 +25,7 @@ while read -r taxon; do
   # because only aligned primer sets can be processed properly
   "$PSQL_INSTALL_PATH" -h "$DB_HOST" -d "$DB_NAME" -U "$DB_USER_RO" -v "organism=$organism_slug" <<< "SELECT name FROM primer_sets WHERE \
   status='processing' AND organism_id=(select id from organisms where organisms.slug=:'organism') AND NOT EXISTS (SELECT 1 FROM oligos WHERE oligos.primer_set_id=primer_sets.id \
-  AND oligos.ref_start IS NULL);" -t --csv > "$new_primers_file";
+  AND NOT EXISTS (SELECT 1 FROM oligo_alignment_positions WHERE oligo_alignment_positions.oligo_id=oligos.id));" -t --csv > "$new_primers_file";
 
   line_count="$(wc -l < "$new_primers_file")"
 
