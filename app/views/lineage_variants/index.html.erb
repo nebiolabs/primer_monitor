@@ -1,11 +1,11 @@
-<h1 class="title"><%= Organism.find_by(slug: params[:organism_name]).name %> Lineage Variant Summary</h1>
+<h1 class="title"><%= @organism.name %> Lineage Variant Summary</h1>
 
 <% primer_sets_map = {} %>
 <% default_tracks_map = {} %>
 <% lineage_sets_map = {} %>
 <% i = 0 %>
 <div class="block">
-  Primers that do not overlap with variants associated with these lineages are shown in blue below a schematic SARS-CoV-2 genome.
+  Primers that do not overlap with variants associated with these lineages are shown in blue below a schematic <%= @organism.name %> genome.
   Primers that overlap with enough sufficiently-frequent variants to be potentially impacted (see below) are indicated in orange.
   Relevant variants are shown in gray directly below the genome, above the primer sets.
   <br><br>

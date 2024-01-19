@@ -5,12 +5,12 @@ class LineageVariantsController < ApplicationController
   def index
     authorize! :index, LineageVariantsController
 
-    organism = Organism.find_by(slug: params[:organism_name])
+    @organism = Organism.find_by(slug: params[:organism_name])
 
     @config = {
       "data_server": ENV['IGV_DATA_SERVER'],
-      "organism_slug": organism.slug,
-      "organism_name": organism.name
+      "organism_slug": @organism.slug,
+      "organism_name": @organism.name
     }
 
     @primer_sets = {}
