@@ -20,8 +20,10 @@ echo "$(date +'%b %d %H:%M:%S') - overlap computation started"
 
 mkdir -p "$output_path"
 
-if [[ $cutoff_date == '-' ]]; then # default of 180 days
-  cutoff_date="$(date -d "180 days ago" +"%Y-%m-%d")"
+if [[ $cutoff_date == '-' ]]; then # default to lookback date from DB
+  lookback=$(psql -h "$DB_HOST" -d "$DB_NAME" -U "$DB_USER_RO" -v "organism_slug=$organism_slug" \
+  <<< "SELECT variant_bed_lookback_days FROM organisms WHERE slug=:'organism_slug';" --csv -t)
+  cutoff_date="$(date -d "$lookback days ago" +"%Y-%m-%d")"
 fi
 
 variants_bed="$$_variants.bed"

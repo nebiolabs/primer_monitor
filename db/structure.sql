@@ -1078,7 +1078,8 @@ CREATE TABLE public.organisms (
     updated_at timestamp(6) without time zone NOT NULL,
     alias character varying,
     slug character varying,
-    public boolean
+    public boolean,
+    variant_bed_lookback_days integer DEFAULT 180 NOT NULL
 );
 
 
@@ -2491,6 +2492,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20231214164630'),
 ('20231215134050'),
 ('20231215144315'),
-('20231218110805');
+('20231218110805'),
+('20240124111845');
 
 
