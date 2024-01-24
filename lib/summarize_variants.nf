@@ -205,24 +205,6 @@ process load_to_db {
     '''
 }
 
-process recalculate_database_views {
-    cpus 1
-    publishDir "${output_path}", mode: 'copy'
-    errorStrategy 'retry'
-    maxRetries 2
-    input:
-        //these files are to make sure all the load_to_db tasks are done first
-        file seq_load_complete
-    output:
-        file 'refresh_complete.txt';
-    shell:
-    '''
-    # recalculate all the views at the end to save time
-    RAILS_ENV=production ruby !{primer_monitor_path}/upload.rb --rebuild_views && touch refresh_complete.txt
-    '''
-}
-
-
 process update_visualization_data {
     cpus 8
     conda "libiconv psycopg2 bedtools coreutils 'postgresql>=15' gawk bc"
@@ -249,6 +231,5 @@ workflow {
     seq_recs = align.out.join(lineage_calls.out)
 
     load_to_db(seq_recs)
-    recalculate_database_views(load_to_db.out.collect())
-    update_visualization_data(recalculate_database_views.out)
+    update_visualization_data(load_to_db.out.collect())
 }

@@ -35,9 +35,10 @@ while read -r taxon; do
   --temp_dir "$TMPDIR" \
   -N "$NOTIFICATION_EMAILS";
 
-
 done < <("$PSQL_INSTALL_PATH" -h "$DB_HOST" -d "$DB_NAME" -U "$DB_USER_RO" \
 -c "SELECT o.slug,ot.reference_accession,lc.name,ot.ncbi_taxon_id \
 FROM organisms o INNER JOIN organism_taxa ot ON ot.organism_id=o.id LEFT JOIN lineage_callers lc \
 ON ot.caller_id=lc.id;" -t --csv);
+
+RAILS_ENV=production ruby "$BACKEND_INSTALL_PATH/upload.rb" --rebuild_views
 
