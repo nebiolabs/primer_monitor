@@ -19,7 +19,7 @@ set :assets_dependencies, %w[app/assets lib/assets vendor/assets Gemfile.lock co
 set :backend_deploy_to, ->{ fetch(:backend_deploy_path) }
 
 # To get the backend path into whenever
-set :whenever_variables, ->{ "\"environment=#{fetch :whenever_environment}&backend_path=#{fetch(:backend_deploy_to)}\"" }
+set :whenever_variables, ->{ "\"environment=#{fetch :whenever_environment}&backend_path=#{fetch(:backend_deploy_to)}/current\"" }
 set :whenever_identifier, ->{ "#{fetch(:application)}_#{fetch(:stage)}" }
 
 set :samtools_version, '1.18'
