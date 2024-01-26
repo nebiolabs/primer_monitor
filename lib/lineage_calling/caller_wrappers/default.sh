@@ -5,7 +5,7 @@
 # usage: default.sh <input sequence> [all other arguments ignored]
 
 if (($# < 1)); then
-    echo "usage: default.sh <input file name>" >&2;
+    echo "usage: default.sh <input file>" >&2;
     exit 1;
 fi
 

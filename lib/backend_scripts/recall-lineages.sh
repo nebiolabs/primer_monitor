@@ -24,27 +24,19 @@ while read -r taxon; do
 
   echo "Starting $caller_name version update"
 
-  while read -d " " -r version; do
-    # if this isn't a version, stop
-    if ! grep "=" <<< "$version"; then
-      break
-    fi
-    package_name="$(cut -f 1 -d "=" <<< "$version")"
-    latest_version=$("$MICROMAMBA_BIN_PATH/micromamba" search -c bioconda "$package_name" | grep -E "Version[[:blank:]]+[0-9]" | awk '{ print $2 }')
-    if [ "$latest_version" = "" ]; then
-      # skip this entire taxon and email an error
-      echo "Error: Got blank version string when trying to update package '$package_name' of caller '$caller_name' \
-      for taxon '$taxon_id' of organism '$organism_slug'. Skipping this taxon." | \
-      mail -r "$ADMIN_EMAIL" -s "Lineage caller update error ($caller_name:$package_name - $organism_slug)" "$NOTIFICATION_EMAILS"
-      continue 2;
-    fi
-    # append version to $new_caller_version
-    new_caller_version="$new_caller_version $package_name==$latest_version"
-  done < <(echo "$caller_version ")
-  # trailing space is intentional to make sure read gets the last word in the string
+  tmpfile="$(mktemp)"
 
-  # trim leading space
-  new_caller_version="$(sed -E "s/^ //" <<< "$new_caller_version")"
+  "$BACKEND_INSTALL_PATH/lib/lineage_calling/update_wrappers/${caller_name}.sh" "$taxon_id" > "$tmpfile"
+  update_success="$?"
+
+  if [ "$update_success" -ne 0 ]; then
+    rm "$tmpfile"
+    continue # skip this entire taxon if it failed
+  fi
+
+  new_caller_version="$(cat "$tmpfile")"
+
+  rm "$tmpfile"
 
   # set pending version
   PGPASSFILE="$BACKEND_INSTALL_PATH/config/.pgpass" "$PSQL_INSTALL_PATH" -h "$DB_HOST" -d "$DB_NAME" -U "$DB_USER" \

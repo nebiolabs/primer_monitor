@@ -1,13 +1,12 @@
 #!/usr/bin/env bash
 
-# pangolin wrapper script
-
-#  <taxon record ID> is unused and is present to keep the interface of this and nextclade compatible
+# nextclade wrapper script
 
 threads=1
 temp_dir="$TMPDIR"
+dataset=""
 
-while getopts ':@:t:h' option_arg; do
+while getopts ':@:t:d:h' option_arg; do
   case "$option_arg" in
     "@")
       threads="$OPTARG"
@@ -16,10 +15,14 @@ while getopts ':@:t:h' option_arg; do
       # a list of primer sets to process
       temp_dir="$OPTARG"
       ;;
+    "d")
+      # the name of the nextclade dataset
+      dataset="$OPTARG"
+      ;;
     "h")
       # help
       cat << HELPMSG
-Usage: pangolin.sh [-@ THREADS] [-t TEMP_DIR] [-h] <input file>
+Usage: nextclade.sh [-@ THREADS] [-t TEMP_DIR] [-d DATASET] [-h] <input file>
 HELPMSG
       exit 0;
       ;;
@@ -33,7 +36,7 @@ done
 shift $((OPTIND - 1));
 
 if (($# < 1)); then
-    echo "usage: pangolin.sh [-@ THREADS] [-t TEMP_DIR] [-h] <input file>" >&2;
+    echo "usage: nextclade.sh [-@ THREADS] [-t TEMP_DIR] [-d DATASET] [-h] <input file>" >&2;
     exit 1;
 fi
 
