@@ -26,7 +26,7 @@ params.lineage_caller =
 lineage_caller = params.lineage_caller
 
 params.lineage_caller_script =
-lineage_caller = params.lineage_caller_script
+lineage_caller_script = params.lineage_caller_script
 
 params.taxon_id =
 taxon_id = params.taxon_id

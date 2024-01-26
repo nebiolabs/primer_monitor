@@ -22,7 +22,7 @@ params.lineage_caller =
 lineage_caller = params.lineage_caller
 
 params.lineage_caller_script =
-lineage_caller = params.lineage_caller_script
+lineage_caller_script = params.lineage_caller_script
 
 params.temp_dir = '/tmp'
 temp_dir = params.temp_dir
