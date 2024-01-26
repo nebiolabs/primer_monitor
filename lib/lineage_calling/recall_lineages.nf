@@ -21,6 +21,9 @@ taxon_id = params.taxon_id
 params.lineage_caller =
 lineage_caller = params.lineage_caller
 
+params.lineage_caller_script =
+lineage_caller = params.lineage_caller_script
+
 params.temp_dir = '/tmp'
 temp_dir = params.temp_dir
 
@@ -141,7 +144,7 @@ process lineage_calls {
     TMPDIR="!{temp_dir}"
     export TMPDIR
 
-    !{primer_monitor_path}/lib/lineage_calling/caller_wrappers/!{lineage_caller}.sh -@ 8 -t !{taxon_id}/pending !{fasta}
+    !{primer_monitor_path}/lib/lineage_calling/caller_wrappers/!{lineage_caller_script}.sh -@ 8 -t !{taxon_id}/pending !{fasta}
     '''
 }
 

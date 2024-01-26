@@ -81,7 +81,8 @@ while read -r taxon; do
   -w "$BACKEND_SCRATCH_PATH/work_lineages/" \
   --primer_monitor_path "$BACKEND_INSTALL_PATH" \
   --output_path "$BACKEND_SCRATCH_PATH" \
-  --lineage_caller "$caller_script_name" \
+  --lineage_caller "$caller_name" \
+  --lineage_caller_script "$caller_script_name" \
   --pct_cutoff "$PCT_CUTOFF" \
   --score_cutoff "$SCORE_CUTOFF" \
   --override_path "$BACKEND_INSTALL_PATH/igvstatic/$organism_slug/overrides.txt" \
