@@ -69,7 +69,7 @@ namespace :backend do
   # Apparently I can't change whenever_path per role, so I had to recreate the command here
   task :update_crontab do
     on roles(:backend) do
-      within fetch(:backend_deploy_to) do
+      within "#{fetch(:backend_deploy_to)}/current" do
         with fetch(:whenever_command_environment_variables) do
           args = fetch(:whenever_command)+[fetch(:whenever_update_flags), "--roles=backend", load_file]
           execute(*args)
@@ -81,7 +81,7 @@ namespace :backend do
   desc 'Install gems'
   task :bundle do
     on roles(:backend, :cluster) do
-      within fetch(:backend_deploy_to) do
+      within "#{fetch(:backend_deploy_to)}/current" do
           execute(:bundle, :install)
       end
     end
