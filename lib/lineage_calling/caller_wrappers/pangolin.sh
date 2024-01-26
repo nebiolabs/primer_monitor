@@ -41,8 +41,6 @@ if (($# < 1)); then
 fi
 
 input_file="$1"
-threads="$2"
-temp_dir="$3"
 workdir="$(pwd)";
 
 pangolin "$workdir/$input_file" -t "$threads" -o "$workdir" \
