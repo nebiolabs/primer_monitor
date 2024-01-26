@@ -17,9 +17,10 @@ export TMPDIR=${TEMP_DIR:-/tmp}
 while read -r taxon; do
   organism_slug="$(cut -f 1 -d "," <<< "$taxon")"
   caller_name="$(cut -f 2 -d "," <<< "$taxon")"
-  caller_version="$(cut -f 3 -d "," <<< "$taxon")"
-  dataset_version="$(cut -f 3 -d "," <<< "$taxon")"
-  taxon_id="$(cut -f 4 -d "," <<< "$taxon")"
+  caller_script_name="$(cut -f 3 -d "," <<< "$taxon")"
+  caller_version="$(cut -f 4 -d "," <<< "$taxon")"
+  dataset_version="$(cut -f 5 -d "," <<< "$taxon")"
+  taxon_id="$(cut -f 6 -d "," <<< "$taxon")"
 
   new_caller_version=""
 
@@ -36,7 +37,7 @@ while read -r taxon; do
       # skip this entire taxon and email an error
       echo "Error: Got blank version string when trying to update package '$package_name' of caller '$caller_name' \
       for taxon '$taxon_id' of organism '$organism_slug'. Skipping this taxon." | \
-      mail -r "$ADMIN_EMAIL" -s "Lineage caller update error (pangolin:$package_name - $organism_slug)" "$NOTIFICATION_EMAILS"
+      mail -r "$ADMIN_EMAIL" -s "Lineage caller update error ($caller_name:$package_name - $organism_slug)" "$NOTIFICATION_EMAILS"
       continue 2;
     fi
     # append version to $new_caller_version
@@ -54,8 +55,8 @@ while read -r taxon; do
 
   tmpfile="$(mktemp)"
 
-  "$BACKEND_INSTALL_PATH/lib/lineage_calling/dataset_update_wrappers/${caller_name}.sh" \
-  "$taxon_id" < <(echo "$dataset_version ") > "$tmpfile"
+  "$BACKEND_INSTALL_PATH/lib/lineage_calling/dataset_update_wrappers/${caller_script_name}.sh" \
+  "$organism_slug" "$taxon_id" "$caller_name" < <(echo "$dataset_version ") > "$tmpfile"
   update_success="$?"
 
   if [ "$update_success" -ne 0 ]; then
@@ -80,7 +81,7 @@ while read -r taxon; do
   -w "$BACKEND_SCRATCH_PATH/work_lineages/" \
   --primer_monitor_path "$BACKEND_INSTALL_PATH" \
   --output_path "$BACKEND_SCRATCH_PATH" \
-  --lineage_caller "$caller_name" \
+  --lineage_caller "$caller_script_name" \
   --pct_cutoff "$PCT_CUTOFF" \
   --score_cutoff "$SCORE_CUTOFF" \
   --override_path "$BACKEND_INSTALL_PATH/igvstatic/$organism_slug/overrides.txt" \
@@ -104,6 +105,6 @@ SQL
   fi
 
 done < <("$PSQL_INSTALL_PATH" -h "$DB_HOST" -d "$DB_NAME" -U "$DB_USER_RO" \
--c "SELECT o.slug,lc.name,lc.version_specifiers,ot.ncbi_taxon_id \
+-c "SELECT o.slug,lc.name,lc.script_name,lc.version_specifiers,ot.ncbi_taxon_id \
 FROM organisms o INNER JOIN organism_taxa ot ON ot.organism_id=o.id LEFT JOIN lineage_callers lc \
 ON ot.caller_id=lc.id;" -t --csv);

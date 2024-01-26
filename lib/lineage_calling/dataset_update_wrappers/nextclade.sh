@@ -4,6 +4,7 @@
 
 organism_slug="$1"
 taxon_id="$2"
+caller_name="$3"
 
 while read -d " " -r version; do
   # if this isn't a version, stop
@@ -21,9 +22,9 @@ while read -d " " -r version; do
   success="$?"
   if [ "$success" -ne 0 ]; then
     # skip this entire taxon and email an error
-    echo "Error: Failed to update dataset '$dataset_name' of caller 'nextclade' \
+    echo "Error: Failed to update dataset '$dataset_name' of caller '$caller_name' \
     for taxon '$taxon_id' of organism '$organism_slug'. Skipping this taxon." | \
-    mail -r "$ADMIN_EMAIL" -s "Dataset update error (nextclade:$dataset_name - $organism_slug)" "$NOTIFICATION_EMAILS"
+    mail -r "$ADMIN_EMAIL" -s "Dataset update error ($caller_name:$dataset_name - $organism_slug)" "$NOTIFICATION_EMAILS"
     exit 1;
   fi
   new_dataset_version="$new_dataset_version $dataset_name=$dataset_version"
