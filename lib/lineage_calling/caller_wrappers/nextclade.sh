@@ -4,20 +4,20 @@
 
 threads=1
 temp_dir="$TMPDIR"
-dataset=""
+taxon_id=""
 
-while getopts ':@:t:d:h' option_arg; do
+while getopts ':@:t:T:h' option_arg; do
   case "$option_arg" in
     "@")
       threads="$OPTARG"
       ;;
-    "t")
-      # a list of primer sets to process
+    "T")
+      # temp dir
       temp_dir="$OPTARG"
       ;;
-    "d")
-      # the name of the nextclade dataset
-      dataset="$OPTARG"
+    "t")
+      # the taxon ID (for finding the dataset)
+      taxon_id="$OPTARG"
       ;;
     "h")
       # help
@@ -45,6 +45,15 @@ threads="$2"
 temp_dir="$3"
 workdir="$(pwd)";
 
-pangolin "$workdir/$input_file" -t "$threads" -o "$workdir" \
---outfile "$input_file.lineage_calls.csv" \
-${temp_dir:+"--tempdir $temp_dir"}; # run pangolin
+if [ -z "$temp_dir" ]; then
+  export TMPDIR="$temp_dir"
+fi
+
+nextclade run --input-dataset "$BACKEND_INSTALL_PATH/datasets/$taxon_id" \
+--output-csv="$input_file.lineage_calls.csv.tmp" \
+--jobs "$threads" \
+"$workdir/$input_file" # run nextclade
+
+# swap semicolons and commas, remove initial index column
+tr ",;" ";," < "$input_file.lineage_calls.csv.tmp" | cut -f 2- -d "," > "$input_file.lineage_calls.csv"
+rm "$input_file.lineage_calls.csv.tmp"

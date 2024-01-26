@@ -4,6 +4,34 @@
 
 # usage: default.sh <input sequence> [all other arguments ignored]
 
+
+while getopts ':@:t:T:h' option_arg; do
+  case "$option_arg" in
+    "@")
+      # unused, here to keep a consistent interface for all of these
+      ;;
+    "t")
+      # unused, here to keep a consistent interface for all of these
+      ;;
+    "T")
+      # unused, here to keep a consistent interface for all of these
+      ;;
+    "h")
+      # help
+      cat << HELPMSG
+Usage: default.sh [-h] <input file>
+HELPMSG
+      exit 0;
+      ;;
+    "*")
+      echo "invalid option -$option_arg" >&2;
+      exit 1;
+      ;;
+  esac
+done
+
+shift $((OPTIND - 1));
+
 if (($# < 1)); then
     echo "usage: default.sh <input file>" >&2;
     exit 1;

@@ -7,13 +7,13 @@
 threads=1
 temp_dir="$TMPDIR"
 
-while getopts ':@:t:h' option_arg; do
+while getopts ':@:t:T:h' option_arg; do
   case "$option_arg" in
     "@")
       threads="$OPTARG"
       ;;
-    "t")
-      # a list of primer sets to process
+    "T")
+      # temp dir
       temp_dir="$OPTARG"
       ;;
     "h")
@@ -22,6 +22,9 @@ while getopts ':@:t:h' option_arg; do
 Usage: pangolin.sh [-@ THREADS] [-t TEMP_DIR] [-h] <input file>
 HELPMSG
       exit 0;
+      ;;
+    "t")
+      # unused, here to keep a consistent interface for all of these
       ;;
     "*")
       echo "invalid option -$option_arg" >&2;

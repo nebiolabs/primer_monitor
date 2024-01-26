@@ -13,7 +13,7 @@ class LineageCall < ApplicationRecord
     record_count = 0
 
     File.readlines(calls_csv).each do |line|
-      next if line.start_with?('taxon,')
+      next if line.start_with?('taxon,', 'seqName,')
 
       record_count += 1
       record = build_lineage_call(line, caller_id)

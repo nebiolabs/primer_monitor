@@ -174,7 +174,7 @@ process lineage_calls {
     TMPDIR="!{temp_dir}"
     export TMPDIR
 
-    !{primer_monitor_path}/lib/lineage_calling/caller_wrappers/!{lineage_caller}.sh !{fasta} 8
+    !{primer_monitor_path}/lib/lineage_calling/caller_wrappers/!{lineage_caller}.sh -@ 8 -t !{taxon_id} !{fasta}
     '''
 }
 
