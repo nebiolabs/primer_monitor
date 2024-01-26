@@ -144,6 +144,9 @@ process lineage_calls {
     TMPDIR="!{temp_dir}"
     export TMPDIR
 
+    source "!{primer_monitor_path}/.env"
+    export BACKEND_INSTALL_PATH
+
     !{primer_monitor_path}/lib/lineage_calling/caller_wrappers/!{lineage_caller_script}.sh -@ 8 -d !{taxon_id}/pending !{fasta}
     '''
 }
