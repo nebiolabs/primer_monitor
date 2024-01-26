@@ -892,7 +892,9 @@ CREATE TABLE public.lineage_callers (
     script_name character varying NOT NULL,
     created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL,
-    pending_version_specifiers character varying
+    pending_version_specifiers character varying,
+    dataset_versions character varying,
+    pending_dataset_versions character varying
 );
 
 
@@ -2493,6 +2495,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20231215134050'),
 ('20231215144315'),
 ('20231218110805'),
-('20240124111845');
+('20240124111845'),
+('20240126135630');
 
 

@@ -4,20 +4,20 @@
 
 threads=1
 temp_dir="$TMPDIR"
-taxon_id=""
+dataset_path=""
 
-while getopts ':@:t:T:h' option_arg; do
+while getopts ':@:d:t:h' option_arg; do
   case "$option_arg" in
     "@")
       threads="$OPTARG"
       ;;
-    "T")
+    "t")
       # temp dir
       temp_dir="$OPTARG"
       ;;
-    "t")
-      # the taxon ID (for finding the dataset)
-      taxon_id="$OPTARG"
+    "d")
+      # dataset path
+      dataset_path="$OPTARG"
       ;;
     "h")
       # help
@@ -49,7 +49,7 @@ if [ -z "$temp_dir" ]; then
   export TMPDIR="$temp_dir"
 fi
 
-nextclade run --input-dataset "$BACKEND_INSTALL_PATH/datasets/$taxon_id" \
+nextclade run --input-dataset "$BACKEND_INSTALL_PATH/datasets/$dataset_path" \
 --output-csv="$input_file.lineage_calls.csv.tmp" \
 --jobs "$threads" \
 "$workdir/$input_file" # run nextclade

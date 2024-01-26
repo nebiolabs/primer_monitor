@@ -7,12 +7,12 @@
 threads=1
 temp_dir="$TMPDIR"
 
-while getopts ':@:t:T:h' option_arg; do
+while getopts ':@:d:t:h' option_arg; do
   case "$option_arg" in
     "@")
       threads="$OPTARG"
       ;;
-    "T")
+    "t")
       # temp dir
       temp_dir="$OPTARG"
       ;;
@@ -23,7 +23,7 @@ Usage: pangolin.sh [-@ THREADS] [-t TEMP_DIR] [-h] <input file>
 HELPMSG
       exit 0;
       ;;
-    "t")
+    "d")
       # unused, here to keep a consistent interface for all of these
       ;;
     "*")

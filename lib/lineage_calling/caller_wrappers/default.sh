@@ -5,15 +5,15 @@
 # usage: default.sh <input sequence> [all other arguments ignored]
 
 
-while getopts ':@:t:T:h' option_arg; do
+while getopts ':@:d:t:h' option_arg; do
   case "$option_arg" in
     "@")
       # unused, here to keep a consistent interface for all of these
       ;;
-    "t")
+    "d")
       # unused, here to keep a consistent interface for all of these
       ;;
-    "T")
+    "t")
       # unused, here to keep a consistent interface for all of these
       ;;
     "h")
