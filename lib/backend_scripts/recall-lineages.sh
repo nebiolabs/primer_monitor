@@ -70,6 +70,7 @@ while read -r taxon; do
 
   if [ "$update_success" -ne 0 ]; then
     rm "$tmpfile"
+    echo_log "dataset update failed, skipping taxon"
     continue # skip this entire taxon if it failed
   fi
 
@@ -120,7 +121,7 @@ SQL
   fi
 
 done < <("$PSQL_INSTALL_PATH" -h "$DB_HOST" -d "$DB_NAME" -U "$DB_USER_RO" \
--c "SELECT o.slug,lc.name,lc.script_name,lc.version_specifiers,ot.ncbi_taxon_id \
+-c "SELECT o.slug,lc.name,lc.script_name,lc.version_specifiers,lc.dataset_versions,ot.ncbi_taxon_id \
 FROM organisms o INNER JOIN organism_taxa ot ON ot.organism_id=o.id LEFT JOIN lineage_callers lc \
 ON ot.caller_id=lc.id;" -t --csv);
 
