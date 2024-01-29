@@ -5,6 +5,9 @@
 
 dotenv_path=$1
 
+# defines echo_log function
+source "$(dirname "$0")/../echo_log.sh"
+
 # shellcheck source=../../.env
 source "$dotenv_path";
 
@@ -20,6 +23,8 @@ while read -r taxon; do
   caller_name="$(cut -f 3 -d "," <<< "$taxon")"
   caller_script_name="$(cut -f 4 -d "," <<< "$taxon")"
   taxon_id="$(cut -f 5 -d "," <<< "$taxon")"
+
+  echo_log "processing taxon $taxon_id for $organism_slug, accession $ref_accession, caller $caller_name"
 
   "$NEXTFLOW_INSTALL_PATH" -quiet -log "$BACKEND_SCRATCH_PATH/log_download-$(date +%F_%T)" \
   run "$BACKEND_INSTALL_PATH/lib/summarize_variants.nf" \
@@ -37,10 +42,14 @@ while read -r taxon; do
   --temp_dir "$TMPDIR" \
   -N "$NOTIFICATION_EMAILS";
 
+  echo_log "processed taxon $taxon_id"
+
 done < <("$PSQL_INSTALL_PATH" -h "$DB_HOST" -d "$DB_NAME" -U "$DB_USER_RO" \
 -c "SELECT o.slug,ot.reference_accession,lc.name,lc.script_name,ot.ncbi_taxon_id \
 FROM organisms o INNER JOIN organism_taxa ot ON ot.organism_id=o.id LEFT JOIN lineage_callers lc \
 ON ot.caller_id=lc.id;" -t --csv);
 
+echo_log "rebuilding materialized views"
 RAILS_ENV=production ruby "$BACKEND_INSTALL_PATH/upload.rb" --rebuild_views
+echo_log "done"
 

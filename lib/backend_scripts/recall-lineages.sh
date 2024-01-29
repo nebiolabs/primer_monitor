@@ -5,6 +5,9 @@
 
 dotenv_path=$1
 
+# defines echo_log function
+source "$(dirname "$0")/../echo_log.sh"
+
 # shellcheck source=../../.env
 source "$dotenv_path";
 
@@ -24,7 +27,7 @@ while read -r taxon; do
 
   new_caller_version=""
 
-  echo "Starting $caller_name version update"
+  echo_log "Starting $caller_name version update on $taxon_id for $organism_slug"
 
   while read -d " " -r version; do
     # if this isn't a version, stop
@@ -35,7 +38,7 @@ while read -r taxon; do
     latest_version=$("$MICROMAMBA_BIN_PATH/micromamba" search -c bioconda "$package_name" | grep -E "Version[[:blank:]]+[0-9]" | awk '{ print $2 }')
     if [ "$latest_version" = "" ]; then
       # skip this entire taxon and email an error
-      echo "Error: Got blank version string when trying to update package '$package_name' of caller '$caller_name' \
+      echo_log "Error: Got blank version string when trying to update package '$package_name' of caller '$caller_name' \
       for taxon '$taxon_id' of organism '$organism_slug'. Skipping this taxon." | \
       mail -r "$ADMIN_EMAIL" -s "Lineage caller update error ($caller_name:$package_name - $organism_slug)" "$NOTIFICATION_EMAILS"
       continue 2;
@@ -52,6 +55,10 @@ while read -r taxon; do
   PGPASSFILE="$BACKEND_INSTALL_PATH/config/.pgpass" "$PSQL_INSTALL_PATH" -h "$DB_HOST" -d "$DB_NAME" -U "$DB_USER" \
   -v "new_caller_version=$new_caller_version" -v "caller_name=$caller_name" \
   <<< "UPDATE lineage_callers SET pending_version_specifiers=:'new_caller_version' WHERE name=:'caller_name';"
+
+  echo_log "$caller_name version updated to $new_caller_version"
+
+  echo_log "Starting $caller_name dataset update on $taxon_id for $organism_slug"
 
   tmpfile="$(mktemp)"
 
@@ -73,7 +80,9 @@ while read -r taxon; do
 
   rm "$tmpfile"
 
-  echo "$caller_name version updated to $new_caller_version"
+  echo_log "$caller_name dataset updated to $new_dataset_version"
+
+  echo_log "processing taxon $taxon_id for $organism_slug, caller $caller_name"
 
   # run the pipeline
   "$NEXTFLOW_INSTALL_PATH" -quiet -log "$BACKEND_SCRATCH_PATH/log_lineages-$(date +%F_%T)" \
@@ -93,7 +102,10 @@ while read -r taxon; do
   -c "$BACKEND_INSTALL_PATH/lib/nextflow.config"
   success="$?"
 
+  echo_log "processed taxon $taxon_id"
+
   if [ "$success" -eq 0 ]; then
+      echo_log "processing successful, updating current lineage caller version"
       # update actual version
       PGPASSFILE="$BACKEND_INSTALL_PATH/config/.pgpass" \
       "$PSQL_INSTALL_PATH" -h "$DB_HOST" -d "$DB_NAME" -U "$DB_USER" -v "caller_name=$caller_name" <<SQL
