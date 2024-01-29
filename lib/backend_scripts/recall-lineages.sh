@@ -17,6 +17,8 @@ export NXF_JAVA_HOME
 
 export TMPDIR=${TEMP_DIR:-/tmp}
 
+echo_log "======= START ======="
+
 while read -r taxon; do
   organism_slug="$(cut -f 1 -d "," <<< "$taxon")"
   caller_name="$(cut -f 2 -d "," <<< "$taxon")"

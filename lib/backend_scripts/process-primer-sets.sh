@@ -34,6 +34,8 @@ while read -r organism; do
     # only run the nextflow if there are actually primers, and no other conflicting script is running
   if [ "$line_count" -gt 0 ]; then
 
+    echo_log "======= START ======="
+
     echo_log "updating primer sets for organism $organism_slug"
 
     "$NEXTFLOW_INSTALL_PATH" -quiet -log "$BACKEND_SCRATCH_PATH/log_primer_sets-$(date +%F_%T)/" \
