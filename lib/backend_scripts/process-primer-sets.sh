@@ -33,7 +33,7 @@ while read -r taxon; do
   if [ "$line_count" -gt 0 ]; then
 
 
-    "$NEXTFLOW_INSTALL_PATH" -log "$BACKEND_SCRATCH_PATH/log_primer_sets-$(date +%F_%T)/" \
+    "$NEXTFLOW_INSTALL_PATH" -quiet -log "$BACKEND_SCRATCH_PATH/log_primer_sets-$(date +%F_%T)/" \
     run "$BACKEND_INSTALL_PATH/lib/process_primer_sets.nf" \
     -w "$BACKEND_SCRATCH_PATH/work_primer_sets/" \
     --primer_monitor_path "$BACKEND_INSTALL_PATH" \

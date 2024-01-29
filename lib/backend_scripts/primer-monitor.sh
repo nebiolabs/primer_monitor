@@ -21,7 +21,7 @@ while read -r taxon; do
   caller_script_name="$(cut -f 4 -d "," <<< "$taxon")"
   taxon_id="$(cut -f 5 -d "," <<< "$taxon")"
 
-  "$NEXTFLOW_INSTALL_PATH" -log "$BACKEND_SCRATCH_PATH/log_download-$(date +%F_%T)" \
+  "$NEXTFLOW_INSTALL_PATH" -quiet -log "$BACKEND_SCRATCH_PATH/log_download-$(date +%F_%T)" \
   run "$BACKEND_INSTALL_PATH/lib/summarize_variants.nf" \
   --ref "$BACKEND_INSTALL_PATH/igvstatic/$organism_slug/ref/$ref_accession.fasta" \
   -w "$BACKEND_SCRATCH_PATH/work_download/" \
