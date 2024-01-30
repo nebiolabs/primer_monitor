@@ -17,8 +17,8 @@ caller_name = params.caller_name
 params.caller_version =
 caller_version = params.caller_version
 
-params.dataset_version_str =
-dataset_version_str = params.dataset_version_str
+params.dataset_version =
+dataset_version_str = params.dataset_version
 
 process update_caller_dataset {
     cpus 1
