@@ -56,7 +56,7 @@ process update_caller_dataset {
       fi
       new_dataset_version="$new_dataset_version $dataset_name=$dataset_version"
 
-    done < <(echo "!{dataset_version_str}")
+    done < <(echo "!{dataset_version_str} ")
     # trailing space is intentional to make sure read gets the last word in the string
 
     # trim leading space
