@@ -45,7 +45,7 @@ process update_caller_dataset {
       rm -rf "!{primer_monitor_path}/datasets/!{taxon_id}/pending"
       nextclade dataset get --name="$dataset_name" --output-dir="!{primer_monitor_path}/datasets/!{taxon_id}/pending"
       dataset_version="$(python "!{primer_monitor_path}/lib/lineage_calling/dataset_update_nextflows/extract_dataset_version.py" \
-      "!{primer_monitor_path}/datasets/$(basename "$dataset_name")/pending/pathogen.json")"
+      "!{primer_monitor_path}/datasets/!{taxon_id}/pending/pathogen.json")"
       success="$?"
       if [ "$success" -ne 0 ]; then
         # skip this entire taxon and email an error
