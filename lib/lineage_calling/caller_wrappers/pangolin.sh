@@ -45,4 +45,4 @@ workdir="$(pwd)";
 
 pangolin "$workdir/$input_file" -t "$threads" -o "$workdir" \
 --outfile "$input_file.lineage_calls.csv" \
-${temp_dir:+"--tempdir $temp_dir"}; # run pangolin
+${temp_dir:+--tempdir "$temp_dir"}; # run pangolin
