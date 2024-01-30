@@ -63,7 +63,7 @@ while read -r taxon; do
   echo_log "Starting $caller_name dataset update on $taxon_id for $organism_slug"
 
   "$NEXTFLOW_INSTALL_PATH" -quiet -log "$BACKEND_SCRATCH_PATH/log_update-$(date +%F_%T)" \
-  run "$BACKEND_INSTALL_PATH/lib/dataset_update_wrappers/${caller_script_name}.nf" \
+  run "$BACKEND_INSTALL_PATH/lib/dataset_update_nextflows/${caller_script_name}.nf" \
   -w "$BACKEND_SCRATCH_PATH/work_dataset_update/" \
   --primer_monitor_path "$BACKEND_INSTALL_PATH" \
   --organism_slug "$organism_slug" \
