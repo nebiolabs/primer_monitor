@@ -62,28 +62,25 @@ while read -r taxon; do
 
   echo_log "Starting $caller_name dataset update on $taxon_id for $organism_slug"
 
-  tmpfile="$(mktemp)"
-
-  "$BACKEND_INSTALL_PATH/lib/lineage_calling/dataset_update_wrappers/${caller_script_name}.sh" \
-  "$organism_slug" "$taxon_id" "$caller_name" < <(echo "$dataset_version ") > "$tmpfile"
+  "$NEXTFLOW_INSTALL_PATH" -quiet -log "$BACKEND_SCRATCH_PATH/log_update-$(date +%F_%T)" \
+  run "$BACKEND_INSTALL_PATH/lib/dataset_update_wrappers/${caller_script_name}.nf" \
+  -w "$BACKEND_SCRATCH_PATH/work_dataset_update/" \
+  --primer_monitor_path "$BACKEND_INSTALL_PATH" \
+  --organism_slug "$organism_slug" \
+  --taxon_id "$taxon_id" \
+  --caller_name "$caller_name" \
+  --caller_version "$new_caller_version" \
+  --dataset_version "$dataset_version" \
+  -N "$NOTIFICATION_EMAILS" \
+  -c "$BACKEND_INSTALL_PATH/lib/nextflow.config"
   update_success="$?"
 
   if [ "$update_success" -ne 0 ]; then
-    rm "$tmpfile"
     echo_log "dataset update failed, skipping taxon"
     continue # skip this entire taxon if it failed
   fi
 
-  new_dataset_version="$(cat "$tmpfile")"
-
-  # set pending version
-  PGPASSFILE="$BACKEND_INSTALL_PATH/config/.pgpass" "$PSQL_INSTALL_PATH" -h "$DB_HOST" -d "$DB_NAME" -U "$DB_USER" \
-  -v "new_dataset_version=$new_dataset_version" -v "caller_name=$caller_name" \
-  <<< "UPDATE lineage_callers SET pending_dataset_versions=:'new_dataset_version' WHERE name=:'caller_name';"
-
-  rm "$tmpfile"
-
-  echo_log "$caller_name dataset updated to $new_dataset_version"
+  echo_log "$caller_name dataset updated"
 
   echo_log "processing taxon $taxon_id for $organism_slug, caller $caller_name"
 
