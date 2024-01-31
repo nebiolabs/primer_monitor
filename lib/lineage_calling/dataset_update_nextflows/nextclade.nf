@@ -60,7 +60,7 @@ process update_caller_dataset {
     # trailing space is intentional to make sure read gets the last word in the string
 
     # trim leading space
-    sed -E "s/^ //" <<< "$new_dataset_version"
+    new_dataset_version=$(sed -E "s/^ //" <<< "$new_dataset_version")
 
     # set pending version
     PGPASSFILE="!{primer_monitor_path}/config/.pgpass" psql -h "$DB_HOST" -d "$DB_NAME" -U "$DB_USER" \
