@@ -114,7 +114,8 @@ while read -r taxon; do
 SQL
       # move pending to current (and remove old current in the process)
       flock "$LOCK_PATH/primer_monitor_swap_datasets_$ENV_NAME.lock" \
-      bash -c "mv $BACKEND_INSTALL_PATH/datasets/$taxon_id/pending $BACKEND_INSTALL_PATH/datasets/$taxon_id/current";
+      bash -c "rm -rf $BACKEND_INSTALL_PATH/datasets/$taxon_id/current && \
+      mv $BACKEND_INSTALL_PATH/datasets/$taxon_id/pending $BACKEND_INSTALL_PATH/datasets/$taxon_id/current";
   fi
 
 done < <("$PSQL_INSTALL_PATH" -h "$DB_HOST" -d "$DB_NAME" -U "$DB_USER_RO" \
