@@ -112,10 +112,13 @@ while read -r taxon; do
       UPDATE lineage_callers SET version_specifiers=pending_version_specifiers,
       dataset_versions=pending_dataset_versions WHERE name=:'caller_name';
 SQL
-      # move pending to current (and remove old current in the process)
-      flock "$LOCK_PATH/primer_monitor_swap_datasets_$ENV_NAME.lock" \
-      bash -c "rm -rf $BACKEND_INSTALL_PATH/datasets/$taxon_id/current && \
-      mv $BACKEND_INSTALL_PATH/datasets/$taxon_id/pending $BACKEND_INSTALL_PATH/datasets/$taxon_id/current";
+      # if there is a dataset in $BACKEND_INSTALL_PATH/datasets
+      if [ -d "$BACKEND_INSTALL_PATH/datasets/$taxon_id" ]; then
+        # move pending to current (and remove old current in the process)
+        flock "$LOCK_PATH/primer_monitor_swap_datasets_$ENV_NAME.lock" \
+        bash -c "rm -rf $BACKEND_INSTALL_PATH/datasets/$taxon_id/current && \
+        mv $BACKEND_INSTALL_PATH/datasets/$taxon_id/pending $BACKEND_INSTALL_PATH/datasets/$taxon_id/current";
+      fi
   fi
 
 done < <("$PSQL_INSTALL_PATH" -h "$DB_HOST" -d "$DB_NAME" -U "$DB_USER_RO" \
