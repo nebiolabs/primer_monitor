@@ -191,10 +191,21 @@ for line in sys.stdin:
         parent = line.split(" ")[-1][1:].split("]")[0].strip()
         if parent == 'none':
             continue
-        if cur_lineage in rsv_lineage_data:
-            rsv_lineage_data[cur_lineage].append(parent)
-        else:
-            rsv_lineage_data[cur_lineage] = [parent]
+        lineage_split = cur_lineage.split(".")
+        parent_split = parent.split(".")
+        if lineage_split != parent_split:
+            # get rid of common suffix to get an alias
+            # e.g. this will convert "B.D.4.1.1 child of B.D.E.1"
+            # to "B.D.4.1 alias of B.D.E"
+            while lineage_split != parent_split:
+                lineage_split.pop()
+                parent_split.pop()
+            alias_cur = ".".join(lineage_split)
+            alias_parent = ".".join(parent_split)
+            if cur_lineage in rsv_lineage_data:
+                rsv_lineage_data[cur_lineage].append(parent)
+            else:
+                rsv_lineage_data[cur_lineage] = [parent]
 
 daily_new_seq_counts = {}
 

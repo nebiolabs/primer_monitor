@@ -18,8 +18,8 @@ def get_relevant_aliases(search_string, aliases):
     Gets all "unaliased" names for a lineage.
     """
     relevant_aliases = [search_string]
+    search_split = search_string.split(".")
     for alias in aliases.keys():
-        search_split = search_string.split(".")
         alias_split = alias.split(".")
         search_len = len(search_split)
         alias_len = len(alias_split)
