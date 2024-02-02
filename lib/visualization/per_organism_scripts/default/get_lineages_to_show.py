@@ -24,7 +24,7 @@ parser.add_argument('root-lineages')
 parser.add_argument('lineages-csv')
 parser.add_argument('seq-counts-csv')
 parser.add_argument('output-path')
-parser.add_argument('overrides-path', required=False)
+parser.add_argument('overrides-path', nargs='?')
 parsed_args = parser.parse_args()
 
 # ignores the other args
