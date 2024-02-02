@@ -193,11 +193,13 @@ for line in sys.stdin:
             continue
         lineage_split = cur_lineage.split(".")
         parent_split = parent.split(".")
-        if lineage_split != parent_split:
+        # does the child lineage simply have extra elements
+        min_len = min(len(parent_split), len(lineage_split))
+        if lineage_split[:min_len] != parent_split[:min_len]:
             # get rid of common suffix to get an alias
             # e.g. this will convert "B.D.4.1.1 child of B.D.E.1"
             # to "B.D.4.1 alias of B.D.E"
-            while lineage_split != parent_split:
+            while lineage_split[-1] == parent_split[-1]:
                 lineage_split.pop()
                 parent_split.pop()
             alias_cur = ".".join(lineage_split)
@@ -244,8 +246,7 @@ for override_lineage in overrides:
 
 lineage_groups = {}
 
-aliases_data = json.loads(rsv_lineage_data)
-reversed_aliases = get_lineage_names.reverse_aliases(aliases_data)
+reversed_aliases = get_lineage_names.reverse_aliases(rsv_lineage_data)
 
 print("{")
 for lineage_group in interesting_lineages:
