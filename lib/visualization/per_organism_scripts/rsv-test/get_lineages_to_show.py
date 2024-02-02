@@ -129,12 +129,12 @@ def get_descendant_lineages(result, base):
     return prefixes
 
 
-def get_lineages(alias_str, lineages_file, starting_lineages, seqs_per_day, lineage_metadata, conn, lineages=None,
+def get_lineages(lineage_tree, lineages_file, starting_lineages, seqs_per_day, lineage_metadata, conn, lineages=None,
                  root_lineages=None):
     """
     Recursively traverses the lineages tree to find "interesting" lineages.
 
-    :param alias_str: The Pango aliases_key file as a string
+    :param alias_str: The RSV lineage data as a dictionary
     :param lineages_file: A file listing all lineages in the database
     :param starting_lineages: The "root" lineages to start from for this recursive call
     :param seqs_per_day: Data on the number of new sequences each day.
@@ -152,7 +152,7 @@ def get_lineages(alias_str, lineages_file, starting_lineages, seqs_per_day, line
         root_lineages = set(starting_lineages)
     for lineage in starting_lineages:
         # get total seqs in this lineage group, and all lineage names
-        result, total, min_date, max_date, median_date = get_lineage_names.process_aliases(alias_str, lineages_file,
+        result, total, min_date, max_date, median_date = get_lineage_names.process_aliases(lineage_tree, lineages_file,
                                                                                            lineage, conn)
         # if this lineage is "interesting" (has more than cutoff # of seqs or is a root lineage)
         if lineage not in lineage_metadata:
@@ -164,7 +164,7 @@ def get_lineages(alias_str, lineages_file, starting_lineages, seqs_per_day, line
                           lineage_metadata) or lineage in root_lineages) and lineage not in lineages:
             # add it and repeat recursively on that lineage
             lineages.add(lineage)
-            lineages = get_lineages(alias_str, lineages_file, get_descendant_lineages(result, lineage), seqs_per_day,
+            lineages = get_lineages(lineage_tree, lineages_file, get_descendant_lineages(result, lineage), seqs_per_day,
                                     lineage_metadata, conn, lineages, root_lineages)
     return lineages
 
@@ -178,9 +178,23 @@ parser.add_argument('overrides-path', required=False)
 parsed_args = parser.parse_args()
 
 base_lineages = parsed_args.root_lineages.split(",")
-pango_aliases_data = sys.stdin.read()
 lineage_list_file = parsed_args.lineages_csv
 seqs_per_day_file = parsed_args.seq_counts_csv
+
+rsv_lineage_data = {}
+
+cur_lineage = None
+for line in sys.stdin:
+    if line.startswith("## "):
+        cur_lineage = line.split(" ")[-1].strip()
+    if " * parent:" in line:
+        parent = line.split(" ")[-1][1:].split("]")[0].strip()
+        if parent == 'none':
+            continue
+        if cur_lineage in rsv_lineage_data:
+            rsv_lineage_data[cur_lineage].append(parent)
+        else:
+            rsv_lineage_data[cur_lineage] = [parent]
 
 daily_new_seq_counts = {}
 
@@ -210,7 +224,7 @@ with open(parsed_args.lineages_csv) as f:
 
 db_conn = psycopg2.connect(
     "dbname=" + os.environ['DB_NAME'] + " user=" + os.environ['DB_USER_RO'] + " host=" + os.environ['DB_HOST'])
-interesting_lineages = get_lineages(pango_aliases_data, lineage_list_file, base_lineages, daily_new_seq_counts,
+interesting_lineages = get_lineages(rsv_lineage_data, lineage_list_file, base_lineages, daily_new_seq_counts,
                                     lineage_data, db_conn)
 db_conn.close()
 
@@ -219,16 +233,15 @@ for override_lineage in overrides:
 
 lineage_groups = {}
 
-aliases_data = json.loads(pango_aliases_data)
+aliases_data = json.loads(rsv_lineage_data)
 reversed_aliases = get_lineage_names.reverse_aliases(aliases_data)
 
 print("{")
 for lineage_group in interesting_lineages:
-    recorded_lineages = get_lineage_names.process_aliases(pango_aliases_data, lineage_list_file, lineage_group, None)[0]
-    # if this lineage group has a single alias name that is not a recombinant lineage (starts with X), use that name
+    recorded_lineages = get_lineage_names.process_aliases(rsv_lineage_data, lineage_list_file, lineage_group, None)[0]
+    # if this lineage group has a single alias name, use that name
     display_name = lineage_group + "*"
-    if lineage_group in reversed_aliases and len(reversed_aliases[lineage_group]) == 1 and not \
-            reversed_aliases[lineage_group][0].startswith("X"):
+    if lineage_group in reversed_aliases and len(reversed_aliases[lineage_group]) == 1:
         display_name = reversed_aliases[lineage_group][0] + "* (" + lineage_group + "*)"
     with open(output_path + "/" + lineage_group + ".txt", "w") as f:
         f.write(recorded_lineages)

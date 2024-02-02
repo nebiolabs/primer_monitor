@@ -17,16 +17,25 @@ overrides path: a path to a file listing a set of Pango lineage names to always 
 """
 
 import sys
+import argparse
+
+parser = argparse.ArgumentParser()
+parser.add_argument('root-lineages')
+parser.add_argument('lineages-csv')
+parser.add_argument('seq-counts-csv')
+parser.add_argument('output-path')
+parser.add_argument('overrides-path', required=False)
+parsed_args = parser.parse_args()
 
 # ignores the other args
-lineage_list_file = sys.argv[2]
+lineage_list_file = parsed_args.lineages_csv
 
-output_path = sys.argv[4]
+output_path = parsed_args.output_path
 
 overrides = []
 
-if len(sys.argv) >= 6:
-    overrides_file = sys.argv[5]
+if parsed_args.overrides_path is not None:
+    overrides_file = parsed_args.overrides_path
     with open(overrides_file) as f:
         for override_line in f:
             overrides.append(override_line.strip())
