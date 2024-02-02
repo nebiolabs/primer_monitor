@@ -153,7 +153,7 @@ def get_lineages(alias_str, lineages_file, starting_lineages, seqs_per_day, line
     for lineage in starting_lineages:
         # get total seqs in this lineage group, and all lineage names
         result, total, min_date, max_date, median_date = get_lineage_names.process_aliases(alias_str, lineages_file,
-                                                                                           lineage, conn)
+                                                                                           lineage, conn, organism_slug)
         # if this lineage is "interesting" (has more than cutoff # of seqs or is a root lineage)
         if lineage not in lineage_metadata:
             lineage_metadata[lineage] = {'num_seen': total,
@@ -174,6 +174,7 @@ parser.add_argument('root_lineages')
 parser.add_argument('lineages_csv')
 parser.add_argument('seq_counts_csv')
 parser.add_argument('output_path')
+parser.add_argument('organism_slug')
 parser.add_argument('overrides_path', nargs='?')
 parsed_args = parser.parse_args()
 
@@ -181,6 +182,7 @@ base_lineages = parsed_args.root_lineages.split(",")
 pango_aliases_data = sys.stdin.read()
 lineage_list_file = parsed_args.lineages_csv
 seqs_per_day_file = parsed_args.seq_counts_csv
+organism_slug = parsed_args.organism_slug
 
 daily_new_seq_counts = {}
 
@@ -210,7 +212,10 @@ with open(parsed_args.lineages_csv) as f:
 
 db_conn = psycopg2.connect(
     "dbname=" + os.environ['DB_NAME'] + " user=" + os.environ['DB_USER_RO'] + " host=" + os.environ['DB_HOST'])
-interesting_lineages = get_lineages(pango_aliases_data, lineage_list_file, base_lineages, daily_new_seq_counts,
+
+aliases_data = json.loads(pango_aliases_data)
+
+interesting_lineages = get_lineages(aliases_data, lineage_list_file, base_lineages, daily_new_seq_counts,
                                     lineage_data, db_conn)
 db_conn.close()
 
@@ -219,12 +224,12 @@ for override_lineage in overrides:
 
 lineage_groups = {}
 
-aliases_data = json.loads(pango_aliases_data)
 reversed_aliases = get_lineage_names.reverse_aliases(aliases_data)
 
 print("{")
 for lineage_group in interesting_lineages:
-    recorded_lineages = get_lineage_names.process_aliases(pango_aliases_data, lineage_list_file, lineage_group, None)[0]
+    recorded_lineages = get_lineage_names.process_aliases(aliases_data, lineage_list_file, lineage_group, None,
+                                                          organism_slug)[0]
     # if this lineage group has a single alias name that is not a recombinant lineage (starts with X), use that name
     display_name = lineage_group + "*"
     if lineage_group in reversed_aliases and len(reversed_aliases[lineage_group]) == 1 and not \

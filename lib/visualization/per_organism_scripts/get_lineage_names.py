@@ -1,15 +1,10 @@
 """
 Finds all descendant lineages of the given designation
-Usage: curl <pangolin alias_key.json URL> | python get_lineage_names.py <lineage>
 
-this is also imported as a module by get_lineages_to_show.py
+this is imported as a module by get_lineages_to_show.py
 """
 
-import json
-import sys
 import re
-import psycopg2
-import os
 import logging
 
 
@@ -56,13 +51,13 @@ def reverse_aliases(aliases_data):
     return reversed_aliases
 
 
-def process_aliases(lineage_parents, lineage_filename, search_string, db_conn):
+def process_aliases(aliases_data, lineage_filename, search_string, db_conn, organism_slug):
     """
     Recursively finds all descendant lineages of a given lineage recorded in the database.
     """
     output = ""
 
-    reversed_aliases = reverse_aliases(lineage_parents)
+    reversed_aliases = reverse_aliases(aliases_data)
 
     search_alias = re.sub(r'\.?\*$', '', search_string)  # remove trailing ".*" or "*" from name
 
@@ -101,18 +96,10 @@ def process_aliases(lineage_parents, lineage_filename, search_string, db_conn):
         (ORDER BY cast(extract(epoch FROM date_submitted) AS integer)))::date AS median_date \
         FROM fasta_records INNER JOIN lineage_calls ON lineage_calls.id=fasta_records.lineage_call_id \
         INNER JOIN lineages ON lineages.id=lineage_calls.lineage_id \
-        WHERE lineages.name IN %s;', (tuple(lineage_data),))
+        INNER JOIN organisms ON organisms.id=lineages.organism_id \
+        WHERE lineages.name IN %s AND organisms.slug=%s;', (tuple(lineage_data), organism_slug))
         num_seen, min_date, max_date, median_date = cur.fetchone()
         logging.debug(num_seen, min_date, max_date, median_date)
         cur.close()
     logging.debug(str([output, num_seen, min_date, max_date, median_date]))
     return [output, num_seen, min_date, max_date, median_date]
-
-
-if __name__ == "__main__":
-    conn = psycopg2.connect(
-        "dbname=" + os.environ['DB_NAME'] + " user=" + os.environ['DB_USER_RO'] + " host=" + os.environ['DB_HOST'])
-    result = process_aliases(sys.stdin.read(), sys.argv[2], sys.argv[1], conn)
-    conn.close()
-    print(result[0])
-    print("total," + str(result[1]))

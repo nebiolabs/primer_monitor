@@ -25,15 +25,15 @@ shift;
 case "$organism_slug" in
   "sars-cov-2")
     curl -Ssf https://raw.githubusercontent.com/cov-lineages/pango-designation/master/pango_designation/alias_key.json \
-      | python "$(dirname "$0")/per_organism_scripts/sars-cov-2/get_lineages_to_show.py" A,B "$@"
+      | python "$(dirname "$0")/per_organism_scripts/get_lineages_to_show_sars_cov_2.py" A,B "$@"
     ;;
   "rsv")
     cat <(curl -Ssf https://raw.githubusercontent.com/rsv-lineages/lineage-designation-A/main/.auto-generated/clades.md) \
         <(curl -Ssf https://raw.githubusercontent.com/rsv-lineages/lineage-designation-B/main/.auto-generated/clades.md) \
-        | python "$(dirname "$0")/per_organism_scripts/rsv/get_lineages_to_show.py" A,B "$@"
+        | python "$(dirname "$0")/per_organism_scripts/get_lineages_to_show_rsv.py" A,B "$@"
     ;;
   *)
-    python "$(dirname "$0")/per_organism_scripts/default/get_lineages_to_show.py" "" "$@"
+    python "$(dirname "$0")/per_organism_scripts/get_lineages_to_show_default.py" "" "$@"
     ;;
 esac
 

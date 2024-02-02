@@ -10,14 +10,13 @@ lineages CSV: the CSV of lineage data from get_lineage_data.sh
 
 seq counts CSV: a file of day-by-day sequence counts for each lineage
 
-lineage sets path: the path where lineage set definition files (a file listing every Pango lineage recorded in the lineage set) are output
+lineage sets path: the path where lineage set definition files are output
 
 overrides path: a path to a file listing a set of Pango lineage names to always consider "interesting"
 """
 import argparse
 import get_lineage_names
 import sys
-import json
 import datetime
 import psycopg2
 import os
@@ -134,7 +133,7 @@ def get_lineages(lineage_tree, lineages_file, starting_lineages, seqs_per_day, l
     """
     Recursively traverses the lineages tree to find "interesting" lineages.
 
-    :param alias_str: The RSV lineage data as a dictionary
+    :param lineage_tree: The RSV lineage data as a dictionary
     :param lineages_file: A file listing all lineages in the database
     :param starting_lineages: The "root" lineages to start from for this recursive call
     :param seqs_per_day: Data on the number of new sequences each day.
@@ -153,7 +152,7 @@ def get_lineages(lineage_tree, lineages_file, starting_lineages, seqs_per_day, l
     for lineage in starting_lineages:
         # get total seqs in this lineage group, and all lineage names
         result, total, min_date, max_date, median_date = get_lineage_names.process_aliases(lineage_tree, lineages_file,
-                                                                                           lineage, conn)
+                                                                                           lineage, conn, organism_slug)
         # if this lineage is "interesting" (has more than cutoff # of seqs or is a root lineage)
         if lineage not in lineage_metadata:
             lineage_metadata[lineage] = {'num_seen': total,
@@ -174,12 +173,14 @@ parser.add_argument('root_lineages')
 parser.add_argument('lineages_csv')
 parser.add_argument('seq_counts_csv')
 parser.add_argument('output_path')
+parser.add_argument('organism_slug')
 parser.add_argument('overrides_path', nargs='?')
 parsed_args = parser.parse_args()
 
 base_lineages = parsed_args.root_lineages.split(",")
 lineage_list_file = parsed_args.lineages_csv
 seqs_per_day_file = parsed_args.seq_counts_csv
+organism_slug = parsed_args.organism_slug
 
 rsv_lineage_data = {}
 
@@ -250,7 +251,8 @@ reversed_aliases = get_lineage_names.reverse_aliases(rsv_lineage_data)
 
 print("{")
 for lineage_group in interesting_lineages:
-    recorded_lineages = get_lineage_names.process_aliases(rsv_lineage_data, lineage_list_file, lineage_group, None)[0]
+    recorded_lineages = get_lineage_names.process_aliases(rsv_lineage_data, lineage_list_file, lineage_group, None,
+                                                          organism_slug)[0]
     # if this lineage group has a single alias name, use that name
     display_name = lineage_group + "*"
     if lineage_group in reversed_aliases and len(reversed_aliases[lineage_group]) == 1:
