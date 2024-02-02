@@ -138,3 +138,7 @@ ul:not(.menu-list) {
 {
   font-weight: bold;
 }
+
+.menu-list a.is-disabled {
+  background-color: whitesmoke !important;
+}

@@ -29,6 +29,7 @@ class Ability
     can :show, Organism
     can %i[index show], LineagesController
     can :index, LineageVariantsController
+    can :index, PrimerVariantSummariesController
     can %i[new create], User
     can %i[index read], PrimerSet, status: 'complete'
   end

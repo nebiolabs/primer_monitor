@@ -33,7 +33,13 @@
             <li><a href="<%= organism_primer_sets_url(organism.slug) %>">Primer Sets (<%=PrimerSet.where(organism_id: organism.id).count %>)</a></li>
             <li><a href="<%= organism_lineages_url(organism.slug) %>">Lineages (<%=Lineage.where(organism_id: organism.id).count %>)</a></li>
             <li><a href="<%= organism_lineage_variants_url(organism.slug) %>">Lineage Variants</a></li>
-            <li><a href="<%= organism_url(organism.slug) %>">Primer Variant Summary</a></li>
+            <li>
+              <% if organism.slug == 'sars-cov-2' %>
+                <a href="<%= organism_primer_variant_summaries_url(organism.slug) %>">Primer Variant Summary</a>
+              <% else %>
+                <a class="is-disabled">Primer Variant Summary - Coming Soon!</a>
+              <% end %>
+                </li>
           </ul>
         </aside>
         <% i=i+1 %>
