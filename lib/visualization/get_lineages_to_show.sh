@@ -20,7 +20,6 @@
 
 
 organism_slug="$1"
-shift;
 
 case "$organism_slug" in
   "sars-cov-2")

@@ -169,11 +169,11 @@ def get_lineages(lineage_tree, lineages_file, starting_lineages, seqs_per_day, l
 
 
 parser = argparse.ArgumentParser()
+parser.add_argument('organism_slug')
 parser.add_argument('root_lineages')
 parser.add_argument('lineages_csv')
 parser.add_argument('seq_counts_csv')
 parser.add_argument('output_path')
-parser.add_argument('organism_slug')
 parser.add_argument('overrides_path', nargs='?')
 parsed_args = parser.parse_args()
 
