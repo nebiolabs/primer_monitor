@@ -39,7 +39,7 @@
             <%= link_to 'Lineage Variants', organism_lineage_variants_path(organism.slug), class: 'navbar-item' %>
 
             <% if organism.slug == 'sars-cov-2' %>
-              <%= link_to 'Primer Variant Summary', organism_primer_variant_summaries_url(organism.slug), class: 'navbar-item' %>
+              <%= link_to 'Primer Variant Summary', organism_primer_variant_summary_url(organism.slug), class: 'navbar-item' %>
             <% else %>
               <span class="navbar-item">Primer Variant Summary - Coming Soon!</span>
             <% end %>

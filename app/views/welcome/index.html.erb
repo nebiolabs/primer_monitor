@@ -35,7 +35,7 @@
             <li><a href="<%= organism_lineage_variants_url(organism.slug) %>">Lineage Variants</a></li>
             <li>
               <% if organism.slug == 'sars-cov-2' %>
-                <a href="<%= organism_primer_variant_summaries_url(organism.slug) %>">Primer Variant Summary</a>
+                <a href="<%= organism_primer_variant_summary_url(organism.slug) %>">Primer Variant Summary</a>
               <% else %>
                 <a class="is-disabled">Primer Variant Summary - Coming Soon!</a>
               <% end %>

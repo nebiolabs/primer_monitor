@@ -2,8 +2,8 @@
 
 # this is the landing page for the application
 class PrimerVariantSummariesController < ApplicationController
-  def index
-    authorize! :index, PrimerVariantSummariesController
+  def show
+    authorize! :show, PrimerVariantSummariesController
     @organism = Organism.find_by(slug: params[:organism_name])
   end
 end
