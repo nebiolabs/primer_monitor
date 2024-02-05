@@ -144,5 +144,6 @@ done < <("$PSQL_INSTALL_PATH" -h "$DB_HOST" -d "$DB_NAME" -U "$DB_USER_RO" \
 -c "SELECT slug FROM organisms;" -t --csv);
 
 echo_log "rebuilding materialized views"
-RAILS_ENV=production ruby "$BACKEND_INSTALL_PATH/upload.rb" --rebuild_views
+PGPASSFILE="$BACKEND_INSTALL_PATH/config/.pgpass" "$PSQL_INSTALL_PATH" -h "$DB_HOST" -d "$DB_NAME" -U "$DB_USER" \
+-c "REFRESH MATERIALIZED VIEW lineage_info;";
 echo_log "done"
