@@ -1,19 +1,7 @@
 nextflow.enable.dsl=2
 
-params.pct_cutoff =
-pct_cutoff = params.pct_cutoff
-
-params.score_cutoff =
-score_cutoff = params.score_cutoff
-
-params.organism =
-organism = params.organism
-
 params.primer_monitor_path =
 primer_monitor_path = params.primer_monitor_path
-
-params.output_path =
-output_path = params.output_path
 
 params.taxon_id =
 taxon_id = params.taxon_id
@@ -26,10 +14,6 @@ lineage_caller_script = params.lineage_caller_script
 
 params.temp_dir = '/tmp'
 temp_dir = params.temp_dir
-
-params.override_path =
-override_path = params.override_path
-override_path = file(override_path).toAbsolutePath()
 
 process get_caller_version {
     cpus 1
@@ -204,19 +188,6 @@ process cleanup_old_calls {
     '''
 }
 
-process update_visualization_data {
-    cpus 8
-    conda "libiconv psycopg2 bedtools coreutils 'postgresql>=15' gawk bc"
-    input:
-        file complete
-    shell:
-    '''
-    # recompute the primer data for igvjs visualization
-    !{primer_monitor_path}/lib/visualization/update_visualization_data.sh -o !{override_path} !{primer_monitor_path} \
-    !{organism} !{pct_cutoff} !{score_cutoff} !{task.cpus} !{taxon_id}
-    '''
-}
-
 
 workflow {
     get_caller_version()
@@ -227,5 +198,4 @@ workflow {
     load_lineage_data(lineage_calls.out)
     update_calls(load_lineage_data.out.collect())
     cleanup_old_calls(update_calls.out)
-    update_visualization_data(update_calls.out)
 }

@@ -89,13 +89,8 @@ while read -r taxon; do
   run "$BACKEND_INSTALL_PATH/lib/lineage_calling/recall_lineages.nf" \
   -w "$BACKEND_SCRATCH_PATH/work_lineages/" \
   --primer_monitor_path "$BACKEND_INSTALL_PATH" \
-  --output_path "$BACKEND_SCRATCH_PATH" \
   --lineage_caller "$caller_name" \
   --lineage_caller_script "$caller_script_name" \
-  --pct_cutoff "$PCT_CUTOFF" \
-  --score_cutoff "$SCORE_CUTOFF" \
-  --override_path "$BACKEND_INSTALL_PATH/igvstatic/$organism_slug/overrides.txt" \
-  --organism "$organism_slug" \
   --taxon_id "$taxon_id" \
   --temp_dir "$TMPDIR" \
   -N "$NOTIFICATION_EMAILS" \
@@ -125,6 +120,28 @@ done < <("$PSQL_INSTALL_PATH" -h "$DB_HOST" -d "$DB_NAME" -U "$DB_USER_RO" \
 -c "SELECT o.slug,lc.name,lc.script_name,lc.version_specifiers,lc.dataset_versions,ot.ncbi_taxon_id \
 FROM organisms o INNER JOIN organism_taxa ot ON ot.organism_id=o.id LEFT JOIN lineage_callers lc \
 ON ot.caller_id=lc.id;" -t --csv);
+
+while read -r organism; do
+  organism_slug="$(cut -f 1 -d "," <<< "$organism")"
+
+  echo_log "updating visualization data for $organism_slug"
+
+  "$NEXTFLOW_INSTALL_PATH" -quiet -log "$BACKEND_SCRATCH_PATH/log_visualization-$(date +%F_%T)" \
+  run "$BACKEND_INSTALL_PATH/lib/update_visualization.nf" \
+  -w "$BACKEND_SCRATCH_PATH/work_visualization/" \
+  --primer_monitor_path "$BACKEND_INSTALL_PATH" \
+  --pct_cutoff "$PCT_CUTOFF" \
+  --score_cutoff "$SCORE_CUTOFF" \
+  --override_path "$BACKEND_INSTALL_PATH/igvstatic/$organism_slug/overrides.txt" \
+  --organism "$organism_slug" \
+  --temp_dir "$TMPDIR" \
+  -N "$NOTIFICATION_EMAILS" \
+  -c "$BACKEND_INSTALL_PATH/lib/nextflow.config";
+
+  echo_log "updated visualization data for $organism_slug"
+
+done < <("$PSQL_INSTALL_PATH" -h "$DB_HOST" -d "$DB_NAME" -U "$DB_USER_RO" \
+-c "SELECT slug FROM organisms;" -t --csv);
 
 echo_log "rebuilding materialized views"
 RAILS_ENV=production ruby "$BACKEND_INSTALL_PATH/upload.rb" --rebuild_views

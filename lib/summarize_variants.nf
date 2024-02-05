@@ -3,21 +3,11 @@ nextflow.enable.dsl = 2
 ref = params.ref
 ref = file(ref).toAbsolutePath()
 
-params.pct_cutoff =
-pct_cutoff = params.pct_cutoff
-
-params.score_cutoff =
-score_cutoff = params.score_cutoff
-
 params.primer_monitor_path =
 primer_monitor_path = params.primer_monitor_path
 
 params.output_path =
 output_path = params.output_path
-
-params.override_path =
-override_path = params.override_path
-override_path = file(override_path).toAbsolutePath()
 
 params.temp_dir = '/tmp'
 temp_dir = params.temp_dir
@@ -30,9 +20,6 @@ lineage_caller_script = params.lineage_caller_script
 
 params.taxon_id =
 taxon_id = params.taxon_id
-
-params.organism =
-organism = params.organism
 
 process download_data {
     // Downloads the full dataset
@@ -211,19 +198,6 @@ process load_to_db {
     '''
 }
 
-process update_visualization_data {
-    cpus 8
-    conda "libiconv psycopg2 bedtools coreutils 'postgresql>=15' gawk bc"
-    input:
-        file complete
-    shell:
-    '''
-    # recompute the primer data for igvjs visualization
-    !{primer_monitor_path}/lib/visualization/update_visualization_data.sh -o !{override_path} !{primer_monitor_path} \
-    !{organism} !{pct_cutoff} !{score_cutoff} !{task.cpus} !{taxon_id}
-    '''
-}
-
 workflow {
     download_data()
     extract_new_records(download_data.out)
@@ -237,5 +211,4 @@ workflow {
     seq_recs = align.out.join(lineage_calls.out)
 
     load_to_db(seq_recs)
-    update_visualization_data(load_to_db.out.collect())
 }
