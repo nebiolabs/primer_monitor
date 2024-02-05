@@ -59,8 +59,7 @@ while read -r organism; do
   --pct_cutoff "$PCT_CUTOFF" \
   --score_cutoff "$SCORE_CUTOFF" \
   --override_path "$BACKEND_INSTALL_PATH/igvstatic/$organism_slug/overrides.txt" \
-  --organism "$organism_slug" \
-  -N "$NOTIFICATION_EMAILS";
+  --organism "$organism_slug";
 
   echo_log "updated visualization data for $organism_slug"
 

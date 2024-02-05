@@ -71,7 +71,6 @@ while read -r taxon; do
   --caller_name "$caller_name" \
   --caller_version "$new_caller_version" \
   --dataset_version "$dataset_version" \
-  -N "$NOTIFICATION_EMAILS" \
   -c "$BACKEND_INSTALL_PATH/lib/nextflow.config"
   update_success="$?"
 
@@ -135,7 +134,6 @@ while read -r organism; do
   --override_path "$BACKEND_INSTALL_PATH/igvstatic/$organism_slug/overrides.txt" \
   --organism "$organism_slug" \
   --temp_dir "$TMPDIR" \
-  -N "$NOTIFICATION_EMAILS" \
   -c "$BACKEND_INSTALL_PATH/lib/nextflow.config";
 
   echo_log "updated visualization data for $organism_slug"
