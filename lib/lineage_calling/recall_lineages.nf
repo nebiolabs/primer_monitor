@@ -1,15 +1,15 @@
 nextflow.enable.dsl=2
 
-params.primer_monitor_path =
+assert params.primer_monitor_path != null : "--primer_monitor_path must be specified"
 primer_monitor_path = params.primer_monitor_path
 
-params.taxon_id =
+assert params.taxon_id != null : "--taxon_id must be specified"
 taxon_id = params.taxon_id
 
-params.lineage_caller =
+assert params.lineage_caller != null : "--lineage_caller must be specified"
 lineage_caller = params.lineage_caller
 
-params.lineage_caller_script =
+assert params.lineage_caller_script != null : "--lineage_caller_script must be specified"
 lineage_caller_script = params.lineage_caller_script
 
 params.temp_dir = '/tmp'
@@ -28,8 +28,6 @@ process get_caller_version {
 
     source "!{primer_monitor_path}/.env"
 
-    export PGPASSFILE="!{primer_monitor_path}/config/.pgpass"
-
     version_spec=$(PGPASSFILE="!{primer_monitor_path}/config/.pgpass" psql -h "$DB_HOST" -d "$DB_NAME" -U "$DB_USER" \
     -v "caller_name=!{lineage_caller}" <<< "SELECT pending_version_specifiers FROM lineage_callers WHERE name=:'caller_name';" -t --csv);
     '''
@@ -47,8 +45,7 @@ process download_data {
     shell:
     '''
 
-    TMPDIR="!{temp_dir}"
-    export TMPDIR
+    export TMPDIR="!{temp_dir}"
 
     date_today=$(date +%Y-%m-%d)
     datasets download virus genome taxon !{taxon_id} --complete-only --host human --filename tmp.zip
@@ -75,8 +72,7 @@ process extract_new_records {
     shell:
     '''
 
-    TMPDIR="!{temp_dir}"
-    export TMPDIR
+    export TMPDIR="!{temp_dir}"
 
     source "!{primer_monitor_path}/.env"
 
@@ -125,8 +121,7 @@ process lineage_calls {
     shell:
     '''
 
-    TMPDIR="!{temp_dir}"
-    export TMPDIR
+    export TMPDIR="!{temp_dir}"
 
     source "!{primer_monitor_path}/.env"
     export BACKEND_INSTALL_PATH

@@ -1,21 +1,22 @@
 nextflow.enable.dsl = 2
 
+assert params.primer_names != null : "--primer_names must be specified"
 primer_names = params.primer_names
 primer_names = file(primer_names).toAbsolutePath()
 
-params.pct_cutoff =
+assert params.primer_names != null : "--pct_cutoff must be specified"
 pct_cutoff = params.pct_cutoff
 
-params.score_cutoff =
+assert params.score_cutoff != null : "--score_cutoff must be specified"
 score_cutoff = params.score_cutoff
 
-params.primer_monitor_path =
+assert params.primer_monitor_path != null : "--primer_monitor_path must be specified"
 primer_monitor_path = params.primer_monitor_path
 
-params.organism =
+assert params.organism != null : "--organism must be specified"
 organism = params.organism
 
-params.override_path =
+assert params.override_path != null : "--override_path must be specified"
 override_path = params.override_path
 override_path = file(override_path).toAbsolutePath()
 

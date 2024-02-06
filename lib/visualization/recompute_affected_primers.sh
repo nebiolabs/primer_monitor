@@ -16,7 +16,6 @@ primer_sets_list_path="$5";
 organism_slug="$6";
 threads="$7"
 
-# defines echo_log function
 source "$(dirname "$0")/../echo_log.sh"
 
 echo_log "overlap computation started"

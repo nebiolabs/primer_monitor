@@ -5,19 +5,19 @@
   <thead>
     <tr>
       <th>Name</th>
-      <th>Ncbi taxon</th>
+      <th>Ncbi taxa</th>
       <th colspan="3"></th>
     </tr>
   </thead>
 
   <tbody>
-    <% @organisms.each do |organism| %>
+    <% @organism_data.each do |organism| %>
       <tr>
-        <td><%= organism.full_name %></td>
-        <td>TODO</td>
-        <td><%= link_to 'Show', organism_path(organism.name) %></td>
-        <td><%= link_to 'Edit', edit_organism_path(organism.name) %></td>
-        <td><%= link_to 'Destroy', organism_path(organism.name), method: :delete, data: { confirm: 'Are you sure?' } %></td>
+        <td><%= organism[:organism].full_name %></td>
+        <td><%= organism[:taxa].pluck(:ncbi_taxon_id).join ',' %></td>
+        <td><%= link_to 'Show', organism_path(organism[:organism].name) %></td>
+        <td><%= link_to 'Edit', edit_organism_path(organism[:organism].name) %></td>
+        <td><%= link_to 'Destroy', organism_path(organism[:organism].name), method: :delete, data: { confirm: 'Are you sure?' } %></td>
       </tr>
     <% end %>
   </tbody>

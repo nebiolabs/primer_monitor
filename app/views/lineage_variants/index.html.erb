@@ -12,6 +12,7 @@
   <p>The score listed for a variant is the percent of sequences it occurs in for the selected lineage set.
   The score listed for a primer is determined by the scoring algorithm described below.</p>
 </div>
+<% if @data_fetched %>
 <form id="primer_set_selection">
   <p>Lineage:</p>
   <div class="columns is-multiline is-gapless">
@@ -57,6 +58,13 @@
 <p id="config" class="invisible"><%= @config.to_json %></p>
 <p id="lineage_set_json" class="invisible"><%= lineage_sets_map.to_json %></p>
 <div id="igv" class="igv_div"></div>
+<% else %>
+  <article class="message is-danger">
+    <div class="message-body">
+      <p>There was an error fetching the visualization data files, so the visualization cannot be displayed.</p>
+    </div>
+  </article>
+<% end %>
 <hr/>
 <div class="block">
   <h2 class="title">Calculating variant impact:</h2>

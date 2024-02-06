@@ -7,7 +7,11 @@ class OrganismsController < ApplicationController
   # GET /organisms
   # GET /organisms.json
   def index
-    @organisms = Organism.all
+    organisms = Organism.all
+    @organism_data = []
+    organisms.each do |organism|
+      @organism_data << { 'organism': organism, 'taxa': OrganismTaxon.where(organism_id: organism.id) }
+    end
   end
 
   # GET /organisms/1

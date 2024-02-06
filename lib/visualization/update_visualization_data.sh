@@ -38,7 +38,6 @@ pct_cutoff="$3"
 score_cutoff="$4"
 cpus="$5"
 
-# defines echo_log function
 source "$(dirname "$0")/../echo_log.sh"
 
 echo_log "primer recomputation started"

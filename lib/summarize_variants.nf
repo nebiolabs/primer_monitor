@@ -1,24 +1,25 @@
 nextflow.enable.dsl = 2
 
+assert params.ref != null : "--ref must be specified"
 ref = params.ref
 ref = file(ref).toAbsolutePath()
 
-params.primer_monitor_path =
+assert params.primer_monitor_path != null : "--primer_monitor_path must be specified"
 primer_monitor_path = params.primer_monitor_path
 
-params.output_path =
+assert params.output_path != null : "--output_path must be specified"
 output_path = params.output_path
 
 params.temp_dir = '/tmp'
 temp_dir = params.temp_dir
 
-params.lineage_caller =
+assert params.lineage_caller != null : "--lineage_caller must be specified"
 lineage_caller = params.lineage_caller
 
-params.lineage_caller_script =
+assert params.lineage_caller_script != null : "--lineage_caller_script must be specified"
 lineage_caller_script = params.lineage_caller_script
 
-params.taxon_id =
+assert params.taxon_id != null : "--taxon_id must be specified"
 taxon_id = params.taxon_id
 
 process download_data {
@@ -27,7 +28,7 @@ process download_data {
     conda "ncbi-datasets-cli unzip zstd"
     errorStrategy 'retry'
     maxRetries 2
-    publishDir "${output_path}", mode: 'link', pattern: '*.zst', overwrite: true
+    publishDir "${output_path}", mode: 'copy', pattern: '*.zst', overwrite: true
     // mode "link" assumes that the output path is on the same disk as the work directory, switch to copy if not
     output:
         tuple file('*.metadata.zst'), file('*.sequences.zst')
@@ -35,8 +36,7 @@ process download_data {
     shell:
     '''
 
-    TMPDIR="!{temp_dir}"
-    export TMPDIR
+    export TMPDIR="!{temp_dir}"
 
     date_today=$(date +%Y-%m-%d)
     datasets download virus genome taxon !{taxon_id} --complete-only --host human --filename tmp.zip
@@ -62,8 +62,7 @@ process extract_new_records {
     shell:
     '''
 
-    TMPDIR="!{temp_dir}"
-    export TMPDIR
+    export TMPDIR="!{temp_dir}"
 
     source "!{primer_monitor_path}/.env"
 
@@ -114,8 +113,7 @@ process align {
     shell:
     '''
 
-        TMPDIR="!{temp_dir}"
-        export TMPDIR
+        export TMPDIR="!{temp_dir}"
 
         date_today=$(date +%Y-%m-%d)
 
@@ -143,8 +141,6 @@ process get_caller_version {
 
     source "!{primer_monitor_path}/.env"
 
-    export PGPASSFILE="!{primer_monitor_path}/config/.pgpass"
-
     version_spec=$(PGPASSFILE="!{primer_monitor_path}/config/.pgpass" psql -h "$DB_HOST" -d "$DB_NAME" -U "$DB_USER" \
     -v "caller_name=!{lineage_caller}" <<< "SELECT version_specifiers FROM lineage_callers WHERE name=:'caller_name';" -t --csv);
     '''
@@ -161,8 +157,7 @@ process lineage_calls {
     shell:
     '''
 
-    TMPDIR="!{temp_dir}"
-    export TMPDIR
+    export TMPDIR="!{temp_dir}"
 
     source "!{primer_monitor_path}/.env"
     export BACKEND_INSTALL_PATH

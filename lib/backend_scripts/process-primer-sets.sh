@@ -6,7 +6,6 @@
 
 dotenv_path=$1
 
-# defines echo_log function
 source "$(dirname "$0")/../echo_log.sh"
 
 # shellcheck source=../../.env

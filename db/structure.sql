@@ -1862,6 +1862,13 @@ CREATE INDEX index_organism_taxa_on_organism_id ON public.organism_taxa USING bt
 
 
 --
+-- Name: index_organisms_on_slug; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_organisms_on_slug ON public.organisms USING btree (slug);
+
+
+--
 -- Name: index_primer_set_subscriptions_on_primer_set_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -2496,6 +2503,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20231215144315'),
 ('20231218110805'),
 ('20240124111845'),
-('20240126135630');
+('20240126135630'),
+('20240206123456');
 
 
