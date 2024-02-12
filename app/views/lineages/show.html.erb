@@ -9,9 +9,9 @@
 
 <p><span class="bold-text">Last seen on:</span> <%= @lineage_info['last_seen'].nil? ? 'N/A' : @lineage_info['last_seen'] %></p>
 
-<% if @lineage.organism.name == "SARS-CoV-2" # this only makes sense for SARS-CoV-2 %>
+<% unless @lineage.external_link.nil? %>
 <br>
-<p><span class="bold-text">More data on outbreak.info:</span> <a href="https://outbreak.info/situation-reports/<%= @lineage.name %>">https://outbreak.info/situation-reports/<%= @lineage.name %></a></p>
+<p><span class="bold-text">More data:</span> <a href="<%= @lineage.external_link %>"><%= @lineage.external_link %></a></p>
 <% end %>
 
 <br>
