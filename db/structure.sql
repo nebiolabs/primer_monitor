@@ -961,7 +961,8 @@ CREATE TABLE public.lineages (
     caller_name character varying,
     organism_id bigint NOT NULL,
     created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL
+    updated_at timestamp(6) without time zone NOT NULL,
+    external_link character varying
 );
 
 
@@ -2504,6 +2505,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20231218110805'),
 ('20240124111845'),
 ('20240126135630'),
-('20240206123456');
+('20240206123456'),
+('20240206170340');
 
 
