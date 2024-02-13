@@ -53,5 +53,5 @@ nextclade run --input-dataset "$BACKEND_INSTALL_PATH/datasets/$dataset_path" \
 "$workdir/$input_file" # run nextclade
 
 # swap semicolons and commas, remove initial index column
-tr ",;" ";," < "$input_file.lineage_calls.csv.tmp" | cut -f 2- -d "," | awk '{ OFS = ","; print "", $0}' > "$input_file.lineage_calls.csv"
+tr ",;" ";," < "$input_file.lineage_calls.csv.tmp" | cut -f 2- -d "," > "$input_file.lineage_calls.csv"
 rm "$input_file.lineage_calls.csv.tmp"

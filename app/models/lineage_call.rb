@@ -25,7 +25,7 @@ class LineageCall < ApplicationRecord
   end
 
   def self.build_lineage_call(line, caller_id)
-    (taxon, lineage, metadata) = line.chomp.split(',', 3)
+    (taxon, lineage, metadata) = line.chomp.split(',', 4)
 
     return unless taxon && lineage
 

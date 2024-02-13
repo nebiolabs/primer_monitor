@@ -44,9 +44,5 @@ input_file="$1"
 workdir="$(pwd)";
 
 pangolin "$workdir/$input_file" -t "$threads" -o "$workdir" \
---outfile "$input_file.lineage_calls.csv.tmp" \
+--outfile "$input_file.lineage_calls.csv" \
 ${temp_dir:+--tempdir "$temp_dir"}; # run pangolin
-
-# add external link
-awk '{ OFS = ","; print "https://outbreak.info/situation-reports?pango=" $2, $0}' < "$input_file.lineage_calls.csv.tmp" > "$input_file.lineage_calls.csv"
-rm "$input_file.lineage_calls.csv.tmp"
