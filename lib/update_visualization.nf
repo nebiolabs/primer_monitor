@@ -1,6 +1,6 @@
 nextflow.enable.dsl = 2
 
-assert params.primer_names != null : "--pct_cutoff must be specified"
+assert params.pct_cutoff != null : "--pct_cutoff must be specified"
 pct_cutoff = params.pct_cutoff
 
 assert params.score_cutoff != null : "--score_cutoff must be specified"
