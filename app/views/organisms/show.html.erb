@@ -28,6 +28,15 @@
 
 <hr/>
 
-<%= link_to 'Primer Sets', organism_primer_sets_path(@organism.slug) %>
+<ul>
+  <li><%= link_to 'Primer Sets', organism_primer_sets_path(@organism.slug) %></li>
+  <li><%= link_to 'Lineages', organism_lineages_path(@organism.slug) %></li>
+  <li><%= link_to 'Lineage Variants', organism_lineage_variants_path(@organism.slug) %></li>
+  <% if @organism.slug == 'sars-cov-2' %>
+    <li><%= link_to 'Primer Variant Summary', organism_primer_variant_summary_url(@organism.slug) %></li>
+  <% else %>
+    <li>Primer Variant Summary - Coming Soon!<li>
+  <% end %>
+</ul>
 
 <%= javascript_pack_tag "organisms_show" %>
