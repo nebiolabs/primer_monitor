@@ -171,7 +171,8 @@ process load_to_db {
     publishDir "${output_path}", mode: 'copy'
     errorStrategy 'retry'
     maxRetries 10
-    maxForks 1
+    // don't use all the connections
+    maxForks 10
 
     conda "'postgresql>=15'"
 

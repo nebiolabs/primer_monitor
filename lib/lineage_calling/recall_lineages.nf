@@ -134,6 +134,8 @@ process load_lineage_data {
     cpus 1
     errorStrategy 'retry'
     maxRetries 10
+    // don't use all the connections
+    maxForks 10
 
     conda "'postgresql>=15'"
 
