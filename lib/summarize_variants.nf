@@ -25,6 +25,7 @@ taxon_id = params.taxon_id
 process download_data {
     // Downloads the full dataset
     cpus 16
+    memory '35 GB'
     conda "ncbi-datasets-cli unzip zstd"
     errorStrategy 'retry'
     maxRetries 2
@@ -52,6 +53,7 @@ process download_data {
 process extract_new_records {
     // Keeps only new records added since previous run
     cpus 1
+    memory '8 GB'
     conda "python=3.9 zstd seqtk 'postgresql>=15'"
 
     input:
@@ -148,6 +150,7 @@ process get_caller_version {
 
 process lineage_calls {
     cpus 8
+    memory '25 GB'
     conda "${version_spec}"
     input:
         val version_spec

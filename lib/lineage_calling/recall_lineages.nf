@@ -36,6 +36,7 @@ process get_caller_version {
 process download_data {
     // Downloads the full dataset
     cpus 16
+    memory '35 GB'
     conda "ncbi-datasets-cli unzip zstd"
     errorStrategy 'retry'
     maxRetries 2
@@ -63,7 +64,7 @@ process extract_new_records {
     // Get all (deduplicated) records currently in the database
     cpus 1
     conda "python=3.9 zstd seqtk 'postgresql>=15'"
-
+    memory '8 GB'
     input:
         tuple file(metadata_json), file(sequences_fasta)
     output:
@@ -112,6 +113,7 @@ process transform_data {
 
 process lineage_calls {
     cpus 8
+    memory '25 GB'
     conda "${version_spec}"
     input:
         val version_spec
