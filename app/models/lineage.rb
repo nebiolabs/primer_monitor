@@ -2,17 +2,25 @@
 
 class Lineage < ApplicationRecord
   belongs_to :organism
-  has_many :pangolin_calls, dependent: :destroy
-  has_many :fasta_records, through: :pangolin_calls
+  has_many :lineage_calls, dependent: :destroy
+  has_many :fasta_records, through: :lineage_calls
 
-  def self.parse(pangolin_csv)
-    raise "Unable to find calls file #{pangolin_csv}" unless File.exist?(pangolin_csv)
+  def self.external_link_url(organism, lineage_name)
+    # expand this with new organisms as support is added for them
+    case organism.slug
+    when 'sars-cov-2'
+      "https://outbreak.info/situation-reports?pango=#{lineage_name}"
+    end
+  end
+
+  def self.parse(calls_csv, organism, caller_id)
+    raise "Unable to find calls file #{calls_csv}" unless File.exist?(calls_csv)
 
     new_lineage_names = Set[] # new empty set
     record_count = 0
 
-    File.readlines(pangolin_csv).each do |line|
-      next if line.start_with?('taxon,')
+    File.readlines(calls_csv).each do |line|
+      next if line.start_with?('taxon,', 'seqName,')
 
       record_count += 1
       new_lineage = parse_record(line)
@@ -20,29 +28,27 @@ class Lineage < ApplicationRecord
     end
 
     # if there are no records (not only pre-existing lineages, but nothing at all)
-    raise "Unable to parse any records from #{pangolin_csv}" if record_count.zero?
+    raise "Unable to parse any records from #{calls_csv}" if record_count.zero?
 
     new_lineages = []
 
-    sarscov2_id = Organism.find_by(ncbi_taxon_id: 2_697_049).id # hardcoded SARS-CoV-2 id for now
-
     new_lineage_names.each do |lineage_name|
-      new_lineages << Lineage.new(name: lineage_name, caller_name: 'pangolin', organism_id: sarscov2_id)
+      new_lineages << Lineage.new(name: lineage_name, caller_name: LineageCaller.find_by(id: caller_id).name,
+                                  organism_id: organism.id, external_link: external_link_url(organism, lineage_name) )
     end
 
     new_lineages
   end
 
   def self.parse_record(line)
-    if line.chomp.split("\t")[1].blank? || line.chomp.split(',')[1].nil?
-      ActiveRecord::Base.logger.info line.chomp.split(',')
-    end
+    fields = line.chomp.split(',')
+    ActiveRecord::Base.logger.info fields if line.chomp.split("\t")[1].blank? || fields.nil?
 
     # prevent trying to re-add lineages that are already in the database
-    if Lineage.exists? name: line.chomp.split(',')[1]
+    if Lineage.exists? name: fields[1]
       nil
     else
-      line.chomp.split(',')[1]
+      fields[1]
     end
   end
 end

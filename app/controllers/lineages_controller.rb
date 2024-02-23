@@ -4,14 +4,15 @@ class LineagesController < ApplicationController
   def index
     authorize! :index, LineagesController
     if params.key? :organism_name
-      @organism = Organism.find_by(name: params[:organism_name])
+      @organism = Organism.find_by(slug: params[:organism_name])
 
       query = <<-SQL
         SELECT name, times_seen, last_seen FROM lineage_info WHERE organism_id=?;
       SQL
       @lineages = ActiveRecord::Base.connection.execute(ActiveRecord::Base.sanitize_sql([query, @organism.id])).to_a
     else
-      redirect_to lineage_variants_url, status: :moved_permanently
+      # hardcoded legacy redirect
+      redirect_to organism_lineage_variants_url(Organism.find_by(slug: 'sars-cov-2').slug), status: :moved_permanently
     end
   end
 

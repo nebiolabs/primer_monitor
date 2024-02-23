@@ -7,15 +7,23 @@ class OrganismsController < ApplicationController
   # GET /organisms
   # GET /organisms.json
   def index
-    @organisms = Organism.all
+    organisms = Organism.all
+    @organism_data = []
+    organisms.each do |organism|
+      @organism_data << { 'organism': organism, 'taxa': OrganismTaxon.where(organism_id: organism.id) }
+    end
   end
 
   # GET /organisms/1
   # GET /organisms/1.json
   def show
-    @subscriptions = PrimerSetSubscription.subscriptions_for_user_by_primer_set(current_user)
+    @organism = Organism.find_by(slug: params[:name])
 
     @config, @primer_sets = @organism.primer_sets_config
+
+    variants_url = URI("#{@config[:data_server]}/#{@config[:organism_slug]}/lineage_variants/all.bed")
+
+    @config[:variants_exist] = (Net::HTTP.get_response(URI(variants_url)).code == '200')
   end
 
   # GET /organisms/new
@@ -75,7 +83,7 @@ class OrganismsController < ApplicationController
 
   # Only allow a list of trusted parameters through.
   def organism_params
-    params.require(:organism).permit(:name, :alias, :ncbi_taxon_id)
+    params.require(:organism).permit(:name, :alias, :slug)
   end
 
   def to_param

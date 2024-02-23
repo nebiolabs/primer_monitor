@@ -4,7 +4,7 @@ body {
   color: #333;
   margin: 33px; }
 
-body, p, ol, ul, td {
+body, p, ol, ul:not(.menu-list), td {
   font-family: verdana, arial, helvetica, sans-serif;
   font-size: 13px;
   line-height: 18px; }
@@ -55,6 +55,6 @@ div.actions {
 label {
   display: block;
 }
-ul {
+ul:not(.menu-list) {
   list-style: unset;
 }

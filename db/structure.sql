@@ -198,8 +198,9 @@ CREATE TABLE public.fasta_records (
     date_submitted date,
     pangolin_lineage text,
     pangolin_version text,
-    pangolin_call_id bigint,
-    pending_pangolin_call_id bigint
+    lineage_call_id bigint,
+    pending_lineage_call_id bigint,
+    organism_taxon_id bigint
 );
 
 
@@ -416,6 +417,21 @@ CREATE VIEW public.join_subscribed_location_to_ids AS
 
 
 --
+-- Name: oligo_alignment_positions; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.oligo_alignment_positions (
+    id bigint NOT NULL,
+    organism_taxon_id bigint NOT NULL,
+    oligo_id bigint NOT NULL,
+    ref_start integer NOT NULL,
+    ref_end integer NOT NULL,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
 -- Name: oligos; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -428,8 +444,6 @@ CREATE TABLE public.oligos (
     updated_at timestamp(6) without time zone NOT NULL,
     locus character varying,
     category public.oligo_category,
-    ref_start bigint,
-    ref_end bigint,
     short_name character varying,
     strand character varying
 );
@@ -531,7 +545,8 @@ CREATE TABLE public.variant_sites (
     updated_at timestamp(6) without time zone NOT NULL,
     ref_end integer NOT NULL,
     usable_del_or_snp boolean GENERATED ALWAYS AS (((((variant_type)::text = 'D'::text) OR ((variant_type)::text = 'X'::text)) AND ((variant)::text !~~ '%N%'::text))) STORED,
-    usable_insertion boolean GENERATED ALWAYS AS ((((variant_type)::text = 'I'::text) AND ((variant)::text !~~ '%N%'::text))) STORED
+    usable_insertion boolean GENERATED ALWAYS AS ((((variant_type)::text = 'I'::text) AND ((variant)::text !~~ '%N%'::text))) STORED,
+    organism_taxon_id bigint
 );
 
 
@@ -542,8 +557,9 @@ CREATE TABLE public.variant_sites (
 CREATE MATERIALIZED VIEW public.variant_overlaps AS
  SELECT oligos.id AS oligo_id,
     oligos.name AS oligo_name,
-    oligos.ref_start AS oligo_start,
-    oligos.ref_end AS oligo_end,
+    oligo_alignment_positions.ref_start AS oligo_start,
+    oligo_alignment_positions.ref_end AS oligo_end,
+    oligo_alignment_positions.organism_taxon_id AS alignment_organism_taxon_id,
     oligos.short_name AS oligo_short_name,
     oligos.locus AS oligo_locus_name,
     oligos.category AS oligo_primer_type,
@@ -560,18 +576,19 @@ CREATE MATERIALIZED VIEW public.variant_overlaps AS
     COALESCE(detailed_geo_locations.subdivision, ''::character varying) AS subdivision,
     detailed_geo_locations.id AS detailed_geo_location_id,
     COALESCE(fasta_records.date_collected, '1900-01-01'::date) AS date_collected
-   FROM ((((public.variant_sites
-     JOIN public.fasta_records ON (((variant_sites.fasta_record_id = fasta_records.id) AND (fasta_records.date_collected > ( SELECT (max(fr.date_collected) - '168 days'::interval)
-           FROM public.fasta_records fr)))))
+   FROM (((((public.variant_sites
+     JOIN public.fasta_records ON ((variant_sites.fasta_record_id = fasta_records.id)))
      JOIN public.detailed_geo_locations ON ((fasta_records.detailed_geo_location_id = detailed_geo_locations.id)))
-     JOIN public.oligos ON ((NOT ((oligos.ref_start >= variant_sites.ref_end) OR (oligos.ref_end <= variant_sites.ref_start)))))
-     JOIN public.primer_sets ON (((oligos.primer_set_id = primer_sets.id) AND (primer_sets.status = 'complete'::public.primer_set_status))))
+     JOIN public.oligo_alignment_positions ON (((NOT ((oligo_alignment_positions.ref_start >= variant_sites.ref_end) OR (oligo_alignment_positions.ref_end <= variant_sites.ref_start))) AND (fasta_records.organism_taxon_id = oligo_alignment_positions.organism_taxon_id))))
+     JOIN public.oligos ON ((oligos.id = oligo_alignment_positions.oligo_id)))
+     JOIN public.primer_sets ON ((oligos.primer_set_id = primer_sets.id)))
   WHERE (variant_sites.usable_del_or_snp = true)
 UNION ALL
  SELECT oligos.id AS oligo_id,
     oligos.name AS oligo_name,
-    oligos.ref_start AS oligo_start,
-    oligos.ref_end AS oligo_end,
+    oligo_alignment_positions.ref_start AS oligo_start,
+    oligo_alignment_positions.ref_end AS oligo_end,
+    oligo_alignment_positions.organism_taxon_id AS alignment_organism_taxon_id,
     oligos.short_name AS oligo_short_name,
     oligos.locus AS oligo_locus_name,
     oligos.category AS oligo_primer_type,
@@ -588,12 +605,12 @@ UNION ALL
     COALESCE(detailed_geo_locations.subdivision, ''::character varying) AS subdivision,
     detailed_geo_locations.id AS detailed_geo_location_id,
     COALESCE(fasta_records.date_collected, '1900-01-01'::date) AS date_collected
-   FROM ((((public.variant_sites
-     JOIN public.fasta_records ON (((variant_sites.fasta_record_id = fasta_records.id) AND (fasta_records.date_collected > ( SELECT (max(fr.date_collected) - '168 days'::interval)
-           FROM public.fasta_records fr)))))
+   FROM (((((public.variant_sites
+     JOIN public.fasta_records ON ((variant_sites.fasta_record_id = fasta_records.id)))
      JOIN public.detailed_geo_locations ON ((fasta_records.detailed_geo_location_id = detailed_geo_locations.id)))
-     JOIN public.oligos ON (((variant_sites.ref_start > oligos.ref_start) AND (variant_sites.ref_start <= oligos.ref_end))))
-     JOIN public.primer_sets ON (((oligos.primer_set_id = primer_sets.id) AND (primer_sets.status = 'complete'::public.primer_set_status))))
+     JOIN public.oligo_alignment_positions ON (((NOT ((oligo_alignment_positions.ref_start >= variant_sites.ref_end) OR (oligo_alignment_positions.ref_end <= variant_sites.ref_start))) AND (fasta_records.organism_taxon_id = oligo_alignment_positions.organism_taxon_id))))
+     JOIN public.oligos ON ((oligos.id = oligo_alignment_positions.oligo_id)))
+     JOIN public.primer_sets ON ((oligos.primer_set_id = primer_sets.id)))
   WHERE (variant_sites.usable_insertion = true)
   WITH NO DATA;
 
@@ -607,6 +624,7 @@ CREATE MATERIALIZED VIEW public.oligo_variant_overlaps AS
     variant_overlaps.oligo_name,
     variant_overlaps.oligo_start,
     variant_overlaps.oligo_end,
+    variant_overlaps.alignment_organism_taxon_id,
     variant_overlaps.oligo_short_name,
     variant_overlaps.oligo_locus_name,
     variant_overlaps.oligo_primer_type,
@@ -641,6 +659,7 @@ UNION ALL
     variant_overlaps.oligo_name,
     variant_overlaps.oligo_start,
     variant_overlaps.oligo_end,
+    variant_overlaps.alignment_organism_taxon_id,
     variant_overlaps.oligo_short_name,
     variant_overlaps.oligo_locus_name,
     variant_overlaps.oligo_primer_type,
@@ -758,9 +777,9 @@ CREATE MATERIALIZED VIEW public.identify_primers_for_notifications AS
              JOIN public.oligo_variant_overlaps ON ((oligo_variant_overlaps.oligo_id = oligos.id)))
              JOIN public.join_subscribed_location_to_ids ON (((join_subscribed_location_to_ids.user_id = primer_set_subscriptions.user_id) AND (join_subscribed_location_to_ids.detailed_geo_location_id = oligo_variant_overlaps.detailed_geo_location_id))))
              JOIN public.users ON ((users.id = primer_set_subscriptions.user_id)))
-          WHERE ((oligo_variant_overlaps.date_collected >= (CURRENT_DATE - users.lookback_days)) AND (primer_set_subscriptions.active = true))
+          WHERE (oligo_variant_overlaps.date_collected >= (CURRENT_DATE - users.lookback_days))
           GROUP BY primer_set_subscriptions.user_id, primer_set_subscriptions.primer_set_id, primer_sets.name, oligos.id, oligos.name, join_subscribed_location_to_ids.detailed_geo_location_id, users.lookback_days, users.variant_fraction_threshold, oligo_variant_overlaps.region, oligo_variant_overlaps.subregion, oligo_variant_overlaps.division, oligo_variant_overlaps.subdivision, oligo_variant_overlaps.coords, oligo_variant_overlaps.detailed_geo_location_id
-        ), total_sequences_for_denominator AS (
+        ), second_query AS (
          SELECT fasta_records.detailed_geo_location_id,
             count(fasta_records.id) AS records_count,
             users.lookback_days
@@ -782,13 +801,13 @@ CREATE MATERIALIZED VIEW public.identify_primers_for_notifications AS
     first_query.subdivision,
     first_query.coords,
     first_query.variant_count,
-    total_sequences_for_denominator.records_count,
     first_query.variant_fraction_threshold,
-    total_sequences_for_denominator.detailed_geo_location_id,
-    ((first_query.variant_count)::numeric / (total_sequences_for_denominator.records_count)::numeric) AS fraction_variant
+    second_query.detailed_geo_location_id,
+    second_query.records_count,
+    ((first_query.variant_count)::numeric / (second_query.records_count)::numeric) AS fraction_variant
    FROM (first_query
-     JOIN total_sequences_for_denominator ON (((total_sequences_for_denominator.detailed_geo_location_id = first_query.detailed_geo_location_id) AND (total_sequences_for_denominator.lookback_days = first_query.lookback_days))))
-  WHERE ((((first_query.variant_count)::numeric / (total_sequences_for_denominator.records_count)::numeric))::double precision >= first_query.variant_fraction_threshold)
+     JOIN second_query ON ((second_query.detailed_geo_location_id = first_query.detailed_geo_location_id)))
+  WHERE ((((first_query.variant_count)::numeric / (second_query.records_count)::numeric))::double precision >= first_query.variant_fraction_threshold)
   WITH NO DATA;
 
 
@@ -863,6 +882,76 @@ CREATE VIEW public.join_subscribed_location_to_id AS
 
 
 --
+-- Name: lineage_callers; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.lineage_callers (
+    id bigint NOT NULL,
+    name character varying NOT NULL,
+    version_specifiers character varying,
+    script_name character varying NOT NULL,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL,
+    pending_version_specifiers character varying,
+    dataset_versions character varying,
+    pending_dataset_versions character varying
+);
+
+
+--
+-- Name: lineage_callers_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.lineage_callers_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: lineage_callers_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.lineage_callers_id_seq OWNED BY public.lineage_callers.id;
+
+
+--
+-- Name: lineage_calls; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.lineage_calls (
+    id bigint NOT NULL,
+    taxon character varying NOT NULL,
+    lineage_id bigint,
+    lineage_caller_id bigint,
+    metadata character varying,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: lineage_calls_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.lineage_calls_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: lineage_calls_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.lineage_calls_id_seq OWNED BY public.lineage_calls.id;
+
+
+--
 -- Name: lineages; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -872,7 +961,8 @@ CREATE TABLE public.lineages (
     caller_name character varying,
     organism_id bigint NOT NULL,
     created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL
+    updated_at timestamp(6) without time zone NOT NULL,
+    external_link character varying
 );
 
 
@@ -893,6 +983,25 @@ CREATE SEQUENCE public.lineages_id_seq
 --
 
 ALTER SEQUENCE public.lineages_id_seq OWNED BY public.lineages.id;
+
+
+--
+-- Name: oligo_alignment_positions_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.oligo_alignment_positions_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: oligo_alignment_positions_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.oligo_alignment_positions_id_seq OWNED BY public.oligo_alignment_positions.id;
 
 
 --
@@ -927,17 +1036,53 @@ CREATE TABLE public.oligos_test (
 
 
 --
+-- Name: organism_taxa; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.organism_taxa (
+    id bigint NOT NULL,
+    name character varying NOT NULL,
+    reference_accession character varying NOT NULL,
+    organism_id bigint NOT NULL,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL,
+    ncbi_taxon_id integer,
+    caller_id bigint
+);
+
+
+--
+-- Name: organism_taxa_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.organism_taxa_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: organism_taxa_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.organism_taxa_id_seq OWNED BY public.organism_taxa.id;
+
+
+--
 -- Name: organisms; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.organisms (
     id bigint NOT NULL,
-    ncbi_taxon_id integer NOT NULL,
     name character varying NOT NULL,
     created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL,
     alias character varying,
-    reference_accession character varying
+    slug character varying,
+    public boolean,
+    variant_bed_lookback_days integer DEFAULT 180 NOT NULL
 );
 
 
@@ -958,53 +1103,6 @@ CREATE SEQUENCE public.organisms_id_seq
 --
 
 ALTER SEQUENCE public.organisms_id_seq OWNED BY public.organisms.id;
-
-
---
--- Name: pangolin_calls; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.pangolin_calls (
-    id bigint NOT NULL,
-    taxon character varying NOT NULL,
-    _lineage_name character varying,
-    conflict character varying,
-    ambiguity_score double precision,
-    scorpio_call character varying,
-    scorpio_support numeric,
-    scorpio_conflict numeric,
-    scorpio_notes text,
-    version character varying NOT NULL,
-    pangolin_version character varying NOT NULL,
-    scorpio_version character varying NOT NULL,
-    constellation_version character varying NOT NULL,
-    is_designated character varying NOT NULL,
-    qc_status character varying,
-    qc_notes character varying,
-    note character varying,
-    created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL,
-    lineage_id bigint
-);
-
-
---
--- Name: pangolin_calls_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE public.pangolin_calls_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: pangolin_calls_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE public.pangolin_calls_id_seq OWNED BY public.pangolin_calls.id;
 
 
 --
@@ -1289,10 +1387,31 @@ ALTER TABLE ONLY public.genomic_features ALTER COLUMN id SET DEFAULT nextval('pu
 
 
 --
+-- Name: lineage_callers id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.lineage_callers ALTER COLUMN id SET DEFAULT nextval('public.lineage_callers_id_seq'::regclass);
+
+
+--
+-- Name: lineage_calls id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.lineage_calls ALTER COLUMN id SET DEFAULT nextval('public.lineage_calls_id_seq'::regclass);
+
+
+--
 -- Name: lineages id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.lineages ALTER COLUMN id SET DEFAULT nextval('public.lineages_id_seq'::regclass);
+
+
+--
+-- Name: oligo_alignment_positions id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.oligo_alignment_positions ALTER COLUMN id SET DEFAULT nextval('public.oligo_alignment_positions_id_seq'::regclass);
 
 
 --
@@ -1303,17 +1422,17 @@ ALTER TABLE ONLY public.oligos ALTER COLUMN id SET DEFAULT nextval('public.oligo
 
 
 --
+-- Name: organism_taxa id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.organism_taxa ALTER COLUMN id SET DEFAULT nextval('public.organism_taxa_id_seq'::regclass);
+
+
+--
 -- Name: organisms id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.organisms ALTER COLUMN id SET DEFAULT nextval('public.organisms_id_seq'::regclass);
-
-
---
--- Name: pangolin_calls id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.pangolin_calls ALTER COLUMN id SET DEFAULT nextval('public.pangolin_calls_id_seq'::regclass);
 
 
 --
@@ -1398,8 +1517,8 @@ CREATE MATERIALIZED VIEW public.lineage_info AS
     COALESCE(max(fasta_records.date_collected), max(fasta_records.date_submitted)) AS last_seen,
     COALESCE(min(fasta_records.date_collected), min(fasta_records.date_submitted)) AS first_seen
    FROM ((public.lineages
-     JOIN public.pangolin_calls ON ((pangolin_calls.lineage_id = lineages.id)))
-     JOIN public.fasta_records ON ((fasta_records.pangolin_call_id = pangolin_calls.id)))
+     JOIN public.lineage_calls ON ((lineage_calls.lineage_id = lineages.id)))
+     JOIN public.fasta_records ON ((fasta_records.lineage_call_id = lineage_calls.id)))
   GROUP BY lineages.id
   WITH NO DATA;
 
@@ -1469,6 +1588,30 @@ ALTER TABLE ONLY public.genomic_features
 
 
 --
+-- Name: lineage_callers lineage_callers_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.lineage_callers
+    ADD CONSTRAINT lineage_callers_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: lineage_calls lineage_calls_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.lineage_calls
+    ADD CONSTRAINT lineage_calls_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: oligo_alignment_positions oligo_alignment_positions_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.oligo_alignment_positions
+    ADD CONSTRAINT oligo_alignment_positions_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: oligos oligos_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -1477,19 +1620,19 @@ ALTER TABLE ONLY public.oligos
 
 
 --
+-- Name: organism_taxa organism_taxa_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.organism_taxa
+    ADD CONSTRAINT organism_taxa_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: organisms organisms_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.organisms
     ADD CONSTRAINT organisms_pkey PRIMARY KEY (id);
-
-
---
--- Name: pangolin_calls pangolin_calls_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.pangolin_calls
-    ADD CONSTRAINT pangolin_calls_pkey PRIMARY KEY (id);
 
 
 --
@@ -1629,17 +1772,24 @@ CREATE INDEX index_fasta_records_on_detailed_geo_location_id ON public.fasta_rec
 
 
 --
--- Name: index_fasta_records_on_pangolin_call_id; Type: INDEX; Schema: public; Owner: -
+-- Name: index_fasta_records_on_lineage_call_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_fasta_records_on_pangolin_call_id ON public.fasta_records USING btree (pangolin_call_id);
+CREATE INDEX index_fasta_records_on_lineage_call_id ON public.fasta_records USING btree (lineage_call_id);
 
 
 --
--- Name: index_fasta_records_on_pending_pangolin_call_id; Type: INDEX; Schema: public; Owner: -
+-- Name: index_fasta_records_on_organism_taxon_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_fasta_records_on_pending_pangolin_call_id ON public.fasta_records USING btree (pending_pangolin_call_id);
+CREATE INDEX index_fasta_records_on_organism_taxon_id ON public.fasta_records USING btree (organism_taxon_id);
+
+
+--
+-- Name: index_fasta_records_on_pending_lineage_call_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_fasta_records_on_pending_lineage_call_id ON public.fasta_records USING btree (pending_lineage_call_id);
 
 
 --
@@ -1647,6 +1797,20 @@ CREATE INDEX index_fasta_records_on_pending_pangolin_call_id ON public.fasta_rec
 --
 
 CREATE INDEX index_genomic_features_on_organism_id ON public.genomic_features USING btree (organism_id);
+
+
+--
+-- Name: index_lineage_calls_on_lineage_caller_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_lineage_calls_on_lineage_caller_id ON public.lineage_calls USING btree (lineage_caller_id);
+
+
+--
+-- Name: index_lineage_calls_on_lineage_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_lineage_calls_on_lineage_id ON public.lineage_calls USING btree (lineage_id);
 
 
 --
@@ -1664,6 +1828,20 @@ CREATE INDEX index_lineages_on_organism_id ON public.lineages USING btree (organ
 
 
 --
+-- Name: index_oligo_alignment_positions_on_oligo_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_oligo_alignment_positions_on_oligo_id ON public.oligo_alignment_positions USING btree (oligo_id);
+
+
+--
+-- Name: index_oligo_alignment_positions_on_organism_taxon_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_oligo_alignment_positions_on_organism_taxon_id ON public.oligo_alignment_positions USING btree (organism_taxon_id);
+
+
+--
 -- Name: index_oligos_on_primer_set_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -1671,10 +1849,24 @@ CREATE INDEX index_oligos_on_primer_set_id ON public.oligos USING btree (primer_
 
 
 --
--- Name: index_pangolin_calls_on_lineage_id; Type: INDEX; Schema: public; Owner: -
+-- Name: index_organism_taxa_on_caller_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_pangolin_calls_on_lineage_id ON public.pangolin_calls USING btree (lineage_id);
+CREATE INDEX index_organism_taxa_on_caller_id ON public.organism_taxa USING btree (caller_id);
+
+
+--
+-- Name: index_organism_taxa_on_organism_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_organism_taxa_on_organism_id ON public.organism_taxa USING btree (organism_id);
+
+
+--
+-- Name: index_organisms_on_slug; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_organisms_on_slug ON public.organisms USING btree (slug);
 
 
 --
@@ -1832,6 +2024,13 @@ CREATE INDEX index_variant_sites_on_fasta_record_id ON public.variant_sites USIN
 
 
 --
+-- Name: index_variant_sites_on_organism_taxon_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_variant_sites_on_organism_taxon_id ON public.variant_sites USING btree (organism_taxon_id);
+
+
+--
 -- Name: index_verified_notifications_on_user_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -1839,24 +2038,17 @@ CREATE INDEX index_verified_notifications_on_user_id ON public.verified_notifica
 
 
 --
--- Name: oligo_variant_overlaps_date_collected_idx; Type: INDEX; Schema: public; Owner: -
+-- Name: oligo_variant_overlaps_primer_set_name_idx; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX oligo_variant_overlaps_date_collected_idx ON public.oligo_variant_overlaps USING btree (date_collected);
-
-
---
--- Name: oligo_variant_overlaps_detailed_geo_location_id_idx; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX oligo_variant_overlaps_detailed_geo_location_id_idx ON public.oligo_variant_overlaps USING btree (detailed_geo_location_id);
+CREATE INDEX oligo_variant_overlaps_primer_set_name_idx ON public.oligo_variant_overlaps USING btree (primer_set_name);
 
 
 --
--- Name: oligo_variant_overlaps_oligo_id_idx; Type: INDEX; Schema: public; Owner: -
+-- Name: oligo_variant_overlaps_region_subregion_division_subdivisio_idx; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX oligo_variant_overlaps_oligo_id_idx ON public.oligo_variant_overlaps USING btree (oligo_id);
+CREATE INDEX oligo_variant_overlaps_region_subregion_division_subdivisio_idx ON public.oligo_variant_overlaps USING btree (region, subregion, division, subdivision, date_collected);
 
 
 --
@@ -1874,10 +2066,10 @@ CREATE INDEX tmp ON public.subscribed_geo_locations USING btree (detailed_geo_lo
 
 
 --
--- Name: variant_overlaps_variant_type_idx; Type: INDEX; Schema: public; Owner: -
+-- Name: variant_overlaps_region_subregion_division_subdivision_date_idx; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX variant_overlaps_variant_type_idx ON public.variant_overlaps USING btree (variant_type);
+CREATE INDEX variant_overlaps_region_subregion_division_subdivision_date_idx ON public.variant_overlaps USING btree (region, subregion, division, subdivision, date_collected);
 
 
 --
@@ -1892,20 +2084,6 @@ CREATE INDEX variant_sites_usable_del_or_snp_idx ON public.variant_sites USING b
 --
 
 CREATE INDEX variant_sites_usable_insertion_idx ON public.variant_sites USING btree (usable_insertion);
-
-
---
--- Name: pangolin_calls init_dates; Type: TRIGGER; Schema: public; Owner: -
---
-
-CREATE TRIGGER init_dates BEFORE INSERT ON public.pangolin_calls FOR EACH ROW EXECUTE FUNCTION public.init_dates_for_pangolin_calls();
-
-
---
--- Name: pangolin_calls update_date; Type: TRIGGER; Schema: public; Owner: -
---
-
-CREATE TRIGGER update_date BEFORE UPDATE ON public.pangolin_calls FOR EACH ROW EXECUTE FUNCTION public.update_date_for_pangolin_calls();
 
 
 --
@@ -1973,6 +2151,14 @@ ALTER TABLE ONLY public.proposed_notifications
 
 
 --
+-- Name: lineage_calls fk_rails_51310c3c3b; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.lineage_calls
+    ADD CONSTRAINT fk_rails_51310c3c3b FOREIGN KEY (lineage_id) REFERENCES public.lineages(id);
+
+
+--
 -- Name: primer_sets fk_rails_52b9cf4012; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -1986,6 +2172,14 @@ ALTER TABLE ONLY public.primer_sets
 
 ALTER TABLE ONLY public.oligos
     ADD CONSTRAINT fk_rails_58e7536518 FOREIGN KEY (primer_set_id) REFERENCES public.primer_sets(id);
+
+
+--
+-- Name: oligo_alignment_positions fk_rails_5af8993443; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.oligo_alignment_positions
+    ADD CONSTRAINT fk_rails_5af8993443 FOREIGN KEY (oligo_id) REFERENCES public.oligos(id);
 
 
 --
@@ -2005,6 +2199,14 @@ ALTER TABLE ONLY public.verified_notifications
 
 
 --
+-- Name: organism_taxa fk_rails_7181a117a9; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.organism_taxa
+    ADD CONSTRAINT fk_rails_7181a117a9 FOREIGN KEY (organism_id) REFERENCES public.organisms(id);
+
+
+--
 -- Name: proposed_notifications fk_rails_736e9d2781; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -2018,6 +2220,14 @@ ALTER TABLE ONLY public.proposed_notifications
 
 ALTER TABLE ONLY public.subscribed_geo_locations
     ADD CONSTRAINT fk_rails_7745c5f33b FOREIGN KEY (user_id) REFERENCES public.users(id);
+
+
+--
+-- Name: variant_sites fk_rails_7a3a7f1da3; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.variant_sites
+    ADD CONSTRAINT fk_rails_7a3a7f1da3 FOREIGN KEY (organism_taxon_id) REFERENCES public.organism_taxa(id);
 
 
 --
@@ -2053,6 +2263,30 @@ ALTER TABLE ONLY public.detailed_geo_locations
 
 
 --
+-- Name: organism_taxa fk_rails_8c4a73ac21; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.organism_taxa
+    ADD CONSTRAINT fk_rails_8c4a73ac21 FOREIGN KEY (caller_id) REFERENCES public.lineage_callers(id);
+
+
+--
+-- Name: fasta_records fk_rails_8c673121b0; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.fasta_records
+    ADD CONSTRAINT fk_rails_8c673121b0 FOREIGN KEY (pending_lineage_call_id) REFERENCES public.lineage_calls(id);
+
+
+--
+-- Name: fasta_records fk_rails_94bad69efe; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.fasta_records
+    ADD CONSTRAINT fk_rails_94bad69efe FOREIGN KEY (lineage_call_id) REFERENCES public.lineage_calls(id);
+
+
+--
 -- Name: primer_set_subscriptions fk_rails_99041872f6; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -2069,19 +2303,19 @@ ALTER TABLE ONLY public.primer_sets
 
 
 --
--- Name: fasta_records fk_rails_b603fc708f; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.fasta_records
-    ADD CONSTRAINT fk_rails_b603fc708f FOREIGN KEY (pending_pangolin_call_id) REFERENCES public.pangolin_calls(id);
-
-
---
 -- Name: blast_hits fk_rails_b63d58c7a5; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.blast_hits
     ADD CONSTRAINT fk_rails_b63d58c7a5 FOREIGN KEY (oligo_id) REFERENCES public.oligos(id);
+
+
+--
+-- Name: fasta_records fk_rails_b985a32672; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.fasta_records
+    ADD CONSTRAINT fk_rails_b985a32672 FOREIGN KEY (organism_taxon_id) REFERENCES public.organism_taxa(id);
 
 
 --
@@ -2101,11 +2335,11 @@ ALTER TABLE ONLY public.proposed_notifications
 
 
 --
--- Name: fasta_records fk_rails_db801c5c92; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: lineage_calls fk_rails_dee6109632; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.fasta_records
-    ADD CONSTRAINT fk_rails_db801c5c92 FOREIGN KEY (pangolin_call_id) REFERENCES public.pangolin_calls(id);
+ALTER TABLE ONLY public.lineage_calls
+    ADD CONSTRAINT fk_rails_dee6109632 FOREIGN KEY (lineage_caller_id) REFERENCES public.lineage_callers(id);
 
 
 --
@@ -2114,6 +2348,14 @@ ALTER TABLE ONLY public.fasta_records
 
 ALTER TABLE ONLY public.primer_set_subscriptions
     ADD CONSTRAINT fk_rails_e7701775d5 FOREIGN KEY (user_id) REFERENCES public.users(id);
+
+
+--
+-- Name: oligo_alignment_positions fk_rails_eee2f0a8c8; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.oligo_alignment_positions
+    ADD CONSTRAINT fk_rails_eee2f0a8c8 FOREIGN KEY (organism_taxon_id) REFERENCES public.organism_taxa(id);
 
 
 --
@@ -2237,6 +2479,33 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20230802152750'),
 ('20230814161850'),
 ('20230816160045'),
-('20230818095330');
+('20230818095330'),
+('20231030170830'),
+('20231030171645'),
+('20231031100050'),
+('20231031151130'),
+('20231031151300'),
+('20231031152630'),
+('20231031152920'),
+('20231031164710'),
+('20231101101700'),
+('20231101102530'),
+('20231101152545'),
+('20231101171500'),
+('20231103173645'),
+('20231109091310'),
+('20231109091800'),
+('20231109092320'),
+('20231109144910'),
+('20231109151545'),
+('2023114143320'),
+('20231214164630'),
+('20231215134050'),
+('20231215144315'),
+('20231218110805'),
+('20240124111845'),
+('20240126135630'),
+('20240206123456'),
+('20240206170340');
 
 

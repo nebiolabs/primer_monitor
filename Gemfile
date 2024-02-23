@@ -8,6 +8,8 @@ gem 'activerecord-import'
 
 gem 'dotenv-rails'
 
+gem 'httparty'
+
 gem 'slop'
 
 gem 'rails', '~> 6.1.1'

@@ -20,8 +20,12 @@
 </p>
 
 <p>
-  <strong>Reference Position:</strong>
-  <%= @oligo.ref_start %> - <%= @oligo.ref_end %>
+  <strong>Reference Positions:</strong>
+  <ul>
+    <% @oligo.oligo_alignment_positions.each do |pos| %>
+      <li><%= pos.organism_taxon.name %> (<%= pos.organism_taxon.reference_accession %>): <%= pos.ref_start %> - <%= pos.ref_end %></li>
+    <% end %>
+  </ul>
 </p>
 <hr/>
 

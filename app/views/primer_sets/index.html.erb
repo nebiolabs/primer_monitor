@@ -1,40 +1,52 @@
-<h1 class="title">Primer Sets</h1>
+<h1 class="title">Organism: <%= @organism.full_name %> </h1>
+
+<div class="tile">
+  <strong>NCBI Taxonomy IDs: </strong>
+  <ul>
+    <% @organism.organism_taxa.each do |organism_taxon| %>
+      <li><%= link_to organism_taxon.ncbi_taxon_id, "https://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?id=#{organism_taxon.ncbi_taxon_id}" %></li>
+    <% end %>
+  </ul>
+</div>
+
+<hr/>
+<h2 class="title">Primer Sets:</h2>
 
 <table>
   <thead>
   <tr>
     <th data-priority="4">Amp. Method</th>
-    <th data-priority="1">Set Name</th>
+    <th data-priority="1">Primer Set</th>
     <th data-priority="2">Source</th>
-    <th data-priority="4">Organism</th>
-    <th data-priority="3">Oligos</th>
+    <th data-priority="3">FASTA</th>
+    <th data-priority="3">BED</th>
     <th data-priority="1">Subscription</th>
   </tr>
   </thead>
 
   <tbody>
-  <% @primer_sets.each do |primer_set| %>
+  <% @organism.primer_sets.accessible_by(Ability.new(current_user)).each do |primer_set| %>
     <tr>
       <td><%= link_to primer_set.amplification_method, primer_set.amplification_method.description_url %></td>
-      <td><%= link_to_if can?(:show, primer_set), primer_set.name, primer_set %></td>
+      <td><%= link_to primer_set.name, primer_set_path(primer_set) %></td>
       <td>
         <% if primer_set.display_url %>
           <%= link_to 'Source', primer_set.display_url %>
         <% end %>
       </td>
-      <td><%= link_to primer_set.organism, organism_path(primer_set.organism.name) %></td>
-      <td><%= primer_set.oligos.length > 12 ? primer_set.oligos[..11].join(", ")+'...' : primer_set.oligos.join(", ") %></td>
+      <% if @primer_sets.key? primer_set.name %>
+        <td><a href="<%= "#{@config[:data_server]}/#{@config[:organism_slug]}/primer_sets_fasta/#{@primer_sets[primer_set.name]}.fasta" %>">Download FASTA</a></td>
+        <td><a href="<%= "#{@config[:data_server]}/#{@config[:organism_slug]}/primer_sets_bed/#{@primer_sets[primer_set.name]}.bed" %>">Download BED</a></td>
+      <% else %>
+        <td>Pending</td>
+        <td>Pending</td>
+      <% end %>
       <td>
-        <%= render 'primer_set_subscription',
-                   user: current_user,
-                   primer_set: primer_set,
-                   primer_set_subscription: @subscriptions[primer_set.id] %>
+        <%= render '/primer_sets/primer_set_subscription', user: current_user, primer_set: primer_set, primer_set_subscription: @subscriptions[primer_set.id] %>
       </td>
     </tr>
   <% end %>
   </tbody>
 </table>
-
-<br>
 
 <%= link_to 'New Primer Set', new_primer_set_path %>

@@ -10,7 +10,7 @@ server 'primer-monitor-dev.neb.com', user: 'deploy', roles: %w{web app db}
 server 'hpc-g', user: 'primer-monitor', roles: %w{backend}, no_release: true
 server 'hpc-sandbox', user: 'primer-monitor', roles: %w{cluster}, no_release: true
 
-# Ensure this matches $BACKEND_INSTALL_PATH on the remote server
+# Ensure $BACKEND_INSTALL_PATH on the remote server is <this path>/current
 set :backend_deploy_path, '/mnt/bioinfo/prg/primer_monitor_staging'
 
 set :rails_env, 'staging'

@@ -1,7 +1,7 @@
 <h1 class="title">Primer Monitoring Tool</h1>
 <div class="content">
   <p>
-    This application compares primer sequences with known SARS-CoV-2 variants from the
+    This application compares primer sequences with known SARS-CoV-2 and RSV variants from the
     <a href="https://www.ncbi.nlm.nih.gov/genbank/">NCBI GenBank</a> database to allow for simple evaluation of their potential impact on
     primer effectiveness.
   </p>
@@ -39,11 +39,91 @@
     </p>
 
     <p>
+      Rambaut, A., Holmes, E. C., O’Toole, Á., Hill, V., McCrone, J. T., Ruis, C., du Plessis, L., & Pybus, O. G. (2020).
+      A dynamic nomenclature proposal for SARS-CoV-2 lineages to assist genomic epidemiology.
+      Nature Microbiology, 5(11), Article 11.
+      DOI: <%= link_to '10.1038/s41564-020-0770-5', 'https://doi.org/10.1038/s41564-020-0770-5' %>
+    </p>
+
+    <p>
+      Rsv-lineages/lineage-designation-A. (2024). [Computer software].
+      RSV Genotyping Consensus Consortium.
+      <%= link_to 'https://github.com/rsv-lineages/lineage-designation-A' %> (Original work published 2023)
+    </p>
+
+    <p>
+      Rsv-lineages/lineage-designation-B. (2024). [Computer software].
+      RSV Genotyping Consensus Consortium.
+      <%= link_to 'https://github.com/rsv-lineages/lineage-designation-B' %> (Original work published 2023)
+    </p>
+
+    <p>
       Tsueng, G., Mullen, J.L., Alkuzweny, M., Cano, M., Rush, B., Haag, E., Lin, J., Welzel, D.J., Zhou, X., Qian, Z.,
       Latif, A.A., Hufbauer, E., Zeller, M., Andersen, K.G., Wu, C., Su, A.I., Gangavarapu, K., Hughes, L.D. (2023) Outbreak.info genomic reports:
       scalable and dynamic surveillance of SARS-CoV-2 variants and mutations.
       <i>Nature Methods</i>, 20(4), 512–522.
       DOI: <%= link_to '10.1038/s41592-023-01769-3', 'https://doi.org/10.1038/s41592-023-01769-3' %>
+    </p>
+
+  </section>
+  <br>
+  <section>
+  <h2 class='title'>Software Tools:</h2>
+    <p>
+      Aksamentov, I., Roemer, C., Hodcroft, E. B., & Neher, R. A., (2021). Nextclade:
+      clade assignment, mutation calling and quality control for viral genomes.
+      <i>Journal of Open Source Software</i>, 6(67), 3773
+      DOI: <%= link_to '10.21105/joss.03773', 'https://doi.org/10.21105/joss.03773' %>.
+    </p>
+
+    <!--pangolin dependency-->
+    <p>
+      Colquhoun & Jackson. Cov-lineages/scorpio. (2024). [Python]. CoV-lineages.
+      <%= link_to 'https://github.com/cov-lineages/scorpio' %> (Original work published 2021)
+    </p>
+
+    <!--freebayes-->
+    <p>
+      Garrison, Erik, and Gabor Marth. “Haplotype-Based Variant Detection from Short-Read Sequencing.” <i>ArXiv</i>:1207.3907
+      [q-Bio], July 20, 2012. <%= link_to 'http://arxiv.org/abs/1207.3907', 'http://arxiv.org/abs/1207.3907' %>.
+    </p>
+
+    <!--pangolin dependency-->
+    <p>
+      Jackson, B. (2022). gofasta: Command-line utilities for genomic epidemiology research. Bioinformatics, 38(16),
+      4033–4035.
+      DOI: <%= link_to '10.1093/bioinformatics/btac424', 'https://doi.org/10.1093/bioinformatics/btac424' %>
+    </p>
+
+    <p>
+      Li, Heng. “Minimap2: Pairwise Alignment for Nucleotide Sequences.” <i>Bioinformatics</i> 34, no. 18 (September 15, 2018):
+      3094–3100.
+      DOI: <%= link_to '10.1093/bioinformatics/bty191', 'https://doi.org/10.1093/bioinformatics/bty191' %>
+      .
+    </p>
+
+    <!--pangolin dependency-->
+    <p>
+      Mölder, F., Jablonski, K. P., Letcher, B., Hall, M. B., Tomkins-Tinch, C. H., Sochat, V., Forster, J., Lee, S.,
+      Twardziok, S. O., Kanitz, A., Wilm, A., Holtgrewe, M., Rahmann, S., Nahnsen, S., & Köster, J. (2021).
+      Sustainable data analysis with Snakemake (10:33). F1000Research.
+      DOI: <%= link_to '10.12688/f1000research.29032.2', 'https://doi.org/10.12688/f1000research.29032.2' %>
+    </p>
+
+    <p>
+      O’Toole, Á., Scher, E., Underwood, A., Jackson, B., Hill, V., McCrone, J. T., Colquhoun, R., Ruis, C.,
+      Abu-Dahab, K., Taylor, B., Yeats, C., du Plessis, L., Maloney, D., Medd, N., Attwood, S. W.,
+      Aanensen, D. M., Holmes, E. C., Pybus, O. G., & Rambaut, A. (2021).
+      Assignment of epidemiological lineages in an emerging pandemic using the pangolin tool.
+      Virus Evolution, 7(2), veab064.
+      DOI: <%= link_to '10.1093/ve/veab064', 'https://doi.org/10.1093/ve/veab064' %>
+    </p>
+
+    <p>
+      Quinlan, Aaron R, and Ira M Hall. “BEDTools: A Flexible Suite of Utilities for Comparing Genomic Features.”
+      <i>Bioinformatics</i> (Oxford, England) 26 (2010):
+      841–42.
+      DOI: <%= link_to '10.1093/bioinformatics/btq033', 'https://doi.org/10.1093/bioinformatics/btq033' %>
     </p>
 
     <p>
@@ -53,4 +133,10 @@
       DOI: <%= link_to '10.1093/bioinformatics/btac830', 'https://doi.org/10.1093/bioinformatics/btac830' %>.
     </p>
   </section>
+
+
+
+
+
+
 </div>

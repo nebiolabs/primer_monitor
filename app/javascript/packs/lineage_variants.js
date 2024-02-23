@@ -8,12 +8,17 @@ let lineageSetsToNames = {};
 let defaultCheckboxStatus = {};
 let config = {};
 let lineageSetNameMap = {};
+let defaultLineage = "";
+
+let activeLineageGroup = null;
+let activeSets = [];
 
 function loadConfig()
 {
     primerSetsToNames = JSON.parse($('#primer_set_json')[0].innerHTML);
     lineageSetsToNames = JSON.parse($('#lineage_set_json')[0].innerHTML);
     defaultCheckboxStatus = JSON.parse($('#default_tracks_json')[0].innerHTML);
+    defaultLineage = $('#default_lineage')[0].innerHTML;
     config = JSON.parse($('#config')[0].innerHTML);
 
     for (let lineageSetKey in lineageSetsToNames) {
@@ -49,12 +54,41 @@ function setSelectFormDisabled(state)
     }
 }
 
+function updateLink()
+{
+    let link_div_wrapper = $('#link_div_wrapper');
+    if(link_div_wrapper.hasClass('invisible')) {
+        let base_link = location.protocol + '//' + location.host + location.pathname;
+        let primerSets = [];
+        activeSets.forEach(function (activeSet) {
+            primerSets.push(primerSetsToNames[activeSet][0]);
+        });
+        let full_link = base_link + "?primer_sets=" + (primerSets.join(",")) + ";lineage=" + activeLineageGroup;
+        let link_element = $('#link')[0];
+        link_element.innerHTML = full_link;
+        link_element.href = full_link;
+        link_div_wrapper.removeClass('invisible');
+        $('#show_link')[0].innerHTML = 'Hide Link';
+    }
+    else
+    {
+        link_div_wrapper.addClass('invisible');
+        $('#show_link')[0].innerHTML = 'Shareable Link';
+    }
+
+}
+
 function updatePrimerSets()
 {
-    const activeLineageGroup = lineageSetsToNames[$('input[name=lineage]:checked').val()][0];
+    $('#link_div_wrapper').addClass('invisible');
+    $('#show_link')[0].innerHTML = 'Shareable Link';
+    let link_element = $('#link')[0];
+    link_element.innerHTML = "";
+    link_element.href = "";
+    activeLineageGroup = lineageSetsToNames[$('input[name=lineage]:checked').val()][0];
 
     if(igvBrowser != null) { //if it's been loaded
-        let activeSets = [];
+        activeSets = [];
         $('.primer_set_checkbox').each(function (index, element) {
             if (element.checked) {
                 activeSets.push(element.name);
@@ -78,7 +112,7 @@ function loadPrimerSets(activePrimerSets, igvBrowser, activeLineageGroup)
 
     const variantsTrack = {
         "name": lineageSetNameMap[activeLineageGroup]+" Variants",
-        "url": config['data_server']+"/"+config['organism_taxid']+"/lineage_variants/"+encodeURIComponent(activeLineageGroup)+".bed",
+        "url": config['data_server']+"/"+config['organism_slug']+"/lineage_variants/"+encodeURIComponent(activeLineageGroup)+".bed",
         "format": "bed",
         "color": "#575757",
         "displayMode": "COLLAPSED",
@@ -91,7 +125,7 @@ function loadPrimerSets(activePrimerSets, igvBrowser, activeLineageGroup)
             let primerSetData = primerSetsToNames[primerSetKey];
             const newTrack = {
                 "name": primerSetData[1],
-                "url": config['data_server']+"/"+config['organism_taxid']+"/primer_sets_status/"+encodeURIComponent(primerSetData[0])+"/"+encodeURIComponent(activeLineageGroup)+".bed",
+                "url": config['data_server']+"/"+config['organism_slug']+"/primer_sets_status/"+encodeURIComponent(primerSetData[0])+"/"+encodeURIComponent(activeLineageGroup)+".bed",
                 "format": "bed",
                 "displayMode": "EXPANDED",
                 "autoHeight": true
@@ -117,15 +151,15 @@ function initBrowser() {
     const browserConfig =
         {
             reference: {
-                "id": config['reference_accession'],
-                "name": config['organism_name']+" ("+config['reference_accession']+")",
-                "fastaURL": config['data_server']+"/"+config['organism_taxid']+"/ref/"+config['reference_accession']+".fasta",
-                "indexURL": config['data_server']+"/"+config['organism_taxid']+"/ref/"+config['reference_accession']+".fasta.fai",
+                "id": config['organism_slug'],
+                "name": config['organism_name'],
+                "fastaURL": config['data_server']+"/"+config['organism_slug']+"/ref/"+config['organism_slug']+".fasta",
+                "indexURL": config['data_server']+"/"+config['organism_slug']+"/ref/"+config['organism_slug']+".fasta.fai",
                 tracks: [
                     {
                         "name": "Genes",
                         "type": "annotation",
-                        "url": config['data_server']+"/"+config['organism_taxid']+"/ref/"+config['reference_accession']+".gff3",
+                        "url": config['data_server']+"/"+config['organism_slug']+"/ref/"+config['organism_slug']+".gff3",
                         "format": "gff3",
                         "filterTypes": ['CDS', 'mature_protein_region_of_CDS', 'region', 'stem_loop', 'five_prime_UTR', 'three_prime_UTR'],
                         "displayMode": "EXPANDED",
@@ -145,7 +179,7 @@ function initBrowser() {
     igv.createBrowser(browser_div, browserConfig).then(function (theBrowser) {
         igvBrowser = theBrowser;
         initCheckboxes();
-        setRadiobuttons("XBB");
+        setRadiobuttons(defaultLineage);
         updatePrimerSets();
     });
 
@@ -187,6 +221,10 @@ $(document).ready(function(){
 
     $('#apply').on("click", function(){
         updatePrimerSets();
+    });
+
+    $('#show_link').on("click", function(){
+        updateLink();
     });
 
     $('#primer_set_selection').on("submit", function(event){

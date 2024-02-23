@@ -37,6 +37,8 @@ $footer-padding:  1rem 1.5rem 1rem;
 
 $navbar-item-img-max-height: 3rem;
 
+$menu-item-hover-background-color: lightgray;
+
 // Update some of Bulma's component variables
 //$body-background-color: $cream;
 //$control-border-width: 2px;
@@ -119,7 +121,7 @@ $navbar-item-img-max-height: 3rem;
   }
 }
 
-ul {
+ul:not(.menu-list) {
   list-style: unset;
 }
 .invisible
@@ -135,4 +137,8 @@ ul {
 .bold-text
 {
   font-weight: bold;
+}
+
+.menu-list a.is-disabled {
+  background-color: whitesmoke !important;
 }

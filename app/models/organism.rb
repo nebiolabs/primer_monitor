@@ -3,6 +3,7 @@
 class Organism < ApplicationRecord
   has_many :blast_hits, dependent: :destroy
   has_many :primer_sets, dependent: :destroy
+  has_many :organism_taxa, dependent: :destroy
 
   def to_s
     name
@@ -15,12 +16,11 @@ class Organism < ApplicationRecord
   def primer_sets_config
     config = {
       "data_server": ENV['IGV_DATA_SERVER'],
-      "organism_taxid": ncbi_taxon_id,
-      "organism_name": name,
-      "reference_accession": reference_accession
+      "organism_slug": slug,
+      "organism_name": name
     }
 
-    tracks_url = URI("#{config[:data_server]}/#{config[:organism_taxid]}/config/tracks.json")
+    tracks_url = URI("#{config[:data_server]}/#{config[:organism_slug]}/config/tracks.json")
 
     begin
       primer_sets = JSON.parse(Net::HTTP.get(tracks_url)).invert

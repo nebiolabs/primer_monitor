@@ -19,7 +19,7 @@ set :assets_dependencies, %w[app/assets lib/assets vendor/assets Gemfile.lock co
 set :backend_deploy_to, ->{ fetch(:backend_deploy_path) }
 
 # To get the backend path into whenever
-set :whenever_variables, ->{ "\"environment=#{fetch :whenever_environment}&backend_path=#{fetch(:backend_deploy_to)}\"" }
+set :whenever_variables, ->{ "\"environment=#{fetch :whenever_environment}&backend_path=#{fetch(:backend_deploy_to)}/current\"" }
 set :whenever_identifier, ->{ "#{fetch(:application)}_#{fetch(:stage)}" }
 
 set :samtools_version, '1.18'
@@ -53,7 +53,11 @@ namespace :backend do
   task :git do
     on roles(:backend) do
       within fetch(:backend_deploy_to) do
-        execute("cd #{fetch(:backend_deploy_path)} && git pull && git checkout #{fetch(:branch)}")
+        execute("cd #{fetch(:backend_deploy_path)}/release && git pull && git checkout #{fetch(:branch)}")
+        # creates a new symlink, overwriting any existing one
+        execute("ln -sf #{fetch(:backend_deploy_path)}/release #{fetch(:backend_deploy_path)}/current")
+        execute("ln -sf #{fetch(:backend_deploy_path)}/shared/datasets #{fetch(:backend_deploy_path)}/current/datasets")
+        execute("ln -sf #{fetch(:backend_deploy_path)}/shared/.env #{fetch(:backend_deploy_path)}/current/.env")
       end
     end
   end
@@ -62,7 +66,7 @@ namespace :backend do
   # Apparently I can't change whenever_path per role, so I had to recreate the command here
   task :update_crontab do
     on roles(:backend) do
-      within fetch(:backend_deploy_to) do
+      within "#{fetch(:backend_deploy_to)}/current" do
         with fetch(:whenever_command_environment_variables) do
           args = fetch(:whenever_command)+[fetch(:whenever_update_flags), "--roles=backend", load_file]
           execute(*args)
@@ -74,7 +78,7 @@ namespace :backend do
   desc 'Install gems'
   task :bundle do
     on roles(:backend, :cluster) do
-      within fetch(:backend_deploy_to) do
+      within "#{fetch(:backend_deploy_to)}/current" do
           execute(:bundle, :install)
       end
     end

@@ -1,43 +1,35 @@
 nextflow.enable.dsl = 2
 
+assert params.ref != null : "--ref must be specified"
 ref = params.ref
 ref = file(ref).toAbsolutePath()
 
-params.pct_cutoff =
-pct_cutoff = params.pct_cutoff
-
-params.score_cutoff =
-score_cutoff = params.score_cutoff
-
-params.primer_monitor_path =
+assert params.primer_monitor_path != null : "--primer_monitor_path must be specified"
 primer_monitor_path = params.primer_monitor_path
 
-params.output_path =
+assert params.output_path != null : "--output_path must be specified"
 output_path = params.output_path
-
-params.override_path =
-override_path = params.override_path
-override_path = file(override_path).toAbsolutePath()
 
 params.temp_dir = '/tmp'
 temp_dir = params.temp_dir
 
-params.pangolin_version_path =
-params.pangolin_data_version_path =
+assert params.lineage_caller != null : "--lineage_caller must be specified"
+lineage_caller = params.lineage_caller
 
-params.organism_dirname =
-organism_dirname = params.organism_dirname
+assert params.lineage_caller_script != null : "--lineage_caller_script must be specified"
+lineage_caller_script = params.lineage_caller_script
 
-pangolin_version = file(params.pangolin_version_path).text
-pangolin_data_version = file(params.pangolin_data_version_path).text
+assert params.taxon_id != null : "--taxon_id must be specified"
+taxon_id = params.taxon_id
 
 process download_data {
     // Downloads the full dataset
     cpus 16
+    memory '35 GB'
     conda "ncbi-datasets-cli unzip zstd"
     errorStrategy 'retry'
     maxRetries 2
-    publishDir "${output_path}", mode: 'link', pattern: '*.zst', overwrite: true
+    publishDir "${output_path}", mode: 'copy', pattern: '*.zst', overwrite: true
     // mode "link" assumes that the output path is on the same disk as the work directory, switch to copy if not
     output:
         tuple file('*.metadata.zst'), file('*.sequences.zst')
@@ -45,11 +37,10 @@ process download_data {
     shell:
     '''
 
-    TMPDIR="!{temp_dir}"
-    export TMPDIR
+    export TMPDIR="!{temp_dir}"
 
     date_today=$(date +%Y-%m-%d)
-    datasets download virus genome taxon 2697049 --complete-only --host human --filename tmp.zip
+    datasets download virus genome taxon !{taxon_id} --complete-only --host human --filename tmp.zip
     unzip tmp.zip
     zstd --long=30 --ultra -22 -T!{task.cpus} ncbi_dataset/data/data_report.jsonl -o ${date_today}.metadata.zst
     zstd --long=30 --ultra -22 -T!{task.cpus} ncbi_dataset/data/genomic.fna -o ${date_today}.sequences.zst
@@ -62,6 +53,7 @@ process download_data {
 process extract_new_records {
     // Keeps only new records added since previous run
     cpus 1
+    memory '8 GB'
     conda "python=3.9 zstd seqtk 'postgresql>=15'"
 
     input:
@@ -72,12 +64,11 @@ process extract_new_records {
     shell:
     '''
 
-    TMPDIR="!{temp_dir}"
-    export TMPDIR
-
-    date_today=$(date +%Y-%m-%d)
+    export TMPDIR="!{temp_dir}"
 
     source "!{primer_monitor_path}/.env"
+
+    date_today=$(date +%Y-%m-%d)
 
     python !{primer_monitor_path}/lib/parse_ncbi.py \
     <(zstd -d --long=30 < !{metadata_json}) \
@@ -124,8 +115,7 @@ process align {
     shell:
     '''
 
-        TMPDIR="!{temp_dir}"
-        export TMPDIR
+        export TMPDIR="!{temp_dir}"
 
         date_today=$(date +%Y-%m-%d)
 
@@ -140,42 +130,42 @@ process align {
     '''
 }
 
-process get_pangolin_version {
+process get_caller_version {
     cpus 1
 
-    conda "'bash>=4.1'"
+    conda "'bash>=4.1' 'postgresql>=15'"
 
     output:
-        env pangolin_version
-        env pangolin_data_version
+        env version_spec
     shell:
     '''
     #! /usr/bin/env bash
 
     source "!{primer_monitor_path}/.env"
 
-    use_pending="false"
-    pangolin_version=$(cat !{params.pangolin_version_path})
-    pangolin_data_version=$(cat !{params.pangolin_data_version_path})
+    version_spec=$(PGPASSFILE="!{primer_monitor_path}/config/.pgpass" psql -h "$DB_HOST" -d "$DB_NAME" -U "$DB_USER" \
+    -v "caller_name=!{lineage_caller}" <<< "SELECT version_specifiers FROM lineage_callers WHERE name=:'caller_name';" -t --csv);
     '''
     }
 
-process pangolin_calls {
+process lineage_calls {
     cpus 8
-    conda "pangolin==$pangolin_version pangolin-data==$pangolin_data_version"
+    memory '25 GB'
+    conda "${version_spec}"
     input:
-        val pangolin_version
-        val pangolin_data_version
+        val version_spec
         tuple val(index), file(metadata), file(fasta)
     output:
         tuple val(index), file("*.csv")
     shell:
     '''
 
-    TMPDIR="!{temp_dir}"
-    export TMPDIR
+    export TMPDIR="!{temp_dir}"
 
-    !{primer_monitor_path}/lib/pangolin_calls/run_pangolin.sh !{fasta} 8
+    source "!{primer_monitor_path}/.env"
+    export BACKEND_INSTALL_PATH
+
+    !{primer_monitor_path}/lib/lineage_calling/caller_wrappers/!{lineage_caller_script}.sh -@ 8 -d !{taxon_id}/current !{fasta}
     '''
 }
 
@@ -184,7 +174,8 @@ process load_to_db {
     publishDir "${output_path}", mode: 'copy'
     errorStrategy 'retry'
     maxRetries 10
-    maxForks 1
+    // don't use all the connections
+    maxForks 10
 
     conda "'postgresql>=15'"
 
@@ -197,40 +188,12 @@ process load_to_db {
     RAILS_ENV=production ruby !{primer_monitor_path}/upload.rb \
             --import_calls \
             --import_seqs \
-            --pangolin_csv !{csv} \
+            --lineage_csv !{csv} \
             --metadata_tsv !{metadata} \
             --variants_tsv !{tsv} \
+            --taxon !{taxon_id} \
+            --caller !{lineage_caller} \
             && mv !{metadata} !{metadata}.complete
-    '''
-}
-
-process recalculate_database_views {
-    cpus 1
-    publishDir "${output_path}", mode: 'copy'
-    errorStrategy 'retry'
-    maxRetries 2
-    input:
-        //these files are to make sure all the load_to_db tasks are done first
-        file seq_load_complete
-    output:
-        file 'refresh_complete.txt';
-    shell:
-    '''
-    # recalculate all the views at the end to save time
-    RAILS_ENV=production ruby !{primer_monitor_path}/upload.rb --rebuild_views && touch refresh_complete.txt
-    '''
-}
-
-
-process update_visualization_data {
-    cpus 8
-    conda "libiconv psycopg2 bedtools coreutils 'postgresql>=15' gawk bc"
-    input:
-        file complete
-    shell:
-    '''
-    # recompute the primer data for igvjs visualization
-    !{primer_monitor_path}/lib/visualization/update_visualization_data.sh -o !{override_path} !{primer_monitor_path} !{organism_dirname} !{pct_cutoff} !{score_cutoff} !{task.cpus}
     '''
 }
 
@@ -240,13 +203,11 @@ workflow {
     index = 0
     transform_data(extract_new_records.out.splitText(file: true, by: 10000).filter{ it.size()>77 }.map{ [index++, it] })
     align(transform_data.out)
-    get_pangolin_version()
-    pangolin_calls(get_pangolin_version.out[0], get_pangolin_version.out[1], transform_data.out)
+    get_caller_version()
+    lineage_calls(get_caller_version.out, transform_data.out)
 
-    //ensure batches of alignments and pangolin calls stay in sync for DB load
-    seq_recs = align.out.join(pangolin_calls.out)
+    //ensure batches of alignments and lineage calls stay in sync for DB load
+    seq_recs = align.out.join(lineage_calls.out)
 
     load_to_db(seq_recs)
-    recalculate_database_views(load_to_db.out.collect())
-    update_visualization_data(recalculate_database_views.out)
 }
