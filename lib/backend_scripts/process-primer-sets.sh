@@ -55,4 +55,4 @@ while read -r organism; do
   rm "$new_primers_file";
 
 done < <("$PSQL_INSTALL_PATH" -h "$DB_HOST" -d "$DB_NAME" -U "$DB_USER_RO" \
--c "SELECT o.slug FROM organisms o;" -t --csv);
+-c "SELECT o.slug FROM organisms o WHERE o.public IS TRUE;" -t --csv);

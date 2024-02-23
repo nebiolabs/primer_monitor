@@ -44,7 +44,7 @@ while read -r taxon; do
 done < <("$PSQL_INSTALL_PATH" -h "$DB_HOST" -d "$DB_NAME" -U "$DB_USER_RO" \
 -c "SELECT o.slug,ot.reference_accession,lc.name,lc.script_name,ot.ncbi_taxon_id \
 FROM organisms o INNER JOIN organism_taxa ot ON ot.organism_id=o.id LEFT JOIN lineage_callers lc \
-ON ot.caller_id=lc.id;" -t --csv);
+ON ot.caller_id=lc.id WHERE o.public IS TRUE;" -t --csv);
 
 while read -r organism; do
   organism_slug="$(cut -f 1 -d "," <<< "$organism")"
@@ -63,7 +63,7 @@ while read -r organism; do
   echo_log "updated visualization data for $organism_slug"
 
 done < <("$PSQL_INSTALL_PATH" -h "$DB_HOST" -d "$DB_NAME" -U "$DB_USER_RO" \
--c "SELECT slug FROM organisms;" -t --csv);
+-c "SELECT slug FROM organisms WHERE public IS TRUE;" -t --csv);
 
 echo_log "rebuilding materialized views"
 PGPASSFILE="$BACKEND_INSTALL_PATH/config/.pgpass" "$PSQL_INSTALL_PATH" -h "$DB_HOST" -d "$DB_NAME" -U "$DB_USER" \
