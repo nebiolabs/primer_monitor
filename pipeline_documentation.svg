@@ -34,7 +34,7 @@
      showgrid="false"
      inkscape:zoom="1.0636576"
      inkscape:cx="844.72672"
-     inkscape:cy="601.22731"
+     inkscape:cy="1127.7125"
      inkscape:window-width="1390"
      inkscape:window-height="955"
      inkscape:window-x="2"
@@ -1309,6 +1309,17 @@
        x="501.95819"
        y="670.60431"
        id="tspan6107-0-4">writes to pending</tspan></text>
+  <text
+     xml:space="preserve"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:11.9996px;font-family:sans-serif;-inkscape-font-specification:sans-serif;fill:#1e26ff;fill-opacity:1;stroke-width:0.74998"
+     x="447.39658"
+     y="984.19238"
+     id="text562-71-53-2-1-8-9"><tspan
+       sodipodi:role="line"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:11.9996px;font-family:Times, serif;-inkscape-font-specification:'Times, serif';fill:#4964c5;fill-opacity:1;stroke:none;stroke-width:0.74998;stroke-opacity:1"
+       x="447.39658"
+       y="984.19238"
+       id="tspan6107-0-4-93">reads from pending, writes to current</tspan></text>
   <text
      xml:space="preserve"
      style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:11.9996px;font-family:sans-serif;-inkscape-font-specification:sans-serif;fill:#1e26ff;fill-opacity:1;stroke-width:0.74998"
