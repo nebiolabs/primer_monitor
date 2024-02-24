@@ -1047,7 +1047,7 @@ CREATE TABLE public.organism_taxa (
     created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL,
     ncbi_taxon_id integer,
-    caller_id bigint
+    lineage_caller_id bigint
 );
 
 
@@ -1849,10 +1849,10 @@ CREATE INDEX index_oligos_on_primer_set_id ON public.oligos USING btree (primer_
 
 
 --
--- Name: index_organism_taxa_on_caller_id; Type: INDEX; Schema: public; Owner: -
+-- Name: index_organism_taxa_on_lineage_caller_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_organism_taxa_on_caller_id ON public.organism_taxa USING btree (caller_id);
+CREATE INDEX index_organism_taxa_on_lineage_caller_id ON public.organism_taxa USING btree (lineage_caller_id);
 
 
 --
@@ -2267,7 +2267,7 @@ ALTER TABLE ONLY public.detailed_geo_locations
 --
 
 ALTER TABLE ONLY public.organism_taxa
-    ADD CONSTRAINT fk_rails_8c4a73ac21 FOREIGN KEY (caller_id) REFERENCES public.lineage_callers(id);
+    ADD CONSTRAINT fk_rails_8c4a73ac21 FOREIGN KEY (lineage_caller_id) REFERENCES public.lineage_callers(id);
 
 
 --
@@ -2506,6 +2506,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20240124111845'),
 ('20240126135630'),
 ('20240206123456'),
-('20240206170340');
+('20240206170340'),
+('20240224131540');
 
 

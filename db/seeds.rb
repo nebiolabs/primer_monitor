@@ -16,17 +16,22 @@ end
 
 admin.roles << Role.find_by(name: 'administrator') if admin.roles.size.zero?
 
+LineageCaller.find_or_create_by!(name: 'default', script_name: 'default')
+
 pangolin = LineageCaller.find_or_create_by!(name: 'pangolin', script_name: 'pangolin')
 
 sars = Organism.find_or_create_by!(name: 'SARS-CoV-2', slug: 'sars-cov-2')
-OrganismTaxon.find_or_create_by!(ncbi_taxon_id: 2_697_049, organism_id: sars.id, caller: pangolin.id)
+OrganismTaxon.find_or_create_by!(ncbi_taxon_id: 2_697_049, organism_id: sars.id, lineage_caller_id: pangolin.id,
+                                 name: 'SARS-CoV-2', reference_accession: 'NC_045512.2')
 
 nextclade_rsva = LineageCaller.find_or_create_by!(name: 'nextclade_rsva', script_name: 'nextclade')
 nextclade_rsvb = LineageCaller.find_or_create_by!(name: 'nextclade_rsvb', script_name: 'nextclade')
 
 rsv = Organism.find_or_create_by!(name: 'RSV', slug: 'rsv')
-OrganismTaxon.find_or_create_by!(ncbi_taxon_id: 208_893, organism_id: rsv.id, caller: nextclade_rsva.id)
-OrganismTaxon.find_or_create_by!(ncbi_taxon_id: 208_895, organism_id: rsv.id, caller: nextclade_rsvb.id)
+OrganismTaxon.find_or_create_by!(ncbi_taxon_id: 208_893, organism_id: rsv.id, lineage_caller_id: nextclade_rsva.id,
+                                 name: 'RSV-A', reference_accession: 'NC_038235.1')
+OrganismTaxon.find_or_create_by!(ncbi_taxon_id: 208_895, organism_id: rsv.id, lineage_caller_id: nextclade_rsvb.id,
+                                 name: 'RSV-B', reference_accession: 'NC_001781.1')
 
 lamp = AmplificationMethod.find_or_create_by!(name: 'LAMP')
 qpcr = AmplificationMethod.find_or_create_by!(name: 'qPCR')
