@@ -19,14 +19,14 @@ admin.roles << Role.find_by(name: 'administrator') if admin.roles.size.zero?
 pangolin = LineageCaller.find_or_create_by!(name: 'pangolin', script_name: 'pangolin')
 
 sars = Organism.find_or_create_by!(name: 'SARS-CoV-2', slug: 'sars-cov-2')
-OrganismTaxon.find_or_create_by!(ncbi_taxon_id: 2_697_049, organism_id: sars.id, lineage_caller: pangolin.id)
+OrganismTaxon.find_or_create_by!(ncbi_taxon_id: 2_697_049, organism_id: sars.id, caller: pangolin.id)
 
 nextclade_rsva = LineageCaller.find_or_create_by!(name: 'nextclade_rsva', script_name: 'nextclade')
 nextclade_rsvb = LineageCaller.find_or_create_by!(name: 'nextclade_rsvb', script_name: 'nextclade')
 
 rsv = Organism.find_or_create_by!(name: 'RSV', slug: 'rsv')
-OrganismTaxon.find_or_create_by!(ncbi_taxon_id: 208_893, organism_id: rsv.id, lineage_caller: nextclade_rsva.id)
-OrganismTaxon.find_or_create_by!(ncbi_taxon_id: 208_895, organism_id: rsv.id, lineage_caller: nextclade_rsvb.id)
+OrganismTaxon.find_or_create_by!(ncbi_taxon_id: 208_893, organism_id: rsv.id, caller: nextclade_rsva.id)
+OrganismTaxon.find_or_create_by!(ncbi_taxon_id: 208_895, organism_id: rsv.id, caller: nextclade_rsvb.id)
 
 lamp = AmplificationMethod.find_or_create_by!(name: 'LAMP')
 qpcr = AmplificationMethod.find_or_create_by!(name: 'qPCR')
