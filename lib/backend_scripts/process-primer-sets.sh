@@ -47,7 +47,8 @@ while read -r organism; do
     --primer_names "$new_primers_file" \
     --override_path "$BACKEND_INSTALL_PATH/igvstatic/$organism_slug/overrides.txt" \
     --organism "$organism_slug" \
-    -N "$NOTIFICATION_EMAILS";
+    -N "$NOTIFICATION_EMAILS" \
+    -c "$BACKEND_INSTALL_PATH/lib/nextflow.config";
 
     echo_log "updated $organism_slug"
   fi

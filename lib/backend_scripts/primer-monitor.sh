@@ -37,7 +37,8 @@ while read -r taxon; do
   --lineage_caller_script "$caller_script_name" \
   --taxon_id "$taxon_id" \
   --temp_dir "$TMPDIR" \
-  -N "$NOTIFICATION_EMAILS";
+  -N "$NOTIFICATION_EMAILS" \
+  -c "$BACKEND_INSTALL_PATH/lib/nextflow.config";
 
   echo_log "processed taxon $taxon_id"
 
@@ -58,7 +59,8 @@ while read -r organism; do
   --pct_cutoff "$PCT_CUTOFF" \
   --score_cutoff "$SCORE_CUTOFF" \
   --override_path "$BACKEND_INSTALL_PATH/igvstatic/$organism_slug/overrides.txt" \
-  --organism "$organism_slug";
+  --organism "$organism_slug" \
+  -c "$BACKEND_INSTALL_PATH/lib/nextflow.config";
 
   echo_log "updated visualization data for $organism_slug"
 

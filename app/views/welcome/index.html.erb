@@ -16,7 +16,7 @@
 
   <% i=0 %>
 
-  <% Organism.all.each do |organism| %>
+  <% Organism.where(public: true).each do |organism| %>
       <% if i%3 == 0 # start a new row every 3 %>
         </div>
         <hr>
