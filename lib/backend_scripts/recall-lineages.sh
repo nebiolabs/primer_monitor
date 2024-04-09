@@ -39,7 +39,7 @@ while read -r taxon; do
     latest_version=$("$MICROMAMBA_BIN_PATH/micromamba" search -c bioconda "$package_name" | grep -E "Version[[:blank:]]+[0-9]" | awk '{ print $2 }')
     if [ "$latest_version" = "" ]; then
       # skip this entire taxon and email an error
-      echo_log "Error: Got blank version string when trying to update package '$package_name' of caller '$caller_name' \
+      echo "Error: Got blank version string when trying to update package '$package_name' of caller '$caller_name' \
       for taxon '$taxon_id' of organism '$organism_slug'. Skipping this taxon." | \
       mail -r "$ADMIN_EMAIL" -s "Lineage caller update error ($caller_name:$package_name - $organism_slug)" "$NOTIFICATION_EMAILS"
       continue 2;
@@ -107,6 +107,11 @@ while read -r taxon; do
 SQL
       # if there is a dataset in $BACKEND_INSTALL_PATH/datasets
       if [ -d "$BACKEND_INSTALL_PATH/datasets/$taxon_id" ]; then
+        if [ -z "$(ls -A "$BACKEND_INSTALL_PATH/datasets/$taxon_id")" ]; then
+          echo "Error: Pending dataset directory for $taxon_id exists but is blank, not updating current dataset." | \
+          mail -r "$ADMIN_EMAIL" -s "Dataset update failed ($caller_name:$package_name - $organism_slug)" "$NOTIFICATION_EMAILS"
+          continue;
+        fi
         # move pending to current (and remove old current in the process)
         flock "$LOCK_PATH/primer_monitor_swap_datasets_$ENV_NAME.lock" \
         bash -c "rm -rf $BACKEND_INSTALL_PATH/datasets/$taxon_id/current && \

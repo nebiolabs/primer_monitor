@@ -25,6 +25,9 @@ process update_caller_dataset {
 
     conda "python=3.9 'postgresql>=15' ${caller_version}"
 
+    output:
+        file "${primer_monitor_path}/datasets/${taxon_id}/pending/pathogen.json"
+
     shell:
     '''
     #! /usr/bin/env bash
