@@ -145,6 +145,10 @@ GEM
       multi_xml (>= 0.5.2)
     i18n (1.12.0)
       concurrent-ruby (~> 1.0)
+    importmap-rails (2.0.1)
+      actionpack (>= 6.0.0)
+      activesupport (>= 6.0.0)
+      railties (>= 6.0.0)
     jbuilder (2.12.0)
       actionview (>= 5.0.0)
       activesupport (>= 5.0.0)
@@ -218,8 +222,6 @@ GEM
     racc (1.6.0)
     rack (2.2.4)
     rack-protection (3.0.2)
-      rack
-    rack-proxy (0.7.4)
       rack
     rack-test (2.0.2)
       rack (>= 1.3)
@@ -324,12 +326,15 @@ GEM
     sshkit (1.21.3)
       net-scp (>= 1.1.2)
       net-ssh (>= 2.8.0)
+    stimulus-rails (1.3.3)
+      railties (>= 6.0.0)
     thor (1.2.1)
     tilt (2.0.11)
     timeout (0.4.1)
-    turbolinks (5.2.1)
-      turbolinks-source (~> 5.2)
-    turbolinks-source (5.2.0)
+    turbo-rails (2.0.5)
+      actionpack (>= 6.0.0)
+      activejob (>= 6.0.0)
+      railties (>= 6.0.0)
     tzinfo (2.0.5)
       concurrent-ruby (~> 1.0)
     unicode-display_width (2.3.0)
@@ -345,10 +350,6 @@ GEM
       nokogiri (~> 1.6)
       rubyzip (>= 1.3.0)
       selenium-webdriver (~> 4.0)
-    webpacker (4.3.0)
-      activesupport (>= 4.2)
-      rack-proxy (>= 0.6.1)
-      railties (>= 4.2)
     websocket (1.2.9)
     websocket-driver (0.7.6)
       websocket-extensions (>= 0.1.0)
@@ -380,6 +381,7 @@ DEPENDENCIES
   dotenv-rails
   ed25519
   httparty
+  importmap-rails
   jbuilder (~> 2.7)
   listen (~> 3.2)
   omniauth-google-oauth2
@@ -397,11 +399,12 @@ DEPENDENCIES
   slop
   spring
   spring-watcher-listen (~> 2.0.0)
-  turbolinks (~> 5)
+  sprockets-rails
+  stimulus-rails
+  turbo-rails
   tzinfo-data
   web-console (>= 3.3.0)
   webdrivers
-  webpacker (~> 4.0)
   whenever
 
 RUBY VERSION
