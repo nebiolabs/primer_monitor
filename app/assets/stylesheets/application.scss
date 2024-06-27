@@ -45,6 +45,8 @@ $menu-item-hover-background-color: lightgray;
 //$input-border-color: transparent;
 //$input-shadow: none;
 
+@import "bulma";
+
 .icon {
   height: 20px;
   width: auto;
@@ -101,8 +103,6 @@ $menu-item-hover-background-color: lightgray;
   font-size: 12pt;
 }
 
-
-@import "bulma";
 @media screen and (min-width: 769px), print {
   .field-label {
     flex-grow: 1.5; /* for wider field labels */
@@ -141,4 +141,13 @@ ul:not(.menu-list) {
 
 .menu-list a.is-disabled {
   background-color: whitesmoke !important;
+}
+
+button.dt-button.buttons-copy.buttons-html5 {
+  margin: revert;
+  padding: revert;
+  border: revert;
+  border-radius: revert;
+  line-height: revert;
+  background: revert;
 }
