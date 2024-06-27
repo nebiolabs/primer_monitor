@@ -1,21 +1,22 @@
-// This file is automatically compiled by Webpack, along with any other files
-// present in this directory. You're encouraged to place your actual application logic in
-// a relevant structure within app/javascript and only use these pack files to reference
-// that code so it'll be compiled.
+import 'init_jquery'
 
-require("@rails/ujs").start()
-require("turbolinks").start()
-require("@rails/activestorage").start()
-require("channels")
-require("@nathanvda/cocoon")
+import select2 from "select2";
+select2();
 
+import Rails from '@rails/ujs';
+Rails.start();
 
+import "@hotwired/turbo-rails"
 
-let $ = require('jquery');
-require('select2')
-import 'select2/dist/css/select2.css';
+import * as ActiveStorage from "@rails/activestorage"
+ActiveStorage.start()
 
+import 'datatables.net';
 
+import "@nathanvda/cocoon";
+
+//old requires for reference until everything is tested
+/*
 require( 'datatables.net-dt/css/jquery.dataTables.min.css' );
 require( 'datatables.net-dt' );
 require( 'datatables.net-buttons-dt' );
@@ -23,17 +24,18 @@ require( 'datatables.net-buttons/js/buttons.html5.js' );
 require( 'datatables.net-buttons/js/buttons.print.js' );
 require( 'datatables.net-responsive' );
 require( 'datatables.net-select-dt' );
+require("channels");
+*/
 
-// Load datatables styles
-import 'datatables.net-dt/css/jquery.dataTables.css'
+// Configure your import map in config/importmap.rb. Read more: https://github.com/rails/importmap-rails
 
-$(document).on('turbolinks:load', () => {
+$(document).on('turbo:load', () => {
     $('select.wide-select2').select2({width: '80%'});
     $('select.select2').select2();
 
 
-    if($('[id^=DataTables_Table]').length == 0) {
-        $('table').DataTable({
+    if($('[id^=DataTables_Table]').length == 0 || true) {
+        let table = new DataTable('table', {
             dom: 'lfBrtip',
             buttons: [
                 'copy', 'excel'

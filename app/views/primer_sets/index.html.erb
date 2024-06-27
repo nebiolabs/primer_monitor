@@ -27,7 +27,7 @@
   <tbody>
   <% @organism.primer_sets.accessible_by(Ability.new(current_user)).each do |primer_set| %>
     <tr>
-      <td><%= link_to primer_set.amplification_method, primer_set.amplification_method.description_url %></td>
+      <td><%= link_to primer_set.amplification_method.name, primer_set.amplification_method.description_url %></td>
       <td><%= link_to primer_set.name, primer_set_path(primer_set) %></td>
       <td>
         <% if primer_set.display_url %>

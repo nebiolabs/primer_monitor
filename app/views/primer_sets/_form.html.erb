@@ -1,3 +1,7 @@
+<% content_for :head do %>
+  <%= javascript_import_module_tag "primer_sets_upload" %>
+<% end %>
+
 <%= form_with(model: primer_set, local: true) do |form| %>
     <% if primer_set.errors.any? %>
     <div class="notification is-warning">
@@ -93,5 +97,3 @@
     <%= form.submit class: 'button is-link'%>
   </div>
 <% end %>
-
-<%= javascript_pack_tag "primer_sets_upload" %>

@@ -1,5 +1,5 @@
-require("igv");
-const $ = require("jquery");
+import 'init_jquery';
+import "igv";
 
 let config = {};
 

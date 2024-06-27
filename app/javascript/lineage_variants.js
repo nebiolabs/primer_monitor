@@ -1,5 +1,5 @@
-require("igv");
-let $ = require('jquery');
+import 'init_jquery';
+import "igv";
 
 let igvBrowser = null; //declaring this as a global for later
 let tracks = [];
@@ -235,8 +235,3 @@ $(document).ready(function(){
     loadConfig();
     initBrowser();
 })
-
-
-
-
-
