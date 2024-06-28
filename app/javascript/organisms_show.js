@@ -54,6 +54,5 @@ function initBrowser() {
 
 $(document).ready(function(){
     config = JSON.parse($('#config')[0].innerHTML);
-    console.log(config)
     initBrowser();
 });
