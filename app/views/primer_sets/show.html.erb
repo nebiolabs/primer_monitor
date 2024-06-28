@@ -55,7 +55,7 @@
 <hr/>
 <h2 class="title">IGV Visualization:</h2>
 
-<p id="config" class="invisible"><%= @config.to_json %></p>
+<p id="config" class="invisible"><%= raw @config.to_json %></p>
 
 <% if @primer_set.status == PrimerSet.statuses[:complete] %>
 
