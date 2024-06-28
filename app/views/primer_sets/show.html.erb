@@ -13,7 +13,7 @@
   <div class="tile is-parent">
     <div class="tile box is-child">
     <strong>Amp. Method: </strong>
-    <%= link_to @primer_set.amplification_method, @primer_set.amplification_method.description_url %>
+    <%= link_to @primer_set.amplification_method.to_s, @primer_set.amplification_method.description_url %>
     </div>
   </div>
   <% if @primer_set.display_url %>
