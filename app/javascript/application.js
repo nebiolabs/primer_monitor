@@ -11,6 +11,8 @@ import "@hotwired/turbo-rails"
 import * as ActiveStorage from "@rails/activestorage"
 ActiveStorage.start()
 
+let tables = []; //list of datatables to destroy on turbo:unload
+
 import 'datatables.net';
 
 import "@nathanvda/cocoon";
@@ -42,6 +44,8 @@ $(document).on('turbo:load', () => {
             ],
             responsive: true
         });
+        tables.push(table);
+        //doing an array so this can later be made to support multiple tables per page
     }
 
     // Check for click events on the navbar burger icon
@@ -51,4 +55,11 @@ $(document).on('turbo:load', () => {
         $(".navbar-menu").toggleClass("is-active");
 
     });
-})
+});
+
+$(document).on('turbo:before-cache', () => {
+    tables.forEach((table) => {
+        table.destroy();
+    });
+    tables = [];
+});
