@@ -15,13 +15,13 @@
     <% end %>
     <% i += 1 %>
   <% end %>
-  <span><strong>NCBI Taxonomy IDs:</strong> <%=raw taxa_str %></span>
+  <span><strong>NCBI Taxonomy IDs:</strong> <%= raw taxa_str %></span>
 </div>
 
 <hr/>
 <h2 class="title">IGV Visualization:</h2>
 
-<p id="config" class="invisible"><%= raw @config.to_json %></p>
+<p id="config" class="invisible"><%= @config.to_json %></p>
 
 <div id="igv" class="igv_div"></div>
 
