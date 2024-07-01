@@ -1,12 +1,19 @@
 <h1 class="title">Organism: <%= @organism.full_name %> </h1>
 
+
 <div class="tile">
-  <strong>NCBI Taxonomy IDs: </strong>
-  <ul>
-    <% @organism.organism_taxa.each do |organism_taxon| %>
-      <li><%= link_to organism_taxon.ncbi_taxon_id, "https://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?id=#{organism_taxon.ncbi_taxon_id}" %></li>
+  <strong>NCBI Taxonomy IDs:&nbsp;</strong>
+  <% taxa_count = @organism.organism_taxa.length %>
+  <% i = 0 %>
+  <% taxa_str = '' %>
+  <% @organism.organism_taxa.each do |organism_taxon| %>
+    <% taxa_str += link_to organism_taxon.ncbi_taxon_id, "https://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?id=#{organism_taxon.ncbi_taxon_id}" %>
+    <% if i < taxa_count-1 # don't put a comma after the last taxon %>
+      <% taxa_str += ',&nbsp;' %>
     <% end %>
-  </ul>
+    <% i += 1 %>
+  <% end %>
+  <%= raw taxa_str %>
 </div>
 
 <hr/>
