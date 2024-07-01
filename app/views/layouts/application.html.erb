@@ -36,6 +36,8 @@
           <div class="navbar-dropdown">
             <%= link_to 'Organism', organism_url(organism.slug), class: 'navbar-item' %>
             <hr class="navbar-divider">
+            <%= link_to 'Primer Sets', organism_primer_sets_url(organism.slug), class: 'navbar-item' %>
+
             <%= link_to 'Lineages', organism_lineages_url(organism.slug), class: 'navbar-item' %>
 
             <%= link_to 'Lineage Variants', organism_lineage_variants_path(organism.slug), class: 'navbar-item' %>
