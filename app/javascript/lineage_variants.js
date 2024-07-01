@@ -202,7 +202,7 @@ function setRadiobuttons(selected)
                 break;
             }
         }
-        $('.lineage_set_radiobutton[value='+lineageSetsToNames[allValue]+']')[0].checked = true;
+        $('.lineage_set_radiobutton[value='+lineageSetsToNames[allValue][0]+']')[0].checked = true;
     }
 }
 
