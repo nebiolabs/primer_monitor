@@ -34,7 +34,7 @@ class Lineage < ApplicationRecord
 
     new_lineage_names.each do |lineage_name|
       new_lineages << Lineage.new(name: lineage_name, caller_name: LineageCaller.find_by(id: caller_id).name,
-                                  organism_id: organism.id, external_link: external_link_url(organism, lineage_name) )
+                                  organism_id: organism.id, external_link: external_link_url(organism, lineage_name))
     end
 
     new_lineages

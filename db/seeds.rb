@@ -14,7 +14,7 @@ admin = User.create_with(first: 'Admin', last: 'User',
   Role.find_or_create_by!(name: role_name)
 end
 
-admin.roles << Role.find_by(name: 'administrator') if admin.roles.size.zero?
+admin.roles << Role.find_by(name: 'administrator') if admin.roles.empty?
 
 LineageCaller.find_or_create_by!(name: 'default', script_name: 'default')
 
