@@ -76,7 +76,7 @@ def import_variants(variants_file, taxon)
 end
 
 def create_new_notifications!
-  new_proposed_notifications = ProposedNotification.new_proposed_notifications()
+  new_proposed_notifications = ProposedNotification.new_proposed_notifications
   return if new_proposed_notifications.empty?
 
   ProposedNotification.import(new_proposed_notifications, validate: false)
@@ -105,6 +105,17 @@ def import_lineages(lineage_csv, pending, taxon, caller_id)
   LineageCall.update_fasta_recs pending
 end
 
+def rebuild_views
+  views = %w[variant_overlaps counts time_counts oligo_variant_overlaps
+             identify_primers_for_notifications initial_score lineage_info]
+  views.each do |view|
+    ActiveRecord::Base.connection.execute("REFRESH MATERIALIZED VIEW #{view}")
+    @log.info("refreshing #{view}")
+  end
+  create_new_notifications!
+  # cannot send notifications here since this may be running on a cluster node.
+end
+
 def main
   opts = parse_options
   @log.level = Logger.const_get(opts[:verbose])
@@ -120,15 +131,7 @@ def main
     if opts[:import_calls]
       import_lineages(opts[:lineage_csv], opts[:pending], taxon, LineageCaller.find_by(name: opts[:caller]))
     end
-    if opts[:rebuild_views]
-      %w[variant_overlaps counts time_counts oligo_variant_overlaps
-         identify_primers_for_notifications initial_score lineage_info].each do |view|
-        ActiveRecord::Base.connection.execute("REFRESH MATERIALIZED VIEW #{view}")
-        @log.info("refreshing #{view}")
-      end
-      create_new_notifications!
-      # cannot send notifications here since this may be running on a cluster node.
-    end
+    rebuild_views if opts[:rebuild_views]
   end
 end
 main if $PROGRAM_NAME.end_with?('upload.rb')
