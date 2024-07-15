@@ -42,9 +42,9 @@ class FastaRecord < ApplicationRecord
     find_or_create_dg_id(region, country, nil, nil)
     dg_id = find_or_create_dg_id(region, country, division, nil)
 
-    FastaRecord.new(strain: strain,
+    FastaRecord.new(strain:,
                     genbank_accession: accession, detailed_geo_location_id: dg_id,
-                    date_collected: date, date_submitted: date_submitted, organism_taxon_id: taxon.id)
+                    date_collected: date, date_submitted:, organism_taxon_id: taxon.id)
   end
 
   # fetches detailed geolocation record for the specified parameters, creates if necessary

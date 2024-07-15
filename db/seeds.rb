@@ -54,7 +54,7 @@ lamp_primers = {
   'N2-LB': 'CTTCGGGAACGTGGTTGACC'
 }
 lamp_primers.each_pair do |name, seq|
-  Oligo.find_or_create_by(name: name, sequence: seq, primer_set: lamp_primerset)
+  Oligo.find_or_create_by(name:, sequence: seq, primer_set: lamp_primerset)
 end
 
 luna_primerset = PrimerSet.find_or_create_by(name: 'NEB Luna qPCR (E3019)', organism: sars, user: admin,
@@ -70,7 +70,7 @@ luna_primers = {
 }
 
 luna_primers.each_pair do |name, seq|
-  Oligo.find_or_create_by(name: name, sequence: seq, primer_set: luna_primerset)
+  Oligo.find_or_create_by(name:, sequence: seq, primer_set: luna_primerset)
 end
 
 features = [['N', 28_274, 29_533],

@@ -50,7 +50,7 @@ class Organism < ApplicationRecord
 
     lineage_sets = JSON.parse(lineages_req.body)
 
-    { data_fetched: true, primer_sets: primer_sets, default_tracks: default_tracks, lineage_sets: lineage_sets,
-      default_lineage: default_lineage }
+    { data_fetched: true, primer_sets:, default_tracks:, lineage_sets:,
+      default_lineage: }
   end
 end

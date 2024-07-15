@@ -48,8 +48,8 @@ class ProposedNotification < ApplicationRecord
 
     ProposedNotification.new(primer_set_id: primer_record.primer_set_id, user_id: primer_record.user_id,
                              oligo_id: primer_record.oligo_id, coordinate: primer_record.coords,
-                             subscribed_geo_location_id: subscribed_geo_location_id,
-                             primer_set_subscription_id: primer_set_subscription_id,
+                             subscribed_geo_location_id:,
+                             primer_set_subscription_id:,
                              detailed_geo_location_alias_id: primer_record.detailed_geo_location
                                                                           .detailed_geo_location_alias_id,
                              fraction_variant: primer_record.fraction_variant)
