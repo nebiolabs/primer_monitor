@@ -13,7 +13,7 @@ gem 'httparty'
 gem 'slop'
 
 gem 'rails', '~> 7'
-# Use sqlite3 as the database for Active Record
+
 gem 'pg', '>=1.2.3'
 # Use Puma as the app server
 gem 'puma', '~> 4.1'

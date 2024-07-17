@@ -1,0 +1,71 @@
+name: test
+# Controls when the workflow will run:
+on:
+  # Triggers the workflow on push to master branch, or on pull request
+  # to any branch:
+  push:
+    branches:
+      - master
+  pull_request:
+
+jobs:
+
+  # label of the job:
+  tests:
+    name: Tests
+    # containers must run in Linux based operating systems:
+    runs-on: ubuntu-latest
+    # Do not ignore bash profile files. From:
+    # https://github.com/marketplace/actions/setup-miniconda
+    # This is needed to run conda. It prevents the error:
+    # CommandNotFoundError: Your shell has not been properly configured
+    # to use 'conda activate'.
+    defaults:
+      run:
+        shell: bash -l {0}
+    services:
+      # label used to access the service container:
+      postgres:
+        # Docker Hub image
+        image: postgres:14.7
+        # service environment variables:
+        # `POSTGRES_HOST` is localhost
+        env:
+          # required
+          POSTGRES_PASSWORD: postgres_password
+          # optional (defaults to `postgres`):
+          POSTGRES_USER: test_user
+        ports:
+          # maps tcp port 5432 on service container to the host:
+          - 5432:5432
+        volumes:
+          - /var/run/postgresql:/var/run/postgresql
+        # set health checks to wait until postgres has started:
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes freetds-dev
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Setup Ruby and install gems
+        uses: ruby/setup-ruby@v1
+        with:
+          bundler-cache: true
+      - name: Set up test database
+        env:
+          PGPASSWORD: postgres_password
+        run: |   
+          echo "createdb -h localhost -p 5432 -U test_user polbase_test" | tee base
+      - name: Run tests
+        env:
+          RAILS_ENV: test
+        run: |
+          cp .env.example .env
+          cp config/database.yml.example config/database.yml
+          RAILS_ENV=test bin/rails db:reset && bin/rails test
