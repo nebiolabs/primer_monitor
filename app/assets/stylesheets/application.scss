@@ -45,6 +45,8 @@ $menu-item-hover-background-color: lightgray;
 //$input-border-color: transparent;
 //$input-shadow: none;
 
+@import "select2-bulma-fixes";
+
 @import "bulma";
 
 .icon {
