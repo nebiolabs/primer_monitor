@@ -42,13 +42,18 @@ class Organism < ApplicationRecord
       return { data_fetched: false }
     end
 
-    primer_sets = JSON.parse(tracks_req.body)
+    process_lineage_variants_data tracks_req.body, defaults_req.body, lineages_req.body
+  end
 
-    defaults_parsed = JSON.parse(defaults_req.body)
+  def process_lineage_variants_data(tracks_json, defaults_json, lineages_json)
+
+    primer_sets = JSON.parse(tracks_json)
+
+    defaults_parsed = JSON.parse(defaults_json)
     default_tracks = defaults_parsed['tracks']
     default_lineage = defaults_parsed['lineage']
 
-    lineage_sets = JSON.parse(lineages_req.body)
+    lineage_sets = JSON.parse(lineages_json)
 
     { data_fetched: true, primer_sets:, default_tracks:, lineage_sets:,
       default_lineage: }

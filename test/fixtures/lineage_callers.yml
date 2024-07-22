@@ -1,0 +1,5 @@
+default:
+    name: "default"
+    version_specifiers: ""
+    pending_version_specifiers: ""
+    script_name: "default"
