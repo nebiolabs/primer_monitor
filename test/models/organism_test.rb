@@ -18,9 +18,9 @@ class OrganismTest < ActiveSupport::TestCase
 
     expected = {
       data_fetched: true,
-      primer_sets: {'track1' => 'value1'},
+      primer_sets: { 'track1' => 'value1' },
       default_tracks: 'default_tracks',
-      lineage_sets: {'lineage1' => 'value1'},
+      lineage_sets: { 'lineage1' => 'value1' },
       default_lineage: 'default_lineage'
     }
 

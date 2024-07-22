@@ -46,7 +46,6 @@ class Organism < ApplicationRecord
   end
 
   def process_lineage_variants_data(tracks_json, defaults_json, lineages_json)
-
     primer_sets = JSON.parse(tracks_json)
 
     defaults_parsed = JSON.parse(defaults_json)
