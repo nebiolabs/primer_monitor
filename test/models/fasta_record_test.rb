@@ -4,7 +4,8 @@ require 'test_helper'
 
 class FastaRecordTest < ActiveSupport::TestCase
   test 'metadata_parse' do
-    new_records = FastaRecord.parse(Rails.root.join('test/fixtures/metadata.tsv'))
+    new_records = FastaRecord.parse(Rails.root.join('test/fixtures/metadata.tsv'),
+                                    OrganismTaxon.find_by(name: 'SARS-CoV-2'))
     assert_equal(7, new_records.size) # AUS/NT01/2020 and AUS/NT02/2020 are already in via the fixtures
     assert(new_records[0].valid?, new_records[0].errors.full_messages)
     assert(new_records[0].detailed_geo_location.valid?, new_records[0].detailed_geo_location.errors.full_messages)

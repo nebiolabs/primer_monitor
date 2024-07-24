@@ -4,7 +4,7 @@ require 'test_helper'
 
 class OrganismsControllerTest < ActionDispatch::IntegrationTest
   setup do
-    @organism = organisms(:one)
+    @organism = organisms(:sars_cov_2)
   end
 
   test 'should get show' do
