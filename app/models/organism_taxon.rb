@@ -2,4 +2,5 @@
 
 class OrganismTaxon < ApplicationRecord
   belongs_to :lineage_caller
+  belongs_to :organism
 end

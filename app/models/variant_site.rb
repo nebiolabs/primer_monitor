@@ -31,7 +31,7 @@ class VariantSite < ApplicationRecord
     ref_end = ref_pos + variant.length
     variant = "#{variant.length}-" if variant_type.include? 'D'
     variant = "#{variant.length}N" if variant.include? 'N'
-    VariantSite.new(ref_start: ref_pos.to_s, ref_end: ref_end, variant_type: variant_type,
-                    variant: variant, fasta_record_id: fasta_record_id, organism_taxon_id: taxon.id)
+    VariantSite.new(ref_start: ref_pos.to_s, ref_end:, variant_type:,
+                    variant:, fasta_record_id:, organism_taxon_id: taxon.id)
   end
 end

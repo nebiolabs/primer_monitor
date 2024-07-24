@@ -1,0 +1,6 @@
+sars_cov_2_taxon:
+    name: "SARS-CoV-2"
+    organism: sars_cov_2
+    reference_accession: "NC_045512.2"
+    ncbi_taxon_id: 2697049
+    lineage_caller: default

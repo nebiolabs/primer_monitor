@@ -12,36 +12,10 @@ class LineageVariantsController < ApplicationController
       "organism_name": @organism.name
     }
 
-    @primer_sets = {}
-    @default_tracks = []
-    @lineage_sets = {}
+    @track_data = @organism.lineage_variants_data(@config[:data_server], @config[:organism_slug])
 
-    @data_fetched = false
+    @default_lineage = params[:lineage] if params.key? 'lineage'
 
-    tracks_req = HTTParty.get("#{@config[:data_server]}/#{@config[:organism_slug]}/config/tracks.json")
-    defaults_req = HTTParty.get("#{@config[:data_server]}/#{@config[:organism_slug]}/defaults.json")
-    lineages_req = HTTParty.get("#{@config[:data_server]}/#{@config[:organism_slug]}/config/lineage_sets.json")
-
-    return unless tracks_req.code == 200 && defaults_req.code == 200 && lineages_req.code == 200
-
-    @data_fetched = true
-
-    @primer_sets = JSON.parse(tracks_req.body)
-
-    defaults_parsed = JSON.parse(defaults_req.body)
-    @default_tracks = defaults_parsed['tracks']
-    @default_lineage = defaults_parsed['lineage']
-
-    if params.key? 'lineage'
-      Rails.logger.warn params[:lineage]
-      @default_lineage = params[:lineage]
-    end
-
-    if params.key? 'primer_sets'
-      Rails.logger.warn params[:primer_sets]
-      @default_tracks = params[:primer_sets].split(',')
-    end
-
-    @lineage_sets = JSON.parse(lineages_req.body)
+    @default_tracks = params[:primer_sets].split(',') if params.key? 'primer_sets'
   end
 end

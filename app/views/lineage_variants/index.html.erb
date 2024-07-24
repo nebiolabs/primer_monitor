@@ -1,3 +1,7 @@
+<% content_for :head do %>
+  <%= javascript_import_module_tag "lineage_variants" %>
+<% end %>
+
 <h1 class="title"><%= @organism.name %> Lineage Variant Summary</h1>
 
 <% primer_sets_map = {} %>
@@ -12,11 +16,11 @@
   <p>The score listed for a variant is the percent of sequences it occurs in for the selected lineage set.
   The score listed for a primer is determined by the scoring algorithm described below.</p>
 </div>
-<% if @data_fetched %>
+<% if @track_data[:data_fetched] %>
 <form id="primer_set_selection">
   <p>Lineage:</p>
   <div class="columns is-multiline is-gapless">
-    <% @lineage_sets.each { |lineageSet, displayName| %>
+    <% @track_data[:lineage_sets].each { |lineageSet, displayName| %>
       <div class="column is-one-fifth">
         <%= label_tag "lineage_set_"+i.to_s, class: 'lineage_set_radiobutton_label' do %>
           <span class="primer_display_name"><%= displayName %></span>
@@ -30,13 +34,13 @@
   <hr><p>Show primer sets:</p>
   <div class="columns is-multiline is-gapless">
   <% i = 0 %>
-  <% @primer_sets.each { |primerSet, displayName| %>
+  <% @track_data[:primer_sets].each { |primerSet, displayName| %>
     <div class="column is-one-fifth">
     <%= label_tag "primer_set_"+i.to_s, class: 'primer_set_checkbox_label' do %>
       <span class="primer_display_name"><%= displayName %></span>
       <%= check_box_tag "primer_set_"+i.to_s, 1, false, class: 'primer_set_checkbox', disabled: true %>
       <% primer_sets_map["primer_set_"+i.to_s] = [primerSet, displayName] %>
-      <% default_tracks_map["primer_set_"+i.to_s] = @default_tracks.include? primerSet %>
+      <% default_tracks_map["primer_set_"+i.to_s] = @track_data[:default_tracks].include? primerSet %>
       <% i+=1 %>
     <% end %>
     </div>
@@ -54,7 +58,7 @@
 </div>
 <p id="primer_set_json" class="invisible"><%= primer_sets_map.to_json %></p>
 <p id="default_tracks_json" class="invisible"><%= default_tracks_map.to_json %></p>
-<p id="default_lineage" class="invisible"><%= @default_lineage %></p>
+<p id="default_lineage" class="invisible"><%= @track_data[:default_lineage] %></p>
 <p id="config" class="invisible"><%= @config.to_json %></p>
 <p id="lineage_set_json" class="invisible"><%= lineage_sets_map.to_json %></p>
 <div id="igv" class="igv_div"></div>
@@ -103,5 +107,4 @@
 </div>
 <hr>
 <div>
-  <%= javascript_pack_tag "lineage_variants" %>
 </div>

@@ -5,8 +5,11 @@
   <%= csrf_meta_tags %>
   <%= csp_meta_tag %>
 
-  <%= stylesheet_link_tag 'application', media: 'all', 'data-turbolinks-track': 'reload' %>
-  <%= javascript_pack_tag 'application', 'data-turbolinks-track': 'reload' %>
+  <link rel="stylesheet" media="all" href="https://cdn.datatables.net/v/dt/dt-1.12.0/b-1.7.1/b-html5-1.7.1/b-print-1.7.1/r-2.3.0/sl-1.4.0/datatables.min.css" />
+  <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+  <%= stylesheet_link_tag 'application', media: 'all', 'data-turbo-track': 'reload' %>
+  <%= javascript_importmap_tags %>
+  <%= yield :head %>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="google-site-verification" content="AWnkeglB0upQ0LFdvIFEDSHkq4LvF1MHm2i1ZEynEXE"/>
 </head>
@@ -34,6 +37,8 @@
           <div class="navbar-dropdown">
             <%= link_to 'Organism', organism_url(organism.slug), class: 'navbar-item' %>
             <hr class="navbar-divider">
+            <%= link_to 'Primer Sets', organism_primer_sets_url(organism.slug), class: 'navbar-item' %>
+
             <%= link_to 'Lineages', organism_lineages_url(organism.slug), class: 'navbar-item' %>
 
             <%= link_to 'Lineage Variants', organism_lineage_variants_path(organism.slug), class: 'navbar-item' %>

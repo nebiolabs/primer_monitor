@@ -1,3 +1,4 @@
 sars_cov_2:
-  name: SARS-CoV-2
-  ncbi_taxon_id: 1
+  name: "SARS-CoV-2"
+  slug: "sars-cov-2"
+  public: true

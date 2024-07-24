@@ -8,7 +8,7 @@
     <% else %>
       <%= button_to "Subscribe", primer_set_subscriptions_path( primer_set_id: primer_set.id ),
                     remote: true, class:"button is-link is-small primer_set_#{primer_set.id}",
-                    title: 'You not are currently subscribed, click to subscribe'
+                    title: 'You are not currently subscribed, click to subscribe'
       %>
     <% end %>
   <% else %>

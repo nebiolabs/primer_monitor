@@ -1,5 +1,5 @@
-require("igv");
-let $ = require('jquery');
+import 'init_jquery';
+import "igv";
 
 let igvBrowser = null; //declaring this as a global for later
 let tracks = [];
@@ -187,9 +187,23 @@ function initBrowser() {
 
 function setRadiobuttons(selected)
 {
+    let selectionFound = false;
     $('.lineage_set_radiobutton').each(function (index, element) {
         element.checked = (lineageSetsToNames[element.value][0] === selected);
+        if(element.checked) {
+            selectionFound = true
+        }
     });
+    if(!selectionFound) { //if selection missing, select "all" as a fallback
+        let allValue = null;
+        for (let lineageSetKey in lineageSetsToNames) {
+            if (lineageSetsToNames[lineageSetKey][0] === 'all') {
+                allValue = lineageSetKey;
+                break;
+            }
+        }
+        $('.lineage_set_radiobutton[value='+allValue+']')[0].checked = true;
+    }
 }
 
 function setCheckboxes(state)
@@ -235,8 +249,3 @@ $(document).ready(function(){
     loadConfig();
     initBrowser();
 })
-
-
-
-
-

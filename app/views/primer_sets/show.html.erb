@@ -1,3 +1,7 @@
+<% content_for :head do %>
+  <%= javascript_import_module_tag "primer_sets_show" %>
+<% end %>
+
 <h1 class="title">Primer Set: <%= @primer_set.name %> </h1>
 <div class="tile">
   <div class="tile is-parent">
@@ -9,7 +13,7 @@
   <div class="tile is-parent">
     <div class="tile box is-child">
     <strong>Amp. Method: </strong>
-    <%= link_to @primer_set.amplification_method, @primer_set.amplification_method.description_url %>
+    <%= link_to @primer_set.amplification_method.to_s, @primer_set.amplification_method.description_url %>
     </div>
   </div>
   <% if @primer_set.display_url %>
@@ -106,5 +110,3 @@
   <%= link_to 'Edit', edit_primer_set_path(@primer_set) %> |
 <% end %>
 <%= link_to 'All Primer Sets', primer_sets_path %>
-
-<%= javascript_pack_tag "primer_sets_show" %>

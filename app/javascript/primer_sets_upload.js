@@ -1,7 +1,4 @@
-const $ = require("jquery");
-
-
-
+import 'init_jquery';
 $(document).ready(function(){
 
     const fasta_upload = $('#fasta_upload');

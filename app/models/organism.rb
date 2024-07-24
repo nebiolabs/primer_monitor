@@ -31,4 +31,30 @@ class Organism < ApplicationRecord
 
     [config, primer_sets]
   end
+
+  def lineage_variants_data(data_server, organism_slug)
+    tracks_req = HTTParty.get("#{data_server}/#{organism_slug}/config/tracks.json")
+    defaults_req = HTTParty.get("#{data_server}/#{organism_slug}/defaults.json")
+    lineages_req = HTTParty.get("#{data_server}/#{organism_slug}/config/lineage_sets.json")
+
+    unless tracks_req.code == 200 && defaults_req.code == 200 && lineages_req.code == 200
+      # data_fetched, @primer_sets, @default_tracks, @lineage_sets, @default_lineage
+      return { data_fetched: false }
+    end
+
+    process_lineage_variants_data tracks_req.body, defaults_req.body, lineages_req.body
+  end
+
+  def process_lineage_variants_data(tracks_json, defaults_json, lineages_json)
+    primer_sets = JSON.parse(tracks_json)
+
+    defaults_parsed = JSON.parse(defaults_json)
+    default_tracks = defaults_parsed['tracks']
+    default_lineage = defaults_parsed['lineage']
+
+    lineage_sets = JSON.parse(lineages_json)
+
+    { data_fetched: true, primer_sets:, default_tracks:, lineage_sets:,
+      default_lineage: }
+  end
 end

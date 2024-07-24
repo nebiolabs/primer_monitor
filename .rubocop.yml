@@ -10,6 +10,7 @@ AllCops:
     - 'vendor/**/*'
     - 'config/**/*'
     - 'db/migrate/*'
+    - 'db/schema.rb'
 
 Metrics/MethodLength:
   Max: 20
