@@ -3,8 +3,11 @@
 require 'application_system_test_case'
 
 class UsersTest < ApplicationSystemTestCase
+  include Devise::Test::IntegrationHelpers
+
   setup do
     @user = users(:one)
+    sign_in(users(:admin_user))
   end
 
   test 'visiting the show' do

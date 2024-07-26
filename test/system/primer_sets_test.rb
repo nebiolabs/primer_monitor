@@ -3,7 +3,10 @@
 require 'application_system_test_case'
 
 class PrimerSetsTest < ApplicationSystemTestCase
+  include Devise::Test::IntegrationHelpers
+
   setup do
+    sign_in(users(:admin_user))
     @primer_set = primer_sets(:one)
   end
 

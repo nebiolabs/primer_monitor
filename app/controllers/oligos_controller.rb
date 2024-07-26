@@ -32,7 +32,7 @@ class OligosController < ApplicationController
         format.html { redirect_to @oligo, notice: 'Oligo was successfully created.' }
         format.json { render :show, status: :created, location: @oligo }
       else
-        format.html { render :created }
+        format.html { render :new }
         format.json { render json: @oligo.errors, status: :unprocessable_entity }
       end
     end
@@ -72,6 +72,6 @@ class OligosController < ApplicationController
   # Only allow a list of trusted parameters through.
   def oligo_params
     params.require(:oligo).permit(%i[id primer_set_id name short_name
-                                     locus category sequence])
+                                     locus category sequence ref_start ref_end])
   end
 end

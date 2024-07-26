@@ -5,14 +5,22 @@ one:
   last: Gehry
   email: frank@contemporary.example.org
   confirmed: true
+  activated: true
   active: true
+  approved: true
+  confirmed_at: <%= Time.zone.now - 1.hour %>
+  confirmation_sent_at: <%= Time.zone.now - 2.hours %>
 
 two:
   first: Mies
   last: van der Rohe
   email: mies@modernist.example.org
   confirmed: true
+  activated: true
   active: true
+  approved: true
+  confirmed_at: <%= Time.zone.now - 1.hour %>
+  confirmation_sent_at: <%= Time.zone.now - 2.hours %>
 
 admin_user:
   first: Admin

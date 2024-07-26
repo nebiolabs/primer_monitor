@@ -3,8 +3,11 @@
 require 'application_system_test_case'
 
 class OligosTest < ApplicationSystemTestCase
+  include Devise::Test::IntegrationHelpers
+
   setup do
     @oligo = oligos(:one)
+    sign_in(users(:admin_user))
   end
 
   test 'visiting the show' do

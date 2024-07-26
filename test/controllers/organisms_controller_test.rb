@@ -3,8 +3,11 @@
 require 'test_helper'
 
 class OrganismsControllerTest < ActionDispatch::IntegrationTest
+  include Devise::Test::IntegrationHelpers
+
   setup do
-    @organism = organisms(:sars_cov_2)
+    sign_in(users(:admin_user))
+    @organism = organisms(:example)
   end
 
   test 'should get show' do
@@ -19,7 +22,7 @@ class OrganismsControllerTest < ActionDispatch::IntegrationTest
 
   test 'should create organism' do
     assert_difference('Organism.count') do
-      post organisms_url, params: { organism: { name: @organism.name, ncbi_taxon_id: @organism.ncbi_taxon_id } }
+      post organisms_url, params: { organism: { name: @organism.name } }
     end
 
     assert_redirected_to organism_url(Organism.last)
@@ -37,7 +40,7 @@ class OrganismsControllerTest < ActionDispatch::IntegrationTest
 
   test 'should update organism' do
     patch organism_url(@organism), params:
-      { organism: { name: @organism.name, ncbi_taxon_id: @organism.ncbi_taxon_id } }
+      { organism: { name: @organism.name } }
     assert_redirected_to organism_url(@organism)
   end
 

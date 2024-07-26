@@ -3,8 +3,11 @@
 require 'application_system_test_case'
 
 class OrganismsTest < ApplicationSystemTestCase
+  include Devise::Test::IntegrationHelpers
+
   setup do
-    @organism = organisms(:one)
+    sign_in(users(:admin_user))
+    @organism = organisms(:example)
   end
 
   test 'visiting the show' do
