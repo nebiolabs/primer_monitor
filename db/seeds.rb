@@ -10,6 +10,8 @@ admin = User.create_with(first: 'Admin', last: 'User',
                          active: true, approved: true, confirmed: true)
             .find_or_create_by!(email: ENV['ADMIN_EMAIL'])
 
+
+
 %w[administrator pi operator participant].each do |role_name|
   Role.find_or_create_by!(name: role_name)
 end
@@ -86,10 +88,9 @@ features = [['N', 28_274, 29_533],
             ['ORF7b', 27_756, 27_887],
             ['5\'UTR', 1, 265],
             ['3\'UTR', 29_675, 29_903]]
-organism = Organism.find_or_create_by(name: 'SARS-CoV-2')
 features.each do |feature|
   GenomicFeature.find_or_create_by!(name: feature[0], ref_start: feature[1], ref_end: feature[2],
-                                    organism_id: organism.id)
+                                    organism_id: sars.id)
 end
 
 # Creates a list of views to operate on (views/*.sql). Order is defined by numeric prefix to view name

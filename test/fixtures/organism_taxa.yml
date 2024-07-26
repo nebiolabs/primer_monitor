@@ -1,6 +1,6 @@
-sars_cov_2_taxon:
-    name: "SARS-CoV-2"
-    organism: sars_cov_2
+example_taxon:
+    name: "Example-Taxon"
+    organism: example
     reference_accession: "NC_045512.2"
     ncbi_taxon_id: 2697049
-    lineage_caller: default
+    lineage_caller: example_lineage_caller

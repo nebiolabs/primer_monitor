@@ -1,4 +1,4 @@
-default:
+example_lineage_caller:
     name: "default"
     version_specifiers: ""
     pending_version_specifiers: ""

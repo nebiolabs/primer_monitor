@@ -2,10 +2,12 @@
 
 one:
   name: Charité
-  organism: sars_cov_2
+  organism: example
   user: one
+  amplification_method: qpcr
 
 two:
   name: CDC
-  organism: sars_cov_2
+  organism: example
   user: one
+  amplification_method: lamp

@@ -19,7 +19,9 @@ admin_user:
   last: User
   email: admin_user@example.org
   confirmed: true
+  activated: true
   active: true
   approved: true
-
+  confirmed_at: <%= Time.zone.now - 1.hour %>
+  confirmation_sent_at: <%= Time.zone.now - 2.hours %>
 

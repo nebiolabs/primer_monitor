@@ -2,6 +2,10 @@
 
 one:
   num_identities: 1
+  organism: example
+  oligo: one
 
 two:
   num_identities: 1
+  organism: example
+  oligo: two

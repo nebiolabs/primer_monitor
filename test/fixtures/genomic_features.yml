@@ -1,0 +1,7 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+example_feature:
+    name: example_feature
+    ref_start: 1
+    ref_end: 29903
+    organism: example
