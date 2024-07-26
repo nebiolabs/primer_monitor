@@ -29,8 +29,6 @@
   <div id="navbarBasicExample" class="navbar-menu">
     <div class="navbar-start">
 
-      <% sarscov2 = Organism.find_by(slug: 'sars-cov-2').name %>
-
       <% Organism.where(public:true).each do |organism| %>
         <div class="navbar-item has-dropdown is-hoverable">
         <a class="navbar-link"><%=organism.name%></a>
