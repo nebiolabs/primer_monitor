@@ -1,0 +1,643 @@
+#LyX 2.3 created this file. For more info see http://www.lyx.org/
+\lyxformat 544
+\begin_document
+\begin_header
+\save_transient_properties true
+\origin unavailable
+\textclass article
+\use_default_options true
+\maintain_unincluded_children false
+\language english
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman "default" "default"
+\font_sans "default" "default"
+\font_typewriter "default" "default"
+\font_math "auto" "auto"
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100 100
+\font_tt_scale 100 100
+\use_microtype false
+\use_dash_ligatures true
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\use_hyperref false
+\papersize default
+\use_geometry false
+\use_package amsmath 1
+\use_package amssymb 1
+\use_package cancel 1
+\use_package esint 1
+\use_package mathdots 1
+\use_package mathtools 1
+\use_package mhchem 1
+\use_package stackrel 1
+\use_package stmaryrd 1
+\use_package undertilde 1
+\cite_engine basic
+\cite_engine_type default
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\justification true
+\use_refstyle 1
+\use_minted 0
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\is_math_indent 0
+\math_numbering_side default
+\quotes_style english
+\dynamic_quotes 0
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Title
+A web-based tool for identifying viral sequencing and detection primers
+ impacted by novel variants
+\end_layout
+
+\begin_layout Author
+[AUTHORS]
+\end_layout
+
+\begin_layout Abstract
+[TODO]
+\end_layout
+
+\begin_layout Section*
+Introduction
+\end_layout
+
+\begin_layout Standard
+[what are sequencing and detection primers for, how do they work, why are
+ they important, how are variants a problem and why do we need to track
+ them]
+\end_layout
+
+\begin_layout Standard
+[what does primer-monitor do also, what is the tool's proper name, going
+ to be here, primer-monitor or primer monitor tool/PMT]
+\end_layout
+
+\begin_layout Section*
+Functionality
+\end_layout
+
+\begin_layout Standard
+[data flow from sequencing -> NCBI -> primer-monitor -> variant/lineage
+ calling -> primer impact detection -> visualization/notification]
+\end_layout
+
+\begin_layout Subsection*
+Variant Detection
+\end_layout
+
+\begin_layout Standard
+[loading seqs and detecting variants]
+\end_layout
+
+\begin_layout Subsection*
+Lineage Classification
+\end_layout
+
+\begin_layout Standard
+[lineage classification, breaking down number of seqs/lineage]
+\end_layout
+
+\begin_layout Subsection*
+Primer Impact Detection
+\end_layout
+
+\begin_layout Standard
+[primer registration, detection of overlaps with variants, and automatic
+ emails]
+\end_layout
+
+\begin_layout Subsection*
+Interactive Visualization
+\end_layout
+
+\begin_layout Standard
+[igvjs visualization, lineage breakdown]
+\end_layout
+
+\begin_layout Section*
+[Example Usage]
+\end_layout
+
+\begin_layout Standard
+[Instead of results, how about a 
+\begin_inset Quotes eld
+\end_inset
+
+case study
+\begin_inset Quotes erd
+\end_inset
+
+ on a specific variant and primer, showing how the tool detects and flags
+ it in the interactive visualization]
+\end_layout
+
+\begin_layout Section*
+Data and Methods
+\end_layout
+
+\begin_layout Subsection*
+Data Sources
+\end_layout
+
+\begin_layout Standard
+Primer-monitor uses virus sequence data from NCBI, accessed through the
+ NCBI Virus database, as well as reference genomes from NCBI GenBank.The
+ specific accession numbers and taxon IDs used (as of the time of writing)
+ are as follows:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Tabular
+<lyxtabular version="3" rows="4" columns="4">
+<features tabularvalignment="middle">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<column alignment="center" valignment="top">
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Organism/Clade
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+GenBank Accession
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+NCBI Taxon ID
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Lineage Caller
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+SARS-CoV-2
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+NC_045512.2
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+2697049
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Pangolin
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+RSV-A
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+NC_038235.1
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+208893
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Nextclade
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+RSV-B
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+NC_001781.1
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+208895
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Nextclade
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection*
+Data Visualization
+\end_layout
+
+\begin_layout Standard
+[TODO talk about the igvjs]
+\end_layout
+
+\begin_layout Subsection*
+Variant Impact Detection
+\end_layout
+
+\begin_layout Standard
+[explain the correct algorithm for this, the igvjs one, then *fix it in
+ the tool so the emails use this too*]
+\end_layout
+
+\begin_layout Standard
+To distinguish primers that are likely to be actually impacted from ones
+ affected by a rare variant or a sequencing error, impact is determined
+ by both the the number of times each variant appears in the data, and the
+ number, length, and position of variants overlapping a primer.
+ To eliminate sequencing errors and other low-frequency variants that will
+ likely not have a significant impact on primers, a variant is only considered
+ in the calculation if it occurs either in at least 1% of sequences (and
+ no less than 10 sequences) in the dataset (after filtering by lineage).
+ Primers are then scored based on the length and position of overlapping
+ variants, and labeled as affected if this results in a sufficiently high
+ score.
+ To focus on recent mutations in the SARS-CoV-2 virus, only variants from
+ the last 180 days are considered.
+\end_layout
+
+\begin_layout Standard
+The composite score for a primer is the sum of all overlapping variant scores.
+ Variant scores are based on length, whether they are indels or mismatches,
+ and position in the primer.
+ Since long variants are more likely to disrupt primer binding, an exponentially
+-increasing length penalty is added.
+ To account for variant position and indels, a flat multiplier is applied
+ to the score for the relevant bases.
+ Indels and variants 3-5 nt in from (but not at) the 3' end of a primer
+ have the highest multipliers, as these traits empirically relate primer
+ disruption.
+ Variants ≤3 nt from the 5' end of the primer, or ≤2 nt from the 3' end
+ have multipliers that reduce the score compared to the default for any
+ other position.
+ We consider variants at these positions to be less likely to affect polymerase
+ binding.
+ For 5' variants, this is because it creates a flap on the 5' end, which
+ interferes less with amplification.
+ For variants at the 3' end, we assume that 3’-5’ exonuclease activity in
+ commonly used polymerases can remove mismatched bases.
+ While we attempt to model the observed effects of variants observed, it
+ is likely imperfect.
+ Proposed variant impacts should be assessed experimentally as we did in
+ SARS-CoV-2 for early omicron [cite], BQ.1 associated variation [cite] and
+ more generally for LAMP applications [cite]
+\end_layout
+
+\begin_layout Standard
+[I've pasted the website text in here as a starting point, the references
+ are on the website I just need to pull them in]
+\end_layout
+
+\begin_layout Subsection*
+Data Download and Processing
+\end_layout
+
+\begin_layout Standard
+To keep primer-monitor up to date with the latest virus sequences, a Nextflow
+ pipeline (hereafter the 
+\begin_inset Quotes eld
+\end_inset
+
+data update pipeline
+\begin_inset Quotes erd
+\end_inset
+
+) runs once each day.
+ This pipeline pulls in new sequences from NCBI Virus, aligns them, performs
+ lineage calling, and stores them in the database.
+\end_layout
+
+\begin_layout Subsubsection*
+Pipeline Details
+\end_layout
+
+\begin_layout Standard
+This pipeline downloads sequence data from NCBI Virus and filters it to
+ only include sequences that are not already in primer-monitor's database.
+ As these sequences are in a TSV format from NCBI, they are then reformatted
+ into two files: a FASTA for the sequences and a separate metadata file
+ for the metadata.
+ The FASTA is then split into chunks of 10000 sequences (to improve parallelism)
+ and fed to minimap2 with the -r 10000 --score-N=0 --eqx -x map-ont flags
+ set.
+ The resulting alignments are parsed to produce a list of variants (i.e.
+ SNPs) for use in later processing.
+ These sequences are also lineage-called using the relevant lineage caller
+ (Pangolin or Nextclade).
+ The sequence metadata, variants, and lineage calls are stored in the database
+ and the visualization data is recomputed.
+\end_layout
+
+\begin_layout Subsubsection*
+Lineage Callers
+\end_layout
+
+\begin_layout Standard
+In order to handle multiple lineage callers, each with different input and
+ output formats and invocation syntax, a wrapper script was created for
+ each lineage caller with a common input and output format and syntax.
+ The wrapper takes a multi-sequence FASTA of all the input sequences to
+ call, as well as a common set of options that can support all lineage callers
+ used (where an option is not applicable, it is simply ignored by the wrapper).
+ The wrapper outputs a CSV file containing the name of the sequence, the
+ called lineage name, and various caller-dependent metadata.
+ Only the sequence name and lineage name are used by the tool, the remaining
+ metadata is simply stored in the database.
+\end_layout
+
+\begin_layout Subsubsection*
+Error Handling
+\end_layout
+
+\begin_layout Standard
+To prevent a failed pipeline run from placing the database or system into
+ an unknown state, all data (e.g.
+ alignments, lineage calls) for a given batch of 10000 sequences is saved
+ in a single database transaction, meaning that a batch of sequences is
+ either saved correctly or not saved at all.
+ Therefore, if the pipeline crashes during saving, all batches of sequences
+ that are saved will either be complete and valid or absent entirely.
+ If a batch of sequences is absent entirely, the next day's download will
+ detect them as 
+\begin_inset Quotes eld
+\end_inset
+
+new
+\begin_inset Quotes erd
+\end_inset
+
+ and try to load them again.
+ If the error has been corrected and this upload succeeds, the database
+ will now be correct and up-to-date without any manual intervention to remove
+ incorrectly-uploaded data.
+ 
+\end_layout
+
+\begin_layout Standard
+In cases such as sporadic network errors where the issue will resolve on
+ its own, this means single failed data update pipeline runs can often be
+ safely ignored, as the next day's pipeline run will also process and upload
+ the sequences that were not uploaded by the failed run.
+\end_layout
+
+\begin_layout Subsection*
+Lineage Recalling
+\end_layout
+
+\begin_layout Standard
+To ensure the lineage classifications in primer-monitor's database remain
+ up to date with the newest lineage definitions, all sequences' lineages
+ are recalled on the 1st and 14th of every month.
+ This involves both updating the lineage caller and any associated datasets,
+ as well as rerunning lineage calling for every sequence in primer-monitor's
+ database.
+ This process is also carried out using a Nextflow pipeline (hereafter the
+ 
+\begin_inset Quotes eld
+\end_inset
+
+lineage recalling pipeline
+\begin_inset Quotes erd
+\end_inset
+
+).
+ 
+\end_layout
+
+\begin_layout Subsubsection*
+Pipeline Details
+\end_layout
+
+\begin_layout Standard
+This pipeline updates the organism's lineage caller and dataset and saves
+ the new version as 
+\begin_inset Quotes eld
+\end_inset
+
+pending
+\begin_inset Quotes erd
+\end_inset
+
+.
+ Like in the data update pipeline, it then downloads sequence data from
+ NCBI Virus.
+ However, instead of only processing new sequences, this pipeline only processes
+ sequences that are already in the database.
+ The sequences As the sequences are already in the database, aligning them
+ is not necessary.
+ The sequences are then lineage-called using the new 
+\begin_inset Quotes eld
+\end_inset
+
+pending
+\begin_inset Quotes erd
+\end_inset
+
+ lineage caller and saved in the database (once again as 
+\begin_inset Quotes eld
+\end_inset
+
+pending
+\begin_inset Quotes erd
+\end_inset
+
+).
+ Once all lineage calls have been processed and saved, the current lineage
+ calls are replaced with the pending calls in a single transaction, and
+ the now-orphaned lineage call records from the old current calls are deleted.
+ If this all succeeded, the pending lineage caller/dataset version is set
+ as the current version for future data update pipeline runs, and the visualizat
+ion data is recomputed.
+\end_layout
+
+\begin_layout Subsubsection*
+Error Handling
+\end_layout
+
+\begin_layout Standard
+As this pipeline updates software as well as data, further measures are
+ needed to prevent a failed run from placing the system in an unknown state.
+ Specifically, if the software was updated but the run failed, without further
+ safeguards, the next day's data update would use the new lineage caller
+ without properly recalling the previous sequences.
+ To avoid this, the lineage recalling pipeline first saves the new lineage
+ caller version as 
+\begin_inset Quotes eld
+\end_inset
+
+pending
+\begin_inset Quotes erd
+\end_inset
+
+ so it can use the new version, but if the pipeline fails, the next day's
+ data update pipeline would still use the original lineage caller.
+ 
+\end_layout
+
+\begin_layout Standard
+Additionally, to avoid a failure during the process of recalling lineages
+ producing a database state where some sequences have updated lineage calls
+ and some do not, all new lineage calls are stored in a separate 
+\begin_inset Quotes eld
+\end_inset
+
+pending_lineage
+\begin_inset Quotes erd
+\end_inset
+
+ column, which is swapped with the current lineage in a single transaction
+ for every sequence once all lineages have been recalled.
+ This is required as the entirety of the new lineage data is too large to
+ save in a single transaction.
+ Therefore, a failure partway through lineage recalling will simply leave
+ the updated calls as 
+\begin_inset Quotes eld
+\end_inset
+
+pending
+\begin_inset Quotes erd
+\end_inset
+
+, with no effect on the current data used by the tool.
+\end_layout
+
+\begin_layout Section*
+[something for the tools we used]
+\end_layout
+
+\begin_layout Standard
+[just like with the methylation paper, list and cite tools here, plus our
+ repo]
+\end_layout
+
+\begin_layout Section*
+Acknowledgments
+\end_layout
+
+\begin_layout Standard
+[exactly what it says]
+\end_layout
+
+\end_body
+\end_document
