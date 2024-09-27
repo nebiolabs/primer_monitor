@@ -29,24 +29,24 @@ class OrganismsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test 'should show organism' do
-    get organism_url(@organism)
+    get organism_url(@organism.slug)
     assert_response :success
   end
 
   test 'should get edit' do
-    get edit_organism_url(@organism)
+    get edit_organism_url(@organism.slug)
     assert_response :success
   end
 
   test 'should update organism' do
-    patch organism_url(@organism), params:
+    patch organism_url(@organism.slug), params:
       { organism: { name: @organism.name } }
-    assert_redirected_to organism_url(@organism)
+    assert_redirected_to organism_url(@organism.slug)
   end
 
   test 'should destroy organism' do
     assert_difference('Organism.count', -1) do
-      delete organism_url(@organism)
+      delete organism_url(@organism.slug)
     end
 
     assert_redirected_to organisms_url

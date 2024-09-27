@@ -11,7 +11,7 @@ class PrimerSetsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test 'should get index' do
-    get organism_primer_sets_url @primer_set.organism
+    get organism_primer_sets_url @primer_set.organism.slug
     assert_response :success
   end
 
@@ -21,8 +21,15 @@ class PrimerSetsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test 'should create primer_set' do
+    oligo = oligos(:one)
     assert_difference('PrimerSet.count') do
-      post primer_sets_url, params: { primer_set: { creator_id: @primer_set.user_id, name: @primer_set.name } }
+      post primer_sets_url, params: { primer_set: { user_id: @primer_set.user_id, name: "#{@primer_set.name}_copy",
+                                                    amplification_method_id: amplification_methods(:lamp).id,
+                                                    organism_id: organisms(:example).id,
+                                                    oligos_attributes: {
+                                                      oligo.id.to_s => { name: oligo.name.to_s,
+                                                                         sequence: oligo.sequence }
+                                                    } } }
     end
 
     assert_redirected_to primer_set_url(PrimerSet.last)
@@ -40,7 +47,7 @@ class PrimerSetsControllerTest < ActionDispatch::IntegrationTest
 
   test 'should update primer_set' do
     patch primer_set_url(@primer_set), params:
-      { primer_set: { creator_id: @primer_set.user_id, name: @primer_set.name } }
+      { primer_set: { user_id: @primer_set.user_id, name: @primer_set.name } }
     assert_redirected_to primer_set_url(@primer_set)
   end
 

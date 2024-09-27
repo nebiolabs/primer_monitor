@@ -17,8 +17,6 @@ class OrganismsController < ApplicationController
   # GET /organisms/1
   # GET /organisms/1.json
   def show
-    @organism = Organism.find_by(slug: params[:name])
-
     @config, @primer_sets = @organism.primer_sets_config
 
     variants_url = URI("#{@config[:data_server]}/#{@config[:organism_slug]}/lineage_variants/all.bed")
@@ -78,7 +76,7 @@ class OrganismsController < ApplicationController
 
   # Use callbacks to share common setup or constraints between actions.
   def set_organism
-    @organism = Organism.find_by(name: params[:name])
+    @organism = Organism.find_by(slug: params[:name])
   end
 
   # Only allow a list of trusted parameters through.

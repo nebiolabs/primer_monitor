@@ -1,13 +1,13 @@
 # Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
 one:
-  name: Charité
+  name: Charité_test
   organism: example
   user: one
   amplification_method: qpcr
 
 two:
-  name: CDC
+  name: CDC_test
   organism: example
   user: one
   amplification_method: lamp

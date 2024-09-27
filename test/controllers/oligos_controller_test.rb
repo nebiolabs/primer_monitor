@@ -7,6 +7,7 @@ class OligosControllerTest < ActionDispatch::IntegrationTest
 
   setup do
     @oligo = oligos(:one)
+    @primer_set = primer_sets(:one)
     sign_in(users(:admin_user))
   end
 
@@ -22,7 +23,7 @@ class OligosControllerTest < ActionDispatch::IntegrationTest
 
   test 'should create oligo' do
     assert_difference('Oligo.count') do
-      post oligos_url, params: { oligo: { name: @oligo.name, sequence: @oligo.sequence } }
+      post oligos_url, params: { oligo: { name: @oligo.name, sequence: @oligo.sequence, primer_set_id: @primer_set.id } }
     end
 
     assert_redirected_to oligo_url(Oligo.last)
@@ -39,7 +40,8 @@ class OligosControllerTest < ActionDispatch::IntegrationTest
   end
 
   test 'should update oligo' do
-    patch oligo_url(@oligo), params: { oligo: { name: @oligo.name, sequence: @oligo.sequence } }
+    patch oligo_url(@oligo), params: { oligo: { name: @oligo.name, sequence: @oligo.sequence,
+                                                primer_set_id: @primer_set.id } }
     assert_redirected_to oligo_url(@oligo)
   end
 
