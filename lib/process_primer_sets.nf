@@ -35,7 +35,7 @@ process compute_visualization_data {
 
     set -e
 
-    cp !{primer_names_file} primers_done.txt
+    cp "!{primer_names_file}" primers_done.txt
 
     # recompute the primer data for igvjs visualization
     !{primer_monitor_path}/lib/visualization/update_visualization_data.sh -o !{override_path} \
