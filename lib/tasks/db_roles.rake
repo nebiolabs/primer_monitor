@@ -1,13 +1,15 @@
-Rake::Task["db:setup"].enhance do
-  Rake::Task["db:ensure_db_roles_exist"].invoke
+# frozen_string_literal: true
+
+Rake::Task['db:setup'].enhance do
+  Rake::Task['db:ensure_db_roles_exist'].invoke
 end
 
-Rake::Task["db:reset"].enhance do
-  Rake::Task["db:ensure_db_roles_exist"].invoke
+Rake::Task['db:reset'].enhance do
+  Rake::Task['db:ensure_db_roles_exist'].invoke
 end
 
 namespace :db do
-  desc "Create database roles"
+  desc 'Create database roles'
   task ensure_db_roles_exist: :environment do
     %w[primer_monitor primer_monitor_ro].each do |r|
       role_exists = ActiveRecord::Base.connection.execute("SELECT 1 FROM pg_roles WHERE rolname = '#{r}'").any?
@@ -22,7 +24,7 @@ namespace :db do
     end
   end
 
-  desc "Drop database roles"
+  desc 'Drop database roles'
   task drop_roles: :environment do
     ActiveRecord::Base.connection.execute <<-SQL
       DROP ROLE IF EXISTS primer_monitor;
