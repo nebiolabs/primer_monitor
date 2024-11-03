@@ -4,24 +4,7 @@
 
 <h1 class="title">Organism: <%= @organism.full_name %> </h1>
 
-
-<div class="tile">
-  <strong>NCBI Taxonomy IDs:&nbsp;</strong>
-  <% taxa_count = @organism.organism_taxa.length %>
-  <% i = 0 %>
-  <% taxa_str = '' %>
-  <% @organism.organism_taxa.each do |organism_taxon| %>
-    <% taxa_str += link_to organism_taxon.ncbi_taxon_id, "https://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?id=#{organism_taxon.ncbi_taxon_id}" %>
-    <% if i < taxa_count-1 # don't put a comma after the last taxon %>
-      <% taxa_str += ',&nbsp;' %>
-    <% end %>
-    <% i += 1 %>
-  <% end %>
-  <%= raw taxa_str %>
-</div>
-
-<hr/>
-<h2 class="title">IGV Visualization:</h2>
+<h2 class="title">Genome:</h2>
 
 <p id="config" class="invisible"><%= @config.to_json %></p>
 
@@ -31,6 +14,7 @@
   <p>Variants will be shown once they are processed.</p>
 <% end %>
 
+<%= render partial: 'shared/ncbi_links', locals: { organism: @organism } %>
 
 <hr/>
 
