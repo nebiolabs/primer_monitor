@@ -68,8 +68,10 @@ group :development do
   gem 'ed25519'
   gem 'listen', '~> 3.2'
   gem 'rubocop', require: false
+  gem 'rubocop-capybara', require: false
   gem 'rubocop-performance', require: false
   gem 'rubocop-rails', require: false
+
   # Access an interactive console on exception pages or by calling 'console' anywhere in the code.
   gem 'web-console', '>= 3.3.0'
   # for measuring test coverage
