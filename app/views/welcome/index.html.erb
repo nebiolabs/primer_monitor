@@ -14,9 +14,7 @@
 <hr>
 <div class="columns">
 
-  <% i=0 %>
-
-  <% Organism.where(public: true).each do |organism| %>
+  <% Organism.where(public: true).each_with_index do |organism,i| %>
       <% if i%3 == 0 # start a new row every 3 %>
         </div>
         <hr>
@@ -42,7 +40,6 @@
                 </li>
           </ul>
         </aside>
-        <% i=i+1 %>
       </div>
   <% end %>
 </div>
