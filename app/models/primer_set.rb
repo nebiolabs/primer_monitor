@@ -8,7 +8,7 @@ class PrimerSet < ApplicationRecord
   has_many :subscriptions, dependent: :destroy, class_name: 'PrimerSetSubscription'
   has_many :subscribers, through: :subscriptions, source: :user
 
-  enum status: { created: 'created', complete: 'complete', failed: 'failed', processing: 'processing' }
+  enum :status, { created: 'created', complete: 'complete', failed: 'failed', processing: 'processing' }
 
   accepts_nested_attributes_for :oligos, reject_if: :all_blank, allow_destroy: true
 
@@ -44,6 +44,7 @@ class PrimerSet < ApplicationRecord
     end
   end
 
+  # TODO: switch this to use delayed job, avoid multiple alignments in succession
   def align_primers
     pid = Process.spawn({ 'DB_HOST' => ENV['DB_HOST'], 'DB_NAME' => ENV['DB_NAME'], 'DB_USER' => ENV['DB_USER'],
                           'MICROMAMBA_BIN_PATH' => ENV['MICROMAMBA_BIN_PATH'],

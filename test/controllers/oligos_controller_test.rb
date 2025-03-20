@@ -22,7 +22,9 @@ class OligosControllerTest < ActionDispatch::IntegrationTest
 
   test 'should create oligo' do
     assert_difference('Oligo.count') do
-      post oligos_url, params: { oligo: { name: @oligo.name, sequence: @oligo.sequence } }
+      post oligos_url,
+           params: { oligo: { name: @oligo.name, short_name: 'SN1.1', sequence: @oligo.sequence,
+                              primer_set_id: @oligo.primer_set_id } }
     end
 
     assert_redirected_to oligo_url(Oligo.last)

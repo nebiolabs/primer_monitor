@@ -1,6 +1,6 @@
 <div class="tile">
   <strong>NCBI Taxonomy IDs:&nbsp;</strong>
   <%= organism.organism_taxa.map do |organism_taxon|
-    link_to(organism_taxon.ncbi_taxon_id, "https://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?id=#{organism_taxon.ncbi_taxon_id}")
+    link_to(organism_taxon.ncbi_taxon_id, organism_taxon.url)
   end.join(', ').html_safe %>
 </div>

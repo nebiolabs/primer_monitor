@@ -4,8 +4,9 @@ require 'test_helper'
 
 class FastaRecordTest < ActiveSupport::TestCase
   test 'metadata_parse' do
-    new_records = FastaRecord.parse(Rails.root.join('test/fixtures/metadata.tsv'))
-    assert_equal(7, new_records.size) # AUS/NT01/2020 and AUS/NT02/2020 are already in via the fixtures
+    sc2_taxon = OrganismTaxon.find_by(name: 'SARS-CoV-2')
+    new_records = FastaRecord.parse(Rails.root.join('test/fixtures/metadata.tsv'), sc2_taxon)
+    assert_equal(9, new_records.size) # AUS/NT01/2020 and AUS/NT02/2020 are already in via the fixtures
     assert(new_records[0].valid?, new_records[0].errors.full_messages)
     assert(new_records[0].detailed_geo_location.valid?, new_records[0].detailed_geo_location.errors.full_messages)
     assert(new_records[0].detailed_geo_location
@@ -17,7 +18,7 @@ class FastaRecordTest < ActiveSupport::TestCase
   test 'python_sam_parser' do
     input_sam = Rails.root.join('test/fixtures/complex_cigar.sam')
     parser = Rails.root.join('lib/parse_alignments.py')
-    output = `python #{parser} < #{input_sam}`
+    output = `python3 #{parser} < #{input_sam}`
     assert_equal "hCoV-19/England/MILK-31C5A2D/2022|EPI_ISL_8755092|2022-01-07\t28362\tD\t---------",
                  output.split("\n")[-1]
   end
@@ -25,7 +26,7 @@ class FastaRecordTest < ActiveSupport::TestCase
   test 'soft clips' do
     input_sam = Rails.root.join('test/fixtures/soft_clip_cigar.sam')
     parser = Rails.root.join('lib/parse_alignments.py')
-    output = `python #{parser} < #{input_sam}`
+    output = `python3 #{parser} < #{input_sam}`
     assert_equal "hCoV-19/USA/CO-CDPHE-2100422558/2021\t29197\tX\tT",
                  output.split("\n")[-1]
   end

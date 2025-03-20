@@ -13,13 +13,18 @@ class OrganismsController < ApplicationController
   # GET /organisms/1
   # GET /organisms/1.json
   def show
-    @organism = Organism.find_by(slug: params[:name])
+    @organism = Organism.find_by!(slug: params[:slug])
 
     @config, @primer_sets = @organism.primer_sets_config
 
     variants_url = URI("#{@config[:data_server]}/#{@config[:organism_slug]}/lineage_variants/all.bed")
 
-    @config[:variants_exist] = (Net::HTTP.get_response(URI(variants_url)).code == '200')
+    begin
+      response = Net::HTTP.get_response(URI(variants_url))
+      @config[:variants_exist] = (response.code == '200')
+    rescue StandardError
+      @config[:variants_exist] = false
+    end
   end
 
   # GET /organisms/new
@@ -40,7 +45,7 @@ class OrganismsController < ApplicationController
         format.html { redirect_to @organism, notice: 'Organism was successfully created.' }
         format.json { render :show, status: :created, location: @organism }
       else
-        format.html { render :created }
+        format.html { render :new }
         format.json { render json: @organism.errors, status: :unprocessable_entity }
       end
     end
@@ -72,17 +77,11 @@ class OrganismsController < ApplicationController
 
   private
 
-  # Use callbacks to share common setup or constraints between actions.
   def set_organism
-    @organism = Organism.find_by(name: params[:name])
+    @organism = Organism.find_by(slug: params[:slug])
   end
 
-  # Only allow a list of trusted parameters through.
   def organism_params
     params.require(:organism).permit(:name, :alias, :slug)
-  end
-
-  def to_param
-    name
   end
 end

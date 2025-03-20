@@ -4,7 +4,8 @@ require 'test_helper'
 
 class OrganismsControllerTest < ActionDispatch::IntegrationTest
   setup do
-    @organism = organisms(:one)
+    @organism = organisms(:sars_cov2)
+    sign_in(users(:admin_user))
   end
 
   test 'should get show' do
@@ -19,13 +20,16 @@ class OrganismsControllerTest < ActionDispatch::IntegrationTest
 
   test 'should create organism' do
     assert_difference('Organism.count') do
-      post organisms_url, params: { organism: { name: @organism.name, ncbi_taxon_id: @organism.ncbi_taxon_id } }
+      post organisms_url,
+           params: { organism: { name: 'test organism', slug: 'test',
+                                 organism_taxa: [organism_taxa(:sars_cov_2_taxon)] } }
     end
 
     assert_redirected_to organism_url(Organism.last)
   end
 
   test 'should show organism' do
+    Organism.any_instance.stubs(:primer_sets_config).returns([{}, {}])
     get organism_url(@organism)
     assert_response :success
   end
@@ -37,7 +41,7 @@ class OrganismsControllerTest < ActionDispatch::IntegrationTest
 
   test 'should update organism' do
     patch organism_url(@organism), params:
-      { organism: { name: @organism.name, ncbi_taxon_id: @organism.ncbi_taxon_id } }
+      { organism: { name: '${@organism.name}∆' } }
     assert_redirected_to organism_url(@organism)
   end
 

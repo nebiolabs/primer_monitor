@@ -4,22 +4,23 @@ one:
   first: Frank
   last: Gehry
   email: frank@contemporary.example.org
-  confirmed: true
+  confirmed_at: <%= Time.now %>
   active: true
+  roles: [submitter]
 
 two:
   first: Mies
   last: van der Rohe
   email: mies@modernist.example.org
-  confirmed: true
+  confirmed_at: <%= Time.now %>
   active: true
+  roles: [submitter]
 
 admin_user:
   first: Admin
   last: User
   email: admin_user@example.org
-  confirmed: true
+  confirmed_at: <%= Time.now %>
   active: true
   approved: true
-
-
+  roles: [administrator]

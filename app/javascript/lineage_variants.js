@@ -85,7 +85,8 @@ function updatePrimerSets()
     let link_element = $('#link')[0];
     link_element.innerHTML = "";
     link_element.href = "";
-    activeLineageGroup = lineageSetsToNames[$('input[name=lineage]:checked').val()][0];
+    let checkedLineage = $('input[name=lineage]:checked').val();
+    activeLineageGroup = checkedLineage ? lineageSetsToNames[checkedLineage][0] : defaultLineage;
 
     if(igvBrowser != null) { //if it's been loaded
         activeSets = [];

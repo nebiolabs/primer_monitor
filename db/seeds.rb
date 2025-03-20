@@ -7,7 +7,7 @@
 admin = User.create_with(first: 'Admin', last: 'User',
                          password: Rails.application.credentials.admin_password,
                          password_confirmation: Rails.application.credentials.admin_password,
-                         active: true, approved: true, confirmed: true, confirmed_at: Time.now)
+                         active: true, approved: true, confirmed: true, confirmed_at: Time.current)
             .find_or_create_by!(email: ENV['ADMIN_EMAIL'])
 
 %w[administrator pi operator participant].each do |role_name|
@@ -35,6 +35,7 @@ OrganismTaxon.find_or_create_by!(ncbi_taxon_id: 208_895, organism_id: rsv.id, li
 
 lamp = AmplificationMethod.find_or_create_by!(name: 'LAMP')
 qpcr = AmplificationMethod.find_or_create_by!(name: 'qPCR')
+AmplificationMethod.find_or_create_by!(name: 'Multiplex PCR')
 
 lamp_primerset = PrimerSet.find_or_create_by(name: 'NEB LAMP (E2019)', organism: sars, user: admin,
                                              amplification_method: lamp)

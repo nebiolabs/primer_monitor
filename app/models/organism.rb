@@ -9,6 +9,10 @@ class Organism < ApplicationRecord
     name
   end
 
+  def to_param
+    slug
+  end
+
   def full_name
     name + (self.alias.blank? ? '' : " (#{self.alias})")
   end
