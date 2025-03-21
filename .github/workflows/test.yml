@@ -8,6 +8,10 @@ on:
       - master
   pull_request:
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
 
   # label of the job:
@@ -61,7 +65,7 @@ jobs:
         env:
           PGPASSWORD: postgres_password
         run: |   
-          echo "createdb -h localhost -p 5432 -U test_user polbase_test" | tee base
+          echo "createdb -h localhost -p 5432 -U test_user primer_monitor_test" | tee base
       - name: Run tests
         env:
           RAILS_ENV: test
