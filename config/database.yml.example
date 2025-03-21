@@ -16,6 +16,7 @@ test:
   database: primer_monitor_test
   host: localhost
   username: test_user
+  password: postgres_password
 
 production:
   <<: *default
