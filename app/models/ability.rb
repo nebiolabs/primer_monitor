@@ -8,7 +8,7 @@ class Ability
 
   def initialize(user)
     clear_aliased_actions
-    alias_action :show, :show, to: :read
+    alias_action :show, to: :read
     alias_action :edit, to: :update
 
     @user = user || User.new
@@ -29,7 +29,6 @@ class Ability
     can :show, Organism
     can %i[index show], LineagesController
     can :index, LineageVariantsController
-    can :show, PrimerVariantSummariesController
     can %i[new create], User
     can %i[index read], PrimerSet, status: 'complete'
   end

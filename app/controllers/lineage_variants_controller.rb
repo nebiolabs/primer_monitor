@@ -4,7 +4,8 @@ class LineageVariantsController < ApplicationController
   def index
     authorize! :index, LineageVariantsController
 
-    @organism = Organism.find_by(slug: params[:organism_name])
+    @organism = Organism.find_by(slug: params[:organism_slug])
+    return head :not_found unless @organism
 
     @config = {
       "data_server": ENV['IGV_DATA_SERVER'],
@@ -14,8 +15,11 @@ class LineageVariantsController < ApplicationController
 
     @track_data = @organism.lineage_variants_data(@config[:data_server], @config[:organism_slug])
 
-    @default_lineage = params[:lineage] if params.key? 'lineage'
+    return unless @track_data[:data_fetched]
 
-    @default_tracks = params[:primer_sets].split(',') if params.key? 'primer_sets'
+    @url_lineage = params[:lineage].presence
+    @url_primer_sets = params[:primer_sets]&.split(',')
+
+    @lineage_frequencies = @organism.recent_lineage_frequencies
   end
 end

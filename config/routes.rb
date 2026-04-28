@@ -21,7 +21,6 @@ Rails.application.routes.draw do
     resources :lineage_variants, only: [:index]
     resources :lineages, param: :name, constraints: { name: /[A-z0-9.]+/ }
     resources :primer_sets, only: [:index]
-    resource :primer_variant_summary, only: [:show]
   end
 
   resources :oligos

@@ -28,12 +28,20 @@ class Organism < ApplicationRecord
 
     begin
       primer_sets = JSON.parse(Net::HTTP.get(tracks_url)).invert
-    rescue JSON::ParserError
-      # cannot parse JSON properly, treat it as empty
+    rescue JSON::ParserError, Errno::ECONNREFUSED, Errno::ENOENT, SocketError, Net::OpenTimeout, Net::ReadTimeout
       primer_sets = {}
     end
 
     [config, primer_sets]
+  end
+
+  def recent_lineage_frequencies(days: 30)
+    Lineage
+      .joins(lineage_calls: :fasta_record)
+      .where(organism_id: id)
+      .where('fasta_records.date_collected >= ?', days.days.ago.to_date)
+      .group('lineages.name')
+      .count('fasta_records.id')
   end
 
   def lineage_variants_data(data_server, organism_slug)
@@ -41,12 +49,12 @@ class Organism < ApplicationRecord
     defaults_req = HTTParty.get("#{data_server}/#{organism_slug}/defaults.json")
     lineages_req = HTTParty.get("#{data_server}/#{organism_slug}/config/lineage_sets.json")
 
-    unless tracks_req.code == 200 && defaults_req.code == 200 && lineages_req.code == 200
-      # data_fetched, @primer_sets, @default_tracks, @lineage_sets, @default_lineage
-      return { data_fetched: false }
-    end
+    return { data_fetched: false } unless tracks_req.code == 200 && defaults_req.code == 200 && lineages_req.code == 200
 
     process_lineage_variants_data tracks_req.body, defaults_req.body, lineages_req.body
+  rescue Errno::ECONNREFUSED, Errno::ENOENT, SocketError, Net::OpenTimeout, Net::ReadTimeout,
+         HTTParty::Error, JSON::ParserError
+    { data_fetched: false }
   end
 
   def process_lineage_variants_data(tracks_json, defaults_json, lineages_json)
