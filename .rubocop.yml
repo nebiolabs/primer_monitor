@@ -2,6 +2,7 @@ plugins:
   - 'rubocop-rails'
   - 'rubocop-performance'
   - 'rubocop-capybara'
+  - 'rubocop-minitest'
 
 AllCops:
   NewCops: disable
