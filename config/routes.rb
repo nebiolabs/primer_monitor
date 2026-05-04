@@ -17,11 +17,10 @@ Rails.application.routes.draw do
   # hardcoded legacy redirect
   get 'lineages', to: 'lineages#index'
 
-  resources :organisms, param: :name do
+  resources :organisms, param: :slug do
     resources :lineage_variants, only: [:index]
     resources :lineages, param: :name, constraints: { name: /[A-z0-9.]+/ }
     resources :primer_sets, only: [:index]
-    resource :primer_variant_summary, only: [:show]
   end
 
   resources :oligos

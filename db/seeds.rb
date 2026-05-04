@@ -4,10 +4,11 @@
 # The data can then be loaded with the rails db:seed command (or created alongside the database with db:setup).
 
 # password should be changed...
+admin_password = Rails.application.credentials.admin_password || SecureRandom.hex(16)
 admin = User.create_with(first: 'Admin', last: 'User',
-                         password: Rails.application.credentials.admin_password,
-                         password_confirmation: Rails.application.credentials.admin_password,
-                         active: true, approved: true, confirmed: true)
+                         password: admin_password,
+                         password_confirmation: admin_password,
+                         active: true, approved: true, confirmed: true, confirmed_at: Time.current)
             .find_or_create_by!(email: ENV['ADMIN_EMAIL'])
 
 %w[administrator pi operator participant].each do |role_name|
@@ -20,14 +21,14 @@ LineageCaller.find_or_create_by!(name: 'default', script_name: 'default')
 
 pangolin = LineageCaller.find_or_create_by!(name: 'pangolin', script_name: 'pangolin')
 
-sars = Organism.find_or_create_by!(name: 'SARS-CoV-2', slug: 'sars-cov-2')
+sars = Organism.find_or_create_by!(name: 'SARS-CoV-2', slug: 'sars-cov-2') { |o| o.update(public: true) }
 OrganismTaxon.find_or_create_by!(ncbi_taxon_id: 2_697_049, organism_id: sars.id, lineage_caller_id: pangolin.id,
                                  name: 'SARS-CoV-2', reference_accession: 'NC_045512.2')
 
 nextclade_rsva = LineageCaller.find_or_create_by!(name: 'nextclade_rsva', script_name: 'nextclade')
 nextclade_rsvb = LineageCaller.find_or_create_by!(name: 'nextclade_rsvb', script_name: 'nextclade')
 
-rsv = Organism.find_or_create_by!(name: 'RSV', slug: 'rsv')
+rsv = Organism.find_or_create_by!(name: 'RSV', slug: 'rsv') { |o| o.update(public: true) }
 OrganismTaxon.find_or_create_by!(ncbi_taxon_id: 208_893, organism_id: rsv.id, lineage_caller_id: nextclade_rsva.id,
                                  name: 'RSV-A', reference_accession: 'NC_038235.1')
 OrganismTaxon.find_or_create_by!(ncbi_taxon_id: 208_895, organism_id: rsv.id, lineage_caller_id: nextclade_rsvb.id,
@@ -35,6 +36,7 @@ OrganismTaxon.find_or_create_by!(ncbi_taxon_id: 208_895, organism_id: rsv.id, li
 
 lamp = AmplificationMethod.find_or_create_by!(name: 'LAMP')
 qpcr = AmplificationMethod.find_or_create_by!(name: 'qPCR')
+AmplificationMethod.find_or_create_by!(name: 'Multiplex PCR')
 
 lamp_primerset = PrimerSet.find_or_create_by(name: 'NEB LAMP (E2019)', organism: sars, user: admin,
                                              amplification_method: lamp)

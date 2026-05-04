@@ -4,24 +4,7 @@
 
 <h1 class="title">Organism: <%= @organism.full_name %> </h1>
 
-
-<div class="tile">
-  <strong>NCBI Taxonomy IDs:&nbsp;</strong>
-  <% taxa_count = @organism.organism_taxa.length %>
-  <% i = 0 %>
-  <% taxa_str = '' %>
-  <% @organism.organism_taxa.each do |organism_taxon| %>
-    <% taxa_str += link_to organism_taxon.ncbi_taxon_id, "https://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?id=#{organism_taxon.ncbi_taxon_id}" %>
-    <% if i < taxa_count-1 # don't put a comma after the last taxon %>
-      <% taxa_str += ',&nbsp;' %>
-    <% end %>
-    <% i += 1 %>
-  <% end %>
-  <%= raw taxa_str %>
-</div>
-
-<hr/>
-<h2 class="title">IGV Visualization:</h2>
+<h2 class="title">Genome:</h2>
 
 <p id="config" class="invisible"><%= @config.to_json %></p>
 
@@ -31,16 +14,12 @@
   <p>Variants will be shown once they are processed.</p>
 <% end %>
 
-
+<hr/>
+<%= render partial: 'shared/ncbi_links', locals: { organism: @organism } %>
 <hr/>
 
 <ul>
   <li><%= link_to 'Primer Sets', organism_primer_sets_path(@organism.slug) %></li>
   <li><%= link_to 'Lineages', organism_lineages_path(@organism.slug) %></li>
   <li><%= link_to 'Lineage Variants', organism_lineage_variants_path(@organism.slug) %></li>
-  <% if @organism.slug == 'sars-cov-2' %>
-    <li><%= link_to 'Primer Variant Summary', organism_primer_variant_summary_url(@organism.slug) %></li>
-  <% else %>
-    <li>Primer Variant Summary - Coming Soon!</li>
-  <% end %>
 </ul>

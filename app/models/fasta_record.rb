@@ -12,7 +12,7 @@ class FastaRecord < ApplicationRecord
     @new_locations = {}
 
     File.readlines(metadata_tsv).each do |line|
-      next if line.start_with?("accession\t")
+      next if line.start_with?("accession\t", "strain\t")
 
       record_count += 1
       record = build_fasta_record(line, taxon)

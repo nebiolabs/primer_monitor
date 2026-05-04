@@ -7,7 +7,7 @@ class PrimerSetsController < ApplicationController
   # GET /primer_sets
   # GET /primer_sets.json
   def index
-    @organism = Organism.find_by(slug: params[:organism_name])
+    @organism = Organism.find_by(slug: params[:organism_slug])
 
     @subscriptions = PrimerSetSubscription.subscriptions_for_user_by_primer_set(current_user)
 
@@ -44,7 +44,7 @@ class PrimerSetsController < ApplicationController
         # start align script in the background
         @primer_set.align_primers
         format.html do
-          redirect_to @primer_set,
+          redirect_to edit_primer_set_url(@primer_set),
                       notice: 'Primer set was successfully added. It will be visible after processing and review.'
         end
         format.json { render :show, status: :created, location: @primer_set }
@@ -61,7 +61,7 @@ class PrimerSetsController < ApplicationController
     respond_to do |format|
       if @primer_set.update(primer_set_params)
         @primer_set.align_primers
-        format.html { redirect_to @primer_set, notice: 'Primer set was successfully updated.' }
+        format.html { redirect_to edit_primer_set_url(@primer_set), notice: 'Primer set was successfully updated.' }
         format.json { render :show, status: :ok, location: @primer_set }
       else
         format.html { render :edit }

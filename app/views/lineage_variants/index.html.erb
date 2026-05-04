@@ -4,10 +4,6 @@
 
 <h1 class="title"><%= @organism.name %> Lineage Variant Summary</h1>
 
-<% primer_sets_map = {} %>
-<% default_tracks_map = {} %>
-<% lineage_sets_map = {} %>
-<% i = 0 %>
 <div class="block">
   Primers that do not overlap with variants associated with these lineages are shown in blue below a schematic <%= @organism.name %> genome.
   Primers that overlap with enough sufficiently-frequent variants to be potentially impacted (see below) are indicated in orange.
@@ -17,38 +13,46 @@
   The score listed for a primer is determined by the scoring algorithm described below.</p>
 </div>
 <% if @track_data[:data_fetched] %>
+<%
+  sorted_lineages = @track_data[:lineage_sets].sort_by { |k, _| -@lineage_frequencies.fetch(k, 0) }
+  most_frequent = sorted_lineages.find { |k, _| @lineage_frequencies.fetch(k, 0) > 0 }&.first
+  effective_lineage = @url_lineage || most_frequent || @track_data[:default_lineage]
+  effective_primer_sets = @url_primer_sets || @track_data[:default_tracks] || []
+  lineage_display_map = sorted_lineages.to_h
+%>
 <form id="primer_set_selection">
-  <p>Lineage:</p>
-  <div class="columns is-multiline is-gapless">
-    <% @track_data[:lineage_sets].each { |lineageSet, displayName| %>
-      <div class="column is-one-fifth">
-        <%= label_tag "lineage_set_"+i.to_s, class: 'lineage_set_radiobutton_label' do %>
-          <span class="primer_display_name"><%= displayName %></span>
-          <%= radio_button_tag "lineage", "lineage_set_"+i.to_s, (lineageSet == "all"), class: 'lineage_set_radiobutton', disabled: true %>
-          <% lineage_sets_map["lineage_set_"+i.to_s] = [lineageSet, displayName] %>
-          <% i+=1 %>
+  <div class="field">
+    <label class="label">Lineage:</label>
+    <div class="control">
+      <select id="lineage_select" name="lineage" class="wide-select2">
+        <% sorted_lineages.each do |key, display_name| %>
+          <% freq = @lineage_frequencies.fetch(key, 0) %>
+          <% freq_text = freq > 0 ? " (#{number_with_delimiter(freq)} in last 30 days)" : "" %>
+          <option value="<%= key %>"<%= ' selected' if key == effective_lineage %>><%= display_name %><%= freq_text %></option>
         <% end %>
-      </div>
-    <% } %>
-  </div>
-  <hr><p>Show primer sets:</p>
-  <div class="columns is-multiline is-gapless">
-  <% i = 0 %>
-  <% @track_data[:primer_sets].each { |primerSet, displayName| %>
-    <div class="column is-one-fifth">
-    <%= label_tag "primer_set_"+i.to_s, class: 'primer_set_checkbox_label' do %>
-      <span class="primer_display_name"><%= displayName %></span>
-      <%= check_box_tag "primer_set_"+i.to_s, 1, false, class: 'primer_set_checkbox', disabled: true %>
-      <% primer_sets_map["primer_set_"+i.to_s] = [primerSet, displayName] %>
-      <% default_tracks_map["primer_set_"+i.to_s] = @track_data[:default_tracks].include? primerSet %>
-      <% i+=1 %>
-    <% end %>
+      </select>
     </div>
-  <% } %>
   </div>
-  <button id="select_all_primers" disabled="disabled">Select All</button> <button id="unselect_all_primers" disabled="disabled">Clear All</button>
-  <br><br><button class="button is-small is-primary" id="apply" disabled="disabled">Update Tracks</button>
-  <button class="button is-small" id="show_link">Shareable Link</button>
+
+  <div class="field">
+    <label class="label">Primer sets:</label>
+    <div class="control">
+      <select id="primer_set_select" name="primer_sets" multiple class="wide-select2">
+        <% @track_data[:primer_sets].each do |primer_key, display_name| %>
+          <option value="<%= primer_key %>"<%= ' selected' if effective_primer_sets.include?(primer_key) %>><%= display_name %></option>
+        <% end %>
+      </select>
+    </div>
+  </div>
+
+  <div class="field is-grouped">
+    <div class="control">
+      <button class="button is-small is-primary" id="apply" disabled="disabled">Update Tracks</button>
+    </div>
+    <div class="control">
+      <button class="button is-small" id="show_link">Shareable Link</button>
+    </div>
+  </div>
 </form>
 <div id="link_div_wrapper" class="invisible">
   <br>
@@ -56,11 +60,9 @@
     <p>You can share your current selection of tracks using this link: <a href="" id="link"></a></p>
   </div>
 </div>
-<p id="primer_set_json" class="invisible"><%= primer_sets_map.to_json %></p>
-<p id="default_tracks_json" class="invisible"><%= default_tracks_map.to_json %></p>
-<p id="default_lineage" class="invisible"><%= @track_data[:default_lineage] %></p>
+<p id="primer_set_json" class="invisible"><%= @track_data[:primer_sets].to_json %></p>
+<p id="lineage_set_json" class="invisible"><%= lineage_display_map.to_json %></p>
 <p id="config" class="invisible"><%= @config.to_json %></p>
-<p id="lineage_set_json" class="invisible"><%= lineage_sets_map.to_json %></p>
 <div id="igv" class="igv_div"></div>
 <% else %>
   <article class="message is-danger">
@@ -97,7 +99,7 @@
     Variants ≤3 nt from the 5' end of the primer, or ≤2 nt from the 3' end have multipliers that reduce the score
     compared to the default for any other position.  We consider variants at these positions to be less likely to
     affect polymerase binding. For 5' variants, this is because it creates a flap on the 5' end, which interferes less
-    with amplification. For variants at the 3' end, we assume that 3’-5’ exonuclease activity in commonly used
+    with amplification. For variants at the 3' end, we assume that 3'-5' exonuclease activity in commonly used
     polymerases can remove mismatched bases. While we attempt to model the observed effects of variants observed,
     it is likely imperfect. Proposed variant impacts should be assessed experimentally as we did in SARS-CoV-2 for
     <a href="https://www.medrxiv.org/content/10.1101/2021.12.16.21267734v1">early omicron</a>,

@@ -1,11 +1,12 @@
 # igv.js Data Server Configuration
 
-The igv.js visualization on the lineages page requires a data server from which to read the organism (currently SARS-CoV-2) 
+The igv.js visualization on the lineages page requires a data server from which to read the organism (currently SARS-CoV-2 and RSV) 
 reference sequence and BED files for primer sets and lineages. The URL of this data server is specified in the `.env`
 file at the project root.
 
-This server only needs to host static files and be able to accept HTTP Range requests, so something basic like NGINX 
-should work for this purpose.
+This server only needs to host static files and be able to accept HTTP Range requests, so something basic like NGINX or
+ruby -run -ehttpd igvstatic/ -p8080 in development should work
+
 
 ## Data Server File Paths
 

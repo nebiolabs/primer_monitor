@@ -3,7 +3,7 @@
 source 'https://rubygems.org'
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
-ruby '3.3.4'
+ruby '3.4.2'
 gem 'activerecord-import'
 
 gem 'dotenv-rails'
@@ -12,7 +12,7 @@ gem 'httparty'
 
 gem 'slop'
 
-gem 'rails', '~> 7'
+gem 'rails', '~> 7.2'
 
 gem 'pg', '>=1.2.3'
 # Use Puma as the app server
@@ -42,8 +42,10 @@ gem 'bootsnap', '>= 1.4.2', require: false
 
 # for error reporting
 gem 'airbrake'
-gem 'cancancan', '~> 3.2.1'
-gem 'devise', '~>4.8.1'
+# for authorization
+gem 'cancancan', '~> 3.x'
+# for authentication
+gem 'devise', '~>4.x'
 gem 'omniauth-google-oauth2'
 gem 'omniauth-rails_csrf_protection', '~> 1.0'
 
@@ -53,11 +55,10 @@ gem 'cocoon'
 # for styling, responsive display
 gem 'bulma-rails', '~> 0.9.0'
 
-gem 'composite_primary_keys'
-
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
   gem 'byebug', platforms: %i[mri mingw x64_mingw]
+  gem 'mocha'
 end
 
 group :development do
@@ -68,8 +69,10 @@ group :development do
   gem 'ed25519'
   gem 'listen', '~> 3.2'
   gem 'rubocop', require: false
+  gem 'rubocop-capybara', require: false
   gem 'rubocop-performance', require: false
   gem 'rubocop-rails', require: false
+
   # Access an interactive console on exception pages or by calling 'console' anywhere in the code.
   gem 'web-console', '>= 3.3.0'
   # for measuring test coverage
@@ -77,8 +80,10 @@ group :development do
   # for generating a search engine sitemap
   gem 'sitemap_generator'
   # Spring speeds up development by keeping your application running in the background. Read more: https://github.com/rails/spring
+  gem 'solargraph' # language server for code editors
   gem 'spring'
-  gem 'spring-watcher-listen', '~> 2.0.0'
+  gem 'spring-watcher-listen'
+  gem 'webrick'
 end
 
 group :test do

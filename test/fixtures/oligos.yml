@@ -1,9 +1,13 @@
 # Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
 one:
-  name: MyString
+  name: probe1
+  short_name: MS1
   sequence: GCAATTTATATACATATA
+  primer_set: one
 
 two:
-  name: MyString
+  name: probe2
+  short_name: MS2
   sequence: CCCCATATACTATATATA
+  primer_set: two

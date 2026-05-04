@@ -6,18 +6,20 @@
     <tr>
       <th>Name</th>
       <th>Ncbi taxa</th>
-      <th colspan="3"></th>
     </tr>
   </thead>
 
   <tbody>
-    <% @organism_data.each do |organism| %>
+    <% @organisms.each do |organism| %>
       <tr>
-        <td><%= organism[:organism].full_name %></td>
-        <td><%= organism[:taxa].pluck(:ncbi_taxon_id).join ',' %></td>
-        <td><%= link_to 'Show', organism_path(organism[:organism].name) %></td>
-        <td><%= link_to 'Edit', edit_organism_path(organism[:organism].name) %></td>
-        <td><%= link_to 'Destroy', organism_path(organism[:organism].name), method: :delete, data: { confirm: 'Are you sure?' } %></td>
+        <td><%= link_to organism.name, organism_path(organism) %></td>
+        <td>
+          <ul>
+            <% organism.organism_taxa.each do |taxon| %>
+              <li><%= link_to taxon.name, taxon.url  %></li>
+            <% end %>
+          </ul>
+        </td>
       </tr>
     <% end %>
   </tbody>
