@@ -45,7 +45,7 @@ gem 'airbrake'
 # for authorization
 gem 'cancancan', '~> 3.x'
 # for authentication
-gem 'devise', '~>4.x'
+gem 'devise', '~>5'
 gem 'omniauth-google-oauth2'
 gem 'omniauth-rails_csrf_protection', '~> 1.0'
 
