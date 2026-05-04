@@ -4,9 +4,10 @@
 # The data can then be loaded with the rails db:seed command (or created alongside the database with db:setup).
 
 # password should be changed...
+admin_password = Rails.application.credentials.admin_password || SecureRandom.hex(16)
 admin = User.create_with(first: 'Admin', last: 'User',
-                         password: Rails.application.credentials.admin_password,
-                         password_confirmation: Rails.application.credentials.admin_password,
+                         password: admin_password,
+                         password_confirmation: admin_password,
                          active: true, approved: true, confirmed: true, confirmed_at: Time.current)
             .find_or_create_by!(email: ENV['ADMIN_EMAIL'])
 

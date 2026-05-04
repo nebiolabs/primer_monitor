@@ -61,15 +61,10 @@ jobs:
         uses: ruby/setup-ruby@v1
         with:
           bundler-cache: true
-      - name: Set up test database
-        env:
-          PGPASSWORD: postgres_password
-        run: |   
-          echo "createdb -h localhost -p 5432 -U test_user primer_monitor_test" | tee base
       - name: Run tests
         env:
           RAILS_ENV: test
         run: |
           cp .env.example .env
           cp config/database.yml.example config/database.yml
-          RAILS_ENV=test bin/rails db:reset && bin/rails test
+          RAILS_ENV=test bin/rails db:create db:schema:load && bin/rails test
