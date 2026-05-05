@@ -40,7 +40,8 @@ class LineageVariantsController < ApplicationController
     @effective_lineage = @url_lineage || dominant_lineage || valid_lineage_default
     @effective_primer_sets = @url_primer_sets ||
                              @track_data[:default_tracks].presence ||
-                             @track_data[:primer_sets].keys.select { |k| k.start_with?('NEB') }
+                             @track_data[:primer_sets].keys.select { |k| k.start_with?('NEB') }.presence ||
+                             @track_data[:primer_sets].keys
   end
 
   def dominant_lineage
