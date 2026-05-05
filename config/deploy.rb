@@ -211,9 +211,9 @@ namespace :deploy do
 
   end
 
-  after 'deploy:published', 'deploy:restart_services'
-  after 'deploy:restart_services', 'deploy:setup_conda'
-  #after 'deploy:setup_conda', 'deploy:seed'
+  after 'deploy:published', 'deploy:setup_conda'
+  after 'deploy:setup_conda', 'deploy:restart_services'
+  #after 'deploy:restart_services', 'deploy:seed'
   after 'deploy:restart_services', 'backend'
 
 end
