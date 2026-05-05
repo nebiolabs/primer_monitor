@@ -131,11 +131,11 @@ namespace :deploy do
   end
 
 
-  after 'deploy:restart_services', :clear_cache do
+  after 'deploy:published', :clear_cache do
     on roles(:app), in: :groups, limit: 3, wait: 10 do
       with rails_env: fetch(:rails_env) do
         within release_path do
-          execute :rake, 'tmp:clear'
+          execute :rake, 'tmp:cache:clear'
         end
       end
     end
@@ -204,9 +204,9 @@ namespace :deploy do
 
   end
 
-  after 'deploy:published', 'deploy:setup_conda'
-  after 'deploy:setup_conda', 'deploy:restart_services'
-  #after 'deploy:restart_services', 'deploy:seed'
+  after 'deploy:published', 'deploy:restart_services'
+  after 'deploy:restart_services', 'deploy:setup_conda'
+  #after 'deploy:setup_conda', 'deploy:seed'
   after 'deploy:restart_services', 'backend'
 
 end
