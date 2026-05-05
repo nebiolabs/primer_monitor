@@ -21,6 +21,8 @@ class LineageVariantsController < ApplicationController
     @url_primer_sets = params[:primer_sets]&.split(',')
 
     prepare_lineage_display
+    @config[:initial_lineage] = @effective_lineage
+    @config[:initial_primer_sets] = @effective_primer_sets
   end
 
   private

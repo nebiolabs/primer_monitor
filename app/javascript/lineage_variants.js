@@ -116,7 +116,11 @@ function initBrowser() {
     const browser_div = document.getElementById("igv");
     igv.createBrowser(browser_div, browserConfig).then(function(theBrowser) {
         igvBrowser = theBrowser;
-        updatePrimerSets();
+        activeLineageGroup = config['initial_lineage'];
+        activeSets = config['initial_primer_sets'] || [];
+        if (activeLineageGroup) {
+            loadPrimerSets(activeSets, igvBrowser, activeLineageGroup);
+        }
     });
 }
 
