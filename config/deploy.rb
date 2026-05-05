@@ -211,8 +211,17 @@ namespace :deploy do
 
   end
 
+  desc 'Prime the app with a request so the first real user hit is not slow'
+  task :warmup do
+    on roles(:app) do
+      socket = "#{shared_path}/tmp/sockets/puma.sock"
+      execute "timeout 60 bash -c 'until curl -sf --unix-socket #{socket} http://localhost/ -o /dev/null 2>/dev/null; do sleep 1; done' || true"
+    end
+  end
+
   after 'deploy:published', 'deploy:setup_conda'
   after 'deploy:setup_conda', 'deploy:restart_services'
+  after 'deploy:restart_services', 'deploy:warmup'
   #after 'deploy:restart_services', 'deploy:seed'
   after 'deploy:restart_services', 'backend'
 
