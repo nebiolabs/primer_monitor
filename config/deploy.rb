@@ -164,7 +164,7 @@ namespace :deploy do
 
             # precompile if the previous deploy failed to finish precompiling
             begin
-              execute(:ls, latest_release_path.join('assets_manifest_backup'))
+              execute(:ls, latest_release_path.join('public', fetch(:assets_prefix)))
             rescue StandardError
               raise(PrecompileRequired)
             end
