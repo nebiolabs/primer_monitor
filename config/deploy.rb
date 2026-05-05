@@ -99,13 +99,6 @@ namespace :deploy do
     end
   end
 
-  desc 'Restart application'
-  task :restart do
-    on roles(:app), in: :sequence, wait: 5 do
-      execute :touch, release_path.join('tmp/restart.txt')
-    end
-  end
-
   desc 'Run rake yarn:install'
   task :yarn_install do
     on roles(:app) do
@@ -126,7 +119,7 @@ namespace :deploy do
     end
   end
 
-  after :restart, :clear_cache do
+  after :restart_services, :clear_cache do
     on roles(:app), in: :groups, limit: 3, wait: 10 do
       with rails_env: fetch(:rails_env) do
         within release_path do
@@ -136,7 +129,8 @@ namespace :deploy do
     end
   end
 
-  after :restart, :restart_services do
+  desc 'Restart application services'
+  task :restart_services do
     on roles(:app), in: :groups, limit: 3, wait: 10 do
       within release_path do
         execute 'mkdir -p tmp/sockets'
@@ -209,7 +203,7 @@ namespace :deploy do
   end
 
   after :published, :setup_conda
-  after :setup_conda, :restart
+  after :setup_conda, :restart_services
   #after 'deploy:restart_services', 'deploy:seed'
   after 'deploy:restart_services', 'backend'
 
