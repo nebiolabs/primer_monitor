@@ -36,18 +36,14 @@ class Organism < ApplicationRecord
   end
 
   def recent_lineage_frequencies(days: 30)
-    most_recent = Lineage
-                  .joins(lineage_calls: :fasta_record)
-                  .where(organism_id: id)
-                  .maximum('fasta_records.date_collected')
+    most_recent = LineageInfo.where(organism_id: id).maximum(:last_seen)
     return {} unless most_recent
 
-    Lineage
-      .joins(lineage_calls: :fasta_record)
+    LineageInfo
       .where(organism_id: id)
-      .where('fasta_records.date_collected >= ?', most_recent - days)
-      .group('lineages.name')
-      .count('fasta_records.id')
+      .where('last_seen >= ?', most_recent - days)
+      .pluck(:name, :times_seen)
+      .to_h
   end
 
   def lineage_variants_data(data_server, organism_slug)
