@@ -3,13 +3,13 @@
     <% if primer_set_subscription&.active? %>
       <%= button_to "Unsubscribe", primer_set_subscription_path(primer_set_subscription),
                     remote: true, method: :delete, class: "button is-link is-small primer_set_#{primer_set.id}",
-                    title: 'You are currently subscribed, click to unsubscribe'
-      %>
+                    title: 'You are currently subscribed, click to unsubscribe',
+                    form: { style: "display: inline; margin: 0" } %>
     <% else %>
-      <%= button_to "Subscribe", primer_set_subscriptions_path( primer_set_id: primer_set.id ),
-                    remote: true, class:"button is-link is-small primer_set_#{primer_set.id}",
-                    title: 'You are not currently subscribed, click to subscribe'
-      %>
+      <%= button_to "Subscribe", primer_set_subscriptions_path(primer_set_id: primer_set.id),
+                    remote: true, class: "button is-link is-small primer_set_#{primer_set.id}",
+                    title: 'You are not currently subscribed, click to subscribe',
+                    form: { style: "display: inline; margin: 0" } %>
     <% end %>
   <% else %>
     <%= link_to 'Log in to subscribe', new_user_session_path %>
