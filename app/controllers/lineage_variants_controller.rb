@@ -37,7 +37,7 @@ class LineageVariantsController < ApplicationController
     end
 
     @sorted_lineages = sorted_lineage_entries(lineage_sets)
-    @effective_lineage = @url_lineage || dominant_lineage || @track_data[:default_lineage]
+    @effective_lineage = @url_lineage || dominant_lineage || valid_lineage_default
     @effective_primer_sets = @url_primer_sets ||
                              @track_data[:default_tracks].presence ||
                              @track_data[:primer_sets].keys.select { |k| k.start_with?('NEB') }
@@ -45,6 +45,14 @@ class LineageVariantsController < ApplicationController
 
   def dominant_lineage
     @lineage_frequencies.reject { |k, v| k == 'all' || v.zero? }.max_by { |_, v| v }&.first
+  end
+
+  def valid_lineage_default
+    default = @track_data[:default_lineage]
+    return default if default && @track_data[:lineage_sets].key?(default)
+    return 'all' if @track_data[:lineage_sets].key?('all')
+
+    @sorted_lineages.first&.first
   end
 
   def sorted_lineage_entries(lineage_sets)

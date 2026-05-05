@@ -20,7 +20,7 @@
       <select id="lineage_select" name="lineage" class="wide-select2">
         <% @sorted_lineages.each do |key, depth| %>
           <% freq = @lineage_frequencies.fetch(key, 0) %>
-          <% freq_text = freq > 0 ? " (#{number_with_delimiter(freq)} in last 30 days)" : "" %>
+          <% freq_text = freq > 0 ? " (#{number_with_delimiter(freq)} in most recent 30 days)" : "" %>
           <% indent = depth > 0 ? "  " * depth + "└ " : "" %>
           <option value="<%= key %>"<%= ' selected' if key == @effective_lineage %>><%= "#{indent}#{@track_data[:lineage_sets][key]}#{freq_text}" %></option>
         <% end %>
