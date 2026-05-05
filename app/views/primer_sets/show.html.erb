@@ -109,4 +109,4 @@
 <% if can? :edit, @primer_set %>
   <%= link_to 'Edit', edit_primer_set_path(@primer_set) %> |
 <% end %>
-<%= link_to 'All Primer Sets', primer_sets_path %>
+<%= link_to 'All Primer Sets', organism_primer_sets_path(@primer_set.organism.slug) %>
