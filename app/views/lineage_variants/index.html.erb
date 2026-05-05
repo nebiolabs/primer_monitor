@@ -13,22 +13,17 @@
   The score listed for a primer is determined by the scoring algorithm described below.</p>
 </div>
 <% if @track_data[:data_fetched] %>
-<%
-  sorted_lineages = @track_data[:lineage_sets].sort_by { |k, _| -@lineage_frequencies.fetch(k, 0) }
-  most_frequent = sorted_lineages.find { |k, _| @lineage_frequencies.fetch(k, 0) > 0 }&.first
-  effective_lineage = @url_lineage || most_frequent || @track_data[:default_lineage]
-  effective_primer_sets = @url_primer_sets || @track_data[:default_tracks] || []
-  lineage_display_map = sorted_lineages.to_h
-%>
+<% effective_primer_sets = @url_primer_sets || @track_data[:default_tracks] || [] %>
 <form id="primer_set_selection">
   <div class="field">
     <label class="label">Lineage:</label>
     <div class="control">
       <select id="lineage_select" name="lineage" class="wide-select2">
-        <% sorted_lineages.each do |key, display_name| %>
+        <% @sorted_lineages.each do |key, depth| %>
           <% freq = @lineage_frequencies.fetch(key, 0) %>
           <% freq_text = freq > 0 ? " (#{number_with_delimiter(freq)} in last 30 days)" : "" %>
-          <option value="<%= key %>"<%= ' selected' if key == effective_lineage %>><%= display_name %><%= freq_text %></option>
+          <% indent = depth > 0 ? "  " * depth + "└ " : "" %>
+          <option value="<%= key %>"<%= ' selected' if key == @effective_lineage %>><%= "#{indent}#{@track_data[:lineage_sets][key]}#{freq_text}" %></option>
         <% end %>
       </select>
     </div>
@@ -61,7 +56,7 @@
   </div>
 </div>
 <p id="primer_set_json" class="invisible"><%= @track_data[:primer_sets].to_json %></p>
-<p id="lineage_set_json" class="invisible"><%= lineage_display_map.to_json %></p>
+<p id="lineage_set_json" class="invisible"><%= @track_data[:lineage_sets].to_json %></p>
 <p id="config" class="invisible"><%= @config.to_json %></p>
 <div id="igv" class="igv_div"></div>
 <% else %>

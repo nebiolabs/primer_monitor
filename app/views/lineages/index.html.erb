@@ -14,7 +14,7 @@
     <% @lineages.each do |lineage| %>
     <% next if lineage['name'] == "Unassigned" %>
       <tr>
-        <td><a href="<%= organism_lineage_url(@organism.name, lineage['name']) %>"><%= lineage['name'] %></a></td>
+        <td><a href="<%= organism_lineage_url(@organism, lineage['name']) %>"><%= lineage['name'] %></a></td>
         <td><%= lineage['last_seen'].nil? ? 'N/A' : lineage['last_seen'] %></td>
         <td><%= lineage['times_seen'] %></td>
       </tr>
