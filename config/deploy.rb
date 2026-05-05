@@ -119,15 +119,6 @@ namespace :deploy do
     end
   end
 
-  after :restart_services, :clear_cache do
-    on roles(:app), in: :groups, limit: 3, wait: 10 do
-      with rails_env: fetch(:rails_env) do
-        within release_path do
-          execute :rake, 'tmp:clear'
-        end
-      end
-    end
-  end
 
   desc 'Restart application services'
   task :restart_services do
@@ -135,6 +126,17 @@ namespace :deploy do
       within release_path do
         execute 'mkdir -p tmp/sockets'
         execute "sudo /bin/systemctl restart #{fetch(:puma_service_name)}"
+      end
+    end
+  end
+
+
+  after 'deploy:restart_services', :clear_cache do
+    on roles(:app), in: :groups, limit: 3, wait: 10 do
+      with rails_env: fetch(:rails_env) do
+        within release_path do
+          execute :rake, 'tmp:clear'
+        end
       end
     end
   end
@@ -202,8 +204,8 @@ namespace :deploy do
 
   end
 
-  after :published, :setup_conda
-  after :setup_conda, :restart_services
+  after 'deploy:published', 'deploy:setup_conda'
+  after 'deploy:setup_conda', 'deploy:restart_services'
   #after 'deploy:restart_services', 'deploy:seed'
   after 'deploy:restart_services', 'backend'
 
