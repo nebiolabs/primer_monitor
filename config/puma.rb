@@ -30,9 +30,6 @@ else
   bind "unix://#{Dir.pwd}/tmp/sockets/puma.sock"
 end
 
-# Cap graceful shutdown so keep-alive connections don't delay deploys.
-force_shutdown_after 15
-
 # Allow puma to be restarted by `bin/rails restart` command.
 plugin :tmp_restart
 

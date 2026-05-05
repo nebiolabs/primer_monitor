@@ -125,7 +125,14 @@ namespace :deploy do
     on roles(:app), in: :groups, limit: 3, wait: 10 do
       within release_path do
         execute 'mkdir -p tmp/sockets'
-        execute "sudo /bin/systemctl restart #{fetch(:puma_service_name)}"
+        puma_pid = capture("systemctl show #{fetch(:puma_service_name)} --property=MainPID --value").strip
+        if puma_pid && puma_pid != '0'
+          # Hot restart: re-execs puma in place, picks up new code via `current` symlink.
+          # No sudo needed; keeps the socket open so downtime is just the Rails boot time.
+          execute "kill -SIGUSR2 #{puma_pid}"
+        else
+          execute "sudo /bin/systemctl restart #{fetch(:puma_service_name)}"
+        end
       end
     end
   end
