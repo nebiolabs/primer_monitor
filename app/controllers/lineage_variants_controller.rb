@@ -36,6 +36,9 @@ class LineageVariantsController < ApplicationController
 
     @sorted_lineages = sorted_lineage_entries(lineage_sets)
     @effective_lineage = @url_lineage || dominant_lineage || @track_data[:default_lineage]
+    @effective_primer_sets = @url_primer_sets ||
+                             @track_data[:default_tracks].presence ||
+                             @track_data[:primer_sets].keys.select { |k| k.start_with?('NEB') }
   end
 
   def dominant_lineage

@@ -45,10 +45,16 @@ function initBrowser() {
 
 }
 
-$(document).ready(function(){
-    config = JSON.parse($('#config')[0].innerHTML);
-    if('primer_set_name' in config)
-    {
+$(document).on('turbo:before-cache', function() {
+    if (!document.getElementById('igv')) return;
+    $('.igv_div').children('.igv-container, .igv-message').remove();
+});
+
+$(document).on('turbo:load', function() {
+    const configEl = document.getElementById('config');
+    if (!configEl) return;
+    config = JSON.parse(configEl.innerHTML);
+    if ('primer_set_name' in config) {
         initBrowser();
     }
 });

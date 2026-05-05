@@ -16,14 +16,6 @@ function loadConfig() {
     config = JSON.parse($('#config')[0].innerHTML);
 }
 
-function setSelectFormDisabled(state) {
-    $('#apply').prop('disabled', state);
-    if (state) {
-        $('#apply').addClass('is-loading');
-    } else {
-        $('#apply').removeClass('is-loading');
-    }
-}
 
 function updateLink() {
     let link_div_wrapper = $('#link_div_wrapper');
@@ -57,7 +49,6 @@ function updatePrimerSets() {
 }
 
 function loadPrimerSets(activePrimerSets, igvBrowser, activeLineageGroup) {
-    setSelectFormDisabled(true);
     tracks.forEach(function(track) {
         igvBrowser.removeTrack(track);
     });
@@ -92,9 +83,6 @@ function loadPrimerSets(activePrimerSets, igvBrowser, activeLineageGroup) {
             addedTracks.forEach(function(addedTrack) {
                 tracks.push(addedTrack);
             });
-            setSelectFormDisabled(false);
-        }).catch(function() {
-            setSelectFormDisabled(false);
         });
     });
 }
@@ -132,19 +120,38 @@ function initBrowser() {
     });
 }
 
-$(document).ready(function() {
-    $('#apply').on("click", function() {
-        updatePrimerSets();
-    });
+// Use document-level delegation so handlers are registered once and don't stack
+// across Turbo navigations.
+$(document).on('click', '#show_link', function() {
+    updateLink();
+});
 
-    $('#show_link').on("click", function() {
-        updateLink();
-    });
+$(document).on('submit', '#primer_set_selection', function(event) {
+    event.preventDefault();
+});
 
-    $('#primer_set_selection').on("submit", function(event) {
-        event.preventDefault();
-    });
+let updateTimer = null;
+function debouncedUpdate() {
+    clearTimeout(updateTimer);
+    updateTimer = setTimeout(updatePrimerSets, 250);
+}
 
+$(document).on('change', '#lineage_select', debouncedUpdate);
+$(document).on('change', '#primer_set_select', debouncedUpdate);
+
+// Clean up before Turbo caches the page so the snapshot is IGV-free.
+$(document).on('turbo:before-cache', function() {
+    if (!document.getElementById('lineage_select')) return;
+    $('.igv_div').children('.igv-container').remove();
+    igvBrowser = null;
+    tracks = [];
+    activeSets = [];
+    activeLineageGroup = null;
+});
+
+// turbo:load fires on both the initial page load and every Turbo navigation.
+$(document).on('turbo:load', function() {
+    if (!document.getElementById('lineage_select')) return;
     loadConfig();
     initBrowser();
 });
