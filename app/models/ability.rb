@@ -23,7 +23,6 @@ class Ability
   def guest_ability
     can :show, WelcomeController
     can :show, AboutController
-    can :show, HelpController
     can :show, HistoryController
     can :show, Oligo
     can :show, Organism
