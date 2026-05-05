@@ -116,6 +116,7 @@ function initBrowser() {
     const browser_div = document.getElementById("igv");
     igv.createBrowser(browser_div, browserConfig).then(function(theBrowser) {
         igvBrowser = theBrowser;
+        $('#igv_loading').addClass('invisible');
         activeLineageGroup = config['initial_lineage'];
         activeSets = config['initial_primer_sets'] || [];
         if (activeLineageGroup) {
@@ -147,6 +148,7 @@ $(document).on('change', '#primer_set_select', debouncedUpdate);
 $(document).on('turbo:before-cache', function() {
     if (!document.getElementById('lineage_select')) return;
     $('.igv_div').children('.igv-container').remove();
+    $('#igv_loading').removeClass('invisible');
     igvBrowser = null;
     tracks = [];
     activeSets = [];

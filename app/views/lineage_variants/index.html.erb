@@ -54,6 +54,10 @@
 <p id="primer_set_json" class="invisible"><%= @track_data[:primer_sets].to_json %></p>
 <p id="lineage_set_json" class="invisible"><%= @track_data[:lineage_sets].to_json %></p>
 <p id="config" class="invisible"><%= @config.to_json %></p>
+<div id="igv_loading" class="has-text-centered" style="padding: 3rem 1rem;">
+  <progress class="progress is-primary" style="max-width: 24rem; margin: 0 auto 0.75rem;" max="100"></progress>
+  <p class="has-text-grey">Loading...</p>
+</div>
 <div id="igv" class="igv_div"></div>
 <% else %>
   <article class="message is-danger">
