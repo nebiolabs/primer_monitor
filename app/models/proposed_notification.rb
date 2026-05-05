@@ -6,7 +6,7 @@ class ProposedNotification < ApplicationRecord
   belongs_to :primer_set
   belongs_to :primer_set_subscription
   belongs_to :subscribed_geo_location
-  belongs_to :verified_notification
+  belongs_to :verified_notification, optional: true
   belongs_to :detailed_geo_location_alias
 
   UNIQUE_FIELDS = %i[primer_set_id user_id oligo_id coordinate

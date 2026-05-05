@@ -18,6 +18,9 @@ namespace :notifications do
 
   desc 'Sends notifications about primer overlaps'
   task send: :environment do
+    new_pns = ProposedNotification.new_proposed_notifications
+    Rails.logger.info("Found #{new_pns.size} new proposed notifications")
+    new_pns.each(&:save!)
     send_notifications(VerifiedNotification.find_or_create_verified_notifications!)
   end
 end
