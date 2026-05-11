@@ -1,8 +1,5 @@
 nextflow.enable.dsl = 2
 
-assert params.pct_cutoff != null : "--pct_cutoff must be specified"
-pct_cutoff = params.pct_cutoff
-
 assert params.score_cutoff != null : "--score_cutoff must be specified"
 score_cutoff = params.score_cutoff
 
@@ -26,7 +23,7 @@ process update_visualization_data {
     '''
     # recompute the primer data for igvjs visualization
     !{primer_monitor_path}/lib/visualization/update_visualization_data.sh -o !{override_path} !{primer_monitor_path} \
-    !{organism} !{pct_cutoff} !{score_cutoff} !{task.cpus}
+    !{organism} !{score_cutoff} !{task.cpus}
     '''
 }
 
