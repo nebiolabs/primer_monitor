@@ -25,6 +25,20 @@ class LineageVariantsController < ApplicationController
     @config[:initial_primer_sets] = @effective_primer_sets
   end
 
+  def variant_overlaps
+    authorize! :index, LineageVariantsController
+
+    @organism = Organism.find_by(slug: params[:organism_slug])
+    return head :not_found unless @organism
+
+    lineage_param = params[:lineage].presence
+    primer_set_params = Array(params[:primer_sets]).reject(&:blank?)
+
+    return head :bad_request if lineage_param.nil? || primer_set_params.empty?
+
+    render json: { variants: [] }
+  end
+
   private
 
   def prepare_lineage_display

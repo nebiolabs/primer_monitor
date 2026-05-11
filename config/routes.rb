@@ -18,7 +18,9 @@ Rails.application.routes.draw do
   get 'lineages', to: 'lineages#index'
 
   resources :organisms, param: :slug do
-    resources :lineage_variants, only: [:index]
+    resources :lineage_variants, only: [:index] do
+      get :variant_overlaps, on: :collection
+    end
     resources :lineages, param: :name, constraints: { name: /[A-z0-9.]+/ }
     resources :primer_sets, only: [:index]
   end
