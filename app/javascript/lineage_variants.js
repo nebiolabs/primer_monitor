@@ -46,6 +46,7 @@ function updatePrimerSets() {
     if (igvBrowser != null) {
         activeSets = $('#primer_set_select').val() || [];
         loadPrimerSets(activeSets, igvBrowser, activeLineageGroup);
+        loadVariantTable(activeLineageGroup, activeSets);
     }
 }
 
@@ -122,6 +123,7 @@ function initBrowser() {
         activeSets = config['initial_primer_sets'] || [];
         if (activeLineageGroup) {
             loadPrimerSets(activeSets, igvBrowser, activeLineageGroup);
+            loadVariantTable(activeLineageGroup, activeSets);
         }
     });
 }
@@ -144,6 +146,112 @@ function debouncedUpdate() {
 
 $(document).on('change', '#lineage_select', debouncedUpdate);
 $(document).on('change', '#primer_set_select', debouncedUpdate);
+
+const VARIANT_TYPE_LABELS = { X: 'SNP', D: 'deletion', I: 'insertion' };
+
+// Stub — replaced by real implementation in Task 8
+function renderOligoSvg(_sequence, _oligoStart, _oligoEnd, _strand, _variantStart, _variantEnd) {
+    return '';
+}
+
+function escapeHtml(str) {
+    return String(str ?? '').replace(/[&<>"']/g, c =>
+        ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])
+    );
+}
+
+function formatSeen(seen) {
+    if (!seen || !seen.date) return '—';
+    const parts = [seen.date, seen.lineage, seen.location].filter(Boolean);
+    return parts.map(escapeHtml).join(' · ');
+}
+
+function buildVariantTable(variants) {
+    if (variants.length === 0) {
+        return '<p class="has-text-grey">No variants overlap the selected primers for this lineage.</p>';
+    }
+
+    const rows = variants.map(v => {
+        const oligoSubRows = v.oligos.map(o => `
+            <tr class="variant-oligo-row" style="display:none">
+                <td colspan="6" style="padding-left:2rem; background:#f9f9f9">
+                    <strong>${escapeHtml(o.name)}</strong>
+                    <span class="has-text-grey"> — ${escapeHtml(o.primer_set)}</span><br>
+                    <div style="overflow-x:auto; margin-top:0.4rem">
+                        ${renderOligoSvg(o.sequence, o.oligo_start, o.oligo_end, o.strand, v.ref_start, v.ref_end)}
+                    </div>
+                </td>
+            </tr>
+        `).join('');
+
+        return `
+            <tr class="variant-row is-clickable" data-expanded="false">
+                <td>
+                    <button class="variant-expand-btn button is-small is-white" aria-label="expand">▶</button>
+                    ${v.ref_start}–${v.ref_end}
+                </td>
+                <td>${escapeHtml(VARIANT_TYPE_LABELS[v.variant_type] || v.variant_type)}</td>
+                <td><code>${escapeHtml(v.variant)}</code></td>
+                <td>${v.frequency_pct.toFixed(1)}%</td>
+                <td>${formatSeen(v.first_seen)}</td>
+                <td>${formatSeen(v.last_seen)}</td>
+            </tr>
+            ${oligoSubRows}
+        `;
+    }).join('');
+
+    return `
+        <table class="table is-fullwidth is-hoverable is-narrow">
+            <thead>
+                <tr>
+                    <th>Position</th>
+                    <th>Type</th>
+                    <th>Change</th>
+                    <th>Frequency</th>
+                    <th>First Seen</th>
+                    <th>Last Seen</th>
+                </tr>
+            </thead>
+            <tbody>${rows}</tbody>
+        </table>
+    `;
+}
+
+function loadVariantTable(lineage, primerSets) {
+    const section = document.getElementById('variant_table_section');
+    const loading = document.getElementById('variant_table_loading');
+    const content = document.getElementById('variant_table_content');
+    if (!section) return;
+
+    section.style.display = 'block';
+    loading.style.display = 'block';
+    content.innerHTML = '';
+
+    const params = new URLSearchParams();
+    params.set('lineage', lineage);
+    primerSets.forEach(ps => params.append('primer_sets[]', ps));
+
+    const url = `${location.pathname}/variant_overlaps.json?${params}`;
+
+    fetch(url)
+        .then(r => r.json())
+        .then(data => {
+            loading.style.display = 'none';
+            content.innerHTML = buildVariantTable(data.variants || []);
+        })
+        .catch(() => {
+            loading.style.display = 'none';
+            content.innerHTML = '<p class="has-text-danger">Error loading variant data.</p>';
+        });
+}
+
+$(document).on('click', '.variant-expand-btn', function() {
+    const row = $(this).closest('tr');
+    const expanded = row.data('expanded') === true;
+    row.data('expanded', !expanded);
+    $(this).text(expanded ? '▶' : '▼');
+    row.nextUntil('tr:not(.variant-oligo-row)').toggle(!expanded);
+});
 
 registerPageModule(
     () => !!document.getElementById('lineage_select'),
