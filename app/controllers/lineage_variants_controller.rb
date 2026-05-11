@@ -81,10 +81,78 @@ class LineageVariantsController < ApplicationController
       }
     end
 
-    render json: { variants: variants_map.values }
+    variants = variants_map.values
+    first_last = fetch_first_last_seen(variants)
+
+    variants.each do |v|
+      seen = first_last.fetch([v[:ref_start], v[:variant_type], v[:variant]],
+                              { first_seen: { date: nil, lineage: nil, location: nil },
+                                last_seen:  { date: nil, lineage: nil, location: nil } })
+      v.merge!(seen)
+    end
+
+    render json: { variants: }
   end
 
   private
+
+  def fetch_first_last_seen(variants)
+    return {} if variants.empty?
+
+    conditions = variants.map do |v|
+      ApplicationRecord.sanitize_sql_array(
+        ['(vs.ref_start = ? AND vs.variant_type = ? AND vs.variant = ?)',
+         v[:ref_start], v[:variant_type], v[:variant]]
+      )
+    end.join(' OR ')
+
+    sql = <<~SQL
+      WITH observations AS (
+        SELECT
+          vs.ref_start,
+          vs.variant_type,
+          vs.variant,
+          COALESCE(fr.date_collected, fr.date_submitted) AS obs_date,
+          l.name AS lineage_name,
+          COALESCE(dga.region, '') ||
+            CASE WHEN dga.division IS NOT NULL THEN ' / ' || dga.division ELSE '' END AS location,
+          ROW_NUMBER() OVER (
+            PARTITION BY vs.ref_start, vs.variant_type, vs.variant
+            ORDER BY COALESCE(fr.date_collected, fr.date_submitted) ASC NULLS LAST, fr.id ASC
+          ) AS rn_first,
+          ROW_NUMBER() OVER (
+            PARTITION BY vs.ref_start, vs.variant_type, vs.variant
+            ORDER BY COALESCE(fr.date_collected, fr.date_submitted) DESC NULLS LAST, fr.id DESC
+          ) AS rn_last
+        FROM variant_sites vs
+        JOIN fasta_records fr ON fr.id = vs.fasta_record_id
+        JOIN lineage_calls lc ON lc.id = fr.lineage_call_id
+        JOIN lineages l ON l.id = lc.lineage_id
+        JOIN detailed_geo_locations dgl ON dgl.id = fr.detailed_geo_location_id
+        JOIN detailed_geo_location_aliases dga ON dga.id = dgl.detailed_geo_location_alias_id
+        WHERE #{conditions}
+      )
+      SELECT
+        ref_start, variant_type, variant,
+        MAX(CASE WHEN rn_first = 1 THEN obs_date END)    AS first_date,
+        MAX(CASE WHEN rn_first = 1 THEN lineage_name END) AS first_lineage,
+        MAX(CASE WHEN rn_first = 1 THEN location END)    AS first_location,
+        MAX(CASE WHEN rn_last  = 1 THEN obs_date END)    AS last_date,
+        MAX(CASE WHEN rn_last  = 1 THEN lineage_name END) AS last_lineage,
+        MAX(CASE WHEN rn_last  = 1 THEN location END)    AS last_location
+      FROM observations
+      WHERE rn_first = 1 OR rn_last = 1
+      GROUP BY ref_start, variant_type, variant
+    SQL
+
+    ApplicationRecord.connection.select_all(sql).each_with_object({}) do |row, h|
+      key = [row['ref_start'].to_i, row['variant_type'], row['variant']]
+      h[key] = {
+        first_seen: { date: row['first_date'], lineage: row['first_lineage'], location: row['first_location'] },
+        last_seen:  { date: row['last_date'],  lineage: row['last_lineage'],  location: row['last_location'] }
+      }
+    end
+  end
 
   def prepare_lineage_display
     individual_frequencies = @organism.recent_lineage_frequencies

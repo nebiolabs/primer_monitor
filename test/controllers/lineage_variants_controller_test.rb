@@ -96,4 +96,20 @@ class LineageVariantsControllerTest < ActionDispatch::IntegrationTest
     data = JSON.parse(response.body)
     assert_equal 0, data['variants'].length
   end
+
+  test 'variant_overlaps includes first_seen and last_seen keys' do
+    get variant_overlaps_organism_lineage_variants_url(
+      organism_slug: @organism.slug,
+      lineage: 'XBB',
+      primer_sets: ['Charité'],
+      format: :json
+    )
+    assert_response :success
+    v = JSON.parse(response.body)['variants'].first
+    assert v.key?('first_seen'), 'missing first_seen'
+    assert v.key?('last_seen'),  'missing last_seen'
+    assert v['first_seen'].key?('date')
+    assert v['first_seen'].key?('lineage')
+    assert v['first_seen'].key?('location')
+  end
 end
