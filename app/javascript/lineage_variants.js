@@ -1,5 +1,6 @@
 import 'init_jquery';
 import "igv";
+import { registerPageModule } from 'turbo_page_module';
 
 let igvBrowser = null;
 let tracks = [];
@@ -144,20 +145,15 @@ function debouncedUpdate() {
 $(document).on('change', '#lineage_select', debouncedUpdate);
 $(document).on('change', '#primer_set_select', debouncedUpdate);
 
-// Clean up before Turbo caches the page so the snapshot is IGV-free.
-$(document).on('turbo:before-cache', function() {
-    if (!document.getElementById('lineage_select')) return;
-    $('.igv_div').children('.igv-container').remove();
-    $('#igv_loading').removeClass('invisible');
-    igvBrowser = null;
-    tracks = [];
-    activeSets = [];
-    activeLineageGroup = null;
-});
-
-// turbo:load fires on both the initial page load and every Turbo navigation.
-$(document).on('turbo:load', function() {
-    if (!document.getElementById('lineage_select')) return;
-    loadConfig();
-    initBrowser();
-});
+registerPageModule(
+    () => !!document.getElementById('lineage_select'),
+    () => { loadConfig(); initBrowser(); },
+    () => {
+        $('.igv_div').children('.igv-container').remove();
+        $('#igv_loading').removeClass('invisible');
+        igvBrowser = null;
+        tracks = [];
+        activeSets = [];
+        activeLineageGroup = null;
+    }
+);

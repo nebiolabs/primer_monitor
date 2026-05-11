@@ -1,5 +1,6 @@
 import 'init_jquery';
 import "igv";
+import { registerPageModule } from 'turbo_page_module';
 
 let config = {};
 
@@ -45,16 +46,11 @@ function initBrowser() {
 
 }
 
-$(document).on('turbo:before-cache', function() {
-    if (!document.getElementById('igv')) return;
-    $('.igv_div').children('.igv-container, .igv-message').remove();
-});
-
-$(document).on('turbo:load', function() {
-    const configEl = document.getElementById('config');
-    if (!configEl) return;
-    config = JSON.parse(configEl.innerHTML);
-    if ('primer_set_name' in config) {
-        initBrowser();
-    }
-});
+registerPageModule(
+    () => !!document.getElementById('config'),
+    () => {
+        config = JSON.parse(document.getElementById('config').innerHTML);
+        if ('primer_set_name' in config) initBrowser();
+    },
+    () => { $('.igv_div').children('.igv-container, .igv-message').remove(); }
+);
