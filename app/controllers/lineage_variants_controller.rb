@@ -82,7 +82,7 @@ class LineageVariantsController < ApplicationController
     end
 
     variants = variants_map.values
-    first_last = fetch_first_last_seen(variants)
+    first_last = fetch_first_last_seen(variants, @organism)
 
     variants.each do |v|
       seen = first_last.fetch([v[:ref_start], v[:variant_type], v[:variant]],
@@ -96,7 +96,7 @@ class LineageVariantsController < ApplicationController
 
   private
 
-  def fetch_first_last_seen(variants)
+  def fetch_first_last_seen(variants, organism)
     return {} if variants.empty?
 
     conditions = variants.map do |v|
@@ -126,6 +126,7 @@ class LineageVariantsController < ApplicationController
           ) AS rn_last
         FROM variant_sites vs
         JOIN fasta_records fr ON fr.id = vs.fasta_record_id
+        JOIN organism_taxa ot2 ON ot2.id = fr.organism_taxon_id AND ot2.organism_id = #{organism.id}
         JOIN lineage_calls lc ON lc.id = fr.lineage_call_id
         JOIN lineages l ON l.id = lc.lineage_id
         JOIN detailed_geo_locations dgl ON dgl.id = fr.detailed_geo_location_id

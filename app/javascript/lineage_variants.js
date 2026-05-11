@@ -262,6 +262,11 @@ function loadVariantTable(lineage, primerSets) {
     const content = document.getElementById('variant_table_content');
     if (!section) return;
 
+    if (!lineage || primerSets.length === 0) {
+        section.style.display = 'none';
+        return;
+    }
+
     section.style.display = 'block';
     loading.style.display = 'block';
     content.innerHTML = '';
