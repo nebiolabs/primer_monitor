@@ -4,6 +4,7 @@ class Organism < ApplicationRecord
   has_many :blast_hits, dependent: :destroy
   has_many :primer_sets, dependent: :destroy
   has_many :organism_taxa, dependent: :destroy
+  has_many :lineage_variant_primer_overlaps, dependent: :destroy
 
   def to_s
     name
