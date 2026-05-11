@@ -2,3 +2,4 @@ sars_cov2:
   name: "SARS-CoV-2"
   slug: "sars-cov-2"
   public: true
+  pct_cutoff: 1.0
