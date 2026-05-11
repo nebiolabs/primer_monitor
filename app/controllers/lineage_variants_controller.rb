@@ -36,7 +36,52 @@ class LineageVariantsController < ApplicationController
 
     return head :bad_request if lineage_param.nil? || primer_set_params.empty?
 
-    render json: { variants: [] }
+    rows = LineageVariantPrimerOverlap
+      .joins(oligo: [:primer_set, { oligo_alignment_positions: :organism_taxon }])
+      .where(
+        lineage_variant_primer_overlaps: {
+          organism_id: @organism.id,
+          lineage_group_key: lineage_param
+        },
+        primer_sets: { name: primer_set_params },
+        organism_taxa: { organism_id: @organism.id }
+      )
+      .select(
+        'lineage_variant_primer_overlaps.ref_start',
+        'lineage_variant_primer_overlaps.ref_end',
+        'lineage_variant_primer_overlaps.variant_type',
+        'lineage_variant_primer_overlaps.variant',
+        'lineage_variant_primer_overlaps.frequency_pct',
+        'oligos.name AS oligo_name',
+        'oligos.sequence AS oligo_sequence',
+        'oligos.strand AS oligo_strand',
+        'oligo_alignment_positions.ref_start AS oligo_start',
+        'oligo_alignment_positions.ref_end AS oligo_end',
+        'primer_sets.name AS primer_set_name'
+      )
+
+    variants_map = {}
+    rows.each do |row|
+      key = [row.ref_start, row.ref_end, row.variant_type, row.variant]
+      variants_map[key] ||= {
+        ref_start: row.ref_start,
+        ref_end: row.ref_end,
+        variant_type: row.variant_type,
+        variant: row.variant,
+        frequency_pct: row.frequency_pct,
+        oligos: []
+      }
+      variants_map[key][:oligos] << {
+        name: row.oligo_name,
+        sequence: row.oligo_sequence,
+        oligo_start: row.oligo_start,
+        oligo_end: row.oligo_end,
+        strand: row.oligo_strand,
+        primer_set: row.primer_set_name
+      }
+    end
+
+    render json: { variants: variants_map.values }
   end
 
   private

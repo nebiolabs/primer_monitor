@@ -1,0 +1,5 @@
+one:
+  oligo: one
+  organism_taxon: sars_cov_2_taxon
+  ref_start: 95
+  ref_end: 115
