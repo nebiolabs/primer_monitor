@@ -149,9 +149,48 @@ $(document).on('change', '#primer_set_select', debouncedUpdate);
 
 const VARIANT_TYPE_LABELS = { X: 'SNP', D: 'deletion', I: 'insertion' };
 
-// Stub — replaced by real implementation in Task 8
-function renderOligoSvg(_sequence, _oligoStart, _oligoEnd, _strand, _variantStart, _variantEnd) {
-    return '';
+function renderOligoSvg(sequence, oligoStart, oligoEnd, strand, variantStart, variantEnd) {
+    const CELL_W = 12;
+    const CELL_H = 20;
+    const LABEL_W = 24;
+    const ARROW_W = 8;
+    const isPlus = strand !== '-';
+    const n = sequence.length;
+    const seqW = n * CELL_W;
+    const totalW = LABEL_W + seqW + ARROW_W + LABEL_W;
+    const totalH = CELL_H + 4;
+
+    const fivePrimeX  = isPlus ? 0              : LABEL_W + seqW + ARROW_W;
+    const threePrimeX = isPlus ? LABEL_W + seqW + ARROW_W : 0;
+
+    const arrowX = isPlus ? LABEL_W + seqW : LABEL_W;
+    const mid = CELL_H / 2;
+    const arrowPoints = isPlus
+        ? `${arrowX},${mid - 4} ${arrowX + ARROW_W},${mid} ${arrowX},${mid + 4}`
+        : `${arrowX + ARROW_W},${mid - 4} ${arrowX},${mid} ${arrowX + ARROW_W},${mid + 4}`;
+
+    const cells = sequence.split('').map((base, i) => {
+        const gPos = isPlus ? oligoStart + i : oligoEnd - 1 - i;
+        const isVariant = gPos >= variantStart && gPos < variantEnd;
+        const x = LABEL_W + i * CELL_W;
+        const fill = isVariant ? '#cc0000' : '#444444';
+        return `
+            <rect x="${x}" y="0" width="${CELL_W}" height="${CELL_H}" fill="${fill}"/>
+            <text x="${x + CELL_W / 2}" y="${CELL_H - 5}"
+                  fill="white" font-size="10" text-anchor="middle"
+                  font-family="monospace">${escapeHtml(base)}</text>`;
+    }).join('');
+
+    return `<svg xmlns="http://www.w3.org/2000/svg"
+                 width="${totalW}" height="${totalH}"
+                 style="display:block">
+        <text x="${fivePrimeX + 2}" y="${CELL_H - 5}"
+              fill="#666" font-size="10" font-family="monospace">5'</text>
+        <text x="${threePrimeX + 2}" y="${CELL_H - 5}"
+              fill="#666" font-size="10" font-family="monospace">3'</text>
+        <polygon points="${arrowPoints}" fill="#888"/>
+        ${cells}
+    </svg>`;
 }
 
 function escapeHtml(str) {
