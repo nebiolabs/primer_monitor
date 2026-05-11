@@ -883,6 +883,43 @@ ALTER SEQUENCE public.lineage_calls_id_seq OWNED BY public.lineage_calls.id;
 
 
 --
+-- Name: lineage_variant_primer_overlaps; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.lineage_variant_primer_overlaps (
+    id bigint NOT NULL,
+    organism_id bigint NOT NULL,
+    lineage_group_key character varying NOT NULL,
+    ref_start integer NOT NULL,
+    ref_end integer NOT NULL,
+    variant_type character varying NOT NULL,
+    variant character varying NOT NULL,
+    frequency_pct double precision NOT NULL,
+    oligo_id bigint NOT NULL,
+    created_at timestamp(6) without time zone DEFAULT now() NOT NULL
+);
+
+
+--
+-- Name: lineage_variant_primer_overlaps_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.lineage_variant_primer_overlaps_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: lineage_variant_primer_overlaps_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.lineage_variant_primer_overlaps_id_seq OWNED BY public.lineage_variant_primer_overlaps.id;
+
+
+--
 -- Name: lineages; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -1333,6 +1370,13 @@ ALTER TABLE ONLY public.lineage_calls ALTER COLUMN id SET DEFAULT nextval('publi
 
 
 --
+-- Name: lineage_variant_primer_overlaps id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.lineage_variant_primer_overlaps ALTER COLUMN id SET DEFAULT nextval('public.lineage_variant_primer_overlaps_id_seq'::regclass);
+
+
+--
 -- Name: lineages id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -1525,6 +1569,14 @@ ALTER TABLE ONLY public.lineage_callers
 
 ALTER TABLE ONLY public.lineage_calls
     ADD CONSTRAINT lineage_calls_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: lineage_variant_primer_overlaps lineage_variant_primer_overlaps_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.lineage_variant_primer_overlaps
+    ADD CONSTRAINT lineage_variant_primer_overlaps_pkey PRIMARY KEY (id);
 
 
 --
@@ -1742,6 +1794,20 @@ CREATE INDEX index_lineage_calls_on_lineage_caller_id ON public.lineage_calls US
 --
 
 CREATE INDEX index_lineage_calls_on_lineage_id ON public.lineage_calls USING btree (lineage_id);
+
+
+--
+-- Name: index_lineage_variant_primer_overlaps_on_oligo_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_lineage_variant_primer_overlaps_on_oligo_id ON public.lineage_variant_primer_overlaps USING btree (oligo_id);
+
+
+--
+-- Name: index_lineage_variant_primer_overlaps_on_organism_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_lineage_variant_primer_overlaps_on_organism_id ON public.lineage_variant_primer_overlaps USING btree (organism_id);
 
 
 --
@@ -1990,6 +2056,20 @@ CREATE INDEX index_verified_notifications_on_user_id ON public.verified_notifica
 
 
 --
+-- Name: lineage_variant_primer_overlaps_unique; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX lineage_variant_primer_overlaps_unique ON public.lineage_variant_primer_overlaps USING btree (organism_id, lineage_group_key, ref_start, variant_type, variant, oligo_id);
+
+
+--
+-- Name: lvpo_organism_lineage_group_key; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX lvpo_organism_lineage_group_key ON public.lineage_variant_primer_overlaps USING btree (organism_id, lineage_group_key);
+
+
+--
 -- Name: oligo_variant_overlaps_date_collected_idx; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -2083,6 +2163,14 @@ ALTER TABLE ONLY public.primer_sets
 
 ALTER TABLE ONLY public.blast_hits
     ADD CONSTRAINT fk_rails_1f04a34db0 FOREIGN KEY (organism_id) REFERENCES public.organisms(id);
+
+
+--
+-- Name: lineage_variant_primer_overlaps fk_rails_24f226013f; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.lineage_variant_primer_overlaps
+    ADD CONSTRAINT fk_rails_24f226013f FOREIGN KEY (organism_id) REFERENCES public.organisms(id);
 
 
 --
@@ -2310,6 +2398,14 @@ ALTER TABLE ONLY public.fasta_records
 
 
 --
+-- Name: lineage_variant_primer_overlaps fk_rails_ee9d00ba36; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.lineage_variant_primer_overlaps
+    ADD CONSTRAINT fk_rails_ee9d00ba36 FOREIGN KEY (oligo_id) REFERENCES public.oligos(id);
+
+
+--
 -- Name: oligo_alignment_positions fk_rails_eee2f0a8c8; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -2332,6 +2428,7 @@ ALTER TABLE ONLY public.proposed_notifications
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260511100001'),
 ('20260511100000'),
 ('20240715163630'),
 ('20240607145249'),
