@@ -10,7 +10,8 @@ class LineageVariantsController < ApplicationController
     @config = {
       "data_server": ENV['IGV_DATA_SERVER'],
       "organism_slug": @organism.slug,
-      "organism_name": @organism.name
+      "organism_name": @organism.name,
+      "reference_accession": @organism.organism_taxa.first&.reference_accession
     }
 
     @track_data = @organism.lineage_variants_data(@config[:data_server], @config[:organism_slug])

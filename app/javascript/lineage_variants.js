@@ -164,10 +164,9 @@ function renderOligoSvg(sequence, oligoStart, oligoEnd, strand, variantStart, va
     const threePrimeX = isPlus ? LABEL_W + seqW + ARROW_W : 0;
 
     const arrowX = isPlus ? LABEL_W + seqW : LABEL_W;
-    const mid = CELL_H / 2;
     const arrowPoints = isPlus
-        ? `${arrowX},${mid - 4} ${arrowX + ARROW_W},${mid} ${arrowX},${mid + 4}`
-        : `${arrowX + ARROW_W},${mid - 4} ${arrowX},${mid} ${arrowX + ARROW_W},${mid + 4}`;
+        ? `${arrowX},0 ${arrowX + ARROW_W},${CELL_H / 2} ${arrowX},${CELL_H}`
+        : `${arrowX + ARROW_W},0 ${arrowX},${CELL_H / 2} ${arrowX + ARROW_W},${CELL_H}`;
 
     const cells = sequence.split('').map((base, i) => {
         const gPos = isPlus ? oligoStart + i : oligoEnd - 1 - i;
@@ -183,12 +182,14 @@ function renderOligoSvg(sequence, oligoStart, oligoEnd, strand, variantStart, va
 
     return `<svg xmlns="http://www.w3.org/2000/svg"
                  width="${totalW}" height="${totalH}"
-                 style="display:block">
+                 style="display:block; cursor:pointer"
+                 class="oligo-svg"
+                 data-start="${oligoStart}" data-end="${oligoEnd}">
         <text x="${fivePrimeX + 2}" y="${CELL_H - 5}"
               fill="#666" font-size="10" font-family="monospace">5'</text>
         <text x="${threePrimeX + 2}" y="${CELL_H - 5}"
               fill="#666" font-size="10" font-family="monospace">3'</text>
-        <polygon points="${arrowPoints}" fill="#888"/>
+        <polygon points="${arrowPoints}" fill="#444444"/>
         ${cells}
     </svg>`;
 }
@@ -289,6 +290,13 @@ function loadVariantTable(lineage, primerSets) {
             content.innerHTML = '<p class="has-text-danger">Error loading variant data.</p>';
         });
 }
+
+$(document).on('click', '.oligo-svg', function() {
+    if (!igvBrowser || !config['reference_accession']) return;
+    const start = Math.max(0, parseInt($(this).data('start')) - 50);
+    const end = parseInt($(this).data('end')) + 50;
+    igvBrowser.search(`${config['reference_accession']}:${start}-${end}`);
+});
 
 $(document).on('click', '.variant-expand-btn', function() {
     const row = $(this).closest('tr');
