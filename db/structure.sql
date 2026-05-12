@@ -887,7 +887,7 @@ ALTER SEQUENCE public.lineage_calls_id_seq OWNED BY public.lineage_calls.id;
 -- Name: lineage_variant_primer_overlaps; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE public.lineage_variant_primer_overlaps (
+CREATE UNLOGGED TABLE public.lineage_variant_primer_overlaps (
     id bigint NOT NULL,
     organism_id bigint NOT NULL,
     lineage_group_key character varying NOT NULL,
@@ -2445,6 +2445,7 @@ SET search_path TO "$user", public;
 INSERT INTO "schema_migrations" (version) VALUES
 ('20260513000001'),
 ('20260513000000'),
+('20260512200000'),
 ('20260512000001'),
 ('20260512000000'),
 ('20260511100001'),
