@@ -185,6 +185,7 @@ function renderOligoSvg(sequence, oligoStart, oligoEnd, strand, variantStart, va
                  style="display:block; cursor:pointer"
                  class="oligo-svg"
                  data-start="${oligoStart}" data-end="${oligoEnd}">
+        <title>Show in IGV</title>
         <text x="${fivePrimeX + 2}" y="${CELL_H - 5}"
               fill="#666" font-size="10" font-family="monospace">5'</text>
         <text x="${threePrimeX + 2}" y="${CELL_H - 5}"
@@ -214,7 +215,7 @@ function buildVariantTable(variants) {
     const rows = variants.map(v => {
         const oligoSubRows = v.oligos.map(o => `
             <tr class="variant-oligo-row" style="display:none">
-                <td colspan="6" style="padding-left:2rem; background:#f9f9f9">
+                <td colspan="5" style="padding-left:2rem; background:#f9f9f9">
                     <strong>${escapeHtml(o.name)}</strong>
                     <span class="has-text-grey"> — ${escapeHtml(o.primer_set)}</span><br>
                     <div style="overflow-x:auto; margin-top:0.4rem">
@@ -231,7 +232,6 @@ function buildVariantTable(variants) {
                     ${v.ref_start}–${v.ref_end}
                 </td>
                 <td>${escapeHtml(VARIANT_TYPE_LABELS[v.variant_type] || v.variant_type)}</td>
-                <td><code>${escapeHtml(v.variant)}</code></td>
                 <td>${v.frequency_pct.toFixed(1)}%</td>
                 <td>${formatSeen(v.first_seen)}</td>
                 <td>${formatSeen(v.last_seen)}</td>
@@ -246,7 +246,6 @@ function buildVariantTable(variants) {
                 <tr>
                     <th>Position</th>
                     <th>Type</th>
-                    <th>Change</th>
                     <th>Frequency</th>
                     <th>First Seen</th>
                     <th>Last Seen</th>
@@ -295,15 +294,15 @@ $(document).on('click', '.oligo-svg', function() {
     if (!igvBrowser || !config['reference_accession']) return;
     const start = Math.max(0, parseInt($(this).data('start')) - 50);
     const end = parseInt($(this).data('end')) + 50;
-    igvBrowser.search(`${config['reference_accession']}:${start}-${end}`);
-    document.getElementById('igv').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    igvBrowser.search(`${config['reference_accession']}:${start}-${end}`)
+        .then(() => document.getElementById('igv').scrollIntoView({ behavior: 'smooth', block: 'start' }));
 });
 
-$(document).on('click', '.variant-expand-btn', function() {
-    const row = $(this).closest('tr');
+$(document).on('click', '.variant-row', function() {
+    const row = $(this);
     const expanded = row.data('expanded') === true;
     row.data('expanded', !expanded);
-    $(this).text(expanded ? '▶' : '▼');
+    row.find('.variant-expand-btn').text(expanded ? '▶' : '▼');
     row.nextUntil('tr:not(.variant-oligo-row)').toggle(!expanded);
 });
 
