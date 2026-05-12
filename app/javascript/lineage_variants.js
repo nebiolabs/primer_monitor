@@ -216,8 +216,10 @@ function escapeHtml(str) {
 
 function formatSeen(seen) {
     if (!seen || !seen.date) return '—';
-    const parts = [seen.date, seen.lineage, seen.location].filter(Boolean);
-    return parts.map(escapeHtml).join(' · ');
+    const parts = [seen.date, seen.lineage].filter(Boolean);
+    const line = parts.map(escapeHtml).join(' · ');
+    const loc = seen.location ? `<br><small class="has-text-grey">${escapeHtml(seen.location)}</small>` : '';
+    return line + loc;
 }
 
 function buildVariantTable(variants) {
@@ -228,13 +230,15 @@ function buildVariantTable(variants) {
     const rows = variants.map(v => {
         const oligoSubRows = v.oligos.map(o => `
             <tr class="variant-oligo-row" style="display:none">
-                <td colspan="5" style="padding-left:2rem; background:#f9f9f9">
+                <td colspan="3" style="padding-left:2rem; background:#f9f9f9">
                     <strong>${escapeHtml(o.name)}</strong>
-                    <span class="has-text-grey"> — ${escapeHtml(o.primer_set)}</span><br>
+                    <span class="has-text-grey"> — ${escapeHtml(o.primer_set)}</span>
                     <div style="overflow-x:auto; margin-top:0.4rem">
                         ${renderOligoSvg(o.sequence, o.oligo_start, o.oligo_end, o.strand, v.ref_start, v.ref_end)}
                     </div>
                 </td>
+                <td style="background:#f9f9f9; vertical-align:top">${formatSeen(v.first_seen)}</td>
+                <td style="background:#f9f9f9; vertical-align:top">${formatSeen(v.last_seen)}</td>
             </tr>
         `).join('');
 
@@ -279,6 +283,10 @@ function loadVariantTable(lineage, primerSets) {
         section.style.display = 'none';
         return;
     }
+
+    const lineageLabel = lineageSetsToNames[lineage] || lineage;
+    const heading = document.getElementById('variant_table_heading');
+    if (heading) heading.textContent = `Variants in ${lineageLabel} Overlapping Selected Primers`;
 
     section.style.display = 'block';
     loading.style.display = 'block';
