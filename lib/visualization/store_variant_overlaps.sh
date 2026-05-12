@@ -41,11 +41,67 @@ DELETE FROM lineage_variant_primer_overlaps
 WHERE organism_id = (SELECT id FROM organisms WHERE slug = :'organism_slug')
   AND lineage_group_key = :'lineage_key';
 
+-- Compute first/last seen globally for each distinct variant position.
+CREATE TEMP TABLE tmp_seen AS
+SELECT
+  vs.ref_start,
+  vs.ref_end,
+  vs.variant_type,
+  vs.variant,
+  MIN(COALESCE(fr.date_collected, fr.date_submitted))
+    FILTER (WHERE COALESCE(fr.date_collected, fr.date_submitted) IS NOT NULL) AS first_date,
+  MAX(COALESCE(fr.date_collected, fr.date_submitted))
+    FILTER (WHERE COALESCE(fr.date_collected, fr.date_submitted) IS NOT NULL) AS last_date
+FROM tmp_variants tv
+JOIN organism_taxa ot2 ON ot2.reference_accession = tv.chrom
+JOIN variant_sites vs  ON vs.ref_start = tv.ref_start
+                      AND vs.ref_end   = tv.ref_end
+                      AND vs.variant   = tv.variant_name
+                      AND vs.organism_taxon_id = ot2.id
+JOIN fasta_records fr  ON fr.id = vs.fasta_record_id
+GROUP BY vs.ref_start, vs.ref_end, vs.variant_type, vs.variant;
+
+-- Enrich first_date with lineage + location.
+CREATE TEMP TABLE tmp_first AS
+SELECT DISTINCT ON (vs.ref_start, vs.variant_type, vs.variant)
+  vs.ref_start, vs.variant_type, vs.variant,
+  l.name  AS lineage,
+  COALESCE(dga.region, '') || CASE WHEN dga.division IS NOT NULL THEN ' / ' || dga.division ELSE '' END AS location
+FROM tmp_seen s
+JOIN variant_sites vs  ON vs.ref_start = s.ref_start AND vs.ref_end = s.ref_end
+                      AND vs.variant_type = s.variant_type AND vs.variant = s.variant
+JOIN fasta_records fr  ON fr.id = vs.fasta_record_id
+                      AND COALESCE(fr.date_collected, fr.date_submitted) = s.first_date
+JOIN lineage_calls lc  ON lc.id = fr.lineage_call_id
+JOIN lineages l        ON l.id  = lc.lineage_id
+JOIN detailed_geo_locations dgl   ON dgl.id = fr.detailed_geo_location_id
+JOIN detailed_geo_location_aliases dga ON dga.id = dgl.detailed_geo_location_alias_id
+ORDER BY vs.ref_start, vs.variant_type, vs.variant, fr.id ASC;
+
+-- Enrich last_date with lineage + location.
+CREATE TEMP TABLE tmp_last AS
+SELECT DISTINCT ON (vs.ref_start, vs.variant_type, vs.variant)
+  vs.ref_start, vs.variant_type, vs.variant,
+  l.name  AS lineage,
+  COALESCE(dga.region, '') || CASE WHEN dga.division IS NOT NULL THEN ' / ' || dga.division ELSE '' END AS location
+FROM tmp_seen s
+JOIN variant_sites vs  ON vs.ref_start = s.ref_start AND vs.ref_end = s.ref_end
+                      AND vs.variant_type = s.variant_type AND vs.variant = s.variant
+JOIN fasta_records fr  ON fr.id = vs.fasta_record_id
+                      AND COALESCE(fr.date_collected, fr.date_submitted) = s.last_date
+JOIN lineage_calls lc  ON lc.id = fr.lineage_call_id
+JOIN lineages l        ON l.id  = lc.lineage_id
+JOIN detailed_geo_locations dgl   ON dgl.id = fr.detailed_geo_location_id
+JOIN detailed_geo_location_aliases dga ON dga.id = dgl.detailed_geo_location_alias_id
+ORDER BY vs.ref_start, vs.variant_type, vs.variant, fr.id DESC;
+
 -- Insert overlaps: variant positions x oligos aligned to the same reference.
--- variant_type is looked up from variant_sites to avoid parsing it from the BED column.
+-- variant_type is looked up from variant_sites; first/last seen pre-computed above.
 INSERT INTO lineage_variant_primer_overlaps
   (organism_id, lineage_group_key, ref_start, ref_end,
-   variant_type, variant, frequency_pct, oligo_id)
+   variant_type, variant, frequency_pct, oligo_id,
+   first_seen_date, first_seen_lineage, first_seen_location,
+   last_seen_date,  last_seen_lineage,  last_seen_location)
 SELECT DISTINCT
   org.id,
   :'lineage_key',
@@ -54,7 +110,9 @@ SELECT DISTINCT
   vs.variant_type,
   tv.variant_name,
   tv.frequency_pct,
-  o.id
+  o.id,
+  s.first_date,  tf.lineage,  tf.location,
+  s.last_date,   tl.lineage,  tl.location
 FROM tmp_variants tv
 JOIN organism_taxa ot  ON ot.reference_accession = tv.chrom
 JOIN organisms org     ON org.id = ot.organism_id AND org.slug = :'organism_slug'
@@ -62,6 +120,9 @@ JOIN variant_sites vs  ON vs.ref_start = tv.ref_start
                       AND vs.ref_end   = tv.ref_end
                       AND vs.variant   = tv.variant_name
                       AND vs.organism_taxon_id = ot.id
+JOIN tmp_seen s        ON s.ref_start = vs.ref_start AND s.variant_type = vs.variant_type AND s.variant = vs.variant
+LEFT JOIN tmp_first tf ON tf.ref_start = vs.ref_start AND tf.variant_type = vs.variant_type AND tf.variant = vs.variant
+LEFT JOIN tmp_last  tl ON tl.ref_start = vs.ref_start AND tl.variant_type = vs.variant_type AND tl.variant = vs.variant
 JOIN oligo_alignment_positions oap
   ON  oap.organism_taxon_id = ot.id
   AND NOT (oap.ref_start >= tv.ref_end OR oap.ref_end <= tv.ref_start)

@@ -896,7 +896,13 @@ CREATE TABLE public.lineage_variant_primer_overlaps (
     variant character varying NOT NULL,
     frequency_pct double precision NOT NULL,
     oligo_id bigint NOT NULL,
-    created_at timestamp(6) without time zone DEFAULT now() NOT NULL
+    created_at timestamp(6) without time zone DEFAULT now() NOT NULL,
+    first_seen_date date,
+    first_seen_lineage character varying,
+    first_seen_location character varying,
+    last_seen_date date,
+    last_seen_lineage character varying,
+    last_seen_location character varying
 );
 
 
@@ -1720,6 +1726,13 @@ CREATE UNIQUE INDEX full_record ON public.detailed_geo_locations USING btree (re
 
 
 --
+-- Name: idx_variant_sites_lookup; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX idx_variant_sites_lookup ON public.variant_sites USING btree (ref_start, variant_type, variant, organism_taxon_id);
+
+
+--
 -- Name: index_blast_hits_on_oligo_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -2428,6 +2441,8 @@ ALTER TABLE ONLY public.proposed_notifications
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260512000001'),
+('20260512000000'),
 ('20260511100001'),
 ('20260511100000'),
 ('20240715163630'),
