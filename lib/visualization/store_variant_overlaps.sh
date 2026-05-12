@@ -8,6 +8,9 @@
 # variants_bed_path: the lineage_variants/{lineage}.bed file produced by count_variants.sh
 #   Columns: chrom, ref_start, ref_end, variant (allele only), frequency_pct
 # variant_type is looked up from variant_sites rather than parsed from the filename.
+#
+# WARNING: organism_slug, lineage_group_key, and variants_bed_path are interpolated directly
+# into SQL. Do not pass arbitrary user input to this script.
 
 set -e
 
@@ -20,11 +23,11 @@ if [[ -z "$organism_slug" || -z "$lineage_group_key" || -z "$variants_bed" ]]; t
   exit 1
 fi
 
-PGPASSWORD="$DB_PASSWORD" psql -h "$DB_HOST" -d "$DB_NAME" -U "$DB_USER" \
-  -v "organism_slug=$organism_slug" \
-  -v "lineage_key=$lineage_group_key" \
-  -v "variants_bed=$variants_bed" \
-  -f - <<'PSQL'
+sql_file=$(mktemp /tmp/store_overlaps_XXXXXX.sql)
+trap "rm -f '$sql_file'" EXIT
+
+cat > "$sql_file" <<SQL
+\set ON_ERROR_STOP on
 
 CREATE TEMP TABLE tmp_variants (
   chrom        varchar,
@@ -34,12 +37,12 @@ CREATE TEMP TABLE tmp_variants (
   frequency_pct float
 ) ON COMMIT DROP;
 
-\COPY tmp_variants FROM :'variants_bed' WITH (FORMAT csv, DELIMITER E'\t', HEADER false)
+\COPY tmp_variants FROM '${variants_bed}' WITH (FORMAT csv, DELIMITER E'\\t', HEADER false)
 
 -- Remove stale rows from previous pipeline runs for this organism + lineage group
 DELETE FROM lineage_variant_primer_overlaps
-WHERE organism_id = (SELECT id FROM organisms WHERE slug = :'organism_slug')
-  AND lineage_group_key = :'lineage_key';
+WHERE organism_id = (SELECT id FROM organisms WHERE slug = '${organism_slug}')
+  AND lineage_group_key = '${lineage_group_key}';
 
 -- Compute first/last seen globally for each distinct variant position.
 CREATE TEMP TABLE tmp_seen AS
@@ -65,7 +68,7 @@ GROUP BY vs.ref_start, vs.ref_end, vs.variant_type, vs.variant;
 CREATE TEMP TABLE tmp_first AS
 SELECT DISTINCT ON (vs.ref_start, vs.variant_type, vs.variant)
   vs.ref_start, vs.variant_type, vs.variant,
-  l.name  AS lineage,
+  l.name AS lineage,
   COALESCE(dga.region, '') || CASE WHEN dga.division IS NOT NULL THEN ' / ' || dga.division ELSE '' END AS location
 FROM tmp_seen s
 JOIN variant_sites vs  ON vs.ref_start = s.ref_start AND vs.ref_end = s.ref_end
@@ -82,7 +85,7 @@ ORDER BY vs.ref_start, vs.variant_type, vs.variant, fr.id ASC;
 CREATE TEMP TABLE tmp_last AS
 SELECT DISTINCT ON (vs.ref_start, vs.variant_type, vs.variant)
   vs.ref_start, vs.variant_type, vs.variant,
-  l.name  AS lineage,
+  l.name AS lineage,
   COALESCE(dga.region, '') || CASE WHEN dga.division IS NOT NULL THEN ' / ' || dga.division ELSE '' END AS location
 FROM tmp_seen s
 JOIN variant_sites vs  ON vs.ref_start = s.ref_start AND vs.ref_end = s.ref_end
@@ -104,7 +107,7 @@ INSERT INTO lineage_variant_primer_overlaps
    last_seen_date,  last_seen_lineage,  last_seen_location)
 SELECT DISTINCT
   org.id,
-  :'lineage_key',
+  '${lineage_group_key}',
   tv.ref_start,
   tv.ref_end,
   vs.variant_type,
@@ -115,7 +118,7 @@ SELECT DISTINCT
   s.last_date,   tl.lineage,  tl.location
 FROM tmp_variants tv
 JOIN organism_taxa ot  ON ot.reference_accession = tv.chrom
-JOIN organisms org     ON org.id = ot.organism_id AND org.slug = :'organism_slug'
+JOIN organisms org     ON org.id = ot.organism_id AND org.slug = '${organism_slug}'
 JOIN variant_sites vs  ON vs.ref_start = tv.ref_start
                       AND vs.ref_end   = tv.ref_end
                       AND vs.variant   = tv.variant_name
@@ -129,5 +132,6 @@ JOIN oligo_alignment_positions oap
 JOIN oligos o          ON o.id = oap.oligo_id
 JOIN primer_sets ps    ON ps.id = o.primer_set_id AND ps.organism_id = org.id
 ON CONFLICT DO NOTHING;
+SQL
 
-PSQL
+PGPASSWORD="$DB_PASSWORD" psql -h "$DB_HOST" -d "$DB_NAME" -U "$DB_USER" -f "$sql_file"
