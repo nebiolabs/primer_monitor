@@ -35,7 +35,7 @@ CREATE TEMP TABLE tmp_variants (
   ref_end      integer,
   variant_name varchar,
   frequency_pct float
-) ON COMMIT DROP;
+);
 
 \COPY tmp_variants FROM '${variants_bed}' WITH (FORMAT csv, DELIMITER E'\\t', HEADER false)
 
@@ -75,10 +75,10 @@ JOIN variant_sites vs  ON vs.ref_start = s.ref_start AND vs.ref_end = s.ref_end
                       AND vs.variant_type = s.variant_type AND vs.variant = s.variant
 JOIN fasta_records fr  ON fr.id = vs.fasta_record_id
                       AND COALESCE(fr.date_collected, fr.date_submitted) = s.first_date
-JOIN lineage_calls lc  ON lc.id = fr.lineage_call_id
-JOIN lineages l        ON l.id  = lc.lineage_id
-JOIN detailed_geo_locations dgl   ON dgl.id = fr.detailed_geo_location_id
-JOIN detailed_geo_location_aliases dga ON dga.id = dgl.detailed_geo_location_alias_id
+LEFT JOIN lineage_calls lc  ON lc.id = fr.lineage_call_id
+LEFT JOIN lineages l        ON l.id  = lc.lineage_id
+LEFT JOIN detailed_geo_locations dgl   ON dgl.id = fr.detailed_geo_location_id
+LEFT JOIN detailed_geo_location_aliases dga ON dga.id = dgl.detailed_geo_location_alias_id
 ORDER BY vs.ref_start, vs.variant_type, vs.variant, fr.id ASC;
 
 -- Enrich last_date with lineage + location.

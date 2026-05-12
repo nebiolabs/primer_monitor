@@ -172,7 +172,7 @@ function renderOligoSvg(sequence, oligoStart, oligoEnd, strand, variantStart, va
         const gPos = isPlus ? oligoStart + i : oligoEnd - 1 - i;
         const isVariant = gPos >= variantStart && gPos < variantEnd;
         const x = LABEL_W + i * CELL_W;
-        const fill = isVariant ? '#cc0000' : '#444444';
+        const fill = isVariant ? '#cc0000' : 'rgb(0,0,200)';
         return `
             <rect x="${x}" y="0" width="${CELL_W}" height="${CELL_H}" fill="${fill}"/>
             <text x="${x + CELL_W / 2}" y="${CELL_H - 5}"
@@ -189,7 +189,7 @@ function renderOligoSvg(sequence, oligoStart, oligoEnd, strand, variantStart, va
               fill="#666" font-size="10" font-family="monospace">5'</text>
         <text x="${threePrimeX + 2}" y="${CELL_H - 5}"
               fill="#666" font-size="10" font-family="monospace">3'</text>
-        <polygon points="${arrowPoints}" fill="#444444"/>
+        <polygon points="${arrowPoints}" fill="rgb(0,0,200)"/>
         ${cells}
     </svg>`;
 }
