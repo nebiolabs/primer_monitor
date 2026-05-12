@@ -296,6 +296,7 @@ $(document).on('click', '.oligo-svg', function() {
     const start = Math.max(0, parseInt($(this).data('start')) - 50);
     const end = parseInt($(this).data('end')) + 50;
     igvBrowser.search(`${config['reference_accession']}:${start}-${end}`);
+    document.getElementById('igv').scrollIntoView({ behavior: 'smooth', block: 'start' });
 });
 
 $(document).on('click', '.variant-expand-btn', function() {
