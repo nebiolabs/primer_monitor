@@ -503,7 +503,8 @@ CREATE TABLE public.variant_sites (
     ref_end integer NOT NULL,
     usable_del_or_snp boolean GENERATED ALWAYS AS (((((variant_type)::text = 'D'::text) OR ((variant_type)::text = 'X'::text)) AND ((variant)::text !~~ '%N%'::text))) STORED,
     usable_insertion boolean GENERATED ALWAYS AS ((((variant_type)::text = 'I'::text) AND ((variant)::text !~~ '%N%'::text))) STORED,
-    organism_taxon_id bigint
+    organism_taxon_id bigint,
+    ref character varying
 );
 
 
@@ -902,7 +903,8 @@ CREATE TABLE public.lineage_variant_primer_overlaps (
     first_seen_location character varying,
     last_seen_date date,
     last_seen_lineage character varying,
-    last_seen_location character varying
+    last_seen_location character varying,
+    ref character varying
 );
 
 
@@ -2441,6 +2443,8 @@ ALTER TABLE ONLY public.proposed_notifications
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260513000001'),
+('20260513000000'),
 ('20260512000001'),
 ('20260512000000'),
 ('20260511100001'),

@@ -52,6 +52,7 @@ class LineageVariantsController < ApplicationController
         'lineage_variant_primer_overlaps.ref_end',
         'lineage_variant_primer_overlaps.variant_type',
         'lineage_variant_primer_overlaps.variant',
+        'lineage_variant_primer_overlaps.ref',
         'lineage_variant_primer_overlaps.frequency_pct',
         'lineage_variant_primer_overlaps.first_seen_date',
         'lineage_variant_primer_overlaps.first_seen_lineage',
@@ -66,6 +67,7 @@ class LineageVariantsController < ApplicationController
         'oligo_alignment_positions.ref_end AS oligo_end',
         'primer_sets.name AS primer_set_name'
       )
+      .order('lineage_variant_primer_overlaps.ref_start ASC, lineage_variant_primer_overlaps.ref_end ASC')
 
     variants_map = {}
     rows.each do |row|
@@ -75,6 +77,7 @@ class LineageVariantsController < ApplicationController
         ref_end: row.ref_end,
         variant_type: row.variant_type,
         variant: row.variant,
+        ref: row.ref,
         frequency_pct: row.frequency_pct,
         first_seen: { date: row.first_seen_date, lineage: row.first_seen_lineage, location: row.first_seen_location },
         last_seen:  { date: row.last_seen_date,  lineage: row.last_seen_lineage,  location: row.last_seen_location  },

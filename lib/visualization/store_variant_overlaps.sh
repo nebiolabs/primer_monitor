@@ -102,7 +102,7 @@ ORDER BY vs.ref_start, vs.variant_type, vs.variant, fr.id DESC;
 -- variant_type is looked up from variant_sites; first/last seen pre-computed above.
 INSERT INTO lineage_variant_primer_overlaps
   (organism_id, lineage_group_key, ref_start, ref_end,
-   variant_type, variant, frequency_pct, oligo_id,
+   variant_type, variant, ref, frequency_pct, oligo_id,
    first_seen_date, first_seen_lineage, first_seen_location,
    last_seen_date,  last_seen_lineage,  last_seen_location)
 SELECT DISTINCT
@@ -112,6 +112,7 @@ SELECT DISTINCT
   tv.ref_end,
   vs.variant_type,
   tv.variant_name,
+  vs.ref,
   tv.frequency_pct,
   o.id,
   s.first_date,  tf.lineage,  tf.location,

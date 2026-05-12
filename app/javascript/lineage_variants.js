@@ -147,7 +147,20 @@ function debouncedUpdate() {
 $(document).on('change', '#lineage_select', debouncedUpdate);
 $(document).on('change', '#primer_set_select', debouncedUpdate);
 
-const VARIANT_TYPE_LABELS = { X: 'SNP', D: 'deletion', I: 'insertion' };
+function formatVariant(v) {
+    const ref = v.ref;
+    const alt = v.variant;
+    if (v.variant_type === 'X') {
+        return ref ? `${escapeHtml(ref)}>${escapeHtml(alt)}` : `>${escapeHtml(alt)}`;
+    }
+    if (v.variant_type === 'I') {
+        return ref ? `${escapeHtml(ref)}>${escapeHtml(ref)}${escapeHtml(alt)}` : `>${escapeHtml(alt)}`;
+    }
+    if (v.variant_type === 'D') {
+        return ref ? `\u0394${escapeHtml(ref)}` : `\u0394${escapeHtml(alt)}`;
+    }
+    return escapeHtml(alt);
+}
 
 function renderOligoSvg(sequence, oligoStart, oligoEnd, strand, variantStart, variantEnd) {
     const CELL_W = 12;
@@ -231,7 +244,7 @@ function buildVariantTable(variants) {
                     <button class="variant-expand-btn button is-small is-white" aria-label="expand">▶</button>
                     ${v.ref_start}–${v.ref_end}
                 </td>
-                <td>${escapeHtml(VARIANT_TYPE_LABELS[v.variant_type] || v.variant_type)}</td>
+                <td>${formatVariant(v)}</td>
                 <td>${v.frequency_pct.toFixed(1)}%</td>
                 <td>${formatSeen(v.first_seen)}</td>
                 <td>${formatSeen(v.last_seen)}</td>
@@ -245,7 +258,7 @@ function buildVariantTable(variants) {
             <thead>
                 <tr>
                     <th>Position</th>
-                    <th>Type</th>
+                    <th>Variant</th>
                     <th>Frequency</th>
                     <th>First Seen</th>
                     <th>Last Seen</th>
