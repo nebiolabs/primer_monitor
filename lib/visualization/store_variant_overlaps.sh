@@ -4,7 +4,7 @@
 #
 # Usage: store_variant_overlaps.sh <organism_slug> <lineage_group_key> <variants_bed_path>
 #
-# Requires: DB_HOST, DB_NAME, DB_USER (write-capable) env vars exported by caller.
+# Requires: DB_HOST, DB_NAME, DB_USER (write-capable), DB_PASSWORD env vars exported by caller.
 # variants_bed_path: the lineage_variants/{lineage}.bed file produced by count_variants.sh
 #   Columns: chrom, ref_start, ref_end, variant (allele only), frequency_pct
 # variant_type is looked up from variant_sites rather than parsed from the filename.
@@ -20,7 +20,7 @@ if [[ -z "$organism_slug" || -z "$lineage_group_key" || -z "$variants_bed" ]]; t
   exit 1
 fi
 
-psql -h "$DB_HOST" -d "$DB_NAME" -U "$DB_USER" \
+PGPASSWORD="$DB_PASSWORD" psql -h "$DB_HOST" -d "$DB_NAME" -U "$DB_USER" \
   -v "organism_slug=$organism_slug" \
   -v "lineage_key=$lineage_group_key" \
   -v "variants_bed=$variants_bed" \
