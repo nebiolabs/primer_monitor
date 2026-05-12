@@ -273,7 +273,8 @@ function loadVariantTable(lineage, primerSets) {
 
     const params = new URLSearchParams();
     params.set('lineage', lineage);
-    primerSets.forEach(ps => params.append('primer_sets[]', ps));
+    // primerSets contains URL-safe keys from tracks.json; send display names to match primer_sets.name in DB
+    primerSets.forEach(ps => params.append('primer_sets[]', primerSetsToNames[ps] || ps));
 
     const url = `${location.pathname}/variant_overlaps.json?${params}`;
 
