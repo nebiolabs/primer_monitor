@@ -6,6 +6,7 @@ class AddVariantSitesLookupIndex < ActiveRecord::Migration[7.0]
   def change
     add_index :variant_sites, %i[ref_start variant_type variant organism_taxon_id],
               name: 'idx_variant_sites_lookup',
-              algorithm: :concurrently
+              algorithm: :concurrently,
+              if_not_exists: true
   end
 end
