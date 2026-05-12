@@ -6,7 +6,8 @@
 #
 # Requires: DB_HOST, DB_NAME, DB_USER (write-capable) env vars exported by caller.
 # variants_bed_path: the lineage_variants/{lineage}.bed file produced by count_variants.sh
-#   Columns: chrom, ref_start, ref_end, variant_name (type/allele), frequency_pct
+#   Columns: chrom, ref_start, ref_end, variant (allele only), frequency_pct
+# variant_type is looked up from variant_sites rather than parsed from the filename.
 
 set -e
 
@@ -40,22 +41,27 @@ DELETE FROM lineage_variant_primer_overlaps
 WHERE organism_id = (SELECT id FROM organisms WHERE slug = :'organism_slug')
   AND lineage_group_key = :'lineage_key';
 
--- Insert overlaps: variant positions x oligos aligned to the same reference
+-- Insert overlaps: variant positions x oligos aligned to the same reference.
+-- variant_type is looked up from variant_sites to avoid parsing it from the BED column.
 INSERT INTO lineage_variant_primer_overlaps
   (organism_id, lineage_group_key, ref_start, ref_end,
    variant_type, variant, frequency_pct, oligo_id)
-SELECT
+SELECT DISTINCT
   org.id,
   :'lineage_key',
   tv.ref_start,
   tv.ref_end,
-  split_part(tv.variant_name, '/', 1),
-  split_part(tv.variant_name, '/', 2),
+  vs.variant_type,
+  tv.variant_name,
   tv.frequency_pct,
   o.id
 FROM tmp_variants tv
 JOIN organism_taxa ot  ON ot.reference_accession = tv.chrom
 JOIN organisms org     ON org.id = ot.organism_id AND org.slug = :'organism_slug'
+JOIN variant_sites vs  ON vs.ref_start = tv.ref_start
+                      AND vs.ref_end   = tv.ref_end
+                      AND vs.variant   = tv.variant_name
+                      AND vs.organism_taxon_id = ot.id
 JOIN oligo_alignment_positions oap
   ON  oap.organism_taxon_id = ot.id
   AND NOT (oap.ref_start >= tv.ref_end OR oap.ref_end <= tv.ref_start)
