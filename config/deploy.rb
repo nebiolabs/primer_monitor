@@ -53,7 +53,7 @@ namespace :backend do
   task :git do
     on roles(:backend) do
       within fetch(:backend_deploy_to) do
-        execute("cd #{fetch(:backend_deploy_path)}/release && git pull && git checkout #{fetch(:branch)}")
+        execute("cd #{fetch(:backend_deploy_path)}/release && git fetch --tags origin && git checkout -B '#{fetch(:branch)}' 'origin/#{fetch(:branch)}'")
         # creates a new symlink, overwriting any existing one
         execute("ln -sf #{fetch(:backend_deploy_path)}/release #{fetch(:backend_deploy_path)}/current")
         execute("ln -sf #{fetch(:backend_deploy_path)}/shared/datasets #{fetch(:backend_deploy_path)}/current/datasets")

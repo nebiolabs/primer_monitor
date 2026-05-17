@@ -38,49 +38,6 @@ CREATE TYPE public.primer_set_status AS ENUM (
 );
 
 
---
--- Name: add_dates(); Type: FUNCTION; Schema: public; Owner: -
---
-
-CREATE FUNCTION public.add_dates() RETURNS trigger
-    LANGUAGE plpgsql
-    AS $$
-        BEGIN
-          NEW.created_at := NOW();
-          NEW.updated_at := NOW();
-        END;
-      $$;
-
-
---
--- Name: init_dates_for_pangolin_calls(); Type: FUNCTION; Schema: public; Owner: -
---
-
-CREATE FUNCTION public.init_dates_for_pangolin_calls() RETURNS trigger
-    LANGUAGE plpgsql
-    AS $$
-        BEGIN
-          NEW.created_at := NOW();
-          NEW.updated_at := NOW();
-          RETURN NEW;
-        END;
-      $$;
-
-
---
--- Name: update_date_for_pangolin_calls(); Type: FUNCTION; Schema: public; Owner: -
---
-
-CREATE FUNCTION public.update_date_for_pangolin_calls() RETURNS trigger
-    LANGUAGE plpgsql
-    AS $$
-        BEGIN
-          NEW.updated_at := NOW();
-          RETURN NEW;
-        END;
-      $$;
-
-
 SET default_tablespace = '';
 
 SET default_table_access_method = heap;
@@ -546,7 +503,8 @@ CREATE TABLE public.variant_sites (
     ref_end integer NOT NULL,
     usable_del_or_snp boolean GENERATED ALWAYS AS (((((variant_type)::text = 'D'::text) OR ((variant_type)::text = 'X'::text)) AND ((variant)::text !~~ '%N%'::text))) STORED,
     usable_insertion boolean GENERATED ALWAYS AS ((((variant_type)::text = 'I'::text) AND ((variant)::text !~~ '%N%'::text))) STORED,
-    organism_taxon_id bigint
+    organism_taxon_id bigint,
+    ref character varying
 );
 
 
@@ -624,7 +582,6 @@ CREATE MATERIALIZED VIEW public.oligo_variant_overlaps AS
     variant_overlaps.oligo_name,
     variant_overlaps.oligo_start,
     variant_overlaps.oligo_end,
-    variant_overlaps.alignment_organism_taxon_id,
     variant_overlaps.oligo_short_name,
     variant_overlaps.oligo_locus_name,
     variant_overlaps.oligo_primer_type,
@@ -659,7 +616,6 @@ UNION ALL
     variant_overlaps.oligo_name,
     variant_overlaps.oligo_start,
     variant_overlaps.oligo_end,
-    variant_overlaps.alignment_organism_taxon_id,
     variant_overlaps.oligo_short_name,
     variant_overlaps.oligo_locus_name,
     variant_overlaps.oligo_primer_type,
@@ -777,9 +733,9 @@ CREATE MATERIALIZED VIEW public.identify_primers_for_notifications AS
              JOIN public.oligo_variant_overlaps ON ((oligo_variant_overlaps.oligo_id = oligos.id)))
              JOIN public.join_subscribed_location_to_ids ON (((join_subscribed_location_to_ids.user_id = primer_set_subscriptions.user_id) AND (join_subscribed_location_to_ids.detailed_geo_location_id = oligo_variant_overlaps.detailed_geo_location_id))))
              JOIN public.users ON ((users.id = primer_set_subscriptions.user_id)))
-          WHERE (oligo_variant_overlaps.date_collected >= (CURRENT_DATE - users.lookback_days))
+          WHERE ((oligo_variant_overlaps.date_collected >= (CURRENT_DATE - users.lookback_days)) AND (primer_set_subscriptions.active = true))
           GROUP BY primer_set_subscriptions.user_id, primer_set_subscriptions.primer_set_id, primer_sets.name, oligos.id, oligos.name, join_subscribed_location_to_ids.detailed_geo_location_id, users.lookback_days, users.variant_fraction_threshold, oligo_variant_overlaps.region, oligo_variant_overlaps.subregion, oligo_variant_overlaps.division, oligo_variant_overlaps.subdivision, oligo_variant_overlaps.coords, oligo_variant_overlaps.detailed_geo_location_id
-        ), second_query AS (
+        ), total_sequences_for_denominator AS (
          SELECT fasta_records.detailed_geo_location_id,
             count(fasta_records.id) AS records_count,
             users.lookback_days
@@ -801,13 +757,13 @@ CREATE MATERIALIZED VIEW public.identify_primers_for_notifications AS
     first_query.subdivision,
     first_query.coords,
     first_query.variant_count,
+    total_sequences_for_denominator.records_count,
     first_query.variant_fraction_threshold,
-    second_query.detailed_geo_location_id,
-    second_query.records_count,
-    ((first_query.variant_count)::numeric / (second_query.records_count)::numeric) AS fraction_variant
+    total_sequences_for_denominator.detailed_geo_location_id,
+    ((first_query.variant_count)::numeric / (total_sequences_for_denominator.records_count)::numeric) AS fraction_variant
    FROM (first_query
-     JOIN second_query ON ((second_query.detailed_geo_location_id = first_query.detailed_geo_location_id)))
-  WHERE ((((first_query.variant_count)::numeric / (second_query.records_count)::numeric))::double precision >= first_query.variant_fraction_threshold)
+     JOIN total_sequences_for_denominator ON (((total_sequences_for_denominator.detailed_geo_location_id = first_query.detailed_geo_location_id) AND (total_sequences_for_denominator.lookback_days = first_query.lookback_days))))
+  WHERE ((((first_query.variant_count)::numeric / (total_sequences_for_denominator.records_count)::numeric))::double precision >= first_query.variant_fraction_threshold)
   WITH NO DATA;
 
 
@@ -855,30 +811,6 @@ CREATE MATERIALIZED VIEW public.initial_score AS
    FROM (all_combos
      LEFT JOIN variants ON (((all_combos.date_collected = variants.date_collected) AND (all_combos.primer_set_id = variants.primer_set_id) AND ((all_combos.oligo_name)::text = (variants.oligo_name)::text) AND (all_combos.detailed_geo_location_id = variants.detailed_geo_location_id))))
   WITH NO DATA;
-
-
---
--- Name: join_subscribed_location_to_id; Type: VIEW; Schema: public; Owner: -
---
-
-CREATE VIEW public.join_subscribed_location_to_id AS
- WITH subscribed_ids AS (
-         SELECT subscribed_geo_locations.user_id,
-            subscribed_geo_locations.detailed_geo_location_alias_id,
-            detailed_geo_location_aliases_1.region,
-            detailed_geo_location_aliases_1.subregion,
-            detailed_geo_location_aliases_1.division,
-            detailed_geo_location_aliases_1.subdivision
-           FROM (public.detailed_geo_location_aliases detailed_geo_location_aliases_1
-             JOIN public.subscribed_geo_locations ON ((subscribed_geo_locations.detailed_geo_location_alias_id = detailed_geo_location_aliases_1.id)))
-        )
- SELECT subscribed_ids.user_id,
-    subscribed_ids.detailed_geo_location_alias_id AS subscribed_id,
-    detailed_geo_location_aliases.id AS detailed_geo_location_alias_id,
-    detailed_geo_locations.id AS detailed_geo_location_id
-   FROM ((public.detailed_geo_location_aliases
-     JOIN subscribed_ids ON ((((subscribed_ids.region IS NULL) OR ((subscribed_ids.region)::text = (detailed_geo_location_aliases.region)::text)) AND ((subscribed_ids.subregion IS NULL) OR ((subscribed_ids.subregion)::text = (detailed_geo_location_aliases.subregion)::text)) AND ((subscribed_ids.division IS NULL) OR ((subscribed_ids.division)::text = (detailed_geo_location_aliases.division)::text)) AND ((subscribed_ids.subdivision IS NULL) OR ((subscribed_ids.subdivision)::text = (detailed_geo_location_aliases.subdivision)::text)))))
-     JOIN public.detailed_geo_locations ON ((detailed_geo_locations.detailed_geo_location_alias_id = detailed_geo_location_aliases.id)));
 
 
 --
@@ -949,6 +881,50 @@ CREATE SEQUENCE public.lineage_calls_id_seq
 --
 
 ALTER SEQUENCE public.lineage_calls_id_seq OWNED BY public.lineage_calls.id;
+
+
+--
+-- Name: lineage_variant_primer_overlaps; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE UNLOGGED TABLE public.lineage_variant_primer_overlaps (
+    id bigint NOT NULL,
+    organism_id bigint NOT NULL,
+    lineage_group_key character varying NOT NULL,
+    ref_start integer NOT NULL,
+    ref_end integer NOT NULL,
+    variant_type character varying NOT NULL,
+    variant character varying NOT NULL,
+    frequency_pct double precision NOT NULL,
+    oligo_id bigint NOT NULL,
+    created_at timestamp(6) without time zone DEFAULT now() NOT NULL,
+    first_seen_date date,
+    first_seen_lineage character varying,
+    first_seen_location character varying,
+    last_seen_date date,
+    last_seen_lineage character varying,
+    last_seen_location character varying,
+    ref character varying
+);
+
+
+--
+-- Name: lineage_variant_primer_overlaps_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.lineage_variant_primer_overlaps_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: lineage_variant_primer_overlaps_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.lineage_variant_primer_overlaps_id_seq OWNED BY public.lineage_variant_primer_overlaps.id;
 
 
 --
@@ -1082,7 +1058,8 @@ CREATE TABLE public.organisms (
     alias character varying,
     slug character varying,
     public boolean,
-    variant_bed_lookback_days integer DEFAULT 180 NOT NULL
+    variant_bed_lookback_days integer DEFAULT 180 NOT NULL,
+    pct_cutoff double precision DEFAULT 1.0 NOT NULL
 );
 
 
@@ -1401,6 +1378,13 @@ ALTER TABLE ONLY public.lineage_calls ALTER COLUMN id SET DEFAULT nextval('publi
 
 
 --
+-- Name: lineage_variant_primer_overlaps id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.lineage_variant_primer_overlaps ALTER COLUMN id SET DEFAULT nextval('public.lineage_variant_primer_overlaps_id_seq'::regclass);
+
+
+--
 -- Name: lineages id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -1564,14 +1548,6 @@ ALTER TABLE ONLY public.detailed_geo_locations
 
 
 --
--- Name: variant_sites ensure_variant_unique; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.variant_sites
-    ADD CONSTRAINT ensure_variant_unique UNIQUE (ref_start, fasta_record_id, variant_type);
-
-
---
 -- Name: fasta_records fasta_records_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -1601,6 +1577,14 @@ ALTER TABLE ONLY public.lineage_callers
 
 ALTER TABLE ONLY public.lineage_calls
     ADD CONSTRAINT lineage_calls_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: lineage_variant_primer_overlaps lineage_variant_primer_overlaps_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.lineage_variant_primer_overlaps
+    ADD CONSTRAINT lineage_variant_primer_overlaps_pkey PRIMARY KEY (id);
 
 
 --
@@ -1730,10 +1714,24 @@ CREATE UNIQUE INDEX counts_region_subregion_division_subdivision_idx ON public.c
 
 
 --
+-- Name: ensure_variant_unique; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX ensure_variant_unique ON public.variant_sites USING btree (ref_start, fasta_record_id, variant_type);
+
+
+--
 -- Name: full_record; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX full_record ON public.detailed_geo_locations USING btree (region, subregion, division, subdivision, locality, sublocality);
+
+
+--
+-- Name: idx_variant_sites_lookup; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX idx_variant_sites_lookup ON public.variant_sites USING btree (ref_start, variant_type, variant, organism_taxon_id);
 
 
 --
@@ -1811,6 +1809,20 @@ CREATE INDEX index_lineage_calls_on_lineage_caller_id ON public.lineage_calls US
 --
 
 CREATE INDEX index_lineage_calls_on_lineage_id ON public.lineage_calls USING btree (lineage_id);
+
+
+--
+-- Name: index_lineage_variant_primer_overlaps_on_oligo_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_lineage_variant_primer_overlaps_on_oligo_id ON public.lineage_variant_primer_overlaps USING btree (oligo_id);
+
+
+--
+-- Name: index_lineage_variant_primer_overlaps_on_organism_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_lineage_variant_primer_overlaps_on_organism_id ON public.lineage_variant_primer_overlaps USING btree (organism_id);
 
 
 --
@@ -1961,10 +1973,24 @@ CREATE INDEX index_proposed_notifications_on_verified_notification_id ON public.
 
 
 --
+-- Name: index_roles_on_name; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_roles_on_name ON public.roles USING btree (name);
+
+
+--
 -- Name: index_subscribed_geo_locations_on_user_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_subscribed_geo_locations_on_user_id ON public.subscribed_geo_locations USING btree (user_id);
+
+
+--
+-- Name: index_subscribed_geo_locs_on_user_and_detailed_geo_loc_alias_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_subscribed_geo_locs_on_user_and_detailed_geo_loc_alias_id ON public.subscribed_geo_locations USING btree (user_id, detailed_geo_location_alias_id);
 
 
 --
@@ -1979,6 +2005,13 @@ CREATE INDEX index_user_roles_on_role_id ON public.user_roles USING btree (role_
 --
 
 CREATE INDEX index_user_roles_on_user_id ON public.user_roles USING btree (user_id);
+
+
+--
+-- Name: index_user_roles_on_user_id_and_role_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_user_roles_on_user_id_and_role_id ON public.user_roles USING btree (user_id, role_id);
 
 
 --
@@ -2038,17 +2071,38 @@ CREATE INDEX index_verified_notifications_on_user_id ON public.verified_notifica
 
 
 --
--- Name: oligo_variant_overlaps_primer_set_name_idx; Type: INDEX; Schema: public; Owner: -
+-- Name: lineage_variant_primer_overlaps_unique; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX oligo_variant_overlaps_primer_set_name_idx ON public.oligo_variant_overlaps USING btree (primer_set_name);
+CREATE UNIQUE INDEX lineage_variant_primer_overlaps_unique ON public.lineage_variant_primer_overlaps USING btree (organism_id, lineage_group_key, ref_start, variant_type, variant, oligo_id);
 
 
 --
--- Name: oligo_variant_overlaps_region_subregion_division_subdivisio_idx; Type: INDEX; Schema: public; Owner: -
+-- Name: lvpo_organism_lineage_group_key; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX oligo_variant_overlaps_region_subregion_division_subdivisio_idx ON public.oligo_variant_overlaps USING btree (region, subregion, division, subdivision, date_collected);
+CREATE INDEX lvpo_organism_lineage_group_key ON public.lineage_variant_primer_overlaps USING btree (organism_id, lineage_group_key);
+
+
+--
+-- Name: oligo_variant_overlaps_date_collected_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX oligo_variant_overlaps_date_collected_idx ON public.oligo_variant_overlaps USING btree (date_collected);
+
+
+--
+-- Name: oligo_variant_overlaps_detailed_geo_location_id_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX oligo_variant_overlaps_detailed_geo_location_id_idx ON public.oligo_variant_overlaps USING btree (detailed_geo_location_id);
+
+
+--
+-- Name: oligo_variant_overlaps_oligo_id_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX oligo_variant_overlaps_oligo_id_idx ON public.oligo_variant_overlaps USING btree (oligo_id);
 
 
 --
@@ -2103,11 +2157,35 @@ ALTER TABLE ONLY public.primer_sets
 
 
 --
+-- Name: proposed_notifications fk_rails_0d66f06de9; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.proposed_notifications
+    ADD CONSTRAINT fk_rails_0d66f06de9 FOREIGN KEY (oligo_id) REFERENCES public.oligos(id);
+
+
+--
+-- Name: primer_sets fk_rails_1df16c6c22; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.primer_sets
+    ADD CONSTRAINT fk_rails_1df16c6c22 FOREIGN KEY (user_id) REFERENCES public.users(id);
+
+
+--
 -- Name: blast_hits fk_rails_1f04a34db0; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.blast_hits
     ADD CONSTRAINT fk_rails_1f04a34db0 FOREIGN KEY (organism_id) REFERENCES public.organisms(id);
+
+
+--
+-- Name: lineage_variant_primer_overlaps fk_rails_24f226013f; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.lineage_variant_primer_overlaps
+    ADD CONSTRAINT fk_rails_24f226013f FOREIGN KEY (organism_id) REFERENCES public.organisms(id);
 
 
 --
@@ -2119,19 +2197,19 @@ ALTER TABLE ONLY public.variant_sites
 
 
 --
+-- Name: organism_taxa fk_rails_312d1cb8a9; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.organism_taxa
+    ADD CONSTRAINT fk_rails_312d1cb8a9 FOREIGN KEY (lineage_caller_id) REFERENCES public.lineage_callers(id);
+
+
+--
 -- Name: user_roles fk_rails_318345354e; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.user_roles
     ADD CONSTRAINT fk_rails_318345354e FOREIGN KEY (user_id) REFERENCES public.users(id);
-
-
---
--- Name: proposed_notifications fk_rails_32a2a94275; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.proposed_notifications
-    ADD CONSTRAINT fk_rails_32a2a94275 FOREIGN KEY (primer_set_id) REFERENCES public.primer_sets(id);
 
 
 --
@@ -2143,35 +2221,19 @@ ALTER TABLE ONLY public.user_roles
 
 
 --
--- Name: proposed_notifications fk_rails_39f3a62e67; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: proposed_notifications fk_rails_395d3a4499; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.proposed_notifications
-    ADD CONSTRAINT fk_rails_39f3a62e67 FOREIGN KEY (oligo_id) REFERENCES public.oligos(id);
+    ADD CONSTRAINT fk_rails_395d3a4499 FOREIGN KEY (primer_set_id) REFERENCES public.primer_sets(id);
 
 
 --
--- Name: lineage_calls fk_rails_51310c3c3b; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.lineage_calls
-    ADD CONSTRAINT fk_rails_51310c3c3b FOREIGN KEY (lineage_id) REFERENCES public.lineages(id);
-
-
---
--- Name: primer_sets fk_rails_52b9cf4012; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.primer_sets
-    ADD CONSTRAINT fk_rails_52b9cf4012 FOREIGN KEY (organism_id) REFERENCES public.organisms(id);
-
-
---
--- Name: oligos fk_rails_58e7536518; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: oligos fk_rails_4f5223c1e0; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.oligos
-    ADD CONSTRAINT fk_rails_58e7536518 FOREIGN KEY (primer_set_id) REFERENCES public.primer_sets(id);
+    ADD CONSTRAINT fk_rails_4f5223c1e0 FOREIGN KEY (primer_set_id) REFERENCES public.primer_sets(id);
 
 
 --
@@ -2191,27 +2253,11 @@ ALTER TABLE ONLY public.genomic_features
 
 
 --
--- Name: verified_notifications fk_rails_660c55653c; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.verified_notifications
-    ADD CONSTRAINT fk_rails_660c55653c FOREIGN KEY (user_id) REFERENCES public.users(id);
-
-
---
 -- Name: organism_taxa fk_rails_7181a117a9; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.organism_taxa
     ADD CONSTRAINT fk_rails_7181a117a9 FOREIGN KEY (organism_id) REFERENCES public.organisms(id);
-
-
---
--- Name: proposed_notifications fk_rails_736e9d2781; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.proposed_notifications
-    ADD CONSTRAINT fk_rails_736e9d2781 FOREIGN KEY (verified_notification_id) REFERENCES public.verified_notifications(id);
 
 
 --
@@ -2223,19 +2269,19 @@ ALTER TABLE ONLY public.subscribed_geo_locations
 
 
 --
--- Name: variant_sites fk_rails_7a3a7f1da3; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.variant_sites
-    ADD CONSTRAINT fk_rails_7a3a7f1da3 FOREIGN KEY (organism_taxon_id) REFERENCES public.organism_taxa(id);
-
-
---
 -- Name: subscribed_geo_locations fk_rails_7c2744b62d; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.subscribed_geo_locations
     ADD CONSTRAINT fk_rails_7c2744b62d FOREIGN KEY (detailed_geo_location_alias_id) REFERENCES public.detailed_geo_location_aliases(id);
+
+
+--
+-- Name: proposed_notifications fk_rails_7c618afe29; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.proposed_notifications
+    ADD CONSTRAINT fk_rails_7c618afe29 FOREIGN KEY (verified_notification_id) REFERENCES public.verified_notifications(id);
 
 
 --
@@ -2247,14 +2293,6 @@ ALTER TABLE ONLY public.lineages
 
 
 --
--- Name: fasta_records fk_rails_82e2588d91; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.fasta_records
-    ADD CONSTRAINT fk_rails_82e2588d91 FOREIGN KEY (detailed_geo_location_id) REFERENCES public.detailed_geo_locations(id);
-
-
---
 -- Name: detailed_geo_locations fk_rails_8a5906d321; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -2263,11 +2301,11 @@ ALTER TABLE ONLY public.detailed_geo_locations
 
 
 --
--- Name: organism_taxa fk_rails_8c4a73ac21; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: fasta_records fk_rails_8b7a7bc7bc; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.organism_taxa
-    ADD CONSTRAINT fk_rails_8c4a73ac21 FOREIGN KEY (lineage_caller_id) REFERENCES public.lineage_callers(id);
+ALTER TABLE ONLY public.fasta_records
+    ADD CONSTRAINT fk_rails_8b7a7bc7bc FOREIGN KEY (detailed_geo_location_id) REFERENCES public.detailed_geo_locations(id);
 
 
 --
@@ -2295,11 +2333,27 @@ ALTER TABLE ONLY public.primer_set_subscriptions
 
 
 --
--- Name: primer_sets fk_rails_a78cff2c70; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: lineage_calls fk_rails_9cea4276f2; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.lineage_calls
+    ADD CONSTRAINT fk_rails_9cea4276f2 FOREIGN KEY (lineage_id) REFERENCES public.lineages(id);
+
+
+--
+-- Name: lineage_calls fk_rails_a5c12d01ce; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.lineage_calls
+    ADD CONSTRAINT fk_rails_a5c12d01ce FOREIGN KEY (lineage_caller_id) REFERENCES public.lineage_callers(id);
+
+
+--
+-- Name: primer_sets fk_rails_aed606bb05; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.primer_sets
-    ADD CONSTRAINT fk_rails_a78cff2c70 FOREIGN KEY (user_id) REFERENCES public.users(id);
+    ADD CONSTRAINT fk_rails_aed606bb05 FOREIGN KEY (organism_id) REFERENCES public.organisms(id);
 
 
 --
@@ -2308,14 +2362,6 @@ ALTER TABLE ONLY public.primer_sets
 
 ALTER TABLE ONLY public.blast_hits
     ADD CONSTRAINT fk_rails_b63d58c7a5 FOREIGN KEY (oligo_id) REFERENCES public.oligos(id);
-
-
---
--- Name: fasta_records fk_rails_b985a32672; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.fasta_records
-    ADD CONSTRAINT fk_rails_b985a32672 FOREIGN KEY (organism_taxon_id) REFERENCES public.organism_taxa(id);
 
 
 --
@@ -2335,11 +2381,11 @@ ALTER TABLE ONLY public.proposed_notifications
 
 
 --
--- Name: lineage_calls fk_rails_dee6109632; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: verified_notifications fk_rails_d45e40a680; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.lineage_calls
-    ADD CONSTRAINT fk_rails_dee6109632 FOREIGN KEY (lineage_caller_id) REFERENCES public.lineage_callers(id);
+ALTER TABLE ONLY public.verified_notifications
+    ADD CONSTRAINT fk_rails_d45e40a680 FOREIGN KEY (user_id) REFERENCES public.users(id);
 
 
 --
@@ -2348,6 +2394,30 @@ ALTER TABLE ONLY public.lineage_calls
 
 ALTER TABLE ONLY public.primer_set_subscriptions
     ADD CONSTRAINT fk_rails_e7701775d5 FOREIGN KEY (user_id) REFERENCES public.users(id);
+
+
+--
+-- Name: variant_sites fk_rails_e86ed2988e; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.variant_sites
+    ADD CONSTRAINT fk_rails_e86ed2988e FOREIGN KEY (organism_taxon_id) REFERENCES public.organism_taxa(id);
+
+
+--
+-- Name: fasta_records fk_rails_ee1e23d184; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.fasta_records
+    ADD CONSTRAINT fk_rails_ee1e23d184 FOREIGN KEY (organism_taxon_id) REFERENCES public.organism_taxa(id);
+
+
+--
+-- Name: lineage_variant_primer_overlaps fk_rails_ee9d00ba36; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.lineage_variant_primer_overlaps
+    ADD CONSTRAINT fk_rails_ee9d00ba36 FOREIGN KEY (oligo_id) REFERENCES public.oligos(id);
 
 
 --
@@ -2373,140 +2443,150 @@ ALTER TABLE ONLY public.proposed_notifications
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
-('20200809190433'),
-('20200809190500'),
-('20200809190541'),
-('20200809190725'),
-('20200810101557'),
-('20201023152436'),
-('20201023153637'),
-('20201023161602'),
-('20210125033513'),
-('20210125033734'),
-('20210125034331'),
-('20210125101936'),
-('20210128221802'),
-('20210129031328'),
-('20210130131727'),
-('20210211193202'),
-('20210211212104'),
-('20210211220241'),
-('20210212182903'),
-('20210212195828'),
-('20210212203816'),
-('20210212204343'),
-('20210216221118'),
-('20210217145903'),
-('20210217152635'),
-('20210218005924'),
-('20210218022343'),
-('20210218123414'),
-('20210218161052'),
-('20210218161800'),
-('20210218172439'),
-('20210218172905'),
-('20210218180015'),
-('20210219000134'),
-('20210219153745'),
-('20210219185233'),
-('20210220203358'),
-('20210220215944'),
-('20210220233440'),
-('20210220234316'),
-('20210220235805'),
-('20210222122744'),
-('20210223192700'),
-('20210223194128'),
-('20210224163709'),
-('20210224192126'),
-('20210225212556'),
-('20210225225243'),
-('20210226173653'),
-('20210226174141'),
-('20210226200532'),
-('20210226202745'),
-('20210226203437'),
-('20210226204550'),
-('20210226205517'),
-('20210301143130'),
-('20210301181827'),
-('20210302184915'),
-('20210302193440'),
-('20210302193832'),
-('20210303180741'),
-('20210303211641'),
-('20210304200709'),
-('20210307125905'),
-('20210312143921'),
-('20210312185232'),
-('20210313180917'),
-('20210318204840'),
-('20210321204308'),
-('20210323205921'),
-('20210325203319'),
-('20210405161255'),
-('20210413164024'),
-('20210413164039'),
-('20210619121250'),
-('20210619220014'),
-('20210621161928'),
-('20210622032542'),
-('20210622124604'),
-('20210622215629'),
-('20210622230211'),
-('20210628001136'),
-('20210628202244'),
-('20210705151710'),
-('20220425010902'),
-('20221116101600'),
-('20221116130745'),
-('20221116134820'),
-('20221116151610'),
-('20230109180448'),
-('20230127154500'),
-('20230217145345'),
-('20230221144400'),
-('20230622143230'),
-('20230622154910'),
-('20230622161730'),
-('20230630135330'),
-('20230706125330'),
-('20230706131800'),
-('20230714105625'),
-('20230714172920'),
-('20230718131700'),
-('20230721152550'),
-('20230802152750'),
-('20230814161850'),
-('20230816160045'),
-('20230818095330'),
-('20231030170830'),
-('20231030171645'),
-('20231031100050'),
-('20231031151130'),
-('20231031151300'),
-('20231031152630'),
-('20231031152920'),
-('20231031164710'),
-('20231101101700'),
-('20231101102530'),
-('20231101152545'),
-('20231101171500'),
-('20231103173645'),
-('20231109091310'),
-('20231109091800'),
-('20231109092320'),
-('20231109144910'),
-('20231109151545'),
-('2023114143320'),
-('20231214164630'),
-('20231215134050'),
-('20231215144315'),
-('20231218110805'),
-('20240124111845'),
-('20240126135630'),
-('20240206123456'),
+('20260513000001'),
+('20260513000000'),
+('20260512200000'),
+('20260512000001'),
+('20260512000000'),
+('20260511100001'),
+('20260511100000'),
+('20240715163630'),
+('20240607145249'),
+('20240607145248'),
+('20240607145247'),
+('20240224131540'),
 ('20240206170340'),
-('20240224131540');
-
+('20240206123456'),
+('20240126135630'),
+('20240124111845'),
+('20231218110805'),
+('20231215144315'),
+('20231215134050'),
+('20231214164630'),
+('2023114143320'),
+('20231109151545'),
+('20231109144910'),
+('20231109092320'),
+('20231109091800'),
+('20231109091310'),
+('20231103173645'),
+('20231101171500'),
+('20231101152545'),
+('20231101102530'),
+('20231101101700'),
+('20231031164710'),
+('20231031152920'),
+('20231031152630'),
+('20231031151300'),
+('20231031151130'),
+('20231031100050'),
+('20231030171645'),
+('20231030170830'),
+('20230818095330'),
+('20230816160045'),
+('20230814161850'),
+('20230802152750'),
+('20230721152550'),
+('20230718131700'),
+('20230714172920'),
+('20230714105625'),
+('20230706131800'),
+('20230706125330'),
+('20230630135330'),
+('20230622161730'),
+('20230622154910'),
+('20230622143230'),
+('20230221144400'),
+('20230217145345'),
+('20230127154500'),
+('20230109180448'),
+('20221116151610'),
+('20221116134820'),
+('20221116130745'),
+('20221116101600'),
+('20220425010902'),
+('20210705151710'),
+('20210628202244'),
+('20210628001136'),
+('20210622230211'),
+('20210622215629'),
+('20210622124604'),
+('20210622032542'),
+('20210621161928'),
+('20210619220014'),
+('20210619121250'),
+('20210413164039'),
+('20210413164024'),
+('20210405161255'),
+('20210325203319'),
+('20210323205921'),
+('20210321204308'),
+('20210318204840'),
+('20210313180917'),
+('20210312185232'),
+('20210312143921'),
+('20210307125905'),
+('20210304200709'),
+('20210303211641'),
+('20210303180741'),
+('20210302193832'),
+('20210302193440'),
+('20210302184915'),
+('20210301181827'),
+('20210301143130'),
+('20210226205517'),
+('20210226204550'),
+('20210226203437'),
+('20210226202745'),
+('20210226200532'),
+('20210226174141'),
+('20210226173653'),
+('20210225225243'),
+('20210225212556'),
+('20210224192126'),
+('20210224163709'),
+('20210223194128'),
+('20210223192700'),
+('20210222122744'),
+('20210220235805'),
+('20210220234316'),
+('20210220233440'),
+('20210220215944'),
+('20210220203358'),
+('20210219185233'),
+('20210219153745'),
+('20210219000134'),
+('20210218180015'),
+('20210218172905'),
+('20210218172439'),
+('20210218161800'),
+('20210218161052'),
+('20210218123414'),
+('20210218022343'),
+('20210218005924'),
+('20210217152635'),
+('20210217145903'),
+('20210216221118'),
+('20210212204343'),
+('20210212203816'),
+('20210212195828'),
+('20210212182903'),
+('20210211220241'),
+('20210211212104'),
+('20210211193202'),
+('20210130131727'),
+('20210129031328'),
+('20210128221802'),
+('20210125101936'),
+('20210125034331'),
+('20210125033734'),
+('20210125033513'),
+('20201023161602'),
+('20201023153637'),
+('20201023152436'),
+('20200810101557'),
+('20200809190725'),
+('20200809190541'),
+('20200809190500'),
+('20200809190433');
 

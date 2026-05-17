@@ -1,0 +1,9 @@
+one:
+  organism: sars_cov2
+  lineage_group_key: "XBB"
+  ref_start: 100
+  ref_end: 101
+  variant_type: "X"
+  variant: "T"
+  frequency_pct: 15.5
+  oligo: one

@@ -6,6 +6,8 @@ class VariantSite < ApplicationRecord
     raise "Unable to find counts file #{variants_tsv}" unless File.exist?(variants_tsv)
 
     variants = []
+    ref_seq = load_reference_sequence(taxon)
+    context = { taxon:, ref_seq: }
 
     # ActiveRecord::Base.logger.debug "Processing variants_tsv #{variants_tsv}"
     File.readlines(variants_tsv).each do |line|
@@ -14,7 +16,7 @@ class VariantSite < ApplicationRecord
       accession, ref_pos, variant_type, variant = line.chomp.split("\t")
       next if variant.nil? # big insertions can push a variant off the end of the genome e.g. USA/VA-SU-SC_65/2021
 
-      variants << (build_variant_site accession, ref_pos, variant_type, variant, taxon)
+      variants << (build_variant_site accession, ref_pos, variant_type, variant, context)
     end
 
     raise "Unable to parse any records from #{variants_tsv}" if variants.empty?
@@ -22,16 +24,63 @@ class VariantSite < ApplicationRecord
     variants
   end
 
-  def self.build_variant_site(accession, ref_pos, variant_type, variant, taxon)
+  def self.build_variant_site(accession, ref_pos, variant_type, variant, context)
+    taxon = context.fetch(:taxon)
+    ref_seq = context[:ref_seq]
     fasta_record_id = FastaRecord.existing_fasta_accession_ids[accession]
     raise "Failed to find fasta record for accession: \"#{accession}\"" unless fasta_record_id
 
     ref_pos = Integer(ref_pos) - 1 # convert 1-based to 0-based
 
+    ref_allele = lookup_ref_allele(ref_seq, ref_pos, variant_type, variant)
+
     ref_end = ref_pos + variant.length
     variant = "#{variant.length}-" if variant_type.include? 'D'
     variant = "#{variant.length}N" if variant.include? 'N'
     VariantSite.new(ref_start: ref_pos.to_s, ref_end:, variant_type:,
-                    variant:, fasta_record_id:, organism_taxon_id: taxon.id)
+                    variant:, ref: ref_allele, fasta_record_id:, organism_taxon_id: taxon.id)
+  end
+
+  def self.load_reference_sequence(taxon)
+    fasta_path = Rails.root.join('igvstatic', taxon.organism.slug, 'ref', "#{taxon.reference_accession}.fasta")
+    return nil unless File.exist?(fasta_path)
+
+    seq = +''
+    File.foreach(fasta_path) do |line|
+      next if line.start_with?('>')
+
+      seq << line.chomp
+    end
+    seq
+  end
+
+  def self.lookup_ref_allele(ref_seq, ref_pos, variant_type, variant)
+    return nil if ref_seq.nil?
+
+    case variant_type
+    when 'X' # SNP: ref base at the position
+      ref_seq[ref_pos]
+    when 'I' # insertion: anchor base just before the insertion point
+      ref_pos.positive? ? ref_seq[ref_pos - 1] : nil
+    when 'D' # deletion: the deleted reference bases (before normalization, variant is "---")
+      ref_seq[ref_pos, variant.length]
+    end
+  end
+
+  def self.pending_ref_ranges(organism_taxon_id, variant_type)
+    where(organism_taxon_id:, variant_type:, ref: nil).distinct.pluck(:ref_start, :ref_end)
+  end
+
+  def self.reference_for_range(ref_seq, variant_type, ref_start, ref_end)
+    return nil if ref_seq.nil?
+
+    case variant_type
+    when 'X'
+      ref_seq[ref_start]
+    when 'I'
+      ref_start.positive? ? ref_seq[ref_start - 1] : nil
+    when 'D'
+      ref_seq[ref_start, ref_end - ref_start]
+    end
   end
 end

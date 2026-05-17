@@ -4,6 +4,7 @@ class Organism < ApplicationRecord
   has_many :blast_hits, dependent: :destroy
   has_many :primer_sets, dependent: :destroy
   has_many :organism_taxa, dependent: :destroy
+  has_many :lineage_variant_primer_overlaps, dependent: :destroy
 
   def to_s
     name
@@ -44,6 +45,18 @@ class Organism < ApplicationRecord
       .where('last_seen >= ?', most_recent - days)
       .pluck(:name, :times_seen)
       .to_h
+  end
+
+  def grouped_lineage_frequencies(lineage_sets, days: 30)
+    individual_frequencies = recent_lineage_frequencies(days:)
+
+    lineage_sets.keys.to_h do |key|
+      prefix = "#{key}."
+      total = individual_frequencies
+              .filter { |name, _| name == key || name.start_with?(prefix) }
+              .sum { |_, count| count }
+      [key, total]
+    end
   end
 
   def lineage_variants_data(data_server, organism_slug)

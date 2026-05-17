@@ -19,7 +19,7 @@ while getopts ':p:o:h' option_arg; do
       # help
       cat << HELPMSG
 Usage: update_visualization_data.sh [-o OVERRIDES_PATH] [-p PRIMER_SETS_FILE] [-h] <primer_monitor_path> \
-<organism_slug> <pct_cutoff> <score_cutoff> <cpus>
+<organism_slug> <score_cutoff> <cpus>
 HELPMSG
       exit 0;
       ;;
@@ -34,9 +34,8 @@ shift $((OPTIND - 1));
 
 primer_monitor_path="$1"
 organism_dirname="$2"
-pct_cutoff="$3"
-score_cutoff="$4"
-cpus="$5"
+score_cutoff="$3"
+cpus="$4"
 
 source "$(dirname "$0")/../echo_log.sh"
 
@@ -110,7 +109,7 @@ fi
 
 echo_log "recomputing overlaps"
 cat <(ls "$organism_dirname/lineage_sets") <(echo "all.txt") \
-| xargs "$primer_monitor_path/lib/visualization/recompute_affected_primers.sh" - "./$organism_dirname" "$pct_cutoff" "$score_cutoff" \
+| xargs "$primer_monitor_path/lib/visualization/recompute_affected_primers.sh" - "./$organism_dirname" "$score_cutoff" \
 "$primer_sets_data_file" "$organism_dirname" "$cpus"
 
 rm "$primer_sets_data_file"

@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'fileutils'
+
 class PrimerSet < ApplicationRecord
   belongs_to :user
   belongs_to :organism
@@ -46,14 +48,27 @@ class PrimerSet < ApplicationRecord
 
   # TODO: switch this to use delayed job, avoid multiple alignments in succession
   def align_primers
+    log_path = primer_alignment_log_path
     pid = Process.spawn({ 'DB_HOST' => ENV['DB_HOST'], 'DB_NAME' => ENV['DB_NAME'], 'DB_USER' => ENV['DB_USER'],
                           'MICROMAMBA_BIN_PATH' => ENV['MICROMAMBA_BIN_PATH'],
                           'PGPASSFILE' => "#{ENV['DEPLOY_SHARED_DIR']}/config/.pgpass" },
                         Shellwords.join(['bash', 'lib/update_primers.sh', "#{ENV['DEPLOY_SHARED_DIR']}/alignment_env",
                                          "bt2_indices/#{organism.name.parameterize}/#{organism.name.parameterize}",
                                          id.to_s]) +
-                          " >> \"#{ENV['FRONTEND_LOG_PATH']}/primer_alignment.log\" 2>&1")
+                          " >> #{Shellwords.escape(log_path)} 2>&1")
     Process.detach pid # prevent zombie process
     pid
+  end
+
+  private
+
+  def primer_alignment_log_path
+    base_dir = ENV['FRONTEND_LOG_PATH'].presence || Rails.root.join('log').to_s
+    FileUtils.mkdir_p(base_dir)
+    File.join(base_dir, 'primer_alignment.log')
+  rescue SystemCallError
+    fallback_dir = Rails.root.join('log').to_s
+    FileUtils.mkdir_p(fallback_dir)
+    File.join(fallback_dir, 'primer_alignment.log')
   end
 end
