@@ -33,10 +33,15 @@ module VariantRefBackfillTask
   end
 
   def copy_ref_backfill_rows(raw, taxon, ref_seq)
+    # Fetch ranges before entering COPY mode — queries on the same connection
+    # would terminate the COPY protocol and cause "no COPY in progress" errors.
+    insert_ranges = VariantSite.pending_ref_ranges(taxon.id, 'I')
+    delete_ranges = VariantSite.pending_ref_ranges(taxon.id, 'D')
+
     raw.copy_data('COPY _ref_backfill (ref_start, ref_end, variant_type, ref) FROM STDIN') do
       copy_snp_rows(raw, ref_seq)
-      copy_variant_rows(raw, taxon, ref_seq, 'I')
-      copy_variant_rows(raw, taxon, ref_seq, 'D')
+      copy_variant_rows(raw, ref_seq, 'I', insert_ranges)
+      copy_variant_rows(raw, ref_seq, 'D', delete_ranges)
     end
   end
 
@@ -47,8 +52,8 @@ module VariantRefBackfillTask
     end
   end
 
-  def copy_variant_rows(raw, taxon, ref_seq, variant_type)
-    VariantSite.pending_ref_ranges(taxon.id, variant_type).each do |ref_start, ref_end|
+  def copy_variant_rows(raw, ref_seq, variant_type, ranges)
+    ranges.each do |ref_start, ref_end|
       ref = VariantSite.reference_for_range(ref_seq, variant_type, ref_start.to_i, ref_end.to_i)
       next unless ref
 
