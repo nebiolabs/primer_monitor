@@ -47,6 +47,18 @@ class Organism < ApplicationRecord
       .to_h
   end
 
+  def grouped_lineage_frequencies(lineage_sets, days: 30)
+    individual_frequencies = recent_lineage_frequencies(days:)
+
+    lineage_sets.keys.to_h do |key|
+      prefix = "#{key}."
+      total = individual_frequencies
+              .filter { |name, _| name == key || name.start_with?(prefix) }
+              .sum { |_, count| count }
+      [key, total]
+    end
+  end
+
   def lineage_variants_data(data_server, organism_slug)
     tracks_req = HTTParty.get("#{data_server}/#{organism_slug}/config/tracks.json")
     defaults_req = HTTParty.get("#{data_server}/#{organism_slug}/defaults.json")
