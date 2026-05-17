@@ -74,12 +74,15 @@ module VariantRefBackfillTask
     result = conn.execute(<<~SQL)
       UPDATE lineage_variant_primer_overlaps lvpo
       SET ref = b.ref
-      FROM _ref_backfill b
+      FROM _ref_backfill b,
+           oligo_alignment_positions oap
       WHERE lvpo.ref_start    = b.ref_start
         AND lvpo.ref_end      = b.ref_end
         AND lvpo.variant_type = b.variant_type
         AND lvpo.organism_id  = #{taxon.organism_id}
         AND lvpo.ref IS NULL
+        AND oap.oligo_id           = lvpo.oligo_id
+        AND oap.organism_taxon_id  = #{taxon.id}
     SQL
     puts "  Updated #{result.cmd_tuples} lineage_variant_primer_overlaps rows"
   end
