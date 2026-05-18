@@ -50,6 +50,8 @@ source "$primer_monitor_path/.env"
 export DB_HOST
 export DB_USER_RO
 export DB_NAME
+export DB_PASSWORD
+export PGPASSWORD="$DB_PASSWORD"
 mkdir -p "$organism_dirname/config"
 mkdir -p "$organism_dirname/lineage_sets"
 mkdir -p "$organism_dirname/lineage_variants"
