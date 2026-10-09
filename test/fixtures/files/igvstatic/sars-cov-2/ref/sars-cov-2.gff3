@@ -1,0 +1,4 @@
+##gff-version 3
+NC_045512.2	RefSeq	region	1	1200	.	+	.	ID=NC_045512.2:1..1200;gbkey=Src
+NC_045512.2	RefSeq	gene	100	900	.	+	.	ID=gene-test;Name=TestGene;gbkey=Gene;gene=TestGene
+NC_045512.2	RefSeq	CDS	100	900	.	+	0	ID=cds-test;Parent=gene-test;Name=TestCDS;gbkey=CDS;gene=TestGene

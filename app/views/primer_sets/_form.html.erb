@@ -70,12 +70,18 @@
   <section class="section">
     <div class="container">
       <h4 class="subtitle is-4">Oligos</h4>
-      <div id="samples">
+      <div id="samples" data-nested-fields>
         <%= form.fields_for :oligos do |es| %>
           <%= render 'oligo_fields', f: es %>
         <% end %>
-        <p id="add-new">
-          <%= link_to_add_association 'Add Oligo', form, :oligos, class: 'button' %>
+        <template data-nested-template>
+          <%= form.fields_for :oligos, Oligo.new, child_index: 'NEW_RECORD' do |es| %>
+            <%= render 'oligo_fields', f: es %>
+          <% end %>
+        </template>
+        <div id="add-new" class="buttons">
+          <button type="button" class="button" data-nested-add>Add Oligo</button>
+        </div>
         <div class="file" id="fasta_div">
           <label class="file-label" id="fasta_upload_label">
             <input class="file-input" type="file" name="fasta" id="fasta_upload">
@@ -86,7 +92,6 @@
             </span>
           </label>
         </div>
-        </p>
       </div>
     </div>
   </section>

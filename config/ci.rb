@@ -9,10 +9,9 @@ CI.run do
   step "Security: Importmap vulnerability audit", "bin/importmap audit"
   step "Security: Brakeman code analysis", "bin/brakeman --quiet --no-pager --exit-on-warn --exit-on-error"
   step "Tests: Rails", "bin/rails test"
-  step "Tests: Seeds", "env RAILS_ENV=test bin/rails db:seed:replant"
-
-  # Optional: Run system tests
-  # step "Tests: System", "bin/rails test:system"
+  step "Tests: System", "bin/rails test:system"
+  # seeding leaves rows the fixtures don't clear, so reset the test database afterwards
+  step "Tests: Seeds", "env RAILS_ENV=test bin/rails db:seed:replant db:test:prepare"
 
   # Optional: set a green GitHub commit status to unblock PR merge.
   # Requires the `gh` CLI and `gh extension install basecamp/gh-signoff`.

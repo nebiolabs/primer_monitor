@@ -13,6 +13,10 @@ module ActiveSupport
     # Setup all fixtures in test/fixtures/*.yml for all tests in alphabetical order.
     fixtures :all
 
+    # Saving a primer set starts the bowtie2 alignment pipeline (lib/update_primers.sh) in the background;
+    # tests never run it.
+    setup { PrimerSet.any_instance.stubs(:align_primers) }
+
     # Add more helper methods to be used by all tests here...
   end
 end

@@ -1,38 +1,38 @@
 @charset "utf-8";
 
-// Set your brand colors
-$orange: #ffb463;
-$cream: #fffdc2;
-$sky_blue: #85abff;
+// NEB brand blue
 $blue: #4556ba;
-$green: #214f35;
 
-$title-size: 1.5rem;
+// Bulma 1 is configured through its Sass module; see https://bulma.io/documentation/customize/with-sass/
+@use "bulma/sass" with (
+  $family-sans-serif: ("Helvetica", sans-serif),
+  $primary: $blue,
+  $link: $blue,
+  $widescreen-enabled: false,
+  $fullhd-enabled: false,
+  $title-size: 1.5rem,
+  $footer-padding: 1rem 1.5rem 1rem,
+  $navbar-item-img-max-height: 3rem
+);
 
-// Update Bulma's global variables
-$family-sans-serif: "Helvetica", sans-serif;
-//$grey-dark: $sky_blue;
-//$grey-light: $cream;
-$primary: $blue;
-$link: $blue;
-$widescreen-enabled: false;
-$fullhd-enabled: false;
-$footer-padding:  1rem 1.5rem 1rem;
+// vendored component CSS (versions match the JavaScript pins in config/importmap.rb)
+@use "datatables/dataTables.bulma"; // datatables.net-bm 3.1.3
+@use "datatables/buttons.bulma"; // datatables.net-buttons-bm 4.1.2
+@use "datatables/responsive.bulma"; // datatables.net-responsive-bm 4.1.1
+@use "tom-select/tom-select"; // tom-select 2.6.2
 
-$navbar-item-img-max-height: 3rem;
+@use "scaffolds";
+@use "searchable-select";
 
-$menu-item-hover-background-color: lightgray;
+// Bulma 1 gives menu items the page's main (white) background and derives hover colours from a lightness shift;
+// keep the original transparent items with a plain light grey hover
+.menu-list a {
+  background-color: transparent;
 
-// Update some of Bulma's component variables
-//$body-background-color: $cream;
-//$control-border-width: 2px;
-//$input-border-color: transparent;
-//$input-shadow: none;
-
-@import "select2-bulma-fixes";
-
-@import "bulma";
-@import "scaffolds";
+  &:hover {
+    background-color: lightgray;
+  }
+}
 
 .icon {
   height: 20px;

@@ -1,12 +1,11 @@
 <!DOCTYPE html>
-<html>
+<%# light theme only: Bulma 1 would otherwise switch to dark mode with the OS setting %>
+<html data-theme="light">
 <head>
   <title>Primer Monitor</title>
   <%= csrf_meta_tags %>
   <%= csp_meta_tag %>
 
-  <link rel="stylesheet" media="all" href="https://cdn.datatables.net/v/dt/dt-1.12.0/b-1.7.1/b-html5-1.7.1/b-print-1.7.1/r-2.3.0/sl-1.4.0/datatables.min.css" />
-  <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
   <%= stylesheet_link_tag 'application', media: 'all', 'data-turbo-track': 'reload' %>
   <%= javascript_importmap_tags %>
   <%= yield :head %>
@@ -51,7 +50,7 @@
           <% if current_user %>
             Logged in as:
             <%= link_to current_user.login, edit_user_registration_path, class: 'navbar-item' %>
-            <%= link_to 'Log out', destroy_user_session_path, :method => :delete, class: 'button is-link is-small' %>
+            <%= button_to 'Log out', destroy_user_session_path, method: :delete, class: 'button is-link is-small', form: { class: 'is-inline' } %>
           <% else %>
             <%= link_to 'Create Account', new_registration_path('user'), class: 'button is-link is-small' %>
             <%= link_to 'Log in', new_user_session_path, class: 'button is-link is-small' %>
@@ -63,7 +62,8 @@
 </nav>
 <section class="section">
   <div class="container">
-    <div class="has-text-danger"><%= flash[:error] %></div>
+    <%# :alert is what Devise uses for sign-in failures (wrong password, unconfirmed email, already signed in) %>
+    <div class="has-text-danger"><%= flash[:error] %><%= flash[:alert] %></div>
     <div class="has-text-warning"><%= flash[:warning] %></div>
     <div class="has-text-info"><%= flash[:notice] %></div>
     <%= yield %>

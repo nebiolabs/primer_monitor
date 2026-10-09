@@ -17,7 +17,7 @@
   <div class="field">
     <label class="label">Lineage:</label>
     <div class="control">
-      <select id="lineage_select" name="lineage" class="wide-select2">
+      <select id="lineage_select" name="lineage" class="searchable-select is-wide">
         <% @sorted_lineages.each do |key, depth| %>
           <% freq = @lineage_frequencies.fetch(key, 0) %>
           <% freq_text = freq > 0 ? " (#{number_with_delimiter(freq)} in most recent 30 days)" : "" %>
@@ -31,7 +31,7 @@
   <div class="field">
     <label class="label">Primer sets:</label>
     <div class="control">
-      <select id="primer_set_select" name="primer_sets" multiple class="wide-select2">
+      <select id="primer_set_select" name="primer_sets" multiple class="searchable-select is-wide">
         <% @track_data[:primer_sets].each do |primer_key, display_name| %>
           <option value="<%= primer_key %>"<%= ' selected' if @effective_primer_sets.include?(primer_key) %>><%= display_name %></option>
         <% end %>

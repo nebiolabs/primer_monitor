@@ -29,7 +29,8 @@ Rails.application.routes.draw do
   end
 
   resources :oligos
-  resources :users
+  # accounts are created by signing up (Devise) or with Google/Microsoft, so admins only list, edit and delete
+  resources :users, except: %i[new create]
   resources :primer_set_subscriptions, only: [:create, :destroy]
   resources :primer_sets, only: [:new, :show, :create, :destroy, :update, :edit]
 end

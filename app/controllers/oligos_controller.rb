@@ -32,7 +32,7 @@ class OligosController < ApplicationController
         format.html { redirect_to @oligo, notice: 'Oligo was successfully created.' }
         format.json { render :show, status: :created, location: @oligo }
       else
-        format.html { render :new }
+        format.html { render :new, status: :unprocessable_content }
         format.json { render json: @oligo.errors, status: :unprocessable_content }
       end
     end
@@ -46,7 +46,7 @@ class OligosController < ApplicationController
         format.html { redirect_to @oligo, notice: 'Oligo was successfully updated.' }
         format.json { render :show, status: :ok, location: @oligo }
       else
-        format.html { render :edit }
+        format.html { render :edit, status: :unprocessable_content }
         format.json { render json: @oligo.errors, status: :unprocessable_content }
       end
     end

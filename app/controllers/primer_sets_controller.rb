@@ -49,7 +49,7 @@ class PrimerSetsController < ApplicationController
         end
         format.json { render :show, status: :created, location: @primer_set }
       else
-        format.html { render :new }
+        format.html { render :new, status: :unprocessable_content }
         format.json { render json: @primer_set.errors, status: :unprocessable_content }
       end
     end
@@ -64,7 +64,7 @@ class PrimerSetsController < ApplicationController
         format.html { redirect_to edit_primer_set_url(@primer_set), notice: 'Primer set was successfully updated.' }
         format.json { render :show, status: :ok, location: @primer_set }
       else
-        format.html { render :edit }
+        format.html { render :edit, status: :unprocessable_content }
         format.json { render json: @primer_set.errors, status: :unprocessable_content }
       end
     end

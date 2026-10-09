@@ -1,4 +1,3 @@
-import 'init_jquery';
 import { createBrowser, removeBrowser } from 'igv_browser';
 import { registerPageModule } from 'turbo_page_module';
 
