@@ -78,6 +78,10 @@ Rails.application.configure do
   # caching is enabled.
   config.action_mailer.perform_caching = false
 
+  # Mailers link back to the site, and mail goes out through the server's local sendmail (nullmailer).
+  config.action_mailer.default_url_options = { host: 'primer-monitor.neb.com', protocol: 'https' }
+  config.action_mailer.delivery_method = :sendmail
+
   # Ignore bad email addresses and do not raise email delivery errors.
   # Set this to true and configure the email server for immediate delivery to raise delivery errors.
   # config.action_mailer.raise_delivery_errors = false
