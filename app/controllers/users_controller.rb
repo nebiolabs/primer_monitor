@@ -48,8 +48,9 @@ class UsersController < ApplicationController
     @user = User.find(params.expect(:id))
   end
 
-  # Only allow a list of trusted parameters through.
+  # Only allow a list of trusted parameters through. Blank password fields keep the current password.
   def user_params
-    params.expect(user: %i[first last email password password_confirmation send_primer_updates])
+    permitted = params.expect(user: %i[first last email password password_confirmation send_primer_updates])
+    permitted[:password].blank? ? permitted.except(:password, :password_confirmation) : permitted
   end
 end

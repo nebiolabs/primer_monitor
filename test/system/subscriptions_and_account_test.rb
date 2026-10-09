@@ -29,6 +29,15 @@ class SubscriptionsAndAccountTest < ApplicationSystemTestCase
     assert_equal options.uniq, options
   end
 
+  test 'saving the user form updates the user' do
+    visit edit_user_path(users(:one))
+    fill_in 'user_first', with: 'Francis'
+    click_on 'Save'
+
+    assert_text 'User was successfully updated.'
+    assert_equal 'Francis', users(:one).reload.first
+  end
+
   test 'logging out' do
     visit root_path
     click_on 'Log out'
