@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # config valid for current version and patch releases of Capistrano
 lock '~> 3.15'
 
@@ -17,11 +19,12 @@ set :conditionally_migrate, true
 set :assets_dependencies, %w[app/assets app/javascript lib/assets vendor/assets vendor/javascript Gemfile.lock
                              config/routes.rb config/importmap.rb config/initializers/dartsass.rb]
 
-set :backend_deploy_to, ->{ fetch(:backend_deploy_path) }
+set :backend_deploy_to, -> { fetch(:backend_deploy_path) }
 
 # To get the backend path into whenever
-set :whenever_variables, ->{ "\"environment=#{fetch :whenever_environment}&backend_path=#{fetch(:backend_deploy_to)}/current\"" }
-set :whenever_identifier, ->{ "#{fetch(:application)}_#{fetch(:stage)}" }
+set :whenever_variables,
+    -> { "\"environment=#{fetch :whenever_environment}&backend_path=#{fetch(:backend_deploy_to)}/current\"" }
+set :whenever_identifier, -> { "#{fetch(:application)}_#{fetch(:stage)}" }
 
 # clear the previous precompile task
 Rake::Task['deploy:assets:precompile'].clear_actions
@@ -45,7 +48,8 @@ task :backend do
   invoke 'backend:update_crontab'
 end
 
-namespace :backend do
+# Capistrano task namespaces are long by nature
+namespace :backend do # rubocop:disable Metrics/BlockLength
   desc 'Pull backend code from git'
   task :git do
     on roles(:backend) do
@@ -69,7 +73,7 @@ namespace :backend do
     on roles(:backend) do
       within "#{fetch(:backend_deploy_to)}/current" do
         with fetch(:whenever_command_environment_variables) do
-          args = fetch(:whenever_command)+[fetch(:whenever_update_flags), "--roles=backend", load_file]
+          args = fetch(:whenever_command) + [fetch(:whenever_update_flags), '--roles=backend', load_file]
           execute(*args)
         end
       end
@@ -80,13 +84,14 @@ namespace :backend do
   task :bundle do
     on roles(:backend, :cluster) do
       within "#{fetch(:backend_deploy_to)}/current" do
-          execute(:bundle, :install)
+        execute(:bundle, :install)
       end
     end
   end
 end
 
-namespace :deploy do
+# Capistrano task namespaces are long by nature
+namespace :deploy do # rubocop:disable Metrics/BlockLength
   desc 'Install the locked aligner environment (lib/alignment/pixi.toml) into the release'
   task :setup_pixi do
     on roles(:app) do
@@ -109,7 +114,6 @@ namespace :deploy do
     end
   end
 
-
   desc 'Restart application services'
   task :restart_services do
     on roles(:app), in: :groups, limit: 3, wait: 10 do
@@ -126,7 +130,6 @@ namespace :deploy do
       end
     end
   end
-
 
   after 'deploy:published', :clear_cache do
     on roles(:app), in: :groups, limit: 3, wait: 10 do
@@ -183,7 +186,7 @@ namespace :deploy do
           execute <<~BASH
             for dir in #{release_path}/igvstatic/*; do \
               pushd $dir && \
-              ln -sf #{shared_path}/igvstatic/$(basename \"$dir\")/* . && \
+              ln -sf #{shared_path}/igvstatic/$(basename "$dir")/* . && \
               popd
             done
           BASH
@@ -192,14 +195,14 @@ namespace :deploy do
     end
 
     after :linked_files, :link_igvstatic
-
   end
 
   desc 'Prime the app with a request so the first real user hit is not slow'
   task :warmup do
     on roles(:app) do
       socket = "#{shared_path}/tmp/sockets/puma.sock"
-      execute "timeout 60 bash -c 'until curl -sf --unix-socket #{socket} http://localhost/ -o /dev/null 2>/dev/null; do sleep 1; done' || true"
+      wait_for_puma = "until curl -sf --unix-socket #{socket} http://localhost/ -o /dev/null; do sleep 1; done"
+      execute "timeout 60 bash -c '#{wait_for_puma}' || true"
     end
   end
 
@@ -207,7 +210,6 @@ namespace :deploy do
   after 'deploy:updated', 'deploy:setup_pixi'
   after 'deploy:published', 'deploy:restart_services'
   after 'deploy:restart_services', 'deploy:warmup'
-  #after 'deploy:restart_services', 'deploy:seed'
+  # after 'deploy:restart_services', 'deploy:seed'
   after 'deploy:restart_services', 'backend'
-
 end
