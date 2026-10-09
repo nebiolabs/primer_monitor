@@ -138,3 +138,8 @@ button.dt-button.buttons-copy.buttons-html5 {
   line-height: revert;
   background: revert;
 }
+// identity provider logos on the sign-in buttons (Bulma's img { height: auto } overrides the height attribute)
+.sign-in-icon {
+  height: 1.5em;
+  width: auto;
+}

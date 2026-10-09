@@ -2,7 +2,7 @@
 <div class="buttons">
   <% if resource_class.omniauth_providers.include?(:entra_id) %>
     <%= button_to omniauth_authorize_path(resource_name, :entra_id), class: 'button is-primary', form: { data: { turbo: false } } do %>
-      <%= image_tag "neb_butterfly.svg", alt: "", height: 24 %>
+      <%= image_tag "neb_butterfly.svg", alt: "", class: "sign-in-icon" %>
       &nbsp; NEB staff: Sign in with Microsoft
     <% end %>
   <% end %>
