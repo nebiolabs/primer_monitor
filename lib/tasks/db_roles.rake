@@ -17,7 +17,7 @@ namespace :db do
         puts "Role #{r} already exists"
       else
         puts "Creating role #{r}"
-        ActiveRecord::Base.connection.execute <<-SQL
+        ActiveRecord::Base.connection.execute <<~SQL.squish
           CREATE ROLE #{r};
         SQL
       end
@@ -26,7 +26,7 @@ namespace :db do
 
   desc 'Drop database roles'
   task drop_roles: :environment do
-    ActiveRecord::Base.connection.execute <<-SQL
+    ActiveRecord::Base.connection.execute <<~SQL.squish
       DROP ROLE IF EXISTS primer_monitor;
       DROP ROLE IF EXISTS primer_monitor_ro;
     SQL

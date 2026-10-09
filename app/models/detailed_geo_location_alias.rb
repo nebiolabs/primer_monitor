@@ -26,6 +26,14 @@ class DetailedGeoLocationAlias < ApplicationRecord
       DetailedGeoLocationAlias.with_enough_sequences
   end
 
+  # [name, id] pairs for the subscription location picker. Counting sequences per location takes seconds, so the
+  # list is cached; uniq because World and regions also qualify as locations with enough sequences.
+  def self.subscribable_options
+    Rails.cache.fetch('detailed_geo_location_aliases/subscribable_options', expires_in: 12.hours) do
+      subscribable.uniq(&:id).map { |location| [location.name, location.id] }
+    end
+  end
+
   def self.new_from_detailed_geolocation(detailed_geolocation)
     DetailedGeoLocationAlias.new(world: 'World', region: detailed_geolocation.region,
                                  subregion: detailed_geolocation.subregion,

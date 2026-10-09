@@ -19,7 +19,7 @@
       <td><%= link_to primer_set.name, primer_set_path(primer_set) %></td>
       <td>
         <% if primer_set.display_url %>
-          <%= link_to 'Source', primer_set.display_url %>
+          <%= external_link 'Source', primer_set.display_url %>
         <% end %>
       </td>
       <% if @primer_sets.key? primer_set.name %>

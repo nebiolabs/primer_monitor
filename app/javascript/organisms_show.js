@@ -1,5 +1,4 @@
-import 'init_jquery';
-import "igv";
+import { createBrowser, removeBrowser } from 'igv_browser';
 import { registerPageModule } from 'turbo_page_module';
 
 let config = {};
@@ -30,12 +29,7 @@ function initBrowser() {
             }
         };
 
-    $('.igv_div').children('.igv-container, .igv-message').remove();
-
-    let igvBrowser = null;
-
-    const browser_div = document.getElementById("igv");
-    igv.createBrowser(browser_div, browserConfig).then(function (igvBrowser) {
+    createBrowser(document.getElementById("igv"), browserConfig).then(function (igvBrowser) {
         if (config['variants_exist']) {
             const variantsTrack = {
                 "name": "Variants",
@@ -54,7 +48,7 @@ function initBrowser() {
 }
 
 registerPageModule(
-    () => !!document.getElementById('config'),
+    () => !!document.querySelector('#config[data-igv-page="organism"]'),
     () => { config = JSON.parse(document.getElementById('config').innerHTML); initBrowser(); },
-    () => { $('.igv_div').children('.igv-container, .igv-message').remove(); }
+    removeBrowser
 );

@@ -13,7 +13,7 @@ class OrganismsController < ApplicationController
   # GET /organisms/1
   # GET /organisms/1.json
   def show
-    @organism = Organism.find_by!(slug: params[:slug])
+    @organism = Organism.find_by!(slug: params.expect(:slug))
 
     @config, @primer_sets = @organism.primer_sets_config
 
@@ -45,8 +45,8 @@ class OrganismsController < ApplicationController
         format.html { redirect_to @organism, notice: 'Organism was successfully created.' }
         format.json { render :show, status: :created, location: @organism }
       else
-        format.html { render :new }
-        format.json { render json: @organism.errors, status: :unprocessable_entity }
+        format.html { render :new, status: :unprocessable_content }
+        format.json { render json: @organism.errors, status: :unprocessable_content }
       end
     end
   end
@@ -59,8 +59,8 @@ class OrganismsController < ApplicationController
         format.html { redirect_to @organism, notice: 'Organism was successfully updated.' }
         format.json { render :show, status: :ok, location: @organism }
       else
-        format.html { render :edit }
-        format.json { render json: @organism.errors, status: :unprocessable_entity }
+        format.html { render :edit, status: :unprocessable_content }
+        format.json { render json: @organism.errors, status: :unprocessable_content }
       end
     end
   end
@@ -82,6 +82,6 @@ class OrganismsController < ApplicationController
   end
 
   def organism_params
-    params.require(:organism).permit(:name, :alias, :slug)
+    params.expect(organism: %i[name alias slug])
   end
 end

@@ -1,14 +1,16 @@
 # Pin npm packages by running ./bin/importmap
 
-pin "jquery" # @3.7.1
-pin "select2" # @4.1.0
-pin "@rails/activestorage", to: "@rails--activestorage.js" # @7.1.3
-pin "@rails/ujs", to: "@rails--ujs.js" # @7.1.3
-pin "@nathanvda/cocoon", to: "@nathanvda--cocoon.js", preload: false # @1.2.14
-pin "@hotwired/turbo", to: "@hotwired--turbo.js" # @8.0.4
-pin "@hotwired/turbo-rails", to: "@hotwired--turbo-rails.js" # @8.0.4
-pin "@rails/actioncable/src", to: "@rails--actioncable--src.js" # @7.1.3
+# Turbo and the Rails libraries come from their gems, so they always match the installed versions
 pin "@hotwired/turbo-rails", to: "turbo.min.js"
-pin "igv" # @2.15.11
+pin "@rails/activestorage", to: "activestorage.esm.js"
+
+pin "tom-select" # @2.6.2 (vendored tom-select.complete.min.js; defines window.TomSelect)
+pin "igv" # @3.8.9
+pin "jszip" # @3.10.1 (vendored dist/jszip.min.js; defines window.JSZip for the Excel button)
 pin_all_from "app/javascript"
-pin "datatables.net", to: "https://cdn.datatables.net/v/dt/dt-1.12.0/b-1.7.1/b-html5-1.7.1/b-print-1.7.1/r-2.3.0/sl-1.4.0/datatables.min.js"
+pin "datatables.net" # @3.1.3 (dependency-free; no jQuery)
+pin "datatables.net-bm" # @3.1.3
+pin "datatables.net-buttons" # @4.1.2 (includes the copy/csv/excel buttons)
+pin "datatables.net-buttons-bm" # @4.1.2
+pin "datatables.net-responsive" # @4.1.1
+pin "datatables.net-responsive-bm" # @4.1.1

@@ -1,5 +1,0 @@
-var $btn = $('button.primer_set_<%= @primer_set_subscription.primer_set_id %>');
-$btn.text('Unsubscribe').attr('title', 'You are currently subscribed, click to unsubscribe');
-$btn.closest('form')
-    .attr('action', '<%= primer_set_subscription_path(@primer_set_subscription.id) %>')
-    .prepend('<input type="hidden" name="_method" value="delete">');

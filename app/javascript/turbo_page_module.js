@@ -1,5 +1,3 @@
-import 'init_jquery';
-
 // Registers a page-specific module that works correctly with Turbo navigation.
 //
 // The race condition: when a page-specific <script type="module"> is injected by
@@ -20,13 +18,13 @@ export function registerPageModule(guardFn, initFn, cleanupFn) {
         initFn();
     }
 
-    $(document).on('turbo:before-cache', function() {
+    document.addEventListener('turbo:before-cache', function() {
         if (!guardFn()) return;
         initialized = false;
         cleanupFn?.();
     });
 
-    $(document).on('turbo:load', maybeInit);
+    document.addEventListener('turbo:load', maybeInit);
 
     // Handle first Turbo navigation to this page: turbo:load already fired before
     // this module loaded, so initialize now if the DOM is already ready.

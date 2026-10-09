@@ -55,3 +55,6 @@ config/.pgpass
 
 /app/assets/builds/*
 !/app/assets/builds/.keep
+
+# pixi environments
+.pixi/

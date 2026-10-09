@@ -19,24 +19,12 @@
   <%= @user.send_primer_updates %>
 </p>
 
-<h1>Subscriptions:</h1>
-<table>
-  <thead>
-    <th>Primer Set</th>
-    <th>Geo Locations</th>
-    <th>Variant Fraction Threshold</th>
-  </thead>
-  <tbody>
-  <% @user.primer_set_subscriptions.each do |pss| %>
-  <tr>
-    <td><%= pss.primer_set %></td>
-    <td><%= @user.subscribed_geo_locations.map(&:to_s).join(', ') %></td>
-    <td><%= @user.variant_fraction_threshold %></td>
-  </tr>
-  <% end %>
-  </tbody>
-</table>
+<h2 class="title">Subscriptions</h2>
+<p>Locations: <%= @user.subscribed_geo_locations.includes(:detailed_geo_location_alias).map(&:to_s).join(', ').presence || 'none' %>;
+  alert threshold <%= number_to_percentage(@user.variant_fraction_threshold * 100, precision: 0) %>
+  over the last <%= pluralize(@user.lookback_days, 'day') %></p>
+<%= render 'users/subscriptions', user: @user, unsubscribe: false %>
 
-<% if can? :edit, @user %>
-  <%= link_to "Edit", edit_user_registration_path(@user) %>
+<% if @user == current_user %>
+  <%= link_to "Edit", edit_user_registration_path %>
 <% end %>

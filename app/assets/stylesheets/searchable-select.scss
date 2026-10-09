@@ -1,0 +1,23 @@
+// Tom Select (searchable dropdowns, see app/javascript/searchable_select.js) matched to Bulma's form controls.
+// Tom Select copies the <select>'s classes onto its wrapper, so .is-wide on the select widens the widget.
+.ts-wrapper.is-wide {
+  width: 80%;
+}
+
+.ts-wrapper .ts-control {
+  border-color: var(--bulma-border);
+  border-radius: var(--bulma-radius);
+  font-size: 1rem;
+  min-height: 2.5em;
+}
+
+.ts-wrapper.multi .ts-control > .item {
+  background: var(--bulma-primary-light);
+  color: var(--bulma-primary-dark);
+  border-radius: var(--bulma-radius-small);
+}
+
+// keep the leading spaces that indent the lineage hierarchy
+.ts-dropdown .option {
+  white-space: pre;
+}

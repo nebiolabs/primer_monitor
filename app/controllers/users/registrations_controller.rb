@@ -2,10 +2,18 @@
 
 module Users
   class RegistrationsController < Devise::RegistrationsController
-    # rubocop:disable Rails/LexicallyScopedActionFilter
     before_action :configure_sign_up_params, only: [:create]
     before_action :configure_account_update_params, only: [:update]
-    # rubocop:enable Rails/LexicallyScopedActionFilter
+    # Devise skips authenticate_user! inside its own controllers unless forced
+    before_action -> { authenticate_user!(force: true) }, only: :send_password_reset
+
+    # POST /users/password_reset
+    # Devise's reset form is for signed-out users; this lets someone who signed up with Google or Microsoft
+    # set a password from their account page.
+    def send_password_reset
+      current_user.send_reset_password_instructions
+      redirect_to edit_user_registration_path, notice: "We emailed #{current_user.email} a link to set your password."
+    end
 
     # GET /resource/sign_up
     # def new
@@ -13,9 +21,9 @@ module Users
     # end
 
     # POST /resource
-    # def create
-    #   super
-    # end
+    def create
+      super
+    end
 
     # GET /resource/edit
     # def edit
@@ -23,9 +31,9 @@ module Users
     # end
 
     # PUT /resource
-    # def update
-    #   super
-    # end
+    def update
+      super
+    end
 
     # DELETE /resource
     # def destroy

@@ -25,7 +25,7 @@ class FastaRecord < ApplicationRecord
   end
 
   def self.existing_fasta_accession_ids
-    @existing_fasta_accession_ids ||= Hash[FastaRecord.pluck(:genbank_accession, :id)]
+    @existing_fasta_accession_ids ||= FastaRecord.pluck(:genbank_accession, :id).to_h
   end
 
   def self.build_fasta_record(line, taxon)

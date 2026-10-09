@@ -30,14 +30,11 @@ class Lineage < ApplicationRecord
     # if there are no records (not only pre-existing lineages, but nothing at all)
     raise "Unable to parse any records from #{calls_csv}" if record_count.zero?
 
-    new_lineages = []
-
-    new_lineage_names.each do |lineage_name|
-      new_lineages << Lineage.new(name: lineage_name, caller_name: LineageCaller.find_by(id: caller_id).name,
-                                  organism_id: organism.id, external_link: external_link_url(organism, lineage_name))
+    caller_name = LineageCaller.find_by(id: caller_id).name
+    new_lineage_names.map do |lineage_name|
+      Lineage.new(name: lineage_name, caller_name:, organism_id: organism.id,
+                  external_link: external_link_url(organism, lineage_name))
     end
-
-    new_lineages
   end
 
   def self.parse_record(line)

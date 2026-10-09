@@ -9,7 +9,7 @@ admin = User.create_with(first: 'Admin', last: 'User',
                          password: admin_password,
                          password_confirmation: admin_password,
                          active: true, approved: true, confirmed: true, confirmed_at: Time.current)
-            .find_or_create_by!(email: ENV['ADMIN_EMAIL'])
+            .find_or_create_by!(email: ENV.fetch('ADMIN_EMAIL', nil))
 
 %w[administrator pi operator participant].each do |role_name|
   Role.find_or_create_by!(name: role_name)
@@ -95,7 +95,7 @@ features.each do |feature|
 end
 
 # Creates a list of views to operate on (views/*.sql). Order is defined by numeric prefix to view name
-view_files = Dir["#{__dir__}/views/*.sql"].sort
+view_files = Dir["#{__dir__}/views/*.sql"]
 
 view_defs = view_files.each_with_object({}) do |view_file, h| # depends on hash being ordered
   view_def = File.readlines(view_file)
@@ -115,16 +115,22 @@ conn = ActiveRecord::Base.connection
 view_defs.keys.reverse_each do |v|
   Rails.logger.info("dropping #{v}")
   conn.execute(
-    view_defs[v][:view] && "drop view if exists #{v} CASCADE;" ||
-      view_defs[v][:mat_view] && "drop materialized view if exists #{v} CASCADE;"
+    (view_defs[v][:view] && "drop view if exists #{v} CASCADE;") ||
+      (view_defs[v][:mat_view] && "drop materialized view if exists #{v} CASCADE;")
   )
+end
+
+# the views grant access to these roles, which belong to the server rather than the database,
+# so a fresh server (e.g. CI) lacks them
+%w[primer_monitor primer_monitor_ro].each do |r|
+  conn.execute("DO $$ BEGIN CREATE ROLE #{r}; EXCEPTION WHEN duplicate_object THEN NULL; END $$;")
 end
 
 # creates all views
 view_defs.each_key do |v|
   Rails.logger.info("Creating #{v}")
   conn.execute(
-    view_defs[v][:view] && view_defs[v][:view].join.to_s ||
-      view_defs[v][:mat_view] && view_defs[v][:mat_view].join.to_s
+    (view_defs[v][:view] && view_defs[v][:view].join.to_s) ||
+      (view_defs[v][:mat_view] && view_defs[v][:mat_view].join.to_s)
   )
 end

@@ -2,8 +2,9 @@
 
 # stores information about users of this system (including submitters and administrators)
 class User < ApplicationRecord
+  # omniauth providers are those configured in config/initializers/devise.rb
   devise :database_authenticatable, :registerable, :recoverable, :rememberable,
-         :validatable, :confirmable, :omniauthable, omniauth_providers: [:google_oauth2]
+         :validatable, :confirmable, :omniauthable
 
   has_many :user_roles, dependent: :destroy
   has_many :roles, through: :user_roles
@@ -16,19 +17,46 @@ class User < ApplicationRecord
   accepts_nested_attributes_for :user_roles, reject_if: :all_blank, allow_destroy: true
 
   before_validation :set_login_from_email
+  before_create :subscribe_to_world
 
+  PROVIDER_NAMES = { 'google_oauth2' => 'Google', 'entra_id' => 'Microsoft' }.freeze
+
+  # the external account the user last signed in with, if any
+  def sign_in_provider_name
+    PROVIDER_NAMES[provider]
+  end
+
+  # The user signing in through Google or Entra ID: the account already linked to that identity, else the
+  # existing account with their email (linked from now on), else a new account.
+  # The identity provider has verified the email, so the account counts as confirmed. Whoever registered an
+  # unconfirmed account never proved they own the email, so the password they chose stops working.
   def self.from_omniauth(auth)
-    data = auth.info
-    Rails.logger.debug("Attempting to log in via oauth with data: #{data}")
-    user_attribs = {
-      email: data['email'], first: data['first_name'],
-      last: data['last_name'],
-      password: Devise.friendly_token[0, 20]
-    }
-    User.create_with(user_attribs).find_or_create_by!(email: data['email']) do |user|
-      Rails.logger.info("Creating new user using : #{user_attribs}")
+    # Entra ID sends no email claim for accounts without a mail attribute; the sign-in name (UPN) is then the email
+    auth.info.email = auth.info.nickname if auth.info.email.blank? && auth.info.nickname.to_s.include?('@')
+    user = find_by(provider: auth.provider, uid: auth.uid) || link_by_email(auth) || build_from_omniauth(auth)
+    unless user.confirmed?
+      user.password = Devise.friendly_token[0, 20] if user.persisted?
       user.skip_confirmation!
     end
+    user.save!
+    user
+  end
+
+  def self.link_by_email(auth)
+    email = auth.info.email.to_s.strip.downcase
+    return if email.empty?
+
+    find_by('lower(email) = ?', email)&.tap { |user| user.assign_attributes(provider: auth.provider, uid: auth.uid) }
+  end
+
+  def self.build_from_omniauth(auth)
+    info = auth.info
+    Rails.logger.info("Creating new #{auth.provider} user for #{info.email}")
+    first, last = info.name.to_s.split(' ', 2)
+    new(provider: auth.provider, uid: auth.uid, email: info.email,
+        first: info.first_name.presence || first.presence || info.email,
+        last: info.last_name.presence || last.presence || '-',
+        password: Devise.friendly_token[0, 20])
   end
 
   def subscribed_detailed_geo_location_alias_ids
@@ -57,6 +85,12 @@ class User < ApplicationRecord
     self.login ||= email
   end
 
+  # alerts only cover subscribed locations, and neither sign-up nor SSO asks for any
+  def subscribe_to_world
+    world = DetailedGeoLocationAlias.world.first
+    subscribed_geo_locations.build(detailed_geo_location_alias: world) if world && subscribed_geo_locations.empty?
+  end
+
   def role_symbols
     roles.map { |r| r.name.gsub(/\s+/, '_').downcase.to_sym }
   end
@@ -67,12 +101,20 @@ class User < ApplicationRecord
                        else
                          [role_to_test]
                        end
-    !(role_to_test_ary & role_symbols).empty?
+    !!role_to_test_ary.intersect?(role_symbols)
   end
 
   def formatted_email
     m = Mail::Address.new email
     m.display_name = "#{first.capitalize} #{last.capitalize}"
     m.format
+  end
+
+  # subscribing to a primer set implies the user wants email about primer updates
+  def subscribe_to_primer_updates!
+    return if send_primer_updates?
+
+    # rubocop:disable-next Rails/SkipsModelValidations
+    update_column(:send_primer_updates, true)
   end
 end

@@ -4,9 +4,7 @@
 
 <h1 class="title">Organism: <%= @organism.full_name %> </h1>
 
-<h2 class="title">Genome:</h2>
-
-<p id="config" class="invisible"><%= @config.to_json %></p>
+<p id="config" class="invisible" data-igv-page="organism"><%= @config.to_json %></p>
 
 <div id="igv" class="igv_div"></div>
 

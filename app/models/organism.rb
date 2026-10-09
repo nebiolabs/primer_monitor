@@ -18,12 +18,18 @@ class Organism < ApplicationRecord
     name + (self.alias.blank? ? '' : " (#{self.alias})")
   end
 
-  def primer_sets_config
-    config = {
-      "data_server": ENV['IGV_DATA_SERVER'],
-      "organism_slug": slug,
-      "organism_name": name
+  # what the igv.js pages need to find this organism's reference and tracks on the data server
+  def igv_config
+    {
+      data_server: ENV.fetch('IGV_DATA_SERVER', nil),
+      organism_slug: slug,
+      organism_name: name,
+      reference_accession: organism_taxa.first&.reference_accession
     }
+  end
+
+  def primer_sets_config
+    config = igv_config
 
     tracks_url = URI("#{config[:data_server]}/#{config[:organism_slug]}/config/tracks.json")
 
@@ -42,7 +48,7 @@ class Organism < ApplicationRecord
 
     LineageInfo
       .where(organism_id: id)
-      .where('last_seen >= ?', most_recent - days)
+      .where(last_seen: (most_recent - days)..)
       .pluck(:name, :times_seen)
       .to_h
   end

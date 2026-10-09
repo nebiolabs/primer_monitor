@@ -3,38 +3,38 @@
 <% end %>
 
 <h1 class="title">Primer Set: <%= @primer_set.name %> </h1>
-<div class="tile">
-  <div class="tile is-parent">
-    <div class="tile box is-child">
+<div class="columns is-multiline">
+  <div class="column is-narrow">
+    <div class="box">
     <strong>Organism: </strong>
     <%= link_to @primer_set.organism, @primer_set.organism %>
     </div>
   </div>
-  <div class="tile is-parent">
-    <div class="tile box is-child">
+  <div class="column is-narrow">
+    <div class="box">
     <strong>Amp. Method: </strong>
     <%= link_to @primer_set.amplification_method.to_s, @primer_set.amplification_method.description_url %>
     </div>
   </div>
   <% if @primer_set.display_url %>
-    <div class="tile is-parent">
-      <div class="tile box is-child">
+    <div class="column is-narrow">
+      <div class="box">
       <strong> Source: </strong>
-          <%= link_to @primer_set.display_url, @primer_set.display_url %>
+          <%= external_link @primer_set.display_url, @primer_set.display_url %>
       </div>
     </div>
   <% end %>
   <% if can?(:confirm, PrimerSet) %>
-    <div class="tile is-parent">
-      <div class="tile box is-child">
+    <div class="column is-narrow">
+      <div class="box">
       <strong>Status: </strong>
       <%= @primer_set.status %>
       </div>
     </div>
   <% end %>
   <% if can?(:edit, @primer_set.user) %>
-    <div class="tile is-parent">
-      <div class="tile box is-child">
+    <div class="column is-narrow">
+      <div class="box">
         <strong>Creator: </strong>
         <%= @primer_set.user %>
       </div>
@@ -42,8 +42,8 @@
   <% end %>
 
 
-  <div class="tile is-parent">
-    <div class="tile  is-child">
+  <div class="column is-narrow">
+    <div>
     <%= render 'primer_set_subscription',
                user: current_user,
                primer_set: @primer_set,
@@ -52,10 +52,13 @@
   </div>
 </div>
 
-<hr/>
-<h2 class="title">IGV Visualization:</h2>
+<% if current_user %>
+  <%= render 'your_subscription', user: current_user, primer_set: @primer_set %>
+<% end %>
 
-<p id="config" class="invisible"><%= @config.to_json %></p>
+<hr/>
+
+<p id="config" class="invisible" data-igv-page="primer_set"><%= @config.to_json %></p>
 
 <% if @primer_set.status == PrimerSet.statuses[:complete] %>
 
@@ -64,7 +67,7 @@
 <% else %>
 
 <p class="igv-message">
-  This primer set has not yet been processed for the igv.js visualization. Processing should be complete shortly after it is approved and made public.
+  The genome view of this primer set will appear once it has been approved and processed.
 </p>
 
 <% end %>

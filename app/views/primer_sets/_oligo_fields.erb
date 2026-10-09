@@ -1,4 +1,4 @@
-<div class='nested-fields is-horizontal'>
+<div class='nested-fields is-horizontal' data-persisted="<%= f.object.persisted? %>">
   <div class="field-body is-horizontal mx-1">
     <%= f.text_field :name, placeholder: "Oligo name", size: 12 %>
     <%= f.text_field :short_name, placeholder: "Short name", size: 10, maxlength:5 %>
@@ -6,8 +6,9 @@
     <%= f.text_field :sequence, placeholder: "DNA sequence (GCAT)", maxlength: 40 %>
     <%= f.select :category, Oligo.categories.keys, prompt: 'Select' %>
 
-    <%= link_to_remove_association f do %>
-      <%= image_tag("remove_icon.svg", alt: 'remove oligo',class: 'icon')%>
-    <% end %>
+    <%= f.hidden_field :_destroy %>
+    <button type="button" class="button is-white is-small" data-nested-remove title="Remove oligo">
+      <%= image_tag("remove_icon.svg", alt: 'remove oligo', class: 'icon') %>
+    </button>
   </div>
 </div>

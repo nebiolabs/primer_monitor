@@ -3,7 +3,7 @@
 source 'https://rubygems.org'
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
-ruby '3.4.2'
+ruby '3.4.11'
 gem 'activerecord-import'
 
 gem 'dotenv-rails'
@@ -12,13 +12,13 @@ gem 'httparty'
 
 gem 'slop'
 
-gem 'rails', '~> 7.2'
+gem 'rails', '~> 8.1'
 
 gem 'pg', '>=1.2.3'
 # Use Puma as the app server
-gem 'puma', '~> 7.2'
+gem 'puma', '~> 8.0'
 # Use SCSS for stylesheets
-gem 'sass-rails', '>= 6'
+gem 'dartsass-rails'
 # Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder
 gem 'jbuilder', '~> 2.7'
 # Use Redis adapter to run Action Cable in production
@@ -46,34 +46,31 @@ gem 'airbrake'
 gem 'cancancan', '~> 3.x'
 # for authentication
 gem 'devise', '~> 5.0'
+gem 'omniauth-entra-id'
 gem 'omniauth-google-oauth2'
-gem 'omniauth-rails_csrf_protection', '~> 1.0'
-
-# for nested form management
-gem 'cocoon'
-
-# for styling, responsive display
-gem 'bulma-rails', '~> 0.9.0'
+gem 'omniauth-rails_csrf_protection', '~> 2.0'
 
 group :development, :test do
-  # Call 'byebug' anywhere in the code to stop execution and get a debugger console
-  gem 'byebug', platforms: %i[mri mingw x64_mingw]
-  gem 'minitest', '~> 5.0'
+  # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
+  gem 'debug', platforms: %i[mri windows], require: 'debug/prelude'
   gem 'mocha'
 end
 
 group :development do
   gem 'bcrypt_pbkdf'
+  gem 'brakeman', require: false
+  gem 'bundler-audit', require: false
   gem 'capistrano', '~> 3.10', require: false
   gem 'capistrano-rails', '~> 1.3', require: false
   gem 'capistrano-rbenv', '~> 2.2'
   gem 'ed25519'
   gem 'listen', '~> 3.2'
-  gem 'rubocop', require: false
-  gem 'rubocop-capybara', require: false
-  gem 'rubocop-minitest', require: false
-  gem 'rubocop-performance', require: false
-  gem 'rubocop-rails', require: false
+  gem 'rubocop', '~> 1.91', require: false
+  gem 'rubocop-capybara', '~> 3.0', require: false
+  gem 'rubocop-minitest', '~> 0.41', require: false
+  gem 'rubocop-performance', '~> 1.27', require: false
+  gem 'rubocop-rails', '~> 2.38', require: false
+  gem 'rubocop-rake', '~> 0.7', require: false
 
   # Access an interactive console on exception pages or by calling 'console' anywhere in the code.
   gem 'web-console', '>= 3.3.0'
@@ -81,10 +78,7 @@ group :development do
   gem 'simplecov'
   # for generating a search engine sitemap
   gem 'sitemap_generator'
-  # Spring speeds up development by keeping your application running in the background. Read more: https://github.com/rails/spring
   gem 'solargraph' # language server for code editors
-  gem 'spring'
-  gem 'spring-watcher-listen'
   gem 'webrick'
 end
 
@@ -92,9 +86,7 @@ group :test do
   # Adds support for Capybara system testing and selenium driver
   gem 'capybara', '>= 2.15'
   gem 'selenium-webdriver'
-  # Easy installation and use of web drivers to run system tests with browsers
-  gem 'webdrivers'
 end
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
-gem 'tzinfo-data', platforms: %i[mingw mswin x64_mingw jruby]
+gem 'tzinfo-data', platforms: %i[windows jruby]

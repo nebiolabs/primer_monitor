@@ -62,6 +62,9 @@ Rails.application.configure do
   # Prepend all log lines with the following tags.
   config.log_tags = [ :request_id ]
 
+  # Prevent health checks from clogging up the logs.
+  config.silence_healthcheck_path = '/up'
+
   # "info" includes generic and useful information about system operation, but avoids logging too much
   # information to avoid inadvertent exposure of personally identifiable information (PII). If you
   # want to log everything, set the level to "debug".
@@ -77,6 +80,10 @@ Rails.application.configure do
   # Disable caching for Action Mailer templates even if Action Controller
   # caching is enabled.
   config.action_mailer.perform_caching = false
+
+  # Mailers link back to the site, and mail goes out through the server's local sendmail (nullmailer).
+  config.action_mailer.default_url_options = { host: 'primer-monitor.neb.com', protocol: 'https' }
+  config.action_mailer.delivery_method = :sendmail
 
   # Ignore bad email addresses and do not raise email delivery errors.
   # Set this to true and configure the email server for immediate delivery to raise delivery errors.

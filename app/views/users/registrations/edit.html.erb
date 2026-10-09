@@ -56,25 +56,40 @@
 <% end %>
 <hr/>
 
+<h2 class="title">Sign-in methods</h2>
+<div class="field is-horizontal">
+  <div class="field-label">Linked account</div>
+  <div class="field-body">
+    <% if resource.sign_in_provider_name %>
+      <span>
+        <%= resource.sign_in_provider_name %> (<%= resource.email %>)
+        <span class="is-size-7">— linked to this account when you last signed in with it</span>
+      </span>
+    <% else %>
+      <span>None. You can also sign in with Google, or with Microsoft if you are NEB staff, using this email address.</span>
+    <% end %>
+  </div>
+</div>
+<div class="field is-horizontal">
+  <div class="field-label">Password</div>
+  <div class="field-body">
+    <span>
+      <%= button_to 'Email me a password reset link', user_password_reset_path, class: 'button is-small is-light',
+                    form: { style: 'display: inline' } %>
+      <span class="is-size-7">Sets a password for signing in with your email address; useful if you signed up with Google or Microsoft.</span>
+    </span>
+  </div>
+</div>
+<hr/>
+
 <h2 class="title">Subscriptions</h2>
 
-<% if current_user.primer_sets.length > 0 %>
-  <div class="field is-horizontal">
-    <div class="field-label">
-      Subscribed primer sets
-    </div>
-    <div class="control field-body">
-      <% current_user.primer_sets.each do |ps|  %>
-        <%=link_to ps, ps %>
-        <%= render '/primer_sets/primer_set_subscription',
-                   user: current_user,
-                   primer_set: ps,
-                   primer_set_subscription: ps.subscription_for_user(current_user)
-        %>
-      <% end %>
-    </div>
-  </div>
-<% end %>
+<%= render 'users/subscriptions', user: resource, unsubscribe: true %>
+<p class="mb-5">
+  Subscribe to more primer sets:
+  <%= safe_join(Organism.where(public: true).order(:name).map { |organism| link_to "#{organism.name} primer sets", organism_primer_sets_path(organism) }, ' · ') %>
+</p>
+
 <%= form_for(resource, as: resource_name, url: registration_path(resource_name), html: { id: 'subscription_form', method: :put }) do |f| %>
 
   <div class="field is-horizontal">
@@ -93,10 +108,10 @@
     </div>
     <div class="control field-body">
       <%=f.select :subscribed_detailed_geo_location_alias_ids,
-                  options_from_collection_for_select(DetailedGeoLocationAlias.subscribable,
-                                                     :id, :name, current_user.subscribed_detailed_geo_location_alias_ids),
+                  options_for_select(DetailedGeoLocationAlias.subscribable_options,
+                                     current_user.subscribed_detailed_geo_location_alias_ids),
                   {include_blank: true} ,
-                  class: 'select2', style: 'width: 500px;', multiple: true
+                  class: 'searchable-select', style: 'width: 500px;', multiple: true
       %>
     </div>
   </div>

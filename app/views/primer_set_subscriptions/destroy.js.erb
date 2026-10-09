@@ -1,5 +1,0 @@
-var $btn = $('button.primer_set_<%= @primer_set_id %>');
-$btn.text('Subscribe').attr('title', 'You are not currently subscribed, click to subscribe');
-var $form = $btn.closest('form');
-$form.attr('action', '<%= primer_set_subscriptions_path(primer_set_id: @primer_set_id) %>');
-$form.find('input[name="_method"]').remove();

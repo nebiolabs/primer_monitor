@@ -1,0 +1,15 @@
+<%# button_to POSTs (OmniAuth 2 requires it); turbo is off so the browser follows the redirect to the provider %>
+<div class="buttons">
+  <% if resource_class.omniauth_providers.include?(:entra_id) %>
+    <%= button_to omniauth_authorize_path(resource_name, :entra_id), class: 'button is-primary', form: { data: { turbo: false } } do %>
+      <%= image_tag "neb_butterfly.svg", alt: "", class: "sign-in-icon" %>
+      &nbsp; NEB staff: Sign in with Microsoft
+    <% end %>
+  <% end %>
+  <% if resource_class.omniauth_providers.include?(:google_oauth2) %>
+    <%= button_to omniauth_authorize_path(resource_name, :google_oauth2), class: 'button is-primary', form: { data: { turbo: false } } do %>
+      <%= image_tag "btn_google_dark_normal_ios.svg", alt: "", width: 30 %>
+      &nbsp; Sign in with Google
+    <% end %>
+  <% end %>
+</div>

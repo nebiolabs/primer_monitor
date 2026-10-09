@@ -1,6 +1,9 @@
 # frozen_string_literal: true
 
 Rails.application.routes.draw do
+  # Health check for load balancers and uptime monitors: 200 if the app boots, 500 otherwise
+  get 'up' => 'rails/health#show', as: :rails_health_check
+
   devise_for :users, controllers: {
     sessions: 'users/sessions',
     registrations: 'users/registrations',
@@ -9,6 +12,9 @@ Rails.application.routes.draw do
     passwords: 'users/passwords',
     omniauth_callbacks: 'users/omniauth_callbacks'
   }
+  devise_scope :user do
+    post 'users/password_reset', to: 'users/registrations#send_password_reset', as: :user_password_reset
+  end
 
   root 'welcome#index'
   get 'about', to: 'about#show'
@@ -26,7 +32,8 @@ Rails.application.routes.draw do
   end
 
   resources :oligos
-  resources :users
+  # accounts are created by signing up (Devise) or with Google/Microsoft, so admins only list, edit and delete
+  resources :users, except: %i[new create]
   resources :primer_set_subscriptions, only: [:create, :destroy]
   resources :primer_sets, only: [:new, :show, :create, :destroy, :update, :edit]
 end

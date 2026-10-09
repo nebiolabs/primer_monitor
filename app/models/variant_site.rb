@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class VariantSite < ApplicationRecord
-  self.ignored_columns = %w[usable_del_or_snp usable_insertion]
+  self.ignored_columns += %w[usable_del_or_snp usable_insertion]
   def self.parse(variants_tsv, taxon)
     raise "Unable to find counts file #{variants_tsv}" unless File.exist?(variants_tsv)
 
@@ -45,13 +45,41 @@ class VariantSite < ApplicationRecord
     fasta_path = Rails.root.join('igvstatic', taxon.organism.slug, 'ref', "#{taxon.reference_accession}.fasta")
     return nil unless File.exist?(fasta_path)
 
-    seq = +''
-    File.foreach(fasta_path) do |line|
-      next if line.start_with?('>')
+    sequences = load_fasta_sequences(fasta_path)
+    return nil if sequences.empty?
 
-      seq << line.chomp
+    accession = taxon.reference_accession.to_s
+    return sequences[accession] if sequences.key?(accession)
+
+    accession_without_version = accession.sub(/\.\d+\z/, '')
+    matched = sequences.find { |key, _| key.sub(/\.\d+\z/, '') == accession_without_version }
+    return matched.last if matched
+
+    # For legacy single-contig reference files, return the only sequence even if
+    # the filename and header id are not identical.
+    return sequences.values.first if sequences.size == 1
+
+    nil
+  end
+
+  def self.load_fasta_sequences(fasta_path)
+    sequences = {}
+    current_header = nil
+
+    File.foreach(fasta_path) do |line|
+      line = line.chomp
+      if line.start_with?('>')
+        current_header = line[1..].split.first
+        sequences[current_header] ||= +''
+        next
+      end
+
+      next unless current_header
+
+      sequences[current_header] << line
     end
-    seq
+
+    sequences
   end
 
   def self.lookup_ref_allele(ref_seq, ref_pos, variant_type, variant)

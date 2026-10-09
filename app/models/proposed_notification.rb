@@ -9,6 +9,23 @@ class ProposedNotification < ApplicationRecord
   belongs_to :verified_notification, optional: true
   belongs_to :detailed_geo_location_alias
 
+  scope :sent, -> { joins(:verified_notification).where(verified_notifications: { status: 'Sent' }) }
+
+  # what the user has been told about a primer set, newest first
+  def self.history_for(user, primer_set, limit: 50)
+    where(user:, primer_set:).includes(:oligo, :detailed_geo_location_alias, :verified_notification)
+                             .order(created_at: :desc).limit(limit)
+  end
+
+  # Sent, Skipped (recorded without emailing), or Pending (not yet emailed)
+  def delivery_status
+    verified_notification&.status.then { |status| status.nil? || status == 'Unsent' ? 'Pending' : status }
+  end
+
+  def delivered_at
+    verified_notification&.status == 'Sent' ? verified_notification.updated_at : nil
+  end
+
   UNIQUE_FIELDS = %i[primer_set_id user_id oligo_id coordinate
                      subscribed_geo_location_id primer_set_subscription_id].freeze
 
@@ -18,15 +35,15 @@ class ProposedNotification < ApplicationRecord
 
   def self.existing_notification_cache
     @existing_notification_cache ||= ProposedNotification.pluck(:id, UNIQUE_FIELDS.join(','))
-                                                         .each_with_object({}) do |pn_fields, h|
-      h[pn_fields[1..].join] = pn_fields[0]
+                                                         .to_h do |pn_fields|
+      [pn_fields[1..].join, pn_fields[0]]
     end
   end
 
   def self.new_proposed_notifications
     potential_notifications = []
 
-    IdentifyPrimersForNotification.includes(:detailed_geo_location).all.find_each do |primer_record|
+    IdentifyPrimersForNotification.includes(:detailed_geo_location).find_each do |primer_record|
       pn = construct_notification_record(primer_record)
 
       potential_notifications << pn unless existing_notification_cache.key?(pn.cache_key)
@@ -51,7 +68,7 @@ class ProposedNotification < ApplicationRecord
                              subscribed_geo_location_id:,
                              primer_set_subscription_id:,
                              detailed_geo_location_alias_id: primer_record.detailed_geo_location
-                                                             .detailed_geo_location_alias_id,
+                                                                          .detailed_geo_location_alias_id,
                              fraction_variant: primer_record.fraction_variant)
   end
 end

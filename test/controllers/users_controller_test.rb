@@ -10,37 +10,45 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
 
   test 'should get index' do
     get users_url
+
     assert_response :success
   end
 
   test 'should get new' do
     sign_out(@user)
     get new_user_registration_url
+
     assert_response :success
   end
 
-  test 'should create user' do
+  test 'signing up creates an unconfirmed user and emails a confirmation link' do
     sign_out(@user)
     assert_difference('User.count') do
-      post user_registration_url, params: { user: { email: 'test@example.org', first: 'test', last: 'user',
-                                                    password: 'test123', password_confirmation: 'test123' } }
+      assert_emails(1) do
+        post user_registration_url, params: { user: { email: 'test@example.org', first: 'test', last: 'user',
+                                                      password: 'test123', password_confirmation: 'test123' } }
+      end
     end
 
     assert_redirected_to root_url
+    assert_not_predicate User.find_by(email: 'test@example.org'), :confirmed?
   end
 
   test 'should show user' do
     get user_url(@user)
+
     assert_response :success
   end
 
   test 'should get edit' do
     get edit_user_registration_path(@user)
+
     assert_response :success
   end
 
   test 'should update user' do
     patch user_url(@user), params: { user: { email: @user.email, first: @user.first, last: @user.last } }
+
     assert_redirected_to user_url(@user)
   end
 

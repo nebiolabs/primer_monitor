@@ -1,5 +1,4 @@
-import 'init_jquery';
-import "igv";
+import { createBrowser, removeBrowser } from 'igv_browser';
 import { registerPageModule } from 'turbo_page_module';
 
 let igvBrowser = null;
@@ -12,39 +11,39 @@ let activeLineageGroup = null;
 let activeSets = [];
 
 function loadConfig() {
-    primerSetsToNames = JSON.parse($('#primer_set_json')[0].innerHTML);
-    lineageSetsToNames = JSON.parse($('#lineage_set_json')[0].innerHTML);
-    config = JSON.parse($('#config')[0].innerHTML);
+    primerSetsToNames = JSON.parse(document.getElementById('primer_set_json').textContent);
+    lineageSetsToNames = JSON.parse(document.getElementById('lineage_set_json').textContent);
+    config = JSON.parse(document.getElementById('config').textContent);
 }
 
 
 function updateLink() {
-    let link_div_wrapper = $('#link_div_wrapper');
-    if (link_div_wrapper.hasClass('invisible')) {
-        let base_link = location.protocol + '//' + location.host + location.pathname;
-        let full_link = base_link + "?primer_sets=" + activeSets.join(',') + ";lineage=" + activeLineageGroup;
-        let link_element = $('#link')[0];
-        link_element.innerHTML = full_link;
-        link_element.href = full_link;
-        link_div_wrapper.removeClass('invisible');
-        $('#show_link')[0].innerHTML = 'Hide Link';
+    const wrapper = document.getElementById('link_div_wrapper');
+    const linkElement = document.getElementById('link');
+    if (wrapper.classList.contains('invisible')) {
+        const baseLink = location.protocol + '//' + location.host + location.pathname;
+        const fullLink = baseLink + "?primer_sets=" + activeSets.join(',') + ";lineage=" + activeLineageGroup;
+        linkElement.textContent = fullLink;
+        linkElement.href = fullLink;
+        wrapper.classList.remove('invisible');
+        document.getElementById('show_link').textContent = 'Hide Link';
     } else {
-        link_div_wrapper.addClass('invisible');
-        $('#show_link')[0].innerHTML = 'Shareable Link';
+        wrapper.classList.add('invisible');
+        document.getElementById('show_link').textContent = 'Shareable Link';
     }
 }
 
 function updatePrimerSets() {
-    $('#link_div_wrapper').addClass('invisible');
-    $('#show_link')[0].innerHTML = 'Shareable Link';
-    let link_element = $('#link')[0];
-    link_element.innerHTML = "";
-    link_element.href = "";
+    document.getElementById('link_div_wrapper').classList.add('invisible');
+    document.getElementById('show_link').textContent = 'Shareable Link';
+    const linkElement = document.getElementById('link');
+    linkElement.textContent = "";
+    linkElement.href = "";
 
-    activeLineageGroup = $('#lineage_select').val();
+    activeLineageGroup = document.getElementById('lineage_select').value;
 
     if (igvBrowser != null) {
-        activeSets = $('#primer_set_select').val() || [];
+        activeSets = [...document.getElementById('primer_set_select').selectedOptions].map(option => option.value);
         loadPrimerSets(activeSets, igvBrowser, activeLineageGroup);
         loadVariantTable(activeLineageGroup, activeSets);
     }
@@ -92,8 +91,8 @@ function loadPrimerSets(activePrimerSets, igvBrowser, activeLineageGroup) {
 function initBrowser() {
     const browserConfig = {
         reference: {
-            "id": config['organism_slug'],
-            "name": config['organism_name'],
+            "id": config['reference_accession'],
+            "name": config['organism_name'] + " (" + config['reference_accession'] + ")",
             "fastaURL": config['data_server'] + "/" + config['organism_slug'] + "/ref/" + config['organism_slug'] + ".fasta",
             "indexURL": config['data_server'] + "/" + config['organism_slug'] + "/ref/" + config['organism_slug'] + ".fasta.fai",
             tracks: [
@@ -113,12 +112,9 @@ function initBrowser() {
         }
     };
 
-    $('.igv_div').children('.igv-container').remove();
-
-    const browser_div = document.getElementById("igv");
-    igv.createBrowser(browser_div, browserConfig).then(function(theBrowser) {
+    createBrowser(document.getElementById("igv"), browserConfig).then(function(theBrowser) {
         igvBrowser = theBrowser;
-        $('#igv_loading').addClass('invisible');
+        document.getElementById('igv_loading').classList.add('invisible');
         activeLineageGroup = config['initial_lineage'];
         activeSets = config['initial_primer_sets'] || [];
         if (activeLineageGroup) {
@@ -130,12 +126,12 @@ function initBrowser() {
 
 // Use document-level delegation so handlers are registered once and don't stack
 // across Turbo navigations.
-$(document).on('click', '#show_link', function() {
-    updateLink();
+document.addEventListener('click', function(event) {
+    if (event.target.closest('#show_link')) updateLink();
 });
 
-$(document).on('submit', '#primer_set_selection', function(event) {
-    event.preventDefault();
+document.addEventListener('submit', function(event) {
+    if (event.target.closest('#primer_set_selection')) event.preventDefault();
 });
 
 let updateTimer = null;
@@ -144,8 +140,9 @@ function debouncedUpdate() {
     updateTimer = setTimeout(updatePrimerSets, 250);
 }
 
-$(document).on('change', '#lineage_select', debouncedUpdate);
-$(document).on('change', '#primer_set_select', debouncedUpdate);
+document.addEventListener('change', function(event) {
+    if (event.target.matches('#lineage_select, #primer_set_select')) debouncedUpdate();
+});
 
 function formatVariant(v) {
     const ref = v.ref;
@@ -258,7 +255,7 @@ function buildVariantTable(variants) {
     }).join('');
 
     return `
-        <table class="table is-fullwidth is-hoverable is-narrow">
+        <table class="table is-fullwidth is-hoverable is-narrow" data-datatable="off">
             <thead>
                 <tr>
                     <th>Position</th>
@@ -311,28 +308,32 @@ function loadVariantTable(lineage, primerSets) {
         });
 }
 
-$(document).on('click', '.oligo-svg', function() {
-    if (!igvBrowser || !config['reference_accession']) return;
-    const start = Math.max(0, parseInt($(this).data('start')) - 50);
-    const end = parseInt($(this).data('end')) + 50;
+document.addEventListener('click', function(event) {
+    const oligo = event.target.closest('.oligo-svg');
+    if (!oligo || !igvBrowser || !config['reference_accession']) return;
+    const start = Math.max(0, parseInt(oligo.dataset.start) - 50);
+    const end = parseInt(oligo.dataset.end) + 50;
     igvBrowser.search(`${config['reference_accession']}:${start}-${end}`)
         .then(() => document.getElementById('igv').scrollIntoView({ behavior: 'smooth', block: 'start' }));
 });
 
-$(document).on('click', '.variant-row', function() {
-    const row = $(this);
-    const expanded = row.data('expanded') === true;
-    row.data('expanded', !expanded);
-    row.find('.variant-expand-btn').text(expanded ? '▶' : '▼');
-    row.nextUntil('tr:not(.variant-oligo-row)').toggle(!expanded);
+document.addEventListener('click', function(event) {
+    const row = event.target.closest('.variant-row');
+    if (!row) return;
+    const expanded = row.dataset.expanded === 'true';
+    row.dataset.expanded = String(!expanded);
+    row.querySelector('.variant-expand-btn').textContent = expanded ? '▶' : '▼';
+    for (let next = row.nextElementSibling; next?.classList.contains('variant-oligo-row'); next = next.nextElementSibling) {
+        next.style.display = expanded ? 'none' : '';
+    }
 });
 
 registerPageModule(
     () => !!document.getElementById('lineage_select'),
     () => { loadConfig(); initBrowser(); },
     () => {
-        $('.igv_div').children('.igv-container').remove();
-        $('#igv_loading').removeClass('invisible');
+        removeBrowser();
+        document.getElementById('igv_loading').classList.remove('invisible');
         igvBrowser = null;
         tracks = [];
         activeSets = [];

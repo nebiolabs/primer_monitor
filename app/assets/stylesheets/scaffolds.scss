@@ -1,6 +1,5 @@
-@import "bulma";
 body {
-  background-color: $background;
+  background-color: var(--bulma-background);
   color: #333;
   margin: 33px; }
 
@@ -10,7 +9,7 @@ body, p, ol, ul:not(.menu-list), td {
   line-height: 18px; }
 
 pre {
-  background-color: $background;
+  background-color: var(--bulma-background);
   padding: 10px;
   font-size: 11px; }
 
@@ -26,18 +25,25 @@ div.actions {
   margin-bottom: 10px; }
 
 #notice {
-  color: $success; }
+  color: var(--bulma-success); }
 
+// Rails wraps invalid fields and their labels in .field_with_errors
 .field_with_errors {
-  @extend .is-danger
- }
+  input, select, textarea {
+    border-color: var(--bulma-danger);
+  }
+
+  label {
+    color: var(--bulma-danger);
+  }
+}
 
 #error_explanation {
   width: 450px;
-  border: 2px solid $danger;
+  border: 2px solid var(--bulma-danger);
   padding: 7px 7px 0;
   margin-bottom: 20px;
-  background-color: $background; }
+  background-color: var(--bulma-background); }
 
 #error_explanation h2 {
   text-align: left;
@@ -45,8 +51,8 @@ div.actions {
   padding: 5px 5px 5px 15px;
   font-size: 12px;
   margin: -7px -7px 0;
-  background-color: $danger;
-  color: $background; }
+  background-color: var(--bulma-danger);
+  color: var(--bulma-background); }
 
 #error_explanation ul li {
   font-size: 12px;

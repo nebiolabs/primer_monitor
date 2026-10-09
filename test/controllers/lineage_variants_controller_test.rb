@@ -14,6 +14,7 @@ class LineageVariantsControllerTest < ActionDispatch::IntegrationTest
       primer_sets: ['Charité'],
       format: :json
     )
+
     assert_response :bad_request
   end
 
@@ -23,6 +24,7 @@ class LineageVariantsControllerTest < ActionDispatch::IntegrationTest
       lineage: 'XBB',
       format: :json
     )
+
     assert_response :bad_request
   end
 
@@ -33,6 +35,7 @@ class LineageVariantsControllerTest < ActionDispatch::IntegrationTest
       primer_sets: ['Charité'],
       format: :json
     )
+
     assert_response :not_found
   end
 
@@ -43,8 +46,10 @@ class LineageVariantsControllerTest < ActionDispatch::IntegrationTest
       primer_sets: ['Charité'],
       format: :json
     )
+
     assert_response :success
-    data = JSON.parse(response.body)
+    data = response.parsed_body
+
     assert data.key?('variants')
   end
 
@@ -55,22 +60,16 @@ class LineageVariantsControllerTest < ActionDispatch::IntegrationTest
       primer_sets: ['Charité'],
       format: :json
     )
+
     assert_response :success
-    data = JSON.parse(response.body)
-    assert_equal 1, data['variants'].length
+    variant, *others = response.parsed_body['variants']
 
-    v = data['variants'].first
-    assert_equal 100, v['ref_start']
-    assert_equal 101, v['ref_end']
-    assert_equal 'X', v['variant_type']
-    assert_equal 'T', v['variant']
-    assert_in_delta 15.5, v['frequency_pct'], 0.01
-
-    assert_equal 1, v['oligos'].length
-    o = v['oligos'].first
-    assert_equal 'probe1', o['name']
-    assert_equal 'GCAATTTATATACATATA', o['sequence']
-    assert_equal 'Charité', o['primer_set']
+    assert_empty others
+    assert_equal({ 'ref_start' => 100, 'ref_end' => 101, 'variant_type' => 'X', 'variant' => 'T' },
+                 variant.slice('ref_start', 'ref_end', 'variant_type', 'variant'))
+    assert_in_delta 15.5, variant['frequency_pct'], 0.01
+    assert_equal([{ 'name' => 'probe1', 'sequence' => 'GCAATTTATATACATATA', 'primer_set' => 'Charité' }],
+                 variant['oligos'].map { |oligo| oligo.slice('name', 'sequence', 'primer_set') })
   end
 
   test 'variant_overlaps excludes variants for other primer sets' do
@@ -80,8 +79,10 @@ class LineageVariantsControllerTest < ActionDispatch::IntegrationTest
       primer_sets: ['CDC'],
       format: :json
     )
+
     assert_response :success
-    data = JSON.parse(response.body)
+    data = response.parsed_body
+
     assert_equal 0, data['variants'].length
   end
 
@@ -92,8 +93,10 @@ class LineageVariantsControllerTest < ActionDispatch::IntegrationTest
       primer_sets: ['Charité'],
       format: :json
     )
+
     assert_response :success
-    data = JSON.parse(response.body)
+    data = response.parsed_body
+
     assert_equal 0, data['variants'].length
   end
 
@@ -104,8 +107,10 @@ class LineageVariantsControllerTest < ActionDispatch::IntegrationTest
       primer_sets: ['Charité'],
       format: :json
     )
+
     assert_response :success
-    v = JSON.parse(response.body)['variants'].first
+    v = response.parsed_body['variants'].first
+
     assert v.key?('first_seen'), 'missing first_seen'
     assert v.key?('last_seen'),  'missing last_seen'
     assert v['first_seen'].key?('date')

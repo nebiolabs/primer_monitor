@@ -20,4 +20,24 @@ class VerifiedNotification < ApplicationRecord
                                        .where(status: 'Unsent')
     existing_vns + new_vns
   end
+
+  # emails the user their pending notifications and records the delivery
+  def deliver!
+    Rails.logger.info("Sending notification to #{user.formatted_email}")
+    notifications = ProposedNotification.where(verified_notification_id: id)
+                                        .includes(:oligo, :primer_set,
+                                                  :subscribed_geo_location, :detailed_geo_location_alias)
+                                        .reorder('primer_sets.name, oligos.locus, oligos.category,' \
+                                                 'region, subregion, division, subdivision')
+    PrimerSetMailer.primer_overlap_notification_email(user_id, notifications).deliver_now
+    update!(status: 'Sent')
+  end
+
+  # Records every pending notification as handled without emailing it, except for the given addresses.
+  # Run after changes that would otherwise flood subscribers with a backlog (see notifications:baseline).
+  def self.skip_unsent!(except_emails: [])
+    keep = except_emails.map { |email| email.strip.downcase }
+    find_or_create_verified_notifications!.reject { |vn| keep.include?(vn.user.email.downcase) }
+                                          .each { |vn| vn.update!(status: 'Skipped') }
+  end
 end
