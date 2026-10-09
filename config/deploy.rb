@@ -14,17 +14,14 @@ set :conditionally_migrate, true
 # Avoid recompiling all the assets on every deploy
 # from https://coderwall.com/p/aridag/only-precompile-assets-when-necessary-rails-4-capistrano-3
 # set the locations that we will look for changed assets to determine whether to precompile
-set :assets_dependencies, %w[app/assets lib/assets vendor/assets Gemfile.lock config/routes.rb]
+set :assets_dependencies, %w[app/assets app/javascript lib/assets vendor/assets vendor/javascript Gemfile.lock
+                             config/routes.rb config/importmap.rb config/initializers/dartsass.rb]
 
 set :backend_deploy_to, ->{ fetch(:backend_deploy_path) }
 
 # To get the backend path into whenever
 set :whenever_variables, ->{ "\"environment=#{fetch :whenever_environment}&backend_path=#{fetch(:backend_deploy_to)}/current\"" }
 set :whenever_identifier, ->{ "#{fetch(:application)}_#{fetch(:stage)}" }
-
-set :samtools_version, '1.18'
-set :bedtools_version, '2.31.0'
-set :bowtie2_version, '2.5.2'
 
 # clear the previous precompile task
 Rake::Task['deploy:assets:precompile'].clear_actions
@@ -86,15 +83,13 @@ namespace :backend do
 end
 
 namespace :deploy do
-  desc 'Setup conda envs'
-  task :setup_conda do
+  desc 'Install the locked aligner environment (lib/alignment/pixi.toml) into the release'
+  task :setup_pixi do
     on roles(:app) do
       within release_path do
-        # remove the env if it exists, else do nothing
-        #  the || true invokes true (a do-nothing command) if the test fails just so the whole command returns 0
-        execute("source #{shared_path}/.env && [ -d #{shared_path}/alignment_env ] && \"$MICROMAMBA_BIN_PATH/micromamba\" env remove -y -q -p #{shared_path}/alignment_env || true")
-        # create the env
-        execute("source #{shared_path}/.env && \"$MICROMAMBA_BIN_PATH/micromamba\" create -y -q -p #{shared_path}/alignment_env 'samtools=#{fetch(:samtools_version)}' 'bedtools=#{fetch(:bedtools_version)}' 'bowtie2=#{fetch(:bowtie2_version)}'")
+        # --frozen installs exactly what pixi.lock says; packages come from pixi's cache after the first deploy
+        execute("source #{shared_path}/.env && \"${PIXI_BIN_PATH:+$PIXI_BIN_PATH/}pixi\" install --frozen " \
+                "--manifest-path #{release_path}/lib/alignment/pixi.toml")
       end
     end
   end
@@ -154,26 +149,20 @@ namespace :deploy do
             latest_release_path = releases_path.join(latest_release)
 
             # precompile if the previous deploy failed to finish precompiling
-            begin
-              execute(:ls, latest_release_path.join('public', fetch(:assets_prefix)))
-            rescue StandardError
+            unless test(:test, '-d', latest_release_path.join('public', fetch(:assets_prefix)))
               raise(PrecompileRequired)
             end
 
             fetch(:assets_dependencies).each do |dep|
-              # execute raises if there is a diff
-
-              execute(:diff, '-Naur', release_path.join(dep),
-                      latest_release_path.join(dep))
-            rescue StandardError
-              raise(PrecompileRequired)
+              # test is false if there is a diff; -q keeps file contents out of the log, and builds/ holds
+              # generated CSS that is never in a fresh checkout
+              unless test(:diff, '-Nqr', '--exclude=builds', release_path.join(dep), latest_release_path.join(dep))
+                raise(PrecompileRequired)
+              end
             end
 
+            # public/assets is a linked dir shared between releases, so the compiled assets are already in place
             info('Skipping asset precompile, no asset diff found')
-
-            # copy over all of the assets from the last release
-            execute(:cp, '-r', latest_release_path.join('public', fetch(:assets_prefix)),
-                    release_path.join('public', fetch(:assets_prefix)))
           rescue PrecompileRequired
             execute(:rake, 'assets:precompile')
           end
@@ -210,8 +199,9 @@ namespace :deploy do
     end
   end
 
-  after 'deploy:published', 'deploy:setup_conda'
-  after 'deploy:setup_conda', 'deploy:restart_services'
+  # install before the release goes live so the running app never sees a missing environment
+  after 'deploy:updated', 'deploy:setup_pixi'
+  after 'deploy:published', 'deploy:restart_services'
   after 'deploy:restart_services', 'deploy:warmup'
   #after 'deploy:restart_services', 'deploy:seed'
   after 'deploy:restart_services', 'backend'

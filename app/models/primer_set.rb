@@ -52,9 +52,9 @@ class PrimerSet < ApplicationRecord
   def align_primers
     shared_dir = ENV.fetch('DEPLOY_SHARED_DIR', nil)
     index_name = organism.name.parameterize
-    # the script also reads DB_HOST, DB_NAME, DB_USER and MICROMAMBA_BIN_PATH, which it inherits from this process
+    # the script also reads DB_HOST, DB_NAME, DB_USER and PIXI_BIN_PATH, which it inherits from this process
     pid = Process.spawn({ 'PGPASSFILE' => "#{shared_dir}/config/.pgpass" },
-                        'bash', 'lib/update_primers.sh', "#{shared_dir}/alignment_env",
+                        'bash', 'lib/update_primers.sh', 'lib/alignment/pixi.toml',
                         "bt2_indices/#{index_name}/#{index_name}", id.to_s,
                         out: [primer_alignment_log_path, 'a'], err: %i[child out])
     Process.detach pid # prevent zombie process

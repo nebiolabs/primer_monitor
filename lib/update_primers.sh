@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 if (($# < 1)); then # if bowtie2 index missing
-  echo "usage: get_primers.sh <conda env path> <bowtie2 index> [primer_set_ids...]" >&2
+  echo "usage: update_primers.sh <pixi manifest> <bowtie2 index> [primer_set_ids...]" >&2
   exit 1
 fi
 
@@ -10,9 +10,12 @@ if (($# < 2)); then # if primer set IDs missing
   exit 1
 fi
 
-conda_env_path="$1"
+pixi_manifest="$1"
 bt2_index="$2"
 shift 2
+
+# put bowtie2, samtools and bedtools from the locked pixi environment on PATH
+eval "$("${PIXI_BIN_PATH:+$PIXI_BIN_PATH/}pixi" shell-hook --frozen --manifest-path "$pixi_manifest")" || exit 1
 
 # you need to export DB_HOST, DB_NAME, and DB_USER before running this
 
@@ -23,9 +26,9 @@ for id in "$@"; do
 
   psql -h "$DB_HOST" -d "$DB_NAME" -U "$DB_USER_RO" -c "SELECT id, sequence FROM oligos WHERE primer_set_id=$id;" --csv -t | \
   awk 'BEGIN { FS="," }; {print ">" $1 "\n" $2}' | \
-  "$MICROMAMBA_BIN_PATH/micromamba" run -p "$conda_env_path" bowtie2 -f --end-to-end --score-min L,-0.6,-1.5 -L 8 -x "$bt2_index" -U - | \
-  "$MICROMAMBA_BIN_PATH/micromamba" run -p "$conda_env_path" samtools view -b | \
-  "$MICROMAMBA_BIN_PATH/micromamba" run -p "$conda_env_path" bedtools bamtobed -i - | awk '{print $1 "," $2 "," $3 "," $4}' >>"$db_csv"
+  bowtie2 -f --end-to-end --score-min L,-0.6,-1.5 -L 8 -x "$bt2_index" -U - | \
+  samtools view -b | \
+  bedtools bamtobed -i - | awk '{print $1 "," $2 "," $3 "," $4}' >>"$db_csv"
 
 done
 
