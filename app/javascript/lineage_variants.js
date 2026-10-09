@@ -255,7 +255,7 @@ function buildVariantTable(variants) {
     }).join('');
 
     return `
-        <table class="table is-fullwidth is-hoverable is-narrow">
+        <table class="table is-fullwidth is-hoverable is-narrow" data-datatable="off">
             <thead>
                 <tr>
                     <th>Position</th>

@@ -4,13 +4,14 @@ import 'datatables.net-responsive-bm';
 import 'jszip';
 
 // Every table on a page gets sorting, search, paging, Copy/Excel export and responsive collapsing
-// (DataTables 3, no jQuery). Tables that page scripts build later, like the lineage variant table, are left alone.
+// (DataTables 3, no jQuery). Tables marked data-datatable="off" are left alone: the lineage variant table pairs each
+// row with hidden sub-rows that sorting and paging would separate, and a Turbo restore brings it back already built.
 DataTable.Buttons.jszip(window.JSZip);
 
 let tables = [];
 
 document.addEventListener('turbo:load', () => {
-    document.querySelectorAll('table').forEach(table => {
+    document.querySelectorAll('table:not([data-datatable="off"])').forEach(table => {
         if (DataTable.isDataTable(table)) return;
         table.classList.add('table', 'is-striped', 'is-hoverable', 'is-fullwidth'); // Bulma table styling
         tables.push(new DataTable(table, {
