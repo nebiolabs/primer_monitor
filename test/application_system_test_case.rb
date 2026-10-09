@@ -8,7 +8,6 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
   # The igv.js pages load genomes and tracks from the IGV data server. Tests serve a small synthetic data set
   # (test/fixtures/files/igvstatic) from the app's own test server instead, so they need no network.
   IGV_FIXTURES = Rails.root.join('test/fixtures/files/igvstatic').to_s
-  Capybara.server_port = 45_678
   Capybara.app = Rack::Builder.new do
     map('/igvstatic') { run Rack::Files.new(IGV_FIXTURES) }
     run Rails.application
@@ -16,7 +15,10 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
 
   include Devise::Test::IntegrationHelpers
 
-  setup { ENV['IGV_DATA_SERVER'] = "http://#{Capybara.server_host}:#{Capybara.server_port}/igvstatic" }
+  setup do
+    server = Capybara.current_session.server # Capybara picks a free port, so ask it which
+    ENV['IGV_DATA_SERVER'] = "http://#{server.host}:#{server.port}/igvstatic"
+  end
   teardown { ENV.delete('IGV_DATA_SERVER') }
 
   # igv.js 3 renders inside a shadow root on #igv, out of reach of normal selectors
