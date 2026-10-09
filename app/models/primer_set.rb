@@ -15,8 +15,10 @@ class PrimerSet < ApplicationRecord
   accepts_nested_attributes_for :oligos, reject_if: :all_blank, allow_destroy: true
 
   validates :name, uniqueness: true, presence: true
-  validates :citation_url, format: { with: %r{\Ahttps?://\S+\z}i, message: 'must start with http:// or https://' },
-                           allow_blank: true
+  HTTP_URL = %r{\Ahttps?://\S+\z}i
+  # only when changed, so sets saved before this rule stay editable; display_url doesn't link their URLs
+  validates :citation_url, format: { with: HTTP_URL, message: 'must start with http:// or https://' },
+                           allow_blank: true, if: :citation_url_changed?
 
   validates :oligos, presence: true
 
@@ -31,7 +33,7 @@ class PrimerSet < ApplicationRecord
   end
 
   def display_url
-    citation_url.presence || doi_url
+    (citation_url if citation_url&.match?(HTTP_URL)) || doi_url
   end
 
   def doi_url
