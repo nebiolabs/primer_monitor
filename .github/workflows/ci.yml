@@ -67,7 +67,8 @@ jobs:
           cp .env.example .env
           cp config/database.yml.example config/database.yml
       - name: Prepare database
-        run: bin/rails db:prepare
+        # db:prepare would also seed a new database, leaving rows that break fixture loading
+        run: bin/rails db:create db:schema:load
       - name: Unit and integration tests
         run: bin/rails test
       # Chrome comes preinstalled on GitHub's Ubuntu runners

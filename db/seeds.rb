@@ -120,6 +120,12 @@ view_defs.keys.reverse_each do |v|
   )
 end
 
+# the views grant access to these roles, which belong to the server rather than the database,
+# so a fresh server (e.g. CI) lacks them
+%w[primer_monitor primer_monitor_ro].each do |r|
+  conn.execute("DO $$ BEGIN CREATE ROLE #{r}; EXCEPTION WHEN duplicate_object THEN NULL; END $$;")
+end
+
 # creates all views
 view_defs.each_key do |v|
   Rails.logger.info("Creating #{v}")
