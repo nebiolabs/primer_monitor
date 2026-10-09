@@ -49,6 +49,20 @@ class OmniauthSignInTest < ActionDispatch::IntegrationTest
     assert_equal users(:one).id, session['warden.user.user.key']&.first&.first
   end
 
+  test 'signing in with Microsoft to an unconfirmed account voids the password whoever registered it chose' do
+    squatter = User.create!(first: 'Not', last: 'Victim', email: 'victim@example.org', password: 'squatter-pass-123')
+    OmniAuth.config.mock_auth[:entra_id] =
+      OmniAuth::AuthHash.new(provider: 'entra_id', uid: 'uid-1', info: { email: 'victim@example.org' })
+    post '/users/auth/entra_id'
+    follow_redirect!
+    delete destroy_user_session_path
+
+    post user_session_path, params: { user: { email: 'victim@example.org', password: 'squatter-pass-123' } }
+
+    assert_predicate squatter.reload, :confirmed?
+    assert_nil session['warden.user.user.key']
+  end
+
   test 'a failed sign-in returns to the log in page' do
     OmniAuth.config.mock_auth[:entra_id] = :invalid_credentials
 

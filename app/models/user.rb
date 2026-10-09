@@ -27,12 +27,16 @@ class User < ApplicationRecord
 
   # The user signing in through Google or Entra ID: the account already linked to that identity, else the
   # existing account with their email (linked from now on), else a new account.
-  # The identity provider has verified the email, so the account counts as confirmed.
+  # The identity provider has verified the email, so the account counts as confirmed. Whoever registered an
+  # unconfirmed account never proved they own the email, so the password they chose stops working.
   def self.from_omniauth(auth)
     # Entra ID sends no email claim for accounts without a mail attribute; the sign-in name (UPN) is then the email
     auth.info.email = auth.info.nickname if auth.info.email.blank? && auth.info.nickname.to_s.include?('@')
     user = find_by(provider: auth.provider, uid: auth.uid) || link_by_email(auth) || build_from_omniauth(auth)
-    user.skip_confirmation! unless user.confirmed?
+    unless user.confirmed?
+      user.password = Devise.friendly_token[0, 20] if user.persisted?
+      user.skip_confirmation!
+    end
     user.save!
     user
   end
