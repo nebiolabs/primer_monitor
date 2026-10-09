@@ -42,7 +42,9 @@ for lineage_set_path in "$@"; do
   echo_log "processing lineage set $lineage_set_path ($lineage_set_name)"
   "$(dirname "$0")/count_variants.sh" "$variants_bed" "$min_pct" "./$organism_slug/lineage_sets/$lineage_set_path" "$output_path" > "${lineage_set_name}_$variants_counts_bed";
   lineage_variants_bed="$output_path/lineage_variants/$lineage_set_name.bed"
+  echo_log "storing variant overlaps for $lineage_set_path ($lineage_set_name)"
   "$(dirname "$0")/store_variant_overlaps.sh" "$organism_slug" "$lineage_set_name" "$lineage_variants_bed"
+  echo_log "processing primer sets for $lineage_set_path ($lineage_set_name)"
   xargs "$(dirname "$0")/process_primer_sets.sh" "${lineage_set_name}_$variants_counts_bed" "$output_path" "$score_cutoff" "$threads" "$lineage_set_name" "./$organism_slug" < "$primer_sets_list_path";
 done
 echo_log "overlap computation done"
