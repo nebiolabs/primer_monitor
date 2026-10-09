@@ -50,7 +50,11 @@ namespace :backend do
   task :git do
     on roles(:backend) do
       within fetch(:backend_deploy_to) do
-        execute("cd #{fetch(:backend_deploy_path)}/release && git fetch --tags origin && git checkout -B '#{fetch(:branch)}' 'origin/#{fetch(:branch)}'")
+        # --force discards edits to tracked files so a hand-patched checkout can't block the deploy; untracked
+        # files (datasets, reports, pipeline output) are kept. Host-specific bundler settings belong in
+        # .bundle/config (e.g. force_ruby_platform on hpc-g), not in Gemfile edits.
+        execute("cd #{fetch(:backend_deploy_path)}/release && git fetch --tags origin && " \
+                "git checkout --force -B '#{fetch(:branch)}' 'origin/#{fetch(:branch)}'")
         # creates a new symlink, overwriting any existing one
         execute("ln -sf #{fetch(:backend_deploy_path)}/release #{fetch(:backend_deploy_path)}/current")
         execute("ln -sf #{fetch(:backend_deploy_path)}/shared/datasets #{fetch(:backend_deploy_path)}/current/datasets")
