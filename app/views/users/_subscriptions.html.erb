@@ -1,0 +1,41 @@
+<%# active primer set subscriptions of user, with overlap and notification counts (PrimerSetSubscription.summaries_for) %>
+<% summaries = PrimerSetSubscription.summaries_for(user) %>
+<% if summaries.empty? %>
+  <p>Not subscribed to any primer sets.</p>
+<% else %>
+  <div class="table-container">
+    <table class="table is-striped is-narrow is-hoverable subscriptions-table">
+      <thead>
+        <tr>
+          <th>Primer set</th>
+          <th>Organism</th>
+          <th class="has-text-right" title="Distinct variants overlapping the set's primers, all locations">
+            Overlapping variants<br><span class="is-size-7 has-text-weight-normal">last <%= pluralize(user.lookback_days, 'day') %></span>
+          </th>
+          <th class="has-text-right" title="Overlaps in your locations above your variant fraction threshold">Current alerts</th>
+          <th class="has-text-right">Notifications sent</th>
+          <th>Last notified</th>
+          <% if unsubscribe %><th></th><% end %>
+        </tr>
+      </thead>
+      <tbody>
+        <% summaries.each do |summary| %>
+          <tr>
+            <td><%= link_to summary.primer_set.name, summary.primer_set %></td>
+            <td><%= summary.primer_set.organism %></td>
+            <td class="has-text-right"><%= summary.overlapping_variants.nil? ? '–' : number_with_delimiter(summary.overlapping_variants) %></td>
+            <td class="has-text-right"><%= summary.current_alerts.nil? ? '–' : summary.current_alerts %></td>
+            <td class="has-text-right"><%= summary.notifications_sent %></td>
+            <td><%= summary.last_notified_at ? l(summary.last_notified_at.to_date) : 'never' %></td>
+            <% if unsubscribe %>
+              <td>
+                <%= button_to 'Unsubscribe', primer_set_subscription_path(summary.subscription), method: :delete,
+                              class: 'button is-small is-light', form: { data: { turbo_confirm: "Unsubscribe from #{summary.primer_set.name}?" } } %>
+              </td>
+            <% end %>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+<% end %>

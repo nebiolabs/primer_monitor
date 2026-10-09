@@ -9,6 +9,23 @@ class ProposedNotification < ApplicationRecord
   belongs_to :verified_notification, optional: true
   belongs_to :detailed_geo_location_alias
 
+  scope :sent, -> { joins(:verified_notification).where(verified_notifications: { status: 'Sent' }) }
+
+  # what the user has been told about a primer set, newest first
+  def self.history_for(user, primer_set, limit: 50)
+    where(user:, primer_set:).includes(:oligo, :detailed_geo_location_alias, :verified_notification)
+                             .order(created_at: :desc).limit(limit)
+  end
+
+  # Sent, Skipped (recorded without emailing), or Pending (not yet emailed)
+  def delivery_status
+    verified_notification&.status.then { |status| status.nil? || status == 'Unsent' ? 'Pending' : status }
+  end
+
+  def delivered_at
+    verified_notification&.status == 'Sent' ? verified_notification.updated_at : nil
+  end
+
   UNIQUE_FIELDS = %i[primer_set_id user_id oligo_id coordinate
                      subscribed_geo_location_id primer_set_subscription_id].freeze
 

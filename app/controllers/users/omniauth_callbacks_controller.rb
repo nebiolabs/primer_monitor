@@ -3,8 +3,6 @@
 module Users
   # Sign-in callbacks from the identity providers configured in config/initializers/devise.rb
   class OmniauthCallbacksController < Devise::OmniauthCallbacksController
-    PROVIDER_NAMES = { google_oauth2: 'Google', entra_id: 'Microsoft' }.freeze
-
     def google_oauth2
       sign_in_from_omniauth
     end
@@ -29,7 +27,7 @@ module Users
       auth = request.env['omniauth.auth']
       @user = User.from_omniauth(auth)
       sign_in_and_redirect @user, event: :authentication
-      set_flash_message(:notice, :success, kind: PROVIDER_NAMES.fetch(auth.provider.to_sym)) if is_navigational_format?
+      set_flash_message(:notice, :success, kind: User::PROVIDER_NAMES.fetch(auth.provider)) if is_navigational_format?
     rescue ActiveRecord::RecordInvalid => e
       Rails.logger.warn("#{auth&.provider} sign-in failed: #{e.message}")
       redirect_to new_user_session_path, alert: "Could not sign in: #{e.record.errors.full_messages.to_sentence}"

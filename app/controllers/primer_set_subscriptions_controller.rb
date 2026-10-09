@@ -9,6 +9,10 @@ class PrimerSetSubscriptionsController < ApplicationController
     @primer_set_subscription.active = true
     respond_to do |format|
       format.js if @primer_set_subscription.save
+      format.html do
+        @primer_set_subscription.save!
+        redirect_back_or_to @primer_set_subscription.primer_set, notice: 'Subscribed.'
+      end
     end
   end
 
@@ -21,6 +25,7 @@ class PrimerSetSubscriptionsController < ApplicationController
     # rubocop:enable Rails/SkipsModelValidations
     respond_to do |format|
       format.js
+      format.html { redirect_back_or_to edit_user_registration_path, notice: 'Unsubscribed.' }
     end
   end
 

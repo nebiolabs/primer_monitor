@@ -52,6 +52,10 @@
   </div>
 </div>
 
+<% if current_user %>
+  <%= render 'your_subscription', user: current_user, primer_set: @primer_set %>
+<% end %>
+
 <hr/>
 <h2 class="title">IGV Visualization:</h2>
 

@@ -18,6 +18,13 @@ class User < ApplicationRecord
 
   before_validation :set_login_from_email
 
+  PROVIDER_NAMES = { 'google_oauth2' => 'Google', 'entra_id' => 'Microsoft' }.freeze
+
+  # the external account the user last signed in with, if any
+  def sign_in_provider_name
+    PROVIDER_NAMES[provider]
+  end
+
   # The user signing in through Google or Entra ID: the account already linked to that identity, else the
   # existing account with their email (linked from now on), else a new account.
   # The identity provider has verified the email, so the account counts as confirmed.

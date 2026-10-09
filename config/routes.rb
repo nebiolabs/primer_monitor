@@ -9,6 +9,9 @@ Rails.application.routes.draw do
     passwords: 'users/passwords',
     omniauth_callbacks: 'users/omniauth_callbacks'
   }
+  devise_scope :user do
+    post 'users/password_reset', to: 'users/registrations#send_password_reset', as: :user_password_reset
+  end
 
   root 'welcome#index'
   get 'about', to: 'about#show'

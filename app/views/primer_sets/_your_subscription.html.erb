@@ -1,0 +1,65 @@
+<%# the signed-in user's subscription to primer_set: overlap and alert counts, and the notifications behind them %>
+<% summary = PrimerSetSubscription.summaries_for(user).find { |s| s.primer_set == primer_set } %>
+<% history = ProposedNotification.history_for(user, primer_set) %>
+<% if summary || history.any? %>
+  <hr/>
+  <h2 class="title">Your subscription</h2>
+  <% if summary %>
+    <nav class="level subscription-summary">
+      <div class="level-item has-text-centered">
+        <div>
+          <p class="heading">Overlapping variants (last <%= pluralize(user.lookback_days, 'day') %>)</p>
+          <p class="title is-4"><%= summary.overlapping_variants.nil? ? '–' : number_with_delimiter(summary.overlapping_variants) %></p>
+        </div>
+      </div>
+      <div class="level-item has-text-centered">
+        <div>
+          <p class="heading">Current alerts</p>
+          <p class="title is-4"><%= summary.current_alerts.nil? ? '–' : summary.current_alerts %></p>
+        </div>
+      </div>
+      <div class="level-item has-text-centered">
+        <div>
+          <p class="heading">Notifications sent</p>
+          <p class="title is-4"><%= summary.notifications_sent %></p>
+        </div>
+      </div>
+      <div class="level-item has-text-centered">
+        <div>
+          <p class="heading">Last notified</p>
+          <p class="title is-4"><%= summary.last_notified_at ? l(summary.last_notified_at.to_date) : 'never' %></p>
+        </div>
+      </div>
+    </nav>
+  <% else %>
+    <p>You are no longer subscribed to this primer set.</p>
+  <% end %>
+
+  <% if history.any? %>
+    <h3 class="subtitle">Notification history<%= ' (latest 50)' if history.size == 50 %></h3>
+    <div class="table-container">
+      <table class="table is-striped is-narrow notification-history">
+        <thead>
+          <tr>
+            <th>Date</th><th>Status</th><th>Primer</th><th class="has-text-right">Position</th>
+            <th>Location</th><th class="has-text-right">Fraction variant</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% history.each do |notification| %>
+            <tr>
+              <td><%= l((notification.delivered_at || notification.created_at).to_date) %></td>
+              <td><%= notification.delivery_status %></td>
+              <td><%= link_to notification.oligo.name, notification.oligo %></td>
+              <td class="has-text-right"><%= number_with_delimiter(notification.coordinate) %></td>
+              <td><%= notification.detailed_geo_location_alias %></td>
+              <td class="has-text-right"><%= number_to_percentage(notification.fraction_variant * 100, precision: 1) %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  <% else %>
+    <p>No notifications yet.</p>
+  <% end %>
+<% end %>
