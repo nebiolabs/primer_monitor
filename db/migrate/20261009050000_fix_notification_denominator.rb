@@ -1,15 +1,22 @@
 # frozen_string_literal: true
 
-# The notification denominator joined each sequence to every user subscribed to its location, so it counted
-# each sequence once per subscriber sharing a lookback period. With ~50 users on the default 30 days, every
-# variant fraction was ~1/50 of its true value and no one on default thresholds was ever notified.
+# join_subscribed_location_to_ids has a row per subscribed alias covering a location, and the notification
+# denominator joined each sequence to every subscriber of its location. So the denominator counted each sequence
+# once per subscriber sharing a lookback period (~50 users on the default 30 days made every variant fraction
+# ~1/50 of its true value, so no one on default thresholds was ever notified), and the numerator counted each
+# overlap once per overlapping subscription (World and North America doubled North American counts).
+# Both now use each (user, location) pair once.
 class FixNotificationDenominator < ActiveRecord::Migration[8.1]
   def up
     recreate_view(<<~SQL)
-      WITH first_query AS (
+      WITH subscribed_locations AS (
+              SELECT DISTINCT join_subscribed_location_to_ids.user_id,
+                 join_subscribed_location_to_ids.detailed_geo_location_id
+                FROM public.join_subscribed_location_to_ids
+             ), first_query AS (
               SELECT primer_set_subscriptions.user_id,
                  primer_set_subscriptions.primer_set_id,
-                 join_subscribed_location_to_ids.detailed_geo_location_id,
+                 subscribed_locations.detailed_geo_location_id,
                  primer_sets.name AS set_name,
                  oligos.name AS primer_name,
                  oligos.id AS oligo_id,
@@ -26,20 +33,22 @@ class FixNotificationDenominator < ActiveRecord::Migration[8.1]
                   JOIN public.primer_sets ON ((primer_sets.id = primer_set_subscriptions.primer_set_id)))
                   JOIN public.oligos ON ((primer_sets.id = oligos.primer_set_id)))
                   JOIN public.oligo_variant_overlaps ON ((oligo_variant_overlaps.oligo_id = oligos.id)))
-                  JOIN public.join_subscribed_location_to_ids ON (((join_subscribed_location_to_ids.user_id = primer_set_subscriptions.user_id) AND (join_subscribed_location_to_ids.detailed_geo_location_id = oligo_variant_overlaps.detailed_geo_location_id))))
+                  JOIN subscribed_locations ON (((subscribed_locations.user_id = primer_set_subscriptions.user_id) AND (subscribed_locations.detailed_geo_location_id = oligo_variant_overlaps.detailed_geo_location_id))))
                   JOIN public.users ON ((users.id = primer_set_subscriptions.user_id)))
                WHERE ((oligo_variant_overlaps.date_collected >= (CURRENT_DATE - users.lookback_days)) AND (primer_set_subscriptions.active = true))
-               GROUP BY primer_set_subscriptions.user_id, primer_set_subscriptions.primer_set_id, primer_sets.name, oligos.id, oligos.name, join_subscribed_location_to_ids.detailed_geo_location_id, users.lookback_days, users.variant_fraction_threshold, oligo_variant_overlaps.region, oligo_variant_overlaps.subregion, oligo_variant_overlaps.division, oligo_variant_overlaps.subdivision, oligo_variant_overlaps.coords, oligo_variant_overlaps.detailed_geo_location_id
+               GROUP BY primer_set_subscriptions.user_id, primer_set_subscriptions.primer_set_id, primer_sets.name, oligos.id, oligos.name, subscribed_locations.detailed_geo_location_id, users.lookback_days, users.variant_fraction_threshold, oligo_variant_overlaps.region, oligo_variant_overlaps.subregion, oligo_variant_overlaps.division, oligo_variant_overlaps.subdivision, oligo_variant_overlaps.coords, oligo_variant_overlaps.detailed_geo_location_id
              ), total_sequences_for_denominator AS (
               SELECT fasta_records.detailed_geo_location_id,
-                 count(DISTINCT fasta_records.id) AS records_count,
-                 users.lookback_days
-                FROM ((public.fasta_records
-                  JOIN public.join_subscribed_location_to_ids ON ((join_subscribed_location_to_ids.detailed_geo_location_id = fasta_records.detailed_geo_location_id)))
-                  JOIN public.users ON ((join_subscribed_location_to_ids.user_id = users.id)))
-               WHERE (fasta_records.date_collected >= (CURRENT_DATE - users.lookback_days))
-               GROUP BY fasta_records.detailed_geo_location_id, users.lookback_days
-              HAVING (count(DISTINCT fasta_records.id) >= 20)
+                 count(fasta_records.id) AS records_count,
+                 location_lookbacks.lookback_days
+                FROM (public.fasta_records
+                  JOIN ( SELECT DISTINCT subscribed_locations.detailed_geo_location_id,
+                         users.lookback_days
+                        FROM (subscribed_locations
+                          JOIN public.users ON ((users.id = subscribed_locations.user_id)))) location_lookbacks ON ((location_lookbacks.detailed_geo_location_id = fasta_records.detailed_geo_location_id)))
+               WHERE (fasta_records.date_collected >= (CURRENT_DATE - location_lookbacks.lookback_days))
+               GROUP BY fasta_records.detailed_geo_location_id, location_lookbacks.lookback_days
+              HAVING (count(fasta_records.id) >= 20)
              )
       SELECT first_query.user_id,
          first_query.primer_set_id,
