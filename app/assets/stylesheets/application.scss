@@ -24,6 +24,19 @@ $blue: #4556ba;
 @use "scaffolds";
 @use "searchable-select";
 
+// DataTables controls: scaffolds.scss makes every label a block, so keep "entries per page" and "Search:" inline,
+// and size the page-length dropdown and search box to match the small Copy/Excel buttons
+.dt-container {
+  label {
+    display: inline;
+  }
+
+  .dt-length select,
+  .dt-search input {
+    font-size: var(--bulma-size-small);
+  }
+}
+
 // Bulma 1 gives menu items the page's main (white) background and derives hover colours from a lightness shift;
 // keep the original transparent items with a plain light grey hover
 .menu-list a {

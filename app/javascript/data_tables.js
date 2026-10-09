@@ -12,6 +12,7 @@ let tables = [];
 document.addEventListener('turbo:load', () => {
     document.querySelectorAll('table').forEach(table => {
         if (DataTable.isDataTable(table)) return;
+        table.classList.add('table', 'is-striped', 'is-hoverable', 'is-fullwidth'); // Bulma table styling
         tables.push(new DataTable(table, {
             layout: {
                 topStart: ['pageLength', 'buttons'],
@@ -19,7 +20,8 @@ document.addEventListener('turbo:load', () => {
                 bottomStart: 'info',
                 bottomEnd: 'paging'
             },
-            buttons: ['copy', 'excel'],
+            // small, to match the page-length dropdown beside them
+            buttons: [{ extend: 'copy', className: 'is-small' }, { extend: 'excel', className: 'is-small' }],
             responsive: true
         }));
     });
