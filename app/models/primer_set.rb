@@ -15,6 +15,8 @@ class PrimerSet < ApplicationRecord
   accepts_nested_attributes_for :oligos, reject_if: :all_blank, allow_destroy: true
 
   validates :name, uniqueness: true, presence: true
+  validates :citation_url, format: { with: %r{\Ahttps?://}i, message: 'must start with http:// or https://' },
+                           allow_blank: true
 
   validates :oligos, presence: true
 

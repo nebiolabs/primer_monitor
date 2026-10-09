@@ -276,6 +276,16 @@ Devise.setup do |config|
                   Rails.application.credentials.omniauth_provider_key, \
                   Rails.application.credentials.omniauth_provider_secret, {}
 
+  # NEB staff sign in through the Entra ID (Azure) app registration; offered only where its secret is available.
+  entra_client_secret = ENV['ENTRA_CLIENT_SECRET'].presence || Rails.application.credentials.entra_client_secret
+  if entra_client_secret.present?
+    config.omniauth :entra_id,
+                    client_id: ENV.fetch('ENTRA_CLIENT_ID', 'ca0491f6-fdd5-4ce0-8a20-627c4651fc7b'),
+                    client_secret: entra_client_secret,
+                    tenant_id: ENV.fetch('ENTRA_TENANT_ID', '77cefbc6-b3d6-4d6a-9f74-0664881c384b'),
+                    redirect_uri: ENV.fetch('ENTRA_REDIRECT_URI', nil)
+  end
+
   # ==> Warden configuration
   # If you want to use other strategies, that are not supported by Devise, or
   # change the failure app, you can configure them inside the config.warden block.

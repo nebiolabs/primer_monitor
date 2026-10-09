@@ -20,4 +20,12 @@ class VerifiedNotification < ApplicationRecord
                                        .where(status: 'Unsent')
     existing_vns + new_vns
   end
+
+  # Records every pending notification as handled without emailing it, except for the given addresses.
+  # Run after changes that would otherwise flood subscribers with a backlog (see notifications:baseline).
+  def self.skip_unsent!(except_emails: [])
+    keep = except_emails.map { |email| email.strip.downcase }
+    find_or_create_verified_notifications!.reject { |vn| keep.include?(vn.user.email.downcase) }
+                                          .each { |vn| vn.update!(status: 'Skipped') }
+  end
 end

@@ -24,3 +24,13 @@ namespace :notifications do
     send_notifications(VerifiedNotification.find_or_create_verified_notifications!)
   end
 end
+
+namespace :notifications do
+  desc 'Records current primer overlaps as already notified, emailing only the given addresses on the next send'
+  task :baseline, [:email] => :environment do |_, args|
+    new_pns = ProposedNotification.new_proposed_notifications
+    new_pns.each(&:save!)
+    skipped = VerifiedNotification.skip_unsent!(except_emails: [args[:email], *args.extras].compact)
+    puts "Recorded #{new_pns.size} new proposed notifications; skipped emailing #{skipped.size} users"
+  end
+end

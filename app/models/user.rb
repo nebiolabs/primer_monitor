@@ -2,8 +2,9 @@
 
 # stores information about users of this system (including submitters and administrators)
 class User < ApplicationRecord
+  # omniauth providers are those configured in config/initializers/devise.rb
   devise :database_authenticatable, :registerable, :recoverable, :rememberable,
-         :validatable, :confirmable, :omniauthable, omniauth_providers: [:google_oauth2]
+         :validatable, :confirmable, :omniauthable
 
   has_many :user_roles, dependent: :destroy
   has_many :roles, through: :user_roles
@@ -17,18 +18,33 @@ class User < ApplicationRecord
 
   before_validation :set_login_from_email
 
+  # The user signing in through Google or Entra ID: the account already linked to that identity, else the
+  # existing account with their email (linked from now on), else a new account.
+  # The identity provider has verified the email, so the account counts as confirmed.
   def self.from_omniauth(auth)
-    data = auth.info
-    Rails.logger.debug("Attempting to log in via oauth with data: #{data}")
-    user_attribs = {
-      email: data['email'], first: data['first_name'],
-      last: data['last_name'],
-      password: Devise.friendly_token[0, 20]
-    }
-    User.create_with(user_attribs).find_or_create_by!(email: data['email']) do |user|
-      Rails.logger.info("Creating new user using : #{user_attribs}")
-      user.skip_confirmation!
-    end
+    # Entra ID sends no email claim for accounts without a mail attribute; the sign-in name (UPN) is then the email
+    auth.info.email = auth.info.nickname if auth.info.email.blank? && auth.info.nickname.to_s.include?('@')
+    user = find_by(provider: auth.provider, uid: auth.uid) || link_by_email(auth) || build_from_omniauth(auth)
+    user.skip_confirmation! unless user.confirmed?
+    user.save!
+    user
+  end
+
+  def self.link_by_email(auth)
+    email = auth.info.email.to_s.strip.downcase
+    return if email.empty?
+
+    find_by('lower(email) = ?', email)&.tap { |user| user.assign_attributes(provider: auth.provider, uid: auth.uid) }
+  end
+
+  def self.build_from_omniauth(auth)
+    info = auth.info
+    Rails.logger.info("Creating new #{auth.provider} user for #{info.email}")
+    first, last = info.name.to_s.split(' ', 2)
+    new(provider: auth.provider, uid: auth.uid, email: info.email,
+        first: info.first_name.presence || first.presence || info.email,
+        last: info.last_name.presence || last.presence || '-',
+        password: Devise.friendly_token[0, 20])
   end
 
   def subscribed_detailed_geo_location_alias_ids

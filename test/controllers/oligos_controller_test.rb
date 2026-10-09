@@ -38,6 +38,7 @@ class OligosControllerTest < ActionDispatch::IntegrationTest
   test 'should get edit' do
     get edit_oligo_url(@oligo)
     assert_response :success
+    assert_select 'li', text: /95 - 115/ # its alignment position, from oligo_alignment_positions
   end
 
   test 'should update oligo' do
