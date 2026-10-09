@@ -156,3 +156,12 @@ button.dt-button.buttons-copy.buttons-html5 {
   height: 1.5em;
   width: auto;
 }
+
+// full-width pages (container is-fluid) still keep running text and the lineage/primer set pickers readable
+.container.is-fluid p {
+  max-width: 80ch;
+}
+
+#primer_set_selection {
+  max-width: 60rem;
+}

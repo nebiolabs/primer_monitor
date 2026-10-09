@@ -61,7 +61,8 @@
   </div>
 </nav>
 <section class="section">
-  <div class="container">
+  <%# pages showing wide data (genome view, many-column tables) set :container_class to is-fluid %>
+  <div class="container <%= yield(:container_class) %>">
     <%# :alert is what Devise uses for sign-in failures (wrong password, unconfirmed email, already signed in) %>
     <div class="has-text-danger"><%= flash[:error] %><%= flash[:alert] %></div>
     <div class="has-text-warning"><%= flash[:warning] %></div>
