@@ -7,6 +7,15 @@ class UserTest < ActiveSupport::TestCase
     assert_not_nil User.new
   end
 
+  test 'a new account is subscribed to World unless it chose locations' do
+    defaulted = User.create!(first: 'A', last: 'B', email: 'a@example.org', password: 'password-123')
+    chosen = User.create!(first: 'C', last: 'D', email: 'c@example.org', password: 'password-123',
+                          subscribed_detailed_geo_location_alias_ids: [detailed_geo_location_aliases(:darwin).id])
+
+    assert_equal [detailed_geo_location_aliases(:world)], defaulted.reload.detailed_geo_location_aliases
+    assert_equal [detailed_geo_location_aliases(:darwin)], chosen.reload.detailed_geo_location_aliases
+  end
+
   # --- User.from_omniauth (Google and Entra ID sign-in) ---
 
   def auth(email, provider: 'entra_id', uid: 'uid-1', **info)

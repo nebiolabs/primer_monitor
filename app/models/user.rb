@@ -17,6 +17,7 @@ class User < ApplicationRecord
   accepts_nested_attributes_for :user_roles, reject_if: :all_blank, allow_destroy: true
 
   before_validation :set_login_from_email
+  before_create :subscribe_to_world
 
   PROVIDER_NAMES = { 'google_oauth2' => 'Google', 'entra_id' => 'Microsoft' }.freeze
 
@@ -82,6 +83,12 @@ class User < ApplicationRecord
 
   def set_login_from_email
     self.login ||= email
+  end
+
+  # alerts only cover subscribed locations, and neither sign-up nor SSO asks for any
+  def subscribe_to_world
+    world = DetailedGeoLocationAlias.world.first
+    subscribed_geo_locations.build(detailed_geo_location_alias: world) if world && subscribed_geo_locations.empty?
   end
 
   def role_symbols
