@@ -12,11 +12,13 @@ class PrimerSetSubscription < ApplicationRecord
     delegate :primer_set, to: :subscription
   end
 
-  # The user's active subscriptions, each with how many distinct variants overlapped the set's primers within the
-  # user's lookback window, how many overlaps currently pass the user's alert settings, and what was emailed.
-  def self.summaries_for(user)
+  # The user's active subscriptions (or just the one to primer_set), each with how many distinct variants overlapped
+  # the set's primers within the user's lookback window, how many overlaps currently pass the user's alert settings,
+  # and what was emailed.
+  def self.summaries_for(user, primer_set: nil)
     subscriptions = where(user:, active: true).joins(:primer_set).includes(primer_set: :organism)
                                               .order('primer_sets.name')
+    subscriptions = subscriptions.where(primer_set:) if primer_set
     ids = subscriptions.map(&:primer_set_id)
     overlaps = overlapping_variant_counts(ids, user.lookback_days)
     alerts = current_alert_counts(user, ids)

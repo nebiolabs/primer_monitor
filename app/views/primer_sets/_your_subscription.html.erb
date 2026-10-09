@@ -1,6 +1,6 @@
 <%# the signed-in user's subscription to primer_set: overlap and alert counts, and the notifications behind them %>
-<% summary = PrimerSetSubscription.summaries_for(user).find { |s| s.primer_set == primer_set } %>
-<% history = ProposedNotification.history_for(user, primer_set) %>
+<% summary = PrimerSetSubscription.summaries_for(user, primer_set:).first %>
+<% history = ProposedNotification.history_for(user, primer_set).to_a %>
 <% if summary || history.any? %>
   <hr/>
   <h2 class="title">Your subscription</h2>
