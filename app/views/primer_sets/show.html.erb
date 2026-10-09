@@ -32,6 +32,26 @@
       </div>
     </div>
   <% end %>
+  <div class="column is-narrow">
+    <div class="box">
+    <strong>FASTA: </strong>
+    <% if @config.key?('primer_set_name') %>
+      <a href="<%= "#{@config[:data_server]}/#{@config[:organism_slug]}/primer_sets_fasta/#{@config['primer_set_name']}.fasta" %>">Download FASTA</a>
+    <% else %>
+      Pending
+    <% end %>
+    </div>
+  </div>
+  <div class="column is-narrow">
+    <div class="box">
+    <strong>BED: </strong>
+    <% if @config.key?('primer_set_name') %>
+      <a href="<%= "#{@config[:data_server]}/#{@config[:organism_slug]}/primer_sets_bed/#{@config['primer_set_name']}.bed" %>">Download BED</a>
+    <% else %>
+      Pending
+    <% end %>
+    </div>
+  </div>
   <% if can?(:edit, @primer_set.user) %>
     <div class="column is-narrow">
       <div class="box">
@@ -60,7 +80,7 @@
 
 <p id="config" class="invisible" data-igv-page="primer_set"><%= @config.to_json %></p>
 
-<% if @primer_set.status == PrimerSet.statuses[:complete] %>
+<% if @primer_set.complete? && @config.key?('primer_set_name') %>
 
 <div id="igv" class="igv_div"></div>
 
@@ -73,17 +93,6 @@
 <% end %>
 
 <hr/>
-
-<% if @primer_set.status == PrimerSet.statuses[:complete] && @config.key?('primer_set_name') %>
-
-<a href="<%= "#{@config[:data_server]}/#{@config[:organism_slug]}/primer_sets_bed/#{@config['primer_set_name']}.bed" %>">Download Primer Set BED</a>
-<br>
-<a href="<%= "#{@config[:data_server]}/#{@config[:organism_slug]}/primer_sets_fasta/#{@config['primer_set_name']}.fasta" %>">Download Sequence FASTA</a>
-
-
-<hr/>
-
-<% end %>
 
 <h2 class="title">Primers:</h2>
 <table>

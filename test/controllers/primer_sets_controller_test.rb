@@ -55,6 +55,31 @@ class PrimerSetsControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
+  test 'show marks FASTA and BED pending until the primer set is on the data server' do
+    @primer_set.update!(status: :complete)
+    Organism.any_instance.stubs(:primer_sets_config).returns([{ data_server: 'http://data' }, {}])
+    get primer_set_url(@primer_set)
+
+    assert_select 'strong', text: 'FASTA:' do |strong|
+      assert_includes strong.first.parent.text, 'Pending'
+    end
+    assert_select 'strong', text: 'BED:' do |strong|
+      assert_includes strong.first.parent.text, 'Pending'
+    end
+    assert_select '#igv', count: 0
+  end
+
+  test 'show links FASTA and BED once the primer set is on the data server' do
+    @primer_set.update!(status: :complete)
+    Organism.any_instance.stubs(:primer_sets_config)
+            .returns([{ data_server: 'http://data', organism_slug: 'sars-cov-2' }, { @primer_set.name => 'Charite' }])
+    get primer_set_url(@primer_set)
+
+    assert_select 'a[href=?]', 'http://data/sars-cov-2/primer_sets_fasta/Charite.fasta'
+    assert_select 'a[href=?]', 'http://data/sars-cov-2/primer_sets_bed/Charite.bed'
+    assert_select '#igv'
+  end
+
   test 'should get edit' do
     get edit_primer_set_url(@primer_set)
 
