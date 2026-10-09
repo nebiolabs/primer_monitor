@@ -737,14 +737,14 @@ CREATE MATERIALIZED VIEW public.identify_primers_for_notifications AS
           GROUP BY primer_set_subscriptions.user_id, primer_set_subscriptions.primer_set_id, primer_sets.name, oligos.id, oligos.name, join_subscribed_location_to_ids.detailed_geo_location_id, users.lookback_days, users.variant_fraction_threshold, oligo_variant_overlaps.region, oligo_variant_overlaps.subregion, oligo_variant_overlaps.division, oligo_variant_overlaps.subdivision, oligo_variant_overlaps.coords, oligo_variant_overlaps.detailed_geo_location_id
         ), total_sequences_for_denominator AS (
          SELECT fasta_records.detailed_geo_location_id,
-            count(fasta_records.id) AS records_count,
+            count(DISTINCT fasta_records.id) AS records_count,
             users.lookback_days
            FROM ((public.fasta_records
              JOIN public.join_subscribed_location_to_ids ON ((join_subscribed_location_to_ids.detailed_geo_location_id = fasta_records.detailed_geo_location_id)))
              JOIN public.users ON ((join_subscribed_location_to_ids.user_id = users.id)))
           WHERE (fasta_records.date_collected >= (CURRENT_DATE - users.lookback_days))
           GROUP BY fasta_records.detailed_geo_location_id, users.lookback_days
-         HAVING (count(fasta_records.id) >= 20)
+         HAVING (count(DISTINCT fasta_records.id) >= 20)
         )
  SELECT first_query.user_id,
     first_query.primer_set_id,
@@ -2443,6 +2443,7 @@ ALTER TABLE ONLY public.proposed_notifications
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20261009050000'),
 ('20260513000001'),
 ('20260513000000'),
 ('20260512200000'),
