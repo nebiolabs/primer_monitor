@@ -15,6 +15,7 @@ class DetailedGeoLocationAliasTest < ActiveSupport::TestCase
       rec.strain += i.to_s
       rec.save!
     end
+
     assert_includes(DetailedGeoLocationAlias.subscribable, orig_rec.detailed_geo_location.detailed_geo_location_alias)
   end
 end

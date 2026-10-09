@@ -9,6 +9,7 @@ class UsersTest < ApplicationSystemTestCase
 
   test 'visiting the show' do
     visit users_url
+
     assert_selector 'h1', text: 'Users'
   end
 

@@ -37,7 +37,7 @@ class UsersController < ApplicationController
         format.json { render :show, status: :created, location: @user }
       else
         format.html { render :new }
-        format.json { render json: @user.errors, status: :unprocessable_entity }
+        format.json { render json: @user.errors, status: :unprocessable_content }
       end
     end
   end
@@ -51,7 +51,7 @@ class UsersController < ApplicationController
         format.json { render :show, status: :ok, location: @user }
       else
         format.html { render :edit }
-        format.json { render json: @user.errors, status: :unprocessable_entity }
+        format.json { render json: @user.errors, status: :unprocessable_content }
       end
     end
   end
@@ -69,11 +69,11 @@ class UsersController < ApplicationController
   private
 
   def set_user
-    @user = User.find(params[:id])
+    @user = User.find(params.expect(:id))
   end
 
   # Only allow a list of trusted parameters through.
   def user_params
-    params.require(:user).permit(:first, :last, :email, :password, :password_confirmation, :send_primer_updates)
+    params.expect(user: %i[first last email password password_confirmation send_primer_updates])
   end
 end

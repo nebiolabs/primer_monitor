@@ -20,9 +20,9 @@ class Organism < ApplicationRecord
 
   def primer_sets_config
     config = {
-      "data_server": ENV['IGV_DATA_SERVER'],
-      "organism_slug": slug,
-      "organism_name": name
+      data_server: ENV.fetch('IGV_DATA_SERVER', nil),
+      organism_slug: slug,
+      organism_name: name
     }
 
     tracks_url = URI("#{config[:data_server]}/#{config[:organism_slug]}/config/tracks.json")
@@ -42,7 +42,7 @@ class Organism < ApplicationRecord
 
     LineageInfo
       .where(organism_id: id)
-      .where('last_seen >= ?', most_recent - days)
+      .where(last_seen: (most_recent - days)..)
       .pluck(:name, :times_seen)
       .to_h
   end

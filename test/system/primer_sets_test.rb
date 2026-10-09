@@ -9,6 +9,7 @@ class PrimerSetsTest < ApplicationSystemTestCase
 
   test 'visiting the index' do
     visit primer_sets_url
+
     assert_selector 'h1', text: 'Primer Sets'
   end
 

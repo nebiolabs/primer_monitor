@@ -10,11 +10,13 @@ class OrganismsControllerTest < ActionDispatch::IntegrationTest
 
   test 'should get show' do
     get organisms_url
+
     assert_response :success
   end
 
   test 'should get new' do
     get new_organism_url
+
     assert_response :success
   end
 
@@ -31,17 +33,20 @@ class OrganismsControllerTest < ActionDispatch::IntegrationTest
   test 'should show organism' do
     Organism.any_instance.stubs(:primer_sets_config).returns([{}, {}])
     get organism_url(@organism)
+
     assert_response :success
   end
 
   test 'should get edit' do
     get edit_organism_url(@organism)
+
     assert_response :success
   end
 
   test 'should update organism' do
     patch organism_url(@organism), params:
       { organism: { name: '${@organism.name}∆' } }
+
     assert_redirected_to organism_url(@organism)
   end
 

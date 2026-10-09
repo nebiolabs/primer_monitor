@@ -15,7 +15,7 @@ class PrimerSet < ApplicationRecord
   accepts_nested_attributes_for :oligos, reject_if: :all_blank, allow_destroy: true
 
   validates :name, uniqueness: true, presence: true
-  validates :citation_url, format: { with: %r{\Ahttps?://}i, message: 'must start with http:// or https://' },
+  validates :citation_url, format: { with: %r{\Ahttps?://\S+\z}i, message: 'must start with http:// or https://' },
                            allow_blank: true
 
   validates :oligos, presence: true
@@ -50,14 +50,13 @@ class PrimerSet < ApplicationRecord
 
   # TODO: switch this to use delayed job, avoid multiple alignments in succession
   def align_primers
-    log_path = primer_alignment_log_path
-    pid = Process.spawn({ 'DB_HOST' => ENV['DB_HOST'], 'DB_NAME' => ENV['DB_NAME'], 'DB_USER' => ENV['DB_USER'],
-                          'MICROMAMBA_BIN_PATH' => ENV['MICROMAMBA_BIN_PATH'],
-                          'PGPASSFILE' => "#{ENV['DEPLOY_SHARED_DIR']}/config/.pgpass" },
-                        Shellwords.join(['bash', 'lib/update_primers.sh', "#{ENV['DEPLOY_SHARED_DIR']}/alignment_env",
-                                         "bt2_indices/#{organism.name.parameterize}/#{organism.name.parameterize}",
-                                         id.to_s]) +
-                          " >> #{Shellwords.escape(log_path)} 2>&1")
+    shared_dir = ENV.fetch('DEPLOY_SHARED_DIR', nil)
+    index_name = organism.name.parameterize
+    # the script also reads DB_HOST, DB_NAME, DB_USER and MICROMAMBA_BIN_PATH, which it inherits from this process
+    pid = Process.spawn({ 'PGPASSFILE' => "#{shared_dir}/config/.pgpass" },
+                        'bash', 'lib/update_primers.sh', "#{shared_dir}/alignment_env",
+                        "bt2_indices/#{index_name}/#{index_name}", id.to_s,
+                        out: [primer_alignment_log_path, 'a'], err: %i[child out])
     Process.detach pid # prevent zombie process
     pid
   end

@@ -9,6 +9,7 @@ class OligosTest < ApplicationSystemTestCase
 
   test 'visiting the show' do
     visit oligos_url
+
     assert_selector 'h1', text: 'Oligos'
   end
 

@@ -33,7 +33,7 @@ class OligosController < ApplicationController
         format.json { render :show, status: :created, location: @oligo }
       else
         format.html { render :new }
-        format.json { render json: @oligo.errors, status: :unprocessable_entity }
+        format.json { render json: @oligo.errors, status: :unprocessable_content }
       end
     end
   end
@@ -47,7 +47,7 @@ class OligosController < ApplicationController
         format.json { render :show, status: :ok, location: @oligo }
       else
         format.html { render :edit }
-        format.json { render json: @oligo.errors, status: :unprocessable_entity }
+        format.json { render json: @oligo.errors, status: :unprocessable_content }
       end
     end
   end
@@ -66,12 +66,11 @@ class OligosController < ApplicationController
 
   # Use callbacks to share common setup or constraints between actions.
   def set_oligo
-    @oligo = Oligo.find(params[:id])
+    @oligo = Oligo.find(params.expect(:id))
   end
 
   # Only allow a list of trusted parameters through.
   def oligo_params
-    params.require(:oligo).permit(%i[id primer_set_id name short_name
-                                     locus category sequence])
+    params.expect(oligo: %i[id primer_set_id name short_name locus category sequence])
   end
 end

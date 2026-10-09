@@ -17,12 +17,11 @@ class PrimerSetSubscriptionsController < ApplicationController
   end
 
   def destroy
-    primer_set_subscription = PrimerSetSubscription.find(params[:id])
+    primer_set_subscription = PrimerSetSubscription.find(params.expect(:id))
     @primer_set_id = primer_set_subscription.primer_set_id
     # setting this boolean to false is always going to be fine
-    # rubocop:disable Rails/SkipsModelValidations
+    # rubocop:disable-next Rails/SkipsModelValidations
     primer_set_subscription.update_column(:active, false)
-    # rubocop:enable Rails/SkipsModelValidations
     respond_to do |format|
       format.js
       format.html { redirect_back_or_to edit_user_registration_path, notice: 'Unsubscribed.' }

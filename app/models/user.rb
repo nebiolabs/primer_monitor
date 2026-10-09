@@ -90,7 +90,7 @@ class User < ApplicationRecord
                        else
                          [role_to_test]
                        end
-    !(role_to_test_ary & role_symbols).empty?
+    !!role_to_test_ary.intersect?(role_symbols)
   end
 
   def formatted_email
@@ -103,8 +103,7 @@ class User < ApplicationRecord
   def subscribe_to_primer_updates!
     return if send_primer_updates?
 
-    # rubocop:disable Rails/SkipsModelValidations
+    # rubocop:disable-next Rails/SkipsModelValidations
     update_column(:send_primer_updates, true)
-    # rubocop:enable Rails/SkipsModelValidations
   end
 end

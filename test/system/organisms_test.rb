@@ -9,6 +9,7 @@ class OrganismsTest < ApplicationSystemTestCase
 
   test 'visiting the show' do
     visit organisms_url
+
     assert_selector 'h1', text: 'Organisms'
   end
 

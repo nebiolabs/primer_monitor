@@ -62,7 +62,7 @@ module VariantRefBackfillTask
   end
 
   def update_variant_site_refs(conn, taxon)
-    result = conn.execute(<<~SQL)
+    result = conn.execute(<<~SQL.squish)
       UPDATE variant_sites
       SET ref = b.ref
       FROM _ref_backfill b
@@ -76,7 +76,7 @@ module VariantRefBackfillTask
   end
 
   def update_lineage_overlap_refs(conn, taxon)
-    result = conn.execute(<<~SQL)
+    result = conn.execute(<<~SQL.squish)
       UPDATE lineage_variant_primer_overlaps lvpo
       SET ref = b.ref
       FROM _ref_backfill b,

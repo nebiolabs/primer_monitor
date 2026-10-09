@@ -10,12 +10,14 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
 
   test 'should get index' do
     get users_url
+
     assert_response :success
   end
 
   test 'should get new' do
     sign_out(@user)
     get new_user_registration_url
+
     assert_response :success
   end
 
@@ -31,16 +33,19 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
 
   test 'should show user' do
     get user_url(@user)
+
     assert_response :success
   end
 
   test 'should get edit' do
     get edit_user_registration_path(@user)
+
     assert_response :success
   end
 
   test 'should update user' do
     patch user_url(@user), params: { user: { email: @user.email, first: @user.first, last: @user.last } }
+
     assert_redirected_to user_url(@user)
   end
 

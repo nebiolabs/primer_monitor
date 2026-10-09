@@ -12,11 +12,13 @@ class OligosControllerTest < ActionDispatch::IntegrationTest
 
   test 'should get show' do
     get oligos_url
+
     assert_response :success
   end
 
   test 'should get new' do
     get new_oligo_url
+
     assert_response :success
   end
 
@@ -32,17 +34,20 @@ class OligosControllerTest < ActionDispatch::IntegrationTest
 
   test 'should show oligo' do
     get oligo_url(@oligo)
+
     assert_response :success
   end
 
   test 'should get edit' do
     get edit_oligo_url(@oligo)
+
     assert_response :success
     assert_select 'li', text: /95 - 115/ # its alignment position, from oligo_alignment_positions
   end
 
   test 'should update oligo' do
     patch oligo_url(@oligo), params: { oligo: { name: @oligo.name, sequence: @oligo.sequence } }
+
     assert_redirected_to oligo_url(@oligo)
   end
 

@@ -3,9 +3,10 @@ plugins:
   - 'rubocop-performance'
   - 'rubocop-capybara'
   - 'rubocop-minitest'
+  - 'rubocop-rake'
 
 AllCops:
-  NewCops: disable
+  NewCops: enable
   Exclude:
     - 'bin/*'
     - 'node_modules/**/*'
@@ -28,3 +29,12 @@ Metrics/PerceivedComplexity:
 
 Style/Documentation:
   Enabled: false
+
+# The app is English-only; moving flash and validation messages into config/locales adds indirection without a
+# translation to serve.
+Rails/I18nLocaleTexts:
+  Enabled: false
+
+# integration tests reasonably check a handful of things about one response
+Minitest/MultipleAssertions:
+  Max: 6

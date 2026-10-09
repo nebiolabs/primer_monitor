@@ -67,11 +67,12 @@ group :development do
   gem 'capistrano-rbenv', '~> 2.2'
   gem 'ed25519'
   gem 'listen', '~> 3.2'
-  gem 'rubocop', require: false
-  gem 'rubocop-capybara', require: false
-  gem 'rubocop-minitest', require: false
-  gem 'rubocop-performance', require: false
-  gem 'rubocop-rails', require: false
+  gem 'rubocop', '~> 1.91', require: false
+  gem 'rubocop-capybara', '~> 3.0', require: false
+  gem 'rubocop-minitest', '~> 0.41', require: false
+  gem 'rubocop-performance', '~> 1.27', require: false
+  gem 'rubocop-rails', '~> 2.38', require: false
+  gem 'rubocop-rake', '~> 0.7', require: false
 
   # Access an interactive console on exception pages or by calling 'console' anywhere in the code.
   gem 'web-console', '>= 3.3.0'

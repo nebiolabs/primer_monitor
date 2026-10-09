@@ -3,6 +3,15 @@
 require 'test_helper'
 
 class VerifiedNotificationTest < ActiveSupport::TestCase
+  include ActionMailer::TestHelper
+
+  test 'deliver! emails the user and records it as sent' do
+    notification = VerifiedNotification.create!(user: users(:one), status: 'Unsent')
+
+    assert_emails(1) { notification.deliver! }
+    assert_equal 'Sent', notification.reload.status
+  end
+
   test 'skip_unsent! marks pending notifications handled, except for the given addresses' do
     skipped = VerifiedNotification.create!(user: users(:one), status: 'Unsent')
     kept = VerifiedNotification.create!(user: users(:two), status: 'Unsent')

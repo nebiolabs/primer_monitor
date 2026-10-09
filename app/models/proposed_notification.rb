@@ -35,15 +35,15 @@ class ProposedNotification < ApplicationRecord
 
   def self.existing_notification_cache
     @existing_notification_cache ||= ProposedNotification.pluck(:id, UNIQUE_FIELDS.join(','))
-                                                         .each_with_object({}) do |pn_fields, h|
-      h[pn_fields[1..].join] = pn_fields[0]
+                                                         .to_h do |pn_fields|
+      [pn_fields[1..].join, pn_fields[0]]
     end
   end
 
   def self.new_proposed_notifications
     potential_notifications = []
 
-    IdentifyPrimersForNotification.includes(:detailed_geo_location).all.find_each do |primer_record|
+    IdentifyPrimersForNotification.includes(:detailed_geo_location).find_each do |primer_record|
       pn = construct_notification_record(primer_record)
 
       potential_notifications << pn unless existing_notification_cache.key?(pn.cache_key)
@@ -68,7 +68,7 @@ class ProposedNotification < ApplicationRecord
                              subscribed_geo_location_id:,
                              primer_set_subscription_id:,
                              detailed_geo_location_alias_id: primer_record.detailed_geo_location
-                                                             .detailed_geo_location_alias_id,
+                                                                          .detailed_geo_location_alias_id,
                              fraction_variant: primer_record.fraction_variant)
   end
 end

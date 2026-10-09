@@ -50,7 +50,7 @@ class PrimerSetsController < ApplicationController
         format.json { render :show, status: :created, location: @primer_set }
       else
         format.html { render :new }
-        format.json { render json: @primer_set.errors, status: :unprocessable_entity }
+        format.json { render json: @primer_set.errors, status: :unprocessable_content }
       end
     end
   end
@@ -65,7 +65,7 @@ class PrimerSetsController < ApplicationController
         format.json { render :show, status: :ok, location: @primer_set }
       else
         format.html { render :edit }
-        format.json { render json: @primer_set.errors, status: :unprocessable_entity }
+        format.json { render json: @primer_set.errors, status: :unprocessable_content }
       end
     end
   end
@@ -84,14 +84,15 @@ class PrimerSetsController < ApplicationController
 
   # Use callbacks to share common setup or constraints between actions.
   def set_primer_set
-    @primer_set = PrimerSet.find(params[:id])
+    @primer_set = PrimerSet.find(params.expect(:id))
   end
 
   # Only allow a list of trusted parameters through.
   def primer_set_params
-    params.require(:primer_set).permit(:name, :user_id, :amplification_method_id, :organism_id, :status,
-                                       :citation_url, :doi,
-                                       oligos_attributes: %i[id primer_set_id name short_name
-                                                             locus category sequence _destroy])
+    # [[...]] accepts the index-keyed hash that fields_for submits for nested oligos
+    params.expect(primer_set: [:name, :user_id, :amplification_method_id, :organism_id, :status,
+                               :citation_url, :doi,
+                               { oligos_attributes: [%i[id primer_set_id name short_name
+                                                        locus category sequence _destroy]] }])
   end
 end

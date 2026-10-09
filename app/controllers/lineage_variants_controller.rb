@@ -8,10 +8,10 @@ class LineageVariantsController < ApplicationController
     return head :not_found unless @organism
 
     @config = {
-      "data_server": ENV['IGV_DATA_SERVER'],
-      "organism_slug": @organism.slug,
-      "organism_name": @organism.name,
-      "reference_accession": @organism.organism_taxa.first&.reference_accession
+      data_server: ENV.fetch('IGV_DATA_SERVER', nil),
+      organism_slug: @organism.slug,
+      organism_name: @organism.name,
+      reference_accession: @organism.organism_taxa.first&.reference_accession
     }
 
     @track_data = @organism.lineage_variants_data(@config[:data_server], @config[:organism_slug])
@@ -47,7 +47,7 @@ class LineageVariantsController < ApplicationController
   private
 
   def overlap_params
-    [params[:lineage].presence, Array(params[:primer_sets]).reject(&:blank?)]
+    [params[:lineage].presence, Array(params[:primer_sets]).compact_blank]
   end
 
   def invalid_overlap_params?(lineage_param, primer_set_params)

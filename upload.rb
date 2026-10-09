@@ -45,10 +45,7 @@ end
 def parse_options
   begin
     slop_opts = define_options
-  rescue Slop::MissingArgument => e
-    @log.error "fatal: #{e}"
-    exit(1)
-  rescue Slop::UnknownOption => e
+  rescue Slop::MissingArgument, Slop::UnknownOption => e
     @log.error "fatal: #{e}"
     exit(1)
   end
