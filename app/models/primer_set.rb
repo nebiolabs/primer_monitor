@@ -22,7 +22,9 @@ class PrimerSet < ApplicationRecord
 
   validates_associated :oligos
 
-  after_save :notify_admins_about_primer_set_update
+  # after commit, not after save: the :async job adapter runs the mailer job on another thread right away, and
+  # before the commit that thread can't see the record yet (ActiveJob::DeserializationError, no email)
+  after_save_commit :notify_admins_about_primer_set_update
 
   def to_s
     name

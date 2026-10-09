@@ -3,6 +3,8 @@
 require 'test_helper'
 
 class PrimerSetTest < ActiveSupport::TestCase
+  include ActionMailer::TestHelper
+
   test 'citation_url must be an http(s) link, since it is rendered as one' do
     primer_set = primer_sets(:one)
 
@@ -15,5 +17,17 @@ class PrimerSetTest < ActiveSupport::TestCase
     primer_set.valid?
 
     assert_empty primer_set.errors[:citation_url]
+  end
+
+  test 'admins are emailed only once the save has committed, so the mailer job can load the primer set' do
+    primer_set = primer_sets(:one)
+
+    PrimerSet.transaction do
+      assert_no_enqueued_emails { primer_set.update!(name: 'renamed primer set') }
+    end
+
+    notified_admins = Role.find_by(name: 'administrator').users.where.not(email: ENV.fetch('ADMIN_EMAIL', nil))
+
+    assert_enqueued_emails notified_admins.count
   end
 end
