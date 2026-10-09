@@ -91,4 +91,13 @@ class User < ApplicationRecord
     m.display_name = "#{first.capitalize} #{last.capitalize}"
     m.format
   end
+
+  # subscribing to a primer set implies the user wants email about primer updates
+  def subscribe_to_primer_updates!
+    return if send_primer_updates?
+
+    # rubocop:disable Rails/SkipsModelValidations
+    update_column(:send_primer_updates, true)
+    # rubocop:enable Rails/SkipsModelValidations
+  end
 end

@@ -4,11 +4,7 @@ class PrimerSetSubscriptionsController < ApplicationController
   load_and_authorize_resource
 
   def create
-    # if the user is subscribing, they must want email...
-    # setting this boolean to true is always going to be fine
-    # rubocop:disable Rails/SkipsModelValidations
-    current_user.send_primer_updates || current_user.update_column(:send_primer_updates, true)
-    # rubocop:enable Rails/SkipsModelValidations
+    current_user.subscribe_to_primer_updates!
     @primer_set_subscription = PrimerSetSubscription.find_or_initialize_by(primer_set_subscription_params)
     @primer_set_subscription.active = true
     respond_to do |format|
