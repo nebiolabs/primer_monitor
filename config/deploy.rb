@@ -99,15 +99,6 @@ namespace :deploy do
     end
   end
 
-  desc 'Run rake yarn:install'
-  task :yarn_install do
-    on roles(:app) do
-      within release_path do
-        execute("cd #{release_path} && yarn install && yarn upgrade")
-      end
-    end
-  end
-
   desc 'Seed application'
   task :seed do
     on roles(:app) do

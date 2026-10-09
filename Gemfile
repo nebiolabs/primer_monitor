@@ -62,6 +62,7 @@ end
 group :development do
   gem 'bcrypt_pbkdf'
   gem 'brakeman', require: false
+  gem 'bundler-audit', require: false
   gem 'capistrano', '~> 3.10', require: false
   gem 'capistrano-rails', '~> 1.3', require: false
   gem 'capistrano-rbenv', '~> 2.2'
