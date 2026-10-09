@@ -48,6 +48,7 @@ unset JUMP_PROXY
 
 source "$primer_monitor_path/.env"
 export DB_HOST
+export DB_USER # store_variant_overlaps.sh writes as this user; unexported, psql falls back to the OS user
 export DB_USER_RO
 export DB_NAME
 export DB_PASSWORD
