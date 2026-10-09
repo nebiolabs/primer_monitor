@@ -4,11 +4,10 @@ class PrimerSetSubscriptionsController < ApplicationController
   load_and_authorize_resource
 
   def create
+    primer_set = PrimerSet.find(params.expect(:primer_set_id)) # a stale or tampered id is a 404
+    PrimerSetSubscription.find_or_initialize_by(user: current_user, primer_set:).update!(active: true)
     current_user.subscribe_to_primer_updates!
-    @primer_set_subscription = PrimerSetSubscription.find_or_initialize_by(primer_set_subscription_params)
-    @primer_set_subscription.active = true
-    @primer_set_subscription.save!
-    redirect_back_or_to @primer_set_subscription.primer_set, notice: 'Subscribed.'
+    redirect_back_or_to primer_set, notice: 'Subscribed.'
   end
 
   def destroy

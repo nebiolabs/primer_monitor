@@ -44,6 +44,13 @@ class SubscriptionsTest < ActionDispatch::IntegrationTest
     assert_select '.notification-history td', text: 'Sent'
   end
 
+  test 'subscribing to a primer set that does not exist is a 404 and changes nothing' do
+    post primer_set_subscriptions_path(primer_set_id: 0)
+
+    assert_response :not_found
+    assert_not @user.reload.send_primer_updates?
+  end
+
   test 'unsubscribing from the account page returns there' do
     delete primer_set_subscription_path(@subscription), headers: { 'HTTP_REFERER' => edit_user_registration_url }
 
