@@ -1,5 +1,5 @@
 import 'init_jquery';
-import "igv";
+import { createBrowser, removeBrowser } from 'igv_browser';
 import { registerPageModule } from 'turbo_page_module';
 
 let config = {};
@@ -37,20 +37,15 @@ function initBrowser() {
             }
         };
 
-    $('.igv_div').children('.igv-container, .igv-message').remove();
-
-    const browser_div = document.getElementById("igv");
-    igv.createBrowser(browser_div, browserConfig).then(function (theBrowser) {
-        igvBrowser = theBrowser;
-    });
+    createBrowser(document.getElementById("igv"), browserConfig);
 
 }
 
 registerPageModule(
-    () => !!document.getElementById('config'),
+    () => !!document.querySelector('#config[data-igv-page="primer_set"]'),
     () => {
         config = JSON.parse(document.getElementById('config').innerHTML);
         if ('primer_set_name' in config) initBrowser();
     },
-    () => { $('.igv_div').children('.igv-container, .igv-message').remove(); }
+    removeBrowser
 );

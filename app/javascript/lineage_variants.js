@@ -1,5 +1,5 @@
 import 'init_jquery';
-import "igv";
+import { createBrowser, removeBrowser } from 'igv_browser';
 import { registerPageModule } from 'turbo_page_module';
 
 let igvBrowser = null;
@@ -92,8 +92,8 @@ function loadPrimerSets(activePrimerSets, igvBrowser, activeLineageGroup) {
 function initBrowser() {
     const browserConfig = {
         reference: {
-            "id": config['organism_slug'],
-            "name": config['organism_name'],
+            "id": config['reference_accession'],
+            "name": config['organism_name'] + " (" + config['reference_accession'] + ")",
             "fastaURL": config['data_server'] + "/" + config['organism_slug'] + "/ref/" + config['organism_slug'] + ".fasta",
             "indexURL": config['data_server'] + "/" + config['organism_slug'] + "/ref/" + config['organism_slug'] + ".fasta.fai",
             tracks: [
@@ -113,10 +113,7 @@ function initBrowser() {
         }
     };
 
-    $('.igv_div').children('.igv-container').remove();
-
-    const browser_div = document.getElementById("igv");
-    igv.createBrowser(browser_div, browserConfig).then(function(theBrowser) {
+    createBrowser(document.getElementById("igv"), browserConfig).then(function(theBrowser) {
         igvBrowser = theBrowser;
         $('#igv_loading').addClass('invisible');
         activeLineageGroup = config['initial_lineage'];
@@ -331,7 +328,7 @@ registerPageModule(
     () => !!document.getElementById('lineage_select'),
     () => { loadConfig(); initBrowser(); },
     () => {
-        $('.igv_div').children('.igv-container').remove();
+        removeBrowser();
         $('#igv_loading').removeClass('invisible');
         igvBrowser = null;
         tracks = [];

@@ -7,12 +7,7 @@ class LineageVariantsController < ApplicationController
     @organism = Organism.find_by(slug: params[:organism_slug])
     return head :not_found unless @organism
 
-    @config = {
-      data_server: ENV.fetch('IGV_DATA_SERVER', nil),
-      organism_slug: @organism.slug,
-      organism_name: @organism.name,
-      reference_accession: @organism.organism_taxa.first&.reference_accession
-    }
+    @config = @organism.igv_config
 
     @track_data = @organism.lineage_variants_data(@config[:data_server], @config[:organism_slug])
 
