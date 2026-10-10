@@ -1,132 +1,121 @@
 #!/usr/bin/env bash
 
-# Stores variant-primer overlaps for one lineage group into the DB.
+# Stores the variant-primer overlaps of all of an organism's lineage groups into the DB, replacing the old ones.
 #
-# Usage: store_variant_overlaps.sh <organism_slug> <lineage_group_key> <variants_bed_path>
+# Usage: store_variant_overlaps.sh <organism_slug> <lineage_variants_dir> <lineage_group_key>...
 #
 # Requires: DB_HOST, DB_NAME, DB_USER (write-capable), DB_PASSWORD env vars exported by caller.
-# variants_bed_path: the lineage_variants/{lineage}.bed file produced by count_variants.sh
+# <lineage_variants_dir>/<lineage_group_key>.bed: produced by count_variants.sh
 #   Columns: chrom, ref_start, ref_end, variant (allele only), frequency_pct
-# variant_type is looked up from variant_sites rather than parsed from the filename.
 #
-# WARNING: organism_slug, lineage_group_key, and variants_bed_path are interpolated directly
+# First/last seen are over all sequences, whatever their lineage, so they are computed once per variant rather than
+# once per lineage group: variant_sites holds hundreds of millions of rows, and a common variant matches millions.
+# Only variants overlapping an aligned primer are looked up, since only those are stored.
+#
+# WARNING: organism_slug, lineage group keys and paths are interpolated directly
 # into SQL. Do not pass arbitrary user input to this script.
 
 set -e
 
 organism_slug="$1"
-lineage_group_key="$2"
-variants_bed="$3"
+variants_dir="$2"
+shift 2
 
-if [[ -z "$organism_slug" || -z "$lineage_group_key" || -z "$variants_bed" ]]; then
-  echo "Usage: store_variant_overlaps.sh <organism_slug> <lineage_group_key> <variants_bed_path>" >&2
+if [[ -z "$organism_slug" || -z "$variants_dir" || $# -eq 0 ]]; then
+  echo "Usage: store_variant_overlaps.sh <organism_slug> <lineage_variants_dir> <lineage_group_key>..." >&2
   exit 1
 fi
 
 sql_file=$(mktemp /tmp/store_overlaps_XXXXXX.sql)
 trap "rm -f '$sql_file'" EXIT
 
+copy_commands=""
+for lineage_group_key in "$@"; do
+  copy_commands+="\\COPY tmp_lineage_variants FROM '${variants_dir}/${lineage_group_key}.bed' WITH (FORMAT csv, DELIMITER E'\\t', HEADER false)
+INSERT INTO tmp_variants SELECT *, '${lineage_group_key}' FROM tmp_lineage_variants;
+TRUNCATE tmp_lineage_variants;
+"
+done
+
 cat > "$sql_file" <<SQL
 \set ON_ERROR_STOP on
 
-CREATE TEMP TABLE tmp_variants (
-  chrom        varchar,
-  ref_start    integer,
-  ref_end      integer,
-  variant_name varchar,
+CREATE TEMP TABLE tmp_lineage_variants (
+  chrom         varchar,
+  ref_start     integer,
+  ref_end       integer,
+  variant_name  varchar,
   frequency_pct float
 );
+CREATE TEMP TABLE tmp_variants (LIKE tmp_lineage_variants, lineage_group_key varchar);
 
-\COPY tmp_variants FROM '${variants_bed}' WITH (FORMAT csv, DELIMITER E'\\t', HEADER false)
+${copy_commands}
+ANALYZE tmp_variants;
 
--- Remove stale rows from previous pipeline runs for this organism + lineage group
-DELETE FROM lineage_variant_primer_overlaps
-WHERE organism_id = (SELECT id FROM organisms WHERE slug = '${organism_slug}')
-  AND lineage_group_key = '${lineage_group_key}';
-
--- Compute first/last seen globally for each distinct variant position.
-CREATE TEMP TABLE tmp_seen AS
-SELECT
-  vs.ref_start,
-  vs.ref_end,
-  vs.variant_type,
-  vs.variant,
-  MIN(COALESCE(fr.date_collected, fr.date_submitted))
-    FILTER (WHERE COALESCE(fr.date_collected, fr.date_submitted) IS NOT NULL) AS first_date,
-  MAX(COALESCE(fr.date_collected, fr.date_submitted))
-    FILTER (WHERE COALESCE(fr.date_collected, fr.date_submitted) IS NOT NULL) AS last_date
+-- the distinct variants that overlap one of the organism's aligned primers
+CREATE TEMP TABLE tmp_overlapping AS
+SELECT DISTINCT ot.id AS organism_taxon_id, tv.ref_start, tv.ref_end, tv.variant_name AS variant
 FROM tmp_variants tv
-JOIN organism_taxa ot2 ON ot2.reference_accession = tv.chrom
-JOIN variant_sites vs  ON vs.ref_start = tv.ref_start
-                      AND vs.ref_end   = tv.ref_end
-                      AND vs.variant   = tv.variant_name
-                      AND vs.organism_taxon_id = ot2.id
-JOIN fasta_records fr  ON fr.id = vs.fasta_record_id
-GROUP BY vs.ref_start, vs.ref_end, vs.variant_type, vs.variant;
+JOIN organism_taxa ot  ON ot.reference_accession = tv.chrom
+JOIN organisms org     ON org.id = ot.organism_id AND org.slug = '${organism_slug}'
+WHERE EXISTS (
+  SELECT 1 FROM oligo_alignment_positions oap
+  JOIN oligos o       ON o.id = oap.oligo_id
+  JOIN primer_sets ps ON ps.id = o.primer_set_id AND ps.organism_id = org.id
+  WHERE oap.organism_taxon_id = ot.id AND NOT (oap.ref_start >= tv.ref_end OR oap.ref_end <= tv.ref_start)
+);
+ANALYZE tmp_overlapping;
 
--- Enrich first_date with lineage + location.
-CREATE TEMP TABLE tmp_first AS
-SELECT DISTINCT ON (vs.ref_start, vs.variant_type, vs.variant)
-  vs.ref_start, vs.variant_type, vs.variant,
-  l.name AS lineage,
-  COALESCE(dga.region, '') || CASE WHEN dga.division IS NOT NULL THEN ' / ' || dga.division ELSE '' END AS location
+-- One pass over each variant's sequences. A key of date then id compares like (date, id), so min/max pick the
+-- earliest sequence (lowest id on ties) and the latest (highest id) without sorting millions of rows.
+CREATE TEMP TABLE tmp_seen AS
+SELECT v.organism_taxon_id, v.ref_start, v.ref_end, vs.variant_type, v.variant, max(vs.ref) AS ref,
+  min(to_char(COALESCE(fr.date_collected, fr.date_submitted), 'YYYYMMDD') || lpad(fr.id::text, 19, '0')) AS first_key,
+  max(to_char(COALESCE(fr.date_collected, fr.date_submitted), 'YYYYMMDD') || lpad(fr.id::text, 19, '0')) AS last_key
+FROM tmp_overlapping v
+JOIN variant_sites vs  ON vs.organism_taxon_id = v.organism_taxon_id
+                      AND vs.ref_start = v.ref_start AND vs.ref_end = v.ref_end AND vs.variant = v.variant
+JOIN fasta_records fr  ON fr.id = vs.fasta_record_id
+GROUP BY v.organism_taxon_id, v.ref_start, v.ref_end, vs.variant_type, v.variant;
+
+-- the lineage and location of the first and last sequences
+CREATE TEMP TABLE tmp_seen_info AS
+SELECT s.organism_taxon_id, s.ref_start, s.ref_end, s.variant_type, s.variant, s.ref,
+  to_date(left(s.first_key, 8), 'YYYYMMDD') AS first_date, fl.name AS first_lineage,
+  COALESCE(fa.region, '') || CASE WHEN fa.division IS NOT NULL THEN ' / ' || fa.division ELSE '' END AS first_location,
+  to_date(left(s.last_key, 8), 'YYYYMMDD') AS last_date, ll.name AS last_lineage,
+  COALESCE(la.region, '') || CASE WHEN la.division IS NOT NULL THEN ' / ' || la.division ELSE '' END AS last_location
 FROM tmp_seen s
-JOIN variant_sites vs  ON vs.ref_start = s.ref_start AND vs.ref_end = s.ref_end
-                      AND vs.variant_type = s.variant_type AND vs.variant = s.variant
-JOIN fasta_records fr  ON fr.id = vs.fasta_record_id
-                      AND COALESCE(fr.date_collected, fr.date_submitted) = s.first_date
-LEFT JOIN lineage_calls lc  ON lc.id = fr.lineage_call_id
-LEFT JOIN lineages l        ON l.id  = lc.lineage_id
-LEFT JOIN detailed_geo_locations dgl   ON dgl.id = fr.detailed_geo_location_id
-LEFT JOIN detailed_geo_location_aliases dga ON dga.id = dgl.detailed_geo_location_alias_id
-ORDER BY vs.ref_start, vs.variant_type, vs.variant, fr.id ASC;
+LEFT JOIN fasta_records ff                ON ff.id = substr(s.first_key, 9)::bigint
+LEFT JOIN lineage_calls fc                ON fc.id = ff.lineage_call_id
+LEFT JOIN lineages fl                     ON fl.id = fc.lineage_id
+LEFT JOIN detailed_geo_locations fg       ON fg.id = ff.detailed_geo_location_id
+LEFT JOIN detailed_geo_location_aliases fa ON fa.id = fg.detailed_geo_location_alias_id
+LEFT JOIN fasta_records lf                ON lf.id = substr(s.last_key, 9)::bigint
+LEFT JOIN lineage_calls lc                ON lc.id = lf.lineage_call_id
+LEFT JOIN lineages ll                     ON ll.id = lc.lineage_id
+LEFT JOIN detailed_geo_locations lg       ON lg.id = lf.detailed_geo_location_id
+LEFT JOIN detailed_geo_location_aliases la ON la.id = lg.detailed_geo_location_alias_id;
 
--- Enrich last_date with lineage + location.
-CREATE TEMP TABLE tmp_last AS
-SELECT DISTINCT ON (vs.ref_start, vs.variant_type, vs.variant)
-  vs.ref_start, vs.variant_type, vs.variant,
-  l.name AS lineage,
-  COALESCE(dga.region, '') || CASE WHEN dga.division IS NOT NULL THEN ' / ' || dga.division ELSE '' END AS location
-FROM tmp_seen s
-JOIN variant_sites vs  ON vs.ref_start = s.ref_start AND vs.ref_end = s.ref_end
-                      AND vs.variant_type = s.variant_type AND vs.variant = s.variant
-JOIN fasta_records fr  ON fr.id = vs.fasta_record_id
-                      AND COALESCE(fr.date_collected, fr.date_submitted) = s.last_date
-JOIN lineage_calls lc  ON lc.id = fr.lineage_call_id
-JOIN lineages l        ON l.id  = lc.lineage_id
-JOIN detailed_geo_locations dgl   ON dgl.id = fr.detailed_geo_location_id
-JOIN detailed_geo_location_aliases dga ON dga.id = dgl.detailed_geo_location_alias_id
-ORDER BY vs.ref_start, vs.variant_type, vs.variant, fr.id DESC;
+-- replace all of the organism's overlaps, so lineage groups no longer shown don't linger
+DELETE FROM lineage_variant_primer_overlaps
+WHERE organism_id = (SELECT id FROM organisms WHERE slug = '${organism_slug}');
 
--- Insert overlaps: variant positions x oligos aligned to the same reference.
--- variant_type is looked up from variant_sites; first/last seen pre-computed above.
 INSERT INTO lineage_variant_primer_overlaps
   (organism_id, lineage_group_key, ref_start, ref_end,
    variant_type, variant, ref, frequency_pct, oligo_id,
    first_seen_date, first_seen_lineage, first_seen_location,
    last_seen_date,  last_seen_lineage,  last_seen_location)
 SELECT DISTINCT
-  org.id,
-  '${lineage_group_key}',
-  tv.ref_start,
-  tv.ref_end,
-  vs.variant_type,
-  tv.variant_name,
-  vs.ref,
-  tv.frequency_pct,
-  o.id,
-  s.first_date,  tf.lineage,  tf.location,
-  s.last_date,   tl.lineage,  tl.location
+  org.id, tv.lineage_group_key, tv.ref_start, tv.ref_end,
+  s.variant_type, tv.variant_name, s.ref, tv.frequency_pct, o.id,
+  s.first_date, s.first_lineage, s.first_location,
+  s.last_date,  s.last_lineage,  s.last_location
 FROM tmp_variants tv
 JOIN organism_taxa ot  ON ot.reference_accession = tv.chrom
 JOIN organisms org     ON org.id = ot.organism_id AND org.slug = '${organism_slug}'
-JOIN variant_sites vs  ON vs.ref_start = tv.ref_start
-                      AND vs.ref_end   = tv.ref_end
-                      AND vs.variant   = tv.variant_name
-                      AND vs.organism_taxon_id = ot.id
-JOIN tmp_seen s        ON s.ref_start = vs.ref_start AND s.variant_type = vs.variant_type AND s.variant = vs.variant
-LEFT JOIN tmp_first tf ON tf.ref_start = vs.ref_start AND tf.variant_type = vs.variant_type AND tf.variant = vs.variant
-LEFT JOIN tmp_last  tl ON tl.ref_start = vs.ref_start AND tl.variant_type = vs.variant_type AND tl.variant = vs.variant
+JOIN tmp_seen_info s   ON s.organism_taxon_id = ot.id AND s.ref_start = tv.ref_start
+                      AND s.ref_end = tv.ref_end AND s.variant = tv.variant_name
 JOIN oligo_alignment_positions oap
   ON  oap.organism_taxon_id = ot.id
   AND NOT (oap.ref_start >= tv.ref_end OR oap.ref_end <= tv.ref_start)
@@ -135,4 +124,5 @@ JOIN primer_sets ps    ON ps.id = o.primer_set_id AND ps.organism_id = org.id
 ON CONFLICT DO NOTHING;
 SQL
 
-PGPASSWORD="$DB_PASSWORD" psql -h "$DB_HOST" -d "$DB_NAME" -U "$DB_USER" -f "$sql_file"
+# one transaction: the page never sees the organism's overlaps half replaced
+PGPASSWORD="$DB_PASSWORD" psql -h "$DB_HOST" -d "$DB_NAME" -U "$DB_USER" --single-transaction -f "$sql_file"

@@ -37,16 +37,19 @@ echo_log "starting DB fetch"
 echo_log "DB fetch done"
 shift 6;
 
+lineage_set_names=()
 for lineage_set_path in "$@"; do
   lineage_set_name=$(basename "$lineage_set_path" | sed -E "s/\.txt$//")
+  lineage_set_names+=("$lineage_set_name")
   echo_log "processing lineage set $lineage_set_path ($lineage_set_name)"
   "$(dirname "$0")/count_variants.sh" "$variants_bed" "$min_pct" "./$organism_slug/lineage_sets/$lineage_set_path" "$output_path" > "${lineage_set_name}_$variants_counts_bed";
-  lineage_variants_bed="$output_path/lineage_variants/$lineage_set_name.bed"
-  echo_log "storing variant overlaps for $lineage_set_path ($lineage_set_name)"
-  "$(dirname "$0")/store_variant_overlaps.sh" "$organism_slug" "$lineage_set_name" "$lineage_variants_bed"
   echo_log "processing primer sets for $lineage_set_path ($lineage_set_name)"
   xargs "$(dirname "$0")/process_primer_sets.sh" "${lineage_set_name}_$variants_counts_bed" "$output_path" "$score_cutoff" "$threads" "$lineage_set_name" "./$organism_slug" < "$primer_sets_list_path";
 done
+
+# all lineage sets at once: their variants' first/last seen are looked up once, not per lineage set
+echo_log "storing variant overlaps for ${#lineage_set_names[@]} lineage sets"
+"$(dirname "$0")/store_variant_overlaps.sh" "$organism_slug" "$output_path/lineage_variants" "${lineage_set_names[@]}"
 echo_log "overlap computation done"
 
 rm "$$_variants.bed";
