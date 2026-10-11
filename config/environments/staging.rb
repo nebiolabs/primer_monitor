@@ -111,4 +111,7 @@ Rails.application.configure do
   config.action_mailer.default_url_options = { host: 'primer-monitor-dev.neb.com' }
   config.action_mailer.delivery_method = :sendmail
 
+  # the database holds copies of real users: only email MAIL_ALLOWED_DOMAINS (see ExternalMailInterceptor)
+  config.action_mailer.interceptors = %w[ExternalMailInterceptor]
+
 end

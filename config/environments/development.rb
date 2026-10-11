@@ -40,6 +40,9 @@ Rails.application.configure do
   # Set localhost to be used by links generated in mailer templates.
   config.action_mailer.default_url_options = { host: "localhost", port: 3000 }
 
+  # the database holds copies of real users: only email MAIL_ALLOWED_DOMAINS (see ExternalMailInterceptor)
+  config.action_mailer.interceptors = %w[ExternalMailInterceptor]
+
   # Print deprecation notices to the Rails logger.
   config.active_support.deprecation = :log
 
