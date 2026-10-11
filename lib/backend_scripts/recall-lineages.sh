@@ -10,6 +10,9 @@ source "$(dirname "$0")/../echo_log.sh"
 # shellcheck source=../../.env
 source "$dotenv_path";
 
+# Change to the backend scratch path to avoid conflicts with other runs
+cd "$BACKEND_SCRATCH_PATH" || { echo_log "FAILED to cd to $BACKEND_SCRATCH_PATH"; exit 1; }
+
 export PATH="$PATH:$MICROMAMBA_BIN_PATH:$CONDA_BIN_PATH:$QSUB_PATH"
 export NXF_CONDA_CACHEDIR="$BACKEND_SCRATCH_PATH/conda_envs"
 export NXF_JAVA_HOME
