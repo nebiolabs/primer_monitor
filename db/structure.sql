@@ -120,113 +120,6 @@ ALTER SEQUENCE public.blast_hits_id_seq OWNED BY public.blast_hits.id;
 
 
 --
--- Name: detailed_geo_locations; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.detailed_geo_locations (
-    id bigint NOT NULL,
-    world character varying NOT NULL,
-    region character varying,
-    subregion character varying,
-    division character varying,
-    subdivision character varying,
-    locality character varying,
-    sublocality character varying,
-    created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL,
-    detailed_geo_location_alias_id bigint NOT NULL
-);
-
-
---
--- Name: fasta_records; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.fasta_records (
-    id bigint NOT NULL,
-    strain character varying NOT NULL,
-    genbank_accession character varying,
-    gisaid_epi_isl character varying,
-    date_collected date,
-    created_at timestamp(6) without time zone,
-    updated_at timestamp(6) without time zone,
-    variant_name character varying,
-    detailed_geo_location_id bigint,
-    date_submitted date,
-    pangolin_lineage text,
-    pangolin_version text,
-    lineage_call_id bigint,
-    pending_lineage_call_id bigint,
-    organism_taxon_id bigint
-);
-
-
---
--- Name: counts; Type: MATERIALIZED VIEW; Schema: public; Owner: -
---
-
-CREATE MATERIALIZED VIEW public.counts AS
- WITH region_count AS (
-         SELECT count(*) AS region_count,
-            COALESCE(detailed_geo_locations.region, ''::character varying) AS region
-           FROM (public.fasta_records
-             JOIN public.detailed_geo_locations ON ((fasta_records.detailed_geo_location_id = detailed_geo_locations.id)))
-          GROUP BY detailed_geo_locations.region
-        ), region_subregion_count AS (
-         SELECT count(*) AS region_subregion_count,
-            COALESCE(detailed_geo_locations.region, ''::character varying) AS region,
-            COALESCE(detailed_geo_locations.subregion, ''::character varying) AS subregion
-           FROM (public.fasta_records
-             JOIN public.detailed_geo_locations ON ((fasta_records.detailed_geo_location_id = detailed_geo_locations.id)))
-          GROUP BY detailed_geo_locations.region, detailed_geo_locations.subregion
-        ), region_subregion_division_count AS (
-         SELECT count(*) AS region_subregion_division_count,
-            COALESCE(detailed_geo_locations.region, ''::character varying) AS region,
-            COALESCE(detailed_geo_locations.subregion, ''::character varying) AS subregion,
-            COALESCE(detailed_geo_locations.division, ''::character varying) AS division
-           FROM (public.fasta_records
-             JOIN public.detailed_geo_locations ON ((fasta_records.detailed_geo_location_id = detailed_geo_locations.id)))
-          GROUP BY detailed_geo_locations.region, detailed_geo_locations.subregion, detailed_geo_locations.division
-        ), region_subregion_division_subdivision_count AS (
-         SELECT count(*) AS region_subregion_division_subdivision_count,
-            COALESCE(detailed_geo_locations.region, ''::character varying) AS region,
-            COALESCE(detailed_geo_locations.subregion, ''::character varying) AS subregion,
-            COALESCE(detailed_geo_locations.division, ''::character varying) AS division,
-            COALESCE(detailed_geo_locations.subdivision, ''::character varying) AS subdivision
-           FROM (public.fasta_records
-             JOIN public.detailed_geo_locations ON ((fasta_records.detailed_geo_location_id = detailed_geo_locations.id)))
-          GROUP BY detailed_geo_locations.region, detailed_geo_locations.subregion, detailed_geo_locations.division, detailed_geo_locations.subdivision
-        )
- SELECT region_subregion_division_subdivision_count.region,
-    region_subregion_division_subdivision_count.subregion,
-    region_subregion_division_subdivision_count.division,
-    region_subregion_division_subdivision_count.subdivision,
-    region_count.region_count,
-    region_subregion_count.region_subregion_count,
-    region_subregion_division_count.region_subregion_division_count,
-    region_subregion_division_subdivision_count.region_subregion_division_subdivision_count
-   FROM (((region_subregion_division_subdivision_count
-     JOIN region_count ON (((region_subregion_division_subdivision_count.region)::text = (region_count.region)::text)))
-     JOIN region_subregion_count ON ((((region_subregion_count.region)::text = (region_subregion_division_subdivision_count.region)::text) AND ((region_subregion_count.subregion)::text = (region_subregion_division_subdivision_count.subregion)::text))))
-     JOIN region_subregion_division_count ON ((((region_subregion_division_count.region)::text = (region_subregion_division_subdivision_count.region)::text) AND ((region_subregion_division_count.subregion)::text = (region_subregion_division_subdivision_count.subregion)::text) AND ((region_subregion_division_count.division)::text = (region_subregion_division_subdivision_count.division)::text))))
-  WITH NO DATA;
-
-
---
--- Name: date_counts; Type: VIEW; Schema: public; Owner: -
---
-
-CREATE VIEW public.date_counts AS
- SELECT count(*) AS total_count,
-    fr.detailed_geo_location_id,
-    fr.date_collected
-   FROM public.fasta_records fr
-  WHERE (fr.date_collected > ( SELECT (max(fasta_records.date_collected) - '168 days'::interval)
-           FROM public.fasta_records))
-  GROUP BY fr.detailed_geo_location_id, fr.date_collected;
-
-
---
 -- Name: detailed_geo_location_aliases; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -266,6 +159,25 @@ ALTER SEQUENCE public.detailed_geo_location_aliases_id_seq OWNED BY public.detai
 
 
 --
+-- Name: detailed_geo_locations; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.detailed_geo_locations (
+    id bigint NOT NULL,
+    world character varying NOT NULL,
+    region character varying,
+    subregion character varying,
+    division character varying,
+    subdivision character varying,
+    locality character varying,
+    sublocality character varying,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL,
+    detailed_geo_location_alias_id bigint NOT NULL
+);
+
+
+--
 -- Name: detailed_geo_locations_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
@@ -282,6 +194,29 @@ CREATE SEQUENCE public.detailed_geo_locations_id_seq
 --
 
 ALTER SEQUENCE public.detailed_geo_locations_id_seq OWNED BY public.detailed_geo_locations.id;
+
+
+--
+-- Name: fasta_records; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.fasta_records (
+    id bigint NOT NULL,
+    strain character varying NOT NULL,
+    genbank_accession character varying,
+    gisaid_epi_isl character varying,
+    date_collected date,
+    created_at timestamp(6) without time zone,
+    updated_at timestamp(6) without time zone,
+    variant_name character varying,
+    detailed_geo_location_id bigint,
+    date_submitted date,
+    pangolin_lineage text,
+    pangolin_version text,
+    lineage_call_id bigint,
+    pending_lineage_call_id bigint,
+    organism_taxon_id bigint
+);
 
 
 --
@@ -425,70 +360,6 @@ CREATE TABLE public.primer_sets (
 
 
 --
--- Name: time_counts; Type: MATERIALIZED VIEW; Schema: public; Owner: -
---
-
-CREATE MATERIALIZED VIEW public.time_counts AS
- WITH region_time_count AS (
-         SELECT count(*) AS region_time_count,
-            COALESCE(detailed_geo_locations.region, ''::character varying) AS region,
-            COALESCE(fasta_records.date_collected, '1900-01-01'::date) AS date_collected
-           FROM (public.fasta_records
-             JOIN public.detailed_geo_locations ON ((fasta_records.detailed_geo_location_id = detailed_geo_locations.id)))
-          WHERE (fasta_records.date_collected > ( SELECT (max(fasta_records_1.date_collected) - '168 days'::interval)
-                   FROM public.fasta_records fasta_records_1))
-          GROUP BY detailed_geo_locations.region, fasta_records.date_collected
-        ), region_subregion_time_count AS (
-         SELECT count(*) AS region_subregion_time_count,
-            COALESCE(detailed_geo_locations.region, ''::character varying) AS region,
-            COALESCE(detailed_geo_locations.subregion, ''::character varying) AS subregion,
-            COALESCE(fasta_records.date_collected, '1900-01-01'::date) AS date_collected
-           FROM (public.fasta_records
-             JOIN public.detailed_geo_locations ON ((fasta_records.detailed_geo_location_id = detailed_geo_locations.id)))
-          WHERE (fasta_records.date_collected > ( SELECT (max(fasta_records_1.date_collected) - '168 days'::interval)
-                   FROM public.fasta_records fasta_records_1))
-          GROUP BY detailed_geo_locations.region, detailed_geo_locations.subregion, fasta_records.date_collected
-        ), region_subregion_division_time_count AS (
-         SELECT count(*) AS region_subregion_division_time_count,
-            COALESCE(detailed_geo_locations.region, ''::character varying) AS region,
-            COALESCE(detailed_geo_locations.subregion, ''::character varying) AS subregion,
-            COALESCE(detailed_geo_locations.division, ''::character varying) AS division,
-            COALESCE(fasta_records.date_collected, '1900-01-01'::date) AS date_collected
-           FROM (public.fasta_records
-             JOIN public.detailed_geo_locations ON ((fasta_records.detailed_geo_location_id = detailed_geo_locations.id)))
-          WHERE (fasta_records.date_collected > ( SELECT (max(fasta_records_1.date_collected) - '168 days'::interval)
-                   FROM public.fasta_records fasta_records_1))
-          GROUP BY detailed_geo_locations.region, detailed_geo_locations.subregion, detailed_geo_locations.division, fasta_records.date_collected
-        ), region_subregion_division_subdivision_time_count AS (
-         SELECT count(*) AS region_subregion_division_subdivision_time_count,
-            COALESCE(detailed_geo_locations.region, ''::character varying) AS region,
-            COALESCE(detailed_geo_locations.subregion, ''::character varying) AS subregion,
-            COALESCE(detailed_geo_locations.division, ''::character varying) AS division,
-            COALESCE(detailed_geo_locations.subdivision, ''::character varying) AS subdivision,
-            COALESCE(fasta_records.date_collected, '1900-01-01'::date) AS date_collected
-           FROM (public.fasta_records
-             JOIN public.detailed_geo_locations ON ((fasta_records.detailed_geo_location_id = detailed_geo_locations.id)))
-          WHERE (fasta_records.date_collected > ( SELECT (max(fasta_records_1.date_collected) - '168 days'::interval)
-                   FROM public.fasta_records fasta_records_1))
-          GROUP BY detailed_geo_locations.region, detailed_geo_locations.subregion, detailed_geo_locations.division, detailed_geo_locations.subdivision, fasta_records.date_collected
-        )
- SELECT region_subregion_division_subdivision_time_count.region,
-    region_subregion_division_subdivision_time_count.subregion,
-    region_subregion_division_subdivision_time_count.division,
-    region_subregion_division_subdivision_time_count.subdivision,
-    region_subregion_division_subdivision_time_count.date_collected,
-    region_time_count.region_time_count,
-    region_subregion_time_count.region_subregion_time_count,
-    region_subregion_division_time_count.region_subregion_division_time_count,
-    region_subregion_division_subdivision_time_count.region_subregion_division_subdivision_time_count
-   FROM (((region_subregion_division_subdivision_time_count
-     JOIN region_time_count ON ((((region_time_count.region)::text = (region_subregion_division_subdivision_time_count.region)::text) AND (region_time_count.date_collected = region_subregion_division_subdivision_time_count.date_collected))))
-     JOIN region_subregion_time_count ON ((((region_subregion_time_count.region)::text = (region_subregion_division_subdivision_time_count.region)::text) AND ((region_subregion_time_count.subregion)::text = (region_subregion_division_subdivision_time_count.subregion)::text) AND (region_subregion_time_count.date_collected = region_subregion_division_subdivision_time_count.date_collected))))
-     JOIN region_subregion_division_time_count ON ((((region_subregion_division_time_count.region)::text = (region_subregion_division_subdivision_time_count.region)::text) AND ((region_subregion_division_time_count.subregion)::text = (region_subregion_division_subdivision_time_count.subregion)::text) AND ((region_subregion_division_time_count.division)::text = (region_subregion_division_subdivision_time_count.division)::text) AND (region_subregion_division_time_count.date_collected = region_subregion_division_subdivision_time_count.date_collected))))
-  WITH NO DATA;
-
-
---
 -- Name: variant_sites; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -540,7 +411,8 @@ CREATE MATERIALIZED VIEW public.variant_overlaps AS
      JOIN public.oligo_alignment_positions ON (((NOT ((oligo_alignment_positions.ref_start >= variant_sites.ref_end) OR (oligo_alignment_positions.ref_end <= variant_sites.ref_start))) AND (fasta_records.organism_taxon_id = oligo_alignment_positions.organism_taxon_id))))
      JOIN public.oligos ON ((oligos.id = oligo_alignment_positions.oligo_id)))
      JOIN public.primer_sets ON ((oligos.primer_set_id = primer_sets.id)))
-  WHERE (variant_sites.usable_del_or_snp = true)
+  WHERE ((variant_sites.usable_del_or_snp = true) AND (fasta_records.date_collected > ( SELECT (max(recent.date_collected) - '168 days'::interval)
+           FROM public.fasta_records recent)))
 UNION ALL
  SELECT oligos.id AS oligo_id,
     oligos.name AS oligo_name,
@@ -569,7 +441,8 @@ UNION ALL
      JOIN public.oligo_alignment_positions ON (((NOT ((oligo_alignment_positions.ref_start >= variant_sites.ref_end) OR (oligo_alignment_positions.ref_end <= variant_sites.ref_start))) AND (fasta_records.organism_taxon_id = oligo_alignment_positions.organism_taxon_id))))
      JOIN public.oligos ON ((oligos.id = oligo_alignment_positions.oligo_id)))
      JOIN public.primer_sets ON ((oligos.primer_set_id = primer_sets.id)))
-  WHERE (variant_sites.usable_insertion = true)
+  WHERE ((variant_sites.usable_insertion = true) AND (fasta_records.date_collected > ( SELECT (max(recent.date_collected) - '168 days'::interval)
+           FROM public.fasta_records recent)))
   WITH NO DATA;
 
 
@@ -598,18 +471,8 @@ CREATE MATERIALIZED VIEW public.oligo_variant_overlaps AS
     variant_overlaps.subdivision,
     variant_overlaps.detailed_geo_location_id,
     variant_overlaps.date_collected,
-    counts.region_count,
-    counts.region_subregion_count,
-    counts.region_subregion_division_count,
-    counts.region_subregion_division_subdivision_count,
-    time_counts.region_time_count,
-    time_counts.region_subregion_time_count,
-    time_counts.region_subregion_division_time_count,
-    time_counts.region_subregion_division_subdivision_time_count,
     generate_series(lower((numrange((variant_overlaps.oligo_start)::numeric, (variant_overlaps.oligo_end)::numeric) * numrange((variant_overlaps.variant_start)::numeric, (variant_overlaps.variant_end)::numeric))), (upper((numrange((variant_overlaps.oligo_start)::numeric, (variant_overlaps.oligo_end)::numeric) * numrange((variant_overlaps.variant_start)::numeric, (variant_overlaps.variant_end)::numeric))) - (1)::numeric)) AS coords
-   FROM ((public.variant_overlaps variant_overlaps
-     JOIN public.counts ON ((((counts.region)::text = (variant_overlaps.region)::text) AND ((counts.subregion)::text = (variant_overlaps.subregion)::text) AND ((counts.division)::text = (variant_overlaps.division)::text) AND ((counts.subdivision)::text = (variant_overlaps.subdivision)::text))))
-     JOIN public.time_counts ON ((((time_counts.region)::text = (variant_overlaps.region)::text) AND ((time_counts.subregion)::text = (variant_overlaps.subregion)::text) AND ((time_counts.division)::text = (variant_overlaps.division)::text) AND ((time_counts.subdivision)::text = (variant_overlaps.subdivision)::text) AND (time_counts.date_collected = variant_overlaps.date_collected))))
+   FROM public.variant_overlaps variant_overlaps
   WHERE ((variant_overlaps.variant_type)::text <> 'I'::text)
 UNION ALL
  SELECT variant_overlaps.oligo_id,
@@ -632,18 +495,8 @@ UNION ALL
     variant_overlaps.subdivision,
     variant_overlaps.detailed_geo_location_id,
     variant_overlaps.date_collected,
-    counts.region_count,
-    counts.region_subregion_count,
-    counts.region_subregion_division_count,
-    counts.region_subregion_division_subdivision_count,
-    time_counts.region_time_count,
-    time_counts.region_subregion_time_count,
-    time_counts.region_subregion_division_time_count,
-    time_counts.region_subregion_division_subdivision_time_count,
     variant_overlaps.variant_start AS coords
-   FROM ((public.variant_overlaps
-     JOIN public.counts ON ((((counts.region)::text = (variant_overlaps.region)::text) AND ((counts.subregion)::text = (variant_overlaps.subregion)::text) AND ((counts.division)::text = (variant_overlaps.division)::text) AND ((counts.subdivision)::text = (variant_overlaps.subdivision)::text))))
-     JOIN public.time_counts ON ((((time_counts.region)::text = (variant_overlaps.region)::text) AND ((time_counts.subregion)::text = (variant_overlaps.subregion)::text) AND ((time_counts.division)::text = (variant_overlaps.division)::text) AND ((time_counts.subdivision)::text = (variant_overlaps.subdivision)::text) AND (time_counts.date_collected = variant_overlaps.date_collected))))
+   FROM public.variant_overlaps
   WHERE ((variant_overlaps.variant_type)::text = 'I'::text)
   WITH NO DATA;
 
@@ -770,52 +623,6 @@ CREATE MATERIALIZED VIEW public.identify_primers_for_notifications AS
    FROM (first_query
      JOIN total_sequences_for_denominator ON (((total_sequences_for_denominator.detailed_geo_location_id = first_query.detailed_geo_location_id) AND (total_sequences_for_denominator.lookback_days = first_query.lookback_days))))
   WHERE ((((first_query.variant_count)::numeric / (total_sequences_for_denominator.records_count)::numeric))::double precision >= first_query.variant_fraction_threshold)
-  WITH NO DATA;
-
-
---
--- Name: initial_score; Type: MATERIALIZED VIEW; Schema: public; Owner: -
---
-
-CREATE MATERIALIZED VIEW public.initial_score AS
- WITH all_combos AS (
-         SELECT oligos_1.oligo_name,
-            oligos_1.locus,
-            oligos_1.primer_set_id,
-            fa_1.detailed_geo_location_id,
-            fa_1.date_collected
-           FROM (( SELECT DISTINCT oligos.name AS oligo_name,
-                    oligos.locus,
-                    oligos.primer_set_id
-                   FROM public.oligos) oligos_1
-             CROSS JOIN ( SELECT DISTINCT fasta_records.detailed_geo_location_id,
-                    fasta_records.date_collected
-                   FROM public.fasta_records
-                  WHERE (fasta_records.date_collected >= '2020-01-01'::date)) fa_1)
-        ), variants AS (
-         SELECT count(variant_sites.fasta_record_id) AS observed_count,
-            ovo.detailed_geo_location_id,
-            ((count(*))::double precision / ((5)::double precision * (count(variant_sites.fasta_record_id))::double precision)) AS three_p_score,
-            oligos.locus,
-            ovo.primer_set_id,
-            ovo.oligo_name,
-            ovo.date_collected
-           FROM (((public.oligo_variant_overlaps ovo
-             JOIN public.variant_sites ON ((variant_sites.id = ovo.variant_id)))
-             JOIN public.fasta_records ON ((fasta_records.id = variant_sites.fasta_record_id)))
-             JOIN public.oligos ON (((oligos.primer_set_id = ovo.primer_set_id) AND ((oligos.name)::text = (ovo.oligo_name)::text))))
-          WHERE (((ovo.oligo_end)::numeric - ovo.coords) <= (5)::numeric)
-          GROUP BY ovo.detailed_geo_location_id, oligos.locus, ovo.primer_set_id, ovo.oligo_name, ovo.date_collected
-        )
- SELECT all_combos.date_collected,
-    all_combos.detailed_geo_location_id,
-    COALESCE(variants.observed_count, (0)::bigint) AS observed_count,
-    COALESCE(variants.three_p_score, (0)::double precision) AS three_p_score,
-    all_combos.locus,
-    all_combos.primer_set_id,
-    all_combos.oligo_name
-   FROM (all_combos
-     LEFT JOIN variants ON (((all_combos.date_collected = variants.date_collected) AND (all_combos.primer_set_id = variants.primer_set_id) AND ((all_combos.oligo_name)::text = (variants.oligo_name)::text) AND (all_combos.detailed_geo_location_id = variants.detailed_geo_location_id))))
   WITH NO DATA;
 
 
@@ -1713,13 +1520,6 @@ CREATE UNIQUE INDEX alias_full_record ON public.detailed_geo_location_aliases US
 
 
 --
--- Name: counts_region_subregion_division_subdivision_idx; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE UNIQUE INDEX counts_region_subregion_division_subdivision_idx ON public.counts USING btree (region, subregion, division, subdivision);
-
-
---
 -- Name: ensure_variant_unique; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -1766,6 +1566,13 @@ CREATE INDEX index_detailed_geo_locations_on_detailed_geo_location_alias_id ON p
 --
 
 CREATE INDEX index_fasta_records_on_created_at ON public.fasta_records USING btree (created_at);
+
+
+--
+-- Name: index_fasta_records_on_date_collected; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_fasta_records_on_date_collected ON public.fasta_records USING btree (date_collected);
 
 
 --
@@ -2112,24 +1919,10 @@ CREATE INDEX oligo_variant_overlaps_oligo_id_idx ON public.oligo_variant_overlap
 
 
 --
--- Name: time_counts_region_subregion_division_subdivision_date_coll_idx; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE UNIQUE INDEX time_counts_region_subregion_division_subdivision_date_coll_idx ON public.time_counts USING btree (region, subregion, division, subdivision, date_collected);
-
-
---
 -- Name: tmp; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX tmp ON public.subscribed_geo_locations USING btree (detailed_geo_location_alias_id);
-
-
---
--- Name: variant_overlaps_region_subregion_division_subdivision_date_idx; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX variant_overlaps_region_subregion_division_subdivision_date_idx ON public.variant_overlaps USING btree (region, subregion, division, subdivision, date_collected);
 
 
 --
@@ -2449,6 +2242,8 @@ ALTER TABLE ONLY public.proposed_notifications
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20261011130001'),
+('20261011130000'),
 ('20261011120000'),
 ('20261011100000'),
 ('20261009050000'),

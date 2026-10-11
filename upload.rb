@@ -103,8 +103,7 @@ def import_lineages(lineage_csv, pending, taxon, caller_id)
 end
 
 def rebuild_views
-  views = %w[variant_overlaps counts time_counts oligo_variant_overlaps
-             identify_primers_for_notifications initial_score lineage_info]
+  views = %w[variant_overlaps oligo_variant_overlaps identify_primers_for_notifications lineage_info]
   views.each do |view|
     ActiveRecord::Base.connection.execute("REFRESH MATERIALIZED VIEW #{view}")
     @log.info("refreshing #{view}")

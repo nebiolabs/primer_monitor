@@ -1,3 +1,6 @@
+-- Only the last 168 days (counted back from the newest collection date) are materialized: every consumer
+-- (oligo_variant_overlaps -> identify_primers_for_notifications, primer set subscription counts) looks at most that far
+-- back, so older history only cost refresh time. Uses the fasta_records(date_collected) index.
 
 CREATE MATERIALIZED VIEW public.variant_overlaps AS
     SELECT oligos.id AS oligo_id,
@@ -27,7 +30,7 @@ CREATE MATERIALIZED VIEW public.variant_overlaps AS
             JOIN oligo_alignment_positions ON NOT (oligo_alignment_positions.ref_start >= variant_sites.ref_end OR oligo_alignment_positions.ref_end <= variant_sites.ref_start) AND fasta_records.organism_taxon_id = oligo_alignment_positions.organism_taxon_id
             JOIN oligos ON oligos.id = oligo_alignment_positions.oligo_id
             JOIN primer_sets ON oligos.primer_set_id = primer_sets.id
-   WHERE variant_sites.usable_del_or_snp = true
+   WHERE variant_sites.usable_del_or_snp = true AND fasta_records.date_collected > (SELECT max(recent.date_collected) - '168 days'::interval FROM fasta_records recent)
    UNION ALL
    SELECT oligos.id AS oligo_id,
           oligos.name AS oligo_name,
@@ -56,8 +59,5 @@ CREATE MATERIALIZED VIEW public.variant_overlaps AS
             JOIN oligo_alignment_positions ON NOT (oligo_alignment_positions.ref_start >= variant_sites.ref_end OR oligo_alignment_positions.ref_end <= variant_sites.ref_start) AND fasta_records.organism_taxon_id = oligo_alignment_positions.organism_taxon_id
             JOIN oligos ON oligos.id = oligo_alignment_positions.oligo_id
             JOIN primer_sets ON oligos.primer_set_id = primer_sets.id
-   WHERE variant_sites.usable_insertion = true
+   WHERE variant_sites.usable_insertion = true AND fasta_records.date_collected > (SELECT max(recent.date_collected) - '168 days'::interval FROM fasta_records recent)
 WITH DATA;
-
--- View indexes:
-CREATE INDEX variant_overlaps_region_subregion_division_subdivision_date_idx ON public.variant_overlaps USING btree (region, subregion, division, subdivision, date_collected);
