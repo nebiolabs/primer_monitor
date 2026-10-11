@@ -38,11 +38,11 @@
   <% if history.any? %>
     <h3 class="subtitle">Notification history<%= ' (latest 50)' if history.size == 50 %></h3>
     <div class="table-container">
-      <table class="table is-striped is-narrow notification-history">
+      <table class="table is-striped is-narrow notification-history" data-column-filters>
         <thead>
           <tr>
-            <th>Date</th><th>Status</th><th>Primer</th><th class="has-text-right">Position</th>
-            <th>Location</th><th class="has-text-right">Fraction variant</th>
+            <th class="filter-search">Date</th><th>Status</th><th>Primer</th><th class="has-text-right filter-search">Position</th>
+            <th>Location</th><th class="has-text-right filter-search">Fraction variant</th>
           </tr>
         </thead>
         <tbody>

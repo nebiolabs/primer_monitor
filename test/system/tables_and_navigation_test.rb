@@ -12,6 +12,20 @@ class TablesAndNavigationTest < ApplicationSystemTestCase
     assert_button 'Excel'
   end
 
+  test 'primer sets can be filtered by amplification method' do
+    primer_sets(:one).update!(status: :complete) # logged-out visitors only see complete sets
+    primer_sets(:two).update!(status: :complete, amplification_method: amplification_methods(:tiled_amplicon))
+    visit organism_primer_sets_path(organisms(:sars_cov2))
+
+    assert_equal ['Primer Set', 'Amp. Method'], all('thead th .dt-column-title').first(2).map(&:text)
+
+    find('thead th', text: 'Amp. Method').find('.dtcc-button_dropdown').click
+    within('.dtcc-dropdown') { click_button 'Tiled amplicon' }
+
+    assert_selector 'tbody tr', count: 1
+    assert_selector 'tbody tr', text: 'CDC'
+  end
+
   test 'the burger opens and closes the mobile menu' do
     page.driver.browser.manage.window.resize_to(600, 900)
     visit root_path

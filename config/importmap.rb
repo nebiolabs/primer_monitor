@@ -14,3 +14,5 @@ pin "datatables.net-buttons" # @4.1.2 (includes the copy/csv/excel buttons)
 pin "datatables.net-buttons-bm" # @4.1.2
 pin "datatables.net-responsive" # @4.1.1
 pin "datatables.net-responsive-bm" # @4.1.1
+pin "datatables.net-columncontrol" # @2.1.2 (per-column sort and value filters in the header)
+pin "datatables.net-columncontrol-bm" # @2.1.2

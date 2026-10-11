@@ -6,10 +6,10 @@
 
 <h2 class="title is-5"><%= pluralize(@alerts.size, 'alert') %></h2>
 <div class="table-container">
-  <table class="table is-striped is-narrow is-hoverable">
+  <table class="table is-striped is-narrow is-hoverable" data-column-filters>
     <thead>
       <tr>
-        <th>Primer set</th><th>Locus</th><th>Primer</th><th>Geographic region</th><th class="has-text-right">Frequency</th>
+        <th>Primer set</th><th>Locus</th><th>Primer</th><th>Geographic region</th><th class="has-text-right filter-search">Frequency</th>
       </tr>
     </thead>
     <tbody>

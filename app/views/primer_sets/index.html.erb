@@ -1,14 +1,14 @@
 <% content_for :container_class, 'is-fluid' %>
 <h1 class="title"><%= @organism.full_name %>  Primer Sets</h1>
 
-<table class="is-narrow is-striped">
+<table class="is-narrow is-striped" data-column-filters>
   <thead>
   <tr>
-    <th data-priority="4">Amp. Method</th>
     <th data-priority="1">Primer Set</th>
-    <th data-priority="2">Source</th>
-    <th data-priority="3">FASTA</th>
-    <th data-priority="3">BED</th>
+    <th data-priority="4">Amp. Method</th>
+    <th data-priority="2" class="no-filter">Source</th>
+    <th data-priority="3" class="no-filter">FASTA</th>
+    <th data-priority="3" class="no-filter">BED</th>
     <th data-priority="1">Subscription</th>
   </tr>
   </thead>
@@ -16,8 +16,8 @@
   <tbody>
   <% @organism.primer_sets.accessible_by(Ability.new(current_user)).each do |primer_set| %>
     <tr>
-      <td><%= link_to primer_set.amplification_method.name, primer_set.amplification_method.description_url %></td>
       <td><%= link_to primer_set.name, primer_set_path(primer_set) %></td>
+      <td><%= link_to primer_set.amplification_method.name, primer_set.amplification_method.description_url %></td>
       <td>
         <% if primer_set.display_url %>
           <%= external_link 'Source', primer_set.display_url %>

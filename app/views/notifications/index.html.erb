@@ -38,15 +38,15 @@
   <p>No notification emails in this period.</p>
 <% else %>
   <div class="table-container">
-    <table class="table is-striped is-narrow is-hoverable">
+    <table class="table is-striped is-narrow is-hoverable" data-column-filters>
       <thead>
         <tr>
-          <th>When</th>
+          <th class="filter-search">When</th>
           <th>User</th>
-          <th>Email</th>
+          <th class="filter-search">Email</th>
           <th>Status</th>
-          <th class="has-text-right">Alerts</th>
-          <th></th>
+          <th class="has-text-right filter-search">Alerts</th>
+          <th class="no-filter"></th>
         </tr>
       </thead>
       <tbody>

@@ -36,7 +36,7 @@ OrganismTaxon.find_or_create_by!(ncbi_taxon_id: 208_895, organism_id: rsv.id, li
 
 lamp = AmplificationMethod.find_or_create_by!(name: 'LAMP')
 qpcr = AmplificationMethod.find_or_create_by!(name: 'qPCR')
-AmplificationMethod.find_or_create_by!(name: 'Multiplex PCR')
+AmplificationMethod.find_or_create_by!(name: 'Tiled amplicon', description_url: 'https://doi.org/10.1038/nprot.2017.066')
 
 lamp_primerset = PrimerSet.find_or_create_by(name: 'NEB LAMP (E2019)', organism: sars, user: admin,
                                              amplification_method: lamp)

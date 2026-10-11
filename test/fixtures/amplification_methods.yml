@@ -1,3 +1,7 @@
 qPCR:
   name: qPCR
   description_url: "https://en.wikipedia.org/wiki/Real-time_polymerase_chain_reaction"
+
+tiled_amplicon:
+  name: Tiled amplicon
+  description_url: "https://doi.org/10.1038/nprot.2017.066"
