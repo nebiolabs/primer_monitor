@@ -19,6 +19,11 @@
   <%= @user.send_primer_updates %>
 </p>
 
+<p>
+  <strong>Active?:</strong>
+  <%= @user.active %>
+</p>
+
 <h2 class="title">Subscriptions</h2>
 <p>Locations: <%= @user.subscribed_geo_locations.includes(:detailed_geo_location_alias).map(&:to_s).join(', ').presence || 'none' %>;
   alert threshold <%= number_to_percentage(@user.variant_fraction_threshold * 100, precision: 0) %>

@@ -6,7 +6,8 @@ namespace :notifications do
     new_pns = ProposedNotification.new_proposed_notifications
     Rails.logger.info("Found #{new_pns.size} new proposed notifications")
     new_pns.each(&:save!)
-    VerifiedNotification.find_or_create_verified_notifications!.each(&:deliver!)
+    handled = VerifiedNotification.find_or_create_verified_notifications!.each(&:deliver!)
+    VerifiedNotification.send_summary!(handled)
   end
 
   desc 'Records current primer overlaps as already notified, emailing only the given addresses on the next send'

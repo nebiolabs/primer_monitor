@@ -50,6 +50,17 @@
     </div>
   </div>
 
+  <% if current_user.role?(:administrator) %>
+    <div class="field is-horizontal">
+      <div class="field-label">
+        <%= form.label :active, "Active (inactive users get no email)" %>
+      </div>
+      <div class="control field-body">
+        <%= form.check_box :active %>
+      </div>
+    </div>
+  <% end %>
+
   <%= form.submit "Save", class: 'button is-link'%>
 
 <% end %>

@@ -30,4 +30,10 @@ class PrimerSetTest < ActiveSupport::TestCase
 
     assert_enqueued_emails notified_admins.count
   end
+
+  test 'inactive admins are not emailed about primer set updates' do
+    Role.find_by(name: 'administrator').users.find_each { |admin| admin.update!(active: false) }
+
+    assert_no_enqueued_emails { primer_sets(:one).update!(name: 'renamed primer set') }
+  end
 end

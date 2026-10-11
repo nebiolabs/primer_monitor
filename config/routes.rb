@@ -35,5 +35,7 @@ Rails.application.routes.draw do
   # accounts are created by signing up (Devise) or with Google/Microsoft, so admins only list, edit and delete
   resources :users, except: %i[new create]
   resources :primer_set_subscriptions, only: [:create, :destroy]
+  # admin dashboard of notification emails sent to users
+  resources :notifications, only: %i[index show]
   resources :primer_sets, only: [:new, :show, :create, :destroy, :update, :edit]
 end

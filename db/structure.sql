@@ -683,7 +683,7 @@ CREATE TABLE public.users (
     last_sign_in_at timestamp without time zone,
     current_sign_in_ip character varying,
     last_sign_in_ip character varying,
-    active boolean DEFAULT false,
+    active boolean DEFAULT true NOT NULL,
     approved boolean DEFAULT false,
     confirmed boolean DEFAULT false,
     send_primer_updates boolean DEFAULT false NOT NULL,
@@ -2449,6 +2449,7 @@ ALTER TABLE ONLY public.proposed_notifications
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20261011100000'),
 ('20261009050000'),
 ('20260513000001'),
 ('20260513000000'),

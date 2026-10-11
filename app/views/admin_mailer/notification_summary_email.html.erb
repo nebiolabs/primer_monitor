@@ -1,0 +1,25 @@
+<html>
+<head>
+  <meta content='text/html; charset=UTF-8' http-equiv='Content-Type' />
+</head>
+<body>
+<h1>Notification emails for <%= @date %></h1>
+<p>
+  <%= pluralize(@sent.size, 'email') %> sent, <%= @skipped.size %> skipped.
+  <a href="<%= @url %>">View them on the notifications dashboard</a>.
+</p>
+<table>
+  <tr>
+    <th>User</th><th>Email</th><th>Status</th><th>Alerts</th>
+  </tr>
+  <% (@sent + @skipped).each do |notification| %>
+    <tr>
+      <td><%= notification.user %></td>
+      <td><%= notification.user.email %></td>
+      <td><%= notification.status %><%= ' (inactive user)' if notification.status == 'Skipped' && !notification.user.active? %></td>
+      <td><%= @alert_counts.fetch(notification.id, 0) %></td>
+    </tr>
+  <% end %>
+</table>
+</body>
+</html>

@@ -49,8 +49,11 @@ class UsersController < ApplicationController
   end
 
   # Only allow a list of trusted parameters through. Blank password fields keep the current password.
+  # Only administrators can (de)activate a user.
   def user_params
-    permitted = params.expect(user: %i[first last email password password_confirmation send_primer_updates])
+    fields = %i[first last email password password_confirmation send_primer_updates]
+    fields << :active if current_user.role?(:administrator)
+    permitted = params.expect(user: fields)
     permitted[:password].blank? ? permitted.except(:password, :password_confirmation) : permitted
   end
 end

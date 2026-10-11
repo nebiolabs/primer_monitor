@@ -47,7 +47,7 @@ class PrimerSet < ApplicationRecord
   end
 
   def notify_admins_about_primer_set_update
-    Role.find_by(name: 'administrator').users.each do |user|
+    Role.find_by(name: 'administrator').users.where(active: true).find_each do |user|
       PrimerSetMailer.updated_primer_set_email(user.email, self).deliver_later unless user.email == ENV['ADMIN_EMAIL']
     end
   end

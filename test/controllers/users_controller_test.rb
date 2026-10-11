@@ -52,6 +52,31 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to user_url(@user)
   end
 
+  test 'administrators can deactivate a user' do
+    patch user_url(users(:one)), params: { user: { active: '0' } }
+
+    assert_redirected_to user_url(users(:one))
+    assert_not users(:one).reload.active?
+  end
+
+  test 'users cannot change whether they are active' do
+    sign_out(@user)
+    sign_in(users(:one))
+    patch user_url(users(:one)), params: { user: { first: 'Frankie', active: '0' } }
+
+    assert_equal 'Frankie', users(:one).reload.first
+    assert_predicate users(:one), :active?
+  end
+
+  test 'inactive users can still sign in' do
+    sign_out(@user)
+    users(:one).update!(active: false)
+    sign_in(users(:one))
+    get user_url(users(:one))
+
+    assert_response :success
+  end
+
   test 'should destroy user' do
     assert_difference('User.count', -1) do
       delete user_url(@user)

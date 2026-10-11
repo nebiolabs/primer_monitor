@@ -1,0 +1,66 @@
+<% content_for :container_class, 'is-fluid' %>
+<h1 class="title">Notification emails</h1>
+
+<%= form_with url: notifications_path, method: :get, local: true, class: 'block' do |form| %>
+  <div class="field is-grouped is-grouped-multiline">
+    <div class="control">
+      <%= form.label :from, 'From', class: 'label is-small' %>
+      <%= form.date_field :from, value: @from, class: 'input is-small' %>
+    </div>
+    <div class="control">
+      <%= form.label :to, 'To', class: 'label is-small' %>
+      <%= form.date_field :to, value: @to, class: 'input is-small' %>
+    </div>
+    <div class="control">
+      <%= form.label :status, 'Status', class: 'label is-small' %>
+      <div class="select is-small">
+        <%= form.select :status, VerifiedNotification::STATUSES, include_blank: 'All', selected: @status %>
+      </div>
+    </div>
+    <div class="control">
+      <%= form.label :q, 'User', class: 'label is-small' %>
+      <%= form.search_field :q, value: @query, placeholder: 'name or email', class: 'input is-small' %>
+    </div>
+    <div class="control is-align-self-flex-end">
+      <%= form.submit 'Filter', name: nil, class: 'button is-link is-small' %>
+    </div>
+  </div>
+<% end %>
+
+<p class="block">
+  <strong><%= pluralize(@status_counts.fetch('Sent', 0), 'email') %></strong> sent to
+  <%= pluralize(@recipient_count, 'user') %>;
+  <%= @status_counts.fetch('Skipped', 0) %> skipped (inactive users or baselined);
+  <%= @status_counts.fetch('Unsent', 0) %> pending.
+</p>
+
+<% if @notifications.empty? %>
+  <p>No notification emails in this period.</p>
+<% else %>
+  <div class="table-container">
+    <table class="table is-striped is-narrow is-hoverable">
+      <thead>
+        <tr>
+          <th>When</th>
+          <th>User</th>
+          <th>Email</th>
+          <th>Status</th>
+          <th class="has-text-right">Alerts</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @notifications.each do |notification| %>
+          <tr>
+            <td><%= l(notification.updated_at, format: :short) %></td>
+            <td><%= link_to notification.user, notification.user %><%= ' (inactive)' unless notification.user.active? %></td>
+            <td><%= notification.user.email %></td>
+            <td><%= notification.status %></td>
+            <td class="has-text-right"><%= notification.alert_count %></td>
+            <td><%= link_to 'Details', notification_path(notification) %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+<% end %>
