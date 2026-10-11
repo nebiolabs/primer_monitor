@@ -54,7 +54,7 @@ process extract_new_records {
     // Keeps only new records added since previous run
     cpus 1
     memory '8 GB'
-    conda "python=3.9 zstd seqtk 'postgresql>=15'"
+    conda "python=3.9 zstd seqtk 'postgresql>=15' fd-find"
 
     input:
         tuple file(metadata_json), file(sequences_fasta)
@@ -76,7 +76,7 @@ process extract_new_records {
     <(psql -h "$DB_HOST" -d "$DB_NAME" -U "$DB_USER_RO" -c "SELECT genbank_accession FROM fasta_records;" --csv -t) \
     ${date_today}.tsv;
 
-    find !{output_path} -maxdepth 1 -mtime +5 -type f -name "*.metadata.zst" -name "*.sequences.zst" -delete;
+    fd --no-ignore --hidden --max-depth 1 --type f --changed-before 5d --glob '*.{metadata,sequences}.zst' !{output_path} -X rm;
     '''
 
 }
