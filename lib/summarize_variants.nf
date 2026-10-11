@@ -170,6 +170,9 @@ process lineage_calls {
 }
 
 process load_to_db {
+    // run on the submit host (hpc-g), whose rbenv ruby matches the deploy; the compute nodes
+    // have a different OS and would need their own ruby build
+    executor 'local'
     cpus 1
     publishDir "${output_path}", mode: 'copy'
     errorStrategy 'retry'
@@ -185,6 +188,8 @@ process load_to_db {
         file '*.complete'
     shell:
     '''
+    # pick up the app's .ruby-version; the work dir has none
+    export RBENV_DIR="!{primer_monitor_path}"
     RAILS_ENV=production ruby !{primer_monitor_path}/upload.rb \
             --import_calls \
             --import_seqs \
