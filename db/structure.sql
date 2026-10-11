@@ -2242,6 +2242,7 @@ ALTER TABLE ONLY public.proposed_notifications
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20261011140000'),
 ('20261011130001'),
 ('20261011130000'),
 ('20261011120000'),
