@@ -23,6 +23,7 @@ class PrimerSetsController < ApplicationController
 
     @config['primer_set_display_name'] = @primer_set.name
     @config['primer_set_name'] = primer_sets[@primer_set.name]
+    prepare_lineage_display
   end
 
   # GET /primer_sets/new
@@ -81,6 +82,24 @@ class PrimerSetsController < ApplicationController
   end
 
   private
+
+  # picks the lineage whose variants are shown against this primer set: the one in the URL, else the most
+  # prevalent recent one. Without the lineage data the page falls back to showing only the primer positions.
+  def prepare_lineage_display
+    organism = @primer_set.organism
+    track_data = organism.lineage_variants_data(@config[:data_server], @config[:organism_slug])
+    return unless track_data[:data_fetched]
+
+    state = LineageVariants::DisplayStateBuilder.call(
+      organism:, track_data:, url_lineage: params[:lineage].presence, url_primer_sets: [@config['primer_set_name']]
+    )
+    @lineage_sets = track_data[:lineage_sets]
+    @lineage_frequencies = state[:lineage_frequencies]
+    @sorted_lineages = state[:sorted_lineages]
+    @config[:initial_lineage] = state[:effective_lineage]
+    @config[:lineage_names] = @lineage_sets
+    @config[:variant_overlaps_path] = variant_overlaps_organism_lineage_variants_path(organism, format: :json)
+  end
 
   # Use callbacks to share common setup or constraints between actions.
   def set_primer_set

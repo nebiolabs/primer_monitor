@@ -74,7 +74,7 @@ class Organism < ApplicationRecord
 
     process_lineage_variants_data tracks_req.body, defaults_req.body, lineages_req.body
   rescue Errno::ECONNREFUSED, Errno::ENOENT, SocketError, Net::OpenTimeout, Net::ReadTimeout,
-         HTTParty::Error, JSON::ParserError
+         OpenSSL::SSL::SSLError, HTTParty::Error, JSON::ParserError
     { data_fetched: false }
   end
 

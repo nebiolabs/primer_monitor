@@ -19,12 +19,9 @@
     <label class="label">Lineage:</label>
     <div class="control">
       <select id="lineage_select" name="lineage" class="searchable-select is-wide">
-        <% @sorted_lineages.each do |key, depth| %>
-          <% freq = @lineage_frequencies.fetch(key, 0) %>
-          <% freq_text = freq > 0 ? " (#{number_with_delimiter(freq)} in most recent 30 days)" : "" %>
-          <% indent = depth > 0 ? "  " * depth + "└ " : "" %>
-          <option value="<%= key %>"<%= ' selected' if key == @effective_lineage %>><%= "#{indent}#{@track_data[:lineage_sets][key]}#{freq_text}" %></option>
-        <% end %>
+        <%= render 'lineage_variants/lineage_options', sorted_lineages: @sorted_lineages,
+                   lineage_frequencies: @lineage_frequencies, lineage_sets: @track_data[:lineage_sets],
+                   selected: @effective_lineage %>
       </select>
     </div>
   </div>

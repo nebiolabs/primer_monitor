@@ -73,6 +73,7 @@ class PrimerSetsControllerTest < ActionDispatch::IntegrationTest
     @primer_set.update!(status: :complete)
     Organism.any_instance.stubs(:primer_sets_config)
             .returns([{ data_server: 'http://data', organism_slug: 'sars-cov-2' }, { @primer_set.name => 'Charite' }])
+    Organism.any_instance.stubs(:lineage_variants_data).returns({ data_fetched: false })
     get primer_set_url(@primer_set)
 
     assert_select 'a[href=?]', 'http://data/sars-cov-2/primer_sets_fasta/Charite.fasta'

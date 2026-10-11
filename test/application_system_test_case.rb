@@ -18,6 +18,8 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
   setup do
     server = Capybara.current_session.server # Capybara picks a free port, so ask it which
     ENV['IGV_DATA_SERVER'] = "http://#{server.host}:#{server.port}/igvstatic"
+    # the lineage and primer set pages read lineage frequencies from this backend-refreshed view
+    ActiveRecord::Base.connection.execute('REFRESH MATERIALIZED VIEW lineage_info')
   end
   teardown { ENV.delete('IGV_DATA_SERVER') }
 

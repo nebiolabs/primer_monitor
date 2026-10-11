@@ -1,0 +1,7 @@
+<%# lineage groups as an indented tree, each with its sequence count from the most recent 30 days %>
+<% sorted_lineages.each do |key, depth| %>
+  <% freq = lineage_frequencies.fetch(key, 0) %>
+  <% freq_text = freq > 0 ? " (#{number_with_delimiter(freq)} in most recent 30 days)" : "" %>
+  <% indent = depth > 0 ? "  " * depth + "└ " : "" %>
+  <option value="<%= key %>"<%= ' selected' if key == selected %>><%= "#{indent}#{lineage_sets[key]}#{freq_text}" %></option>
+<% end %>

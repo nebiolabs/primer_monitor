@@ -16,3 +16,8 @@ export function removeBrowser() {
     pending = null;
     loading.then(browser => igv.removeBrowser(browser)).catch(() => {});
 }
+
+// The promise of the page's browser, or null when there is none
+export function currentBrowser() {
+    return pending;
+}
