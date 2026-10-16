@@ -94,12 +94,16 @@ def import_lineages(lineage_csv, pending, taxon, caller_id)
     @log.info("Loaded #{result_lineages.ids.size}/#{lineages.size} new lineages")
   end
 
+  import_lineage_calls(lineage_csv, pending, caller_id)
+end
+
+def import_lineage_calls(lineage_csv, pending, caller_id)
   calls = LineageCall.parse(lineage_csv, caller_id)
   result_calls = LineageCall.import(calls, validate: false)
   result_calls.failed_instances.each { |rec| @log.error("Failed to insert lineage call \"#{rec}\"") }
-  @log.info("Loaded #{result_calls.size}/#{calls.size} new lineage calls")
+  @log.info("Loaded #{result_calls.ids.size}/#{calls.size} new lineage calls")
 
-  LineageCall.update_fasta_recs pending
+  LineageCall.update_fasta_recs pending, result_calls.ids
 end
 
 def rebuild_views

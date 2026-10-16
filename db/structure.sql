@@ -1625,6 +1625,13 @@ CREATE INDEX index_lineage_calls_on_lineage_id ON public.lineage_calls USING btr
 
 
 --
+-- Name: index_lineage_calls_on_taxon; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_lineage_calls_on_taxon ON public.lineage_calls USING btree (taxon);
+
+
+--
 -- Name: index_lineage_variant_primer_overlaps_on_oligo_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -2242,6 +2249,7 @@ ALTER TABLE ONLY public.proposed_notifications
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20261016120000'),
 ('20261011140000'),
 ('20261011130001'),
 ('20261011130000'),

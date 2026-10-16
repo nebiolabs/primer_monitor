@@ -34,12 +34,21 @@ class LineageCall < ApplicationRecord
     LineageCall.new(taxon:, lineage_id: lineage_rec.id, lineage_caller_id: caller_id, metadata:)
   end
 
-  def self.update_fasta_recs(pending)
+  # Points fasta records at the calls just imported (call_ids). Limiting this to the batch keeps the parallel
+  # load_lineage_data tasks of a recall off each other's rows. A recall (pending) re-calls every record, so it
+  # overwrites any pending call a failed earlier recall left behind; nightly calls only fill records without one.
+  def self.update_fasta_recs(pending, call_ids)
+    return if call_ids.empty?
+
     id_field = pending ? 'pending_lineage_call_id' : 'lineage_call_id'
+    only_unset = pending ? '' : "AND fasta_records.#{id_field} IS NULL"
 
     # likely faster this way than with ActiveRecord
-    # the interpolation is safe because it can only be one of the 2 hardcoded values above
-    ActiveRecord::Base.connection.execute "UPDATE fasta_records SET #{id_field}=lineage_calls.id
-  FROM lineage_calls WHERE lineage_calls.taxon=fasta_records.genbank_accession AND fasta_records.#{id_field} IS NULL;"
+    # the interpolation is safe because it can only be one of the hardcoded values above
+    ActiveRecord::Base.connection.execute sanitize_sql_array([<<~SQL.squish, call_ids])
+      UPDATE fasta_records SET #{id_field}=lineage_calls.id
+      FROM lineage_calls WHERE lineage_calls.id IN (?)
+      AND lineage_calls.taxon=fasta_records.genbank_accession #{only_unset}
+    SQL
   end
 end
