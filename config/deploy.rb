@@ -56,7 +56,10 @@ namespace :backend do # rubocop:disable Metrics/BlockLength
       within fetch(:backend_deploy_to) do
         # --force discards edits to tracked files so a hand-patched checkout can't block the deploy; untracked
         # files (datasets, reports, pipeline output) are kept. Host-specific bundler settings belong in
-        # .bundle/config (e.g. force_ruby_platform on hpc-g), not in Gemfile edits.
+        # .bundle/config (e.g. force_ruby_platform on hpc-g), not in Gemfile edits. SGE compute nodes (Rocky 8,
+        # glibc 2.28) use HOME=/data/primer-monitor with their own rbenv, so rubies and gems used by Nextflow
+        # tasks must be built there via qsub, and /data/primer-monitor/.bundle/config needs force_ruby_platform
+        # and build.pg=--with-pg-config=/usr/pgsql-13/bin/pg_config.
         execute("cd #{fetch(:backend_deploy_path)}/release && git fetch --tags origin && " \
                 "git checkout --force -B '#{fetch(:branch)}' 'origin/#{fetch(:branch)}'")
         # creates a new symlink, overwriting any existing one
