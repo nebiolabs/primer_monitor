@@ -18,7 +18,7 @@ class NotificationsController < ApplicationController
     @alerts = @notification.proposed_notifications
                            .includes(:primer_set, :oligo, :detailed_geo_location_alias)
                            .joins(:primer_set, :oligo)
-                           .order('primer_sets.name, oligos.locus, oligos.category')
+                           .order('primer_sets.name, proposed_notifications.coordinate, oligos.name')
   end
 
   private
