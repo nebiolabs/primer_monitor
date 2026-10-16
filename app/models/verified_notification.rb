@@ -41,7 +41,8 @@ class VerifiedNotification < ApplicationRecord
   end
 
   # emails the user their pending notifications and records the delivery; inactive users get no email, and their
-  # notifications are recorded as skipped so reactivating them doesn't send the backlog
+  # notifications are recorded as skipped so reactivating them doesn't send the backlog. Mail cancelled by an
+  # interceptor (external addresses outside production) is recorded as skipped too.
   def deliver!
     return update!(status: 'Skipped') unless user.active?
 
@@ -49,10 +50,18 @@ class VerifiedNotification < ApplicationRecord
     notifications = ProposedNotification.where(verified_notification_id: id)
                                         .includes(:oligo, :primer_set,
                                                   :subscribed_geo_location, :detailed_geo_location_alias)
-                                        .reorder('primer_sets.name, oligos.locus, oligos.category,' \
+                                        .reorder('primer_sets.name, proposed_notifications.coordinate, oligos.name,' \
                                                  'region, subregion, division, subdivision')
-    PrimerSetMailer.primer_overlap_notification_email(user_id, notifications).deliver_now
-    update!(status: 'Sent')
+    message = PrimerSetMailer.primer_overlap_notification_email(user_id, notifications).deliver_now
+    update!(status: message.perform_deliveries ? 'Sent' : 'Skipped')
+  end
+
+  # why a notification was recorded without emailing it, if it was
+  def skip_reason
+    return unless status == 'Skipped'
+    return 'inactive user' unless user.active?
+
+    'external address' if ExternalMailInterceptor.active? && !ExternalMailInterceptor.allowed?(user.email)
   end
 
   # Records every pending notification as handled without emailing it, except for the given addresses.

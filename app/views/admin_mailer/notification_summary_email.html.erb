@@ -16,7 +16,7 @@
     <tr>
       <td><%= notification.user %></td>
       <td><%= notification.user.email %></td>
-      <td><%= notification.status %><%= ' (inactive user)' if notification.status == 'Skipped' && !notification.user.active? %></td>
+      <td><%= notification.status %><%= " (#{notification.skip_reason})" if notification.skip_reason %></td>
       <td><%= @alert_counts.fetch(notification.id, 0) %></td>
     </tr>
   <% end %>

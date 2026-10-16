@@ -30,7 +30,7 @@
 <p class="block">
   <strong><%= pluralize(@status_counts.fetch('Sent', 0), 'email') %></strong> sent to
   <%= pluralize(@recipient_count, 'user') %>;
-  <%= @status_counts.fetch('Skipped', 0) %> skipped (inactive users or baselined);
+  <%= @status_counts.fetch('Skipped', 0) %> skipped (inactive users, external addresses outside production, or baselined);
   <%= @status_counts.fetch('Unsent', 0) %> pending.
 </p>
 

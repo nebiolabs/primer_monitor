@@ -20,6 +20,17 @@ class VerifiedNotificationTest < ActiveSupport::TestCase
     assert_equal 'Skipped', notification.reload.status
   end
 
+  test 'deliver! records mail cancelled by the external mail interceptor as skipped' do
+    ActionMailer::Base.register_interceptor(ExternalMailInterceptor)
+    users(:one).update!(email: 'someone@example.org')
+    notification = VerifiedNotification.create!(user: users(:one), status: 'Unsent')
+
+    assert_no_emails { notification.deliver! }
+    assert_equal 'Skipped', notification.reload.status
+  ensure
+    ActionMailer::Base.unregister_interceptor(ExternalMailInterceptor)
+  end
+
   test 'skip_unsent! marks pending notifications handled, except for the given addresses' do
     skipped = VerifiedNotification.create!(user: users(:one), status: 'Unsent')
     kept = VerifiedNotification.create!(user: users(:two), status: 'Unsent')

@@ -6,6 +6,10 @@
 class ExternalMailInterceptor
   FIELDS = %i[to cc bcc].freeze
 
+  def self.active?
+    Array(Rails.application.config.action_mailer.interceptors).map(&:to_s).include?(name)
+  end
+
   def self.allowed_domains
     ENV.fetch('MAIL_ALLOWED_DOMAINS', 'neb.com').split(',').map { |domain| domain.strip.downcase }.compact_blank
   end

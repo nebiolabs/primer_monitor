@@ -108,7 +108,7 @@ Rails.application.configure do
   # config.active_record.database_resolver_context = ActiveRecord::Middleware::DatabaseSelector::Resolver::Session
   #
 
-  config.action_mailer.default_url_options = { host: 'primer-monitor-dev.neb.com' }
+  config.action_mailer.default_url_options = { host: 'primer-monitor-dev.neb.com', protocol: 'https' }
   config.action_mailer.delivery_method = :sendmail
 
   # the database holds copies of real users: only email MAIL_ALLOWED_DOMAINS (see ExternalMailInterceptor)
