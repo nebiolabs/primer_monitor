@@ -45,6 +45,7 @@ class ProposedNotification < ApplicationRecord
 
     IdentifyPrimersForNotification.includes(:detailed_geo_location).find_each do |primer_record|
       pn = construct_notification_record(primer_record)
+      next if pn.nil?
 
       potential_notifications << pn unless existing_notification_cache.key?(pn.cache_key)
     end
@@ -52,16 +53,20 @@ class ProposedNotification < ApplicationRecord
     potential_notifications
   end
 
+  # nil when the user dropped the location or primer set since the nightly view refresh
   def self.construct_notification_record(primer_record)
     subscribed_alias = JoinSubscribedLocationToId.find_by(user_id: primer_record.user_id,
                                                           detailed_geo_location_id:
                                                             primer_record.detailed_geo_location_id)
+    return if subscribed_alias.nil?
+
     subscribed_geo_location_id = SubscribedGeoLocation.find_by(user_id: primer_record.user_id,
                                                                detailed_geo_location_alias_id:
-                                                                 subscribed_alias.detailed_geo_location_alias_id).id
+                                                                 subscribed_alias.detailed_geo_location_alias_id)&.id
 
     primer_set_subscription_id = PrimerSetSubscription.find_by(user_id: primer_record.user_id,
-                                                               primer_set_id: primer_record.primer_set_id).id
+                                                               primer_set_id: primer_record.primer_set_id)&.id
+    return if subscribed_geo_location_id.nil? || primer_set_subscription_id.nil?
 
     ProposedNotification.new(primer_set_id: primer_record.primer_set_id, user_id: primer_record.user_id,
                              oligo_id: primer_record.oligo_id, coordinate: primer_record.coords,
