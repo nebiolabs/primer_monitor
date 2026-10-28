@@ -19,7 +19,7 @@ class TablesAndNavigationTest < ApplicationSystemTestCase
 
     assert_equal ['Primer Set', 'Amp. Method'], all('thead th .dt-column-title').first(2).map(&:text)
 
-    find('thead th', text: 'Amp. Method').find('.dtcc-button_dropdown').click
+    within('thead th', text: 'Amp. Method') { find('.dtcc-button_dropdown').click }
     within('.dtcc-dropdown') { click_button 'Tiled amplicon' }
 
     assert_selector 'tbody tr', count: 1
