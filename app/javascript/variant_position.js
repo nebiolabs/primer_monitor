@@ -41,7 +41,7 @@ function initDiagram(config) {
                 "format": "bed",
                 "color": primer.color,
                 "displayMode": "SQUISHED",
-                "height": 12,
+                "height": 17,
                 "autoHeight": false
             })),
             // one track per allele, most frequent first; the name carries its frequency
