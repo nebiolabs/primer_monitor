@@ -4,6 +4,8 @@
 # draws a map of the sequences and an igv.js diagram of the position; the .text format serves the diagram's tracks.
 class VariantPositionsController < ApplicationController
   DEFAULT_DAYS = 30
+  # the nightly overlap view behind the primer scores covers 168 days
+  MAX_DAYS = 168
 
   def show
     authorize! :show, VariantPositionsController
@@ -26,7 +28,7 @@ class VariantPositionsController < ApplicationController
 
   def load_position
     @coordinate = params[:coordinate].to_i
-    @days = params[:days].present? ? params[:days].to_i.clamp(1, 365) : DEFAULT_DAYS
+    @days = params[:days].present? ? params[:days].to_i.clamp(1, MAX_DAYS) : DEFAULT_DAYS
     @summary = VariantPositions::Summary.call(organism: @organism, coordinate: @coordinate, days: @days)
     @track = VariantPositions::Track.new(organism: @organism, coordinate: @coordinate, days: @days)
   end

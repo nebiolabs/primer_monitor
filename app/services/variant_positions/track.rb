@@ -6,6 +6,7 @@ module VariantPositions
   # sequences collected within the last `days` days. Uses the organism's first taxon, like the organism browser.
   class Track
     PADDING = 25
+    CACHE_TTL = 1.hour
 
     Allele = Struct.new(:ref_start, :ref_end, :variant_type, :variant, :sequences, keyword_init: true)
 
@@ -21,9 +22,9 @@ module VariantPositions
 
     # the variant alleles at the position, most frequent first; each one is a track of its own so the order holds
     def alleles
-      @alleles ||= begin
+      @alleles ||= cached(:alleles) do
         built = allele_counts.map do |(start, stop, type, variant), sequences|
-          build_allele(start, stop, type, variant, sequences)
+          Allele.new(ref_start: start, ref_end: stop, variant_type: type, variant:, sequences:)
         end
         built.sort_by { |a| [-a.sequences, a.ref_start, a.variant_type, a.variant] }
       end
@@ -43,12 +44,13 @@ module VariantPositions
     end
 
     # BED lines of the primers overlapping the position, named by primer set and primer. The score is the number of
-    # sequences in the window with a variant inside the primer.
+    # distinct variant sites in the window overlapping the primer.
     def primer_bed
+      counts = primer_variant_counts
       bed(primer_positions.map do |position|
         oligo = position.oligo
         [position.ref_start, position.ref_end, "#{oligo.primer_set.name} #{oligo.label}",
-         primer_variant_sequences(position), strand(oligo)]
+         counts.fetch(oligo.id, 0), strand(oligo)]
       end)
     end
 
@@ -70,10 +72,6 @@ module VariantPositions
                  .group(:ref_start, :ref_end, :variant_type, :variant).count
     end
 
-    def build_allele(start, stop, type, variant, sequences)
-      Allele.new(ref_start: start, ref_end: stop, variant_type: type, variant:, sequences:)
-    end
-
     # share of the sequences in the window that carry the allele
     def percent(count)
       total = window_sequence_count
@@ -81,19 +79,23 @@ module VariantPositions
     end
 
     def window_sequence_count
-      @window_sequence_count ||= if taxon
-                                   FastaRecord.where(organism_taxon_id: taxon.id,
-                                                     date_collected: since..).count
-                                 else
-                                   0
-                                 end
+      @window_sequence_count ||= cached(:sequence_count) do
+        taxon ? FastaRecord.where(organism_taxon_id: taxon.id, date_collected: since..).count : 0
+      end
     end
 
-    def primer_variant_sequences(position)
-      FastaRecord.where(organism_taxon_id: taxon.id, date_collected: since..)
-                 .where(id: VariantSite.where(organism_taxon_id: taxon.id)
-                                       .overlapping(position.ref_start, position.ref_end).select(:fasta_record_id))
-                 .count
+    # oligo id => distinct variant sites in the window overlapping that primer, in one query against the nightly
+    # overlap view (which is why the page caps its window at the view's 168 days)
+    def primer_variant_counts
+      @primer_variant_counts ||= cached(:primer_variant_counts) do
+        OligoVariantOverlap.where(oligo_id: primer_positions.map { |p| p.oligo.id })
+                           .where(date_collected: since..).group(:oligo_id).distinct.count(:variant_id)
+      end
+    end
+
+    # the diagram makes one request per allele track, all for the same data, so share it for a while
+    def cached(name, &)
+      Rails.cache.fetch(['variant_position_track', taxon&.id, coordinate, since, name], expires_in: CACHE_TTL, &)
     end
 
     def primer_positions

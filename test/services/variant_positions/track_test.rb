@@ -8,6 +8,13 @@ module VariantPositions
       @organism = organisms(:sars_cov2)
       @taxon = organism_taxa(:sars_cov_2_taxon)
       @track = Track.new(organism: @organism, coordinate: 100, days: 30)
+      refresh_overlap_views
+    end
+
+    def refresh_overlap_views
+      %w[variant_overlaps oligo_variant_overlaps].each do |view|
+        ActiveRecord::Base.connection.execute("REFRESH MATERIALIZED VIEW #{view}")
+      end
     end
 
     test 'primer track lists the primers overlapping the position' do
@@ -30,6 +37,7 @@ module VariantPositions
                           ref_start: 110, ref_end: 111, variant_type: 'X', variant: 'T')
       VariantSite.create!(fasta_record_id: record.id, organism_taxon_id: @taxon.id, ref: nil,
                           ref_start: 300, ref_end: 301, variant_type: 'X', variant: 'T')
+      refresh_overlap_views
 
       score = @track.primer_bed.split("\t")[4]
 

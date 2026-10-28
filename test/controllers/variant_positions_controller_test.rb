@@ -10,6 +10,9 @@ class VariantPositionsControllerTest < ActionDispatch::IntegrationTest
                                  date_collected: Date.current, organism_taxon_id: taxon.id)
     VariantSite.create!(fasta_record_id: record.id, organism_taxon_id: taxon.id, ref_start: 100, ref_end: 101,
                         variant_type: 'X', variant: 'A', ref: nil)
+    %w[variant_overlaps oligo_variant_overlaps].each do |view|
+      ActiveRecord::Base.connection.execute("REFRESH MATERIALIZED VIEW #{view}")
+    end
   end
 
   test 'shows the geographic distribution of the position' do
