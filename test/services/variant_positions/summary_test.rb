@@ -61,6 +61,24 @@ module VariantPositions
       assert_in_delta 133.0, point[:longitude], 0.01
     end
 
+    test 'a US location is placed at its state, and its table row points there' do
+      california = DetailedGeoLocation.create!(world: 'World', region: 'North America', subregion: 'USA',
+                                               division: 'California',
+                                               detailed_geo_location_alias: detailed_geo_location_aliases(:darwin))
+      record = FastaRecord.create!(strain: 'ca/1', detailed_geo_location: california, date_collected: Date.current,
+                                   organism_taxon_id: @taxon.id)
+      VariantSite.create!(fasta_record_id: record.id, organism_taxon_id: @taxon.id, ref: nil,
+                          ref_start: 100, ref_end: 101, variant_type: 'X', variant: 'A')
+
+      summary = summarize(100)
+      point = summary[:map_points].find { |p| p[:name] == 'California, United States' }
+      row = summary[:locations].find { |r| r.name == 'North America/USA/California' }
+
+      assert_equal [1, 1], [point[:variant_count], point[:sequence_count]]
+      assert_equal 'California, United States', row.map_name
+      assert_in_delta 37.2461, point[:latitude], 0.001
+    end
+
     test 'lists only named lineages that carry the variant' do
       lineage = summarize(100)[:lineages].first
 

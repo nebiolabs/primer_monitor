@@ -52,9 +52,8 @@ module VariantPositions
 
       rows = variants.map do |location_id, variant_count|
         location = names.fetch(location_id)
-        centroid = CountryCentroids.lookup(location.subregion)
         build_row(location_name(location), variant_count, totals.fetch(location_id, 0),
-                  map_name: centroid&.fetch('name'))
+                  map_name: CountryCentroids.point(location.subregion, location.division)&.fetch(:name))
       end
       sort_rows(rows)
     end
@@ -89,25 +88,31 @@ module VariantPositions
               fraction: sequence_count.zero? ? 0.0 : variant_count.to_f / sequence_count)
     end
 
-    # one point per country for the map, at its centroid; sequences whose country is unknown appear only in the table
+    # one point per map position (a state or a country), at its centroid, summing the locations in it. Sequences in a
+    # location without a position appear only in the table.
     def map_points
-      variants = centroid_sums(variant_records)
-      sequences = centroid_sums(window_records)
-      rows = variants.map do |country, variant_count|
-        centroid = CountryCentroids.lookup(country)
-        build_row(country, variant_count, sequences.fetch(country, 0)).to_h.merge(latitude: centroid['lat'],
-                                                                                  longitude: centroid['lng'])
+      variants = point_sums(variant_records)
+      sequences = point_sums(window_records)
+      rows = variants.map do |name, entry|
+        point = entry[:point]
+        build_row(name, entry[:count], sequences.dig(name, :count) || 0).to_h
+                                                                        .merge(latitude: point[:lat],
+                                                                               longitude: point[:lng])
       end
       rows.sort_by { |row| [-row[:variant_count], row[:name]] }
     end
 
-    # variant or sequence counts per country, keyed by the country's centroid name
-    def centroid_sums(records)
-      counts = records.joins(:detailed_geo_location).where.not(detailed_geo_locations: { subregion: nil })
-                      .group('detailed_geo_locations.subregion').count
-      counts.each_with_object(Hash.new(0)) do |(subregion, count), sums|
-        centroid = CountryCentroids.lookup(subregion)
-        sums[centroid['name']] += count if centroid
+    # {position name => {count:, point:}} for the records, counted by the location they were collected in
+    def point_sums(records)
+      counts = records.where.not(detailed_geo_location_id: nil).group(:detailed_geo_location_id).count
+      locations = DetailedGeoLocation.where(id: counts.keys).index_by(&:id)
+      counts.each_with_object({}) do |(location_id, count), sums|
+        location = locations.fetch(location_id)
+        point = CountryCentroids.point(location.subregion, location.division)
+        next if point.nil?
+
+        sums[point[:name]] ||= { count: 0, point: }
+        sums[point[:name]][:count] += count
       end
     end
   end
