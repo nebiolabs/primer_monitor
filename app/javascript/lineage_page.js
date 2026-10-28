@@ -12,7 +12,6 @@ function initDiagram(config) {
             "name": primerSet.name,
             "url": primerSet.url,
             "format": "bed",
-            "description": "",
             "color": primerSet.color,
             "displayMode": "SQUISHED",
             "height": 17,
