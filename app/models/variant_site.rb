@@ -12,6 +12,15 @@ class VariantSite < ApplicationRecord
     SQL
   }
 
+  # the usable variants that oligo_variant_overlaps reports within [start, stop): SNPs and deletions overlapping it,
+  # insertions starting in it
+  scope :overlapping, lambda { |start, stop|
+    where(<<~SQL.squish, start:, stop:)
+      (variant_type IN ('X', 'D') AND variant NOT LIKE '%N%' AND ref_start < :stop AND ref_end > :start)
+      OR (variant_type = 'I' AND variant NOT LIKE '%N%' AND ref_start >= :start AND ref_start < :stop)
+    SQL
+  }
+
   def self.parse(variants_tsv, taxon)
     raise "Unable to find counts file #{variants_tsv}" unless File.exist?(variants_tsv)
 

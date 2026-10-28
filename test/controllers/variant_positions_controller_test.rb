@@ -41,11 +41,17 @@ class VariantPositionsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test 'serves the variant and primer tracks as BED' do
-    get organism_variant_position_url(organism_slug: @organism.slug, coordinate: 100, track: 'variants', format: :text)
+    get organism_variant_position_url(organism_slug: @organism.slug, coordinate: 100, track: 'variant', allele: 0,
+                                      format: :text)
 
     assert_response :success
     assert_equal 'text/plain', response.media_type
-    assert_includes response.body, "100\t101\tX:A (1 seqs)"
+    assert_includes response.body, "100\t101\tX:A_(100.0%)\t1\t."
+
+    get organism_variant_position_url(organism_slug: @organism.slug, coordinate: 100, track: 'variant', allele: 9,
+                                      format: :text)
+
+    assert_response :not_found
 
     get organism_variant_position_url(organism_slug: @organism.slug, coordinate: 100, track: 'primers', format: :text)
 

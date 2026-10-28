@@ -6,7 +6,7 @@ const TILE_URL = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
 
 let leafletMap = null;
 
-// Diagram of the reference around the position: genes, then the variant and the primers covering it
+// Diagram of the reference around the position: genes, then the variant and the primers overlapping it
 function initDiagram(config) {
     const reference = config['reference_accession'];
     const slug = config['organism_slug'];
@@ -35,20 +35,22 @@ function initDiagram(config) {
         locus: config['locus'],
         tracks: [
             {
-                "name": "Primers covering position",
+                "name": "Primers overlapping position",
                 "url": config['primer_track_url'],
                 "format": "bed",
-                "displayMode": "EXPANDED",
+                "displayMode": "SQUISHED",
                 "autoHeight": true
             },
-            {
-                "name": "Variant",
-                "url": config['variant_track_url'],
+            // one track per allele, most frequent first; the name carries its frequency
+            ...(config['variant_tracks'] || []).map(variant => ({
+                "name": variant.name,
+                "url": variant.url,
                 "format": "bed",
                 "color": "#d62828",
-                "displayMode": "EXPANDED",
-                "autoHeight": true
-            }
+                "displayMode": "SQUISHED",
+                "height": 12,
+                "autoHeight": false
+            }))
         ]
     };
 

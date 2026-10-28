@@ -15,7 +15,10 @@ class VariantPositionsController < ApplicationController
 
     respond_to do |format|
       format.html { @igv_config = igv_config }
-      format.text { render plain: params[:track] == 'primers' ? @track.primer_bed : @track.variant_bed }
+      format.text do
+        body = params[:track] == 'primers' ? @track.primer_bed : @track.variant_bed(params[:allele].to_i)
+        body ? render(plain: body) : head(:not_found)
+      end
     end
   end
 
@@ -25,14 +28,17 @@ class VariantPositionsController < ApplicationController
     @coordinate = params[:coordinate].to_i
     @days = params[:days].present? ? params[:days].to_i.clamp(1, 365) : DEFAULT_DAYS
     @summary = VariantPositions::Summary.call(organism: @organism, coordinate: @coordinate, days: @days)
-    @track = VariantPositions::Track.new(organism: @organism, coordinate: @coordinate)
+    @track = VariantPositions::Track.new(organism: @organism, coordinate: @coordinate, days: @days)
   end
 
   def igv_config
     @organism.igv_config.merge(
       locus: @track.locus,
-      variant_track_url: organism_variant_position_url(@organism, coordinate: @coordinate, days: @days,
-                                                                  track: 'variants', format: :text),
+      variant_tracks: @track.alleles.each_with_index.map do |allele, index|
+        { name: @track.allele_name(allele),
+          url: organism_variant_position_url(@organism, coordinate: @coordinate, days: @days,
+                                                        track: 'variant', allele: index, format: :text) }
+      end,
       primer_track_url: organism_variant_position_url(@organism, coordinate: @coordinate, days: @days,
                                                                  track: 'primers', format: :text)
     )
