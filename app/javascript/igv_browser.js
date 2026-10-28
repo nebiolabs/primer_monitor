@@ -6,8 +6,20 @@ let pending = null;
 
 export function createBrowser(div, config) {
     removeBrowser();
+    suppressTrackNamePopovers(div);
     pending = igv.createBrowser(div, config);
     return pending;
+}
+
+// igv.js opens a popover with each track's URL when its name is clicked, which we don't want. The click is stopped
+// while it is still passing down the page (capture phase), so igv's own handler on the track name never sees it. The
+// listener is added once per container, however often the page is visited.
+function suppressTrackNamePopovers(div) {
+    if (div.dataset.trackPopoversSuppressed) return;
+    div.dataset.trackPopoversSuppressed = 'true';
+    div.addEventListener('click', event => {
+        if (event.target.closest('.igv-track-label')) event.stopPropagation();
+    }, true);
 }
 
 export function removeBrowser() {
