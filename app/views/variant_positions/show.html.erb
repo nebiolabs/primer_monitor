@@ -20,8 +20,8 @@
 
 <h2 class="title is-5">Geographic distribution</h2>
 <% if @summary[:locations].any? %>
-  <div id="variant_map" class="variant-map" data-locations="<%= @summary[:locations].to_json %>"></div>
-  <p class="help">Circles are sized by the number of sequences with the variant and coloured by the fraction of sequences from that location carrying it.</p>
+  <div id="variant_map" class="variant-map" data-locations="<%= @summary[:map_points].to_json %>"></div>
+  <p class="help">One circle per country: sized by the number of sequences with the variant and coloured by the fraction of that country's sequences carrying it. Click a circle to zoom to it; click the background to show all.</p>
   <div class="table-container">
     <table class="table is-striped is-narrow is-hoverable">
       <thead>

@@ -68,18 +68,23 @@ function initMap(element) {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     }).addTo(leafletMap);
 
-    const points = [];
+    const points = locations.map(location => [location.latitude, location.longitude]);
+    const showAll = () => {
+        if (points.length > 0) leafletMap.fitBounds(points, { padding: [30, 30], maxZoom: 5 });
+    };
+
     locations.forEach(location => {
         const point = [location.latitude, location.longitude];
-        points.push(point);
         const hue = Math.round((1 - location.fraction) * 60); // yellow (all sequences) to red (none)
         const marker = window.L.circleMarker(point, {
             radius: Math.min(5 + 3 * Math.sqrt(location.variant_count), 30),
             color: '#333',
             weight: 1,
             fillColor: `hsl(${hue}, 90%, 50%)`,
-            fillOpacity: 0.8
+            fillOpacity: 0.8,
+            bubblingMouseEvents: false // so clicking a circle does not also count as a background click
         }).addTo(leafletMap);
+        marker.on('click', () => leafletMap.flyTo(point, Math.max(leafletMap.getZoom(), 5)));
 
         const popup = document.createElement('div');
         const name = document.createElement('strong');
@@ -91,9 +96,8 @@ function initMap(element) {
         marker.bindPopup(popup);
     });
 
-    if (points.length > 0) {
-        leafletMap.fitBounds(points, { padding: [30, 30], maxZoom: 5 });
-    }
+    leafletMap.on('click', showAll);
+    showAll();
 }
 
 function cleanup() {

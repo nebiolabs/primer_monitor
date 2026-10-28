@@ -5,7 +5,7 @@ module VariantPositions
   # which named lineages those sequences belong to. Fractions are over all sequences in the same location or lineage
   # within the window, the same denominator the notification emails use.
   class Summary
-    Row = Struct.new(:name, :variant_count, :sequence_count, :fraction, :latitude, :longitude, keyword_init: true)
+    Row = Struct.new(:name, :variant_count, :sequence_count, :fraction, keyword_init: true)
 
     def self.call(organism:, coordinate:, days:)
       new(organism:, coordinate:, days:).call
@@ -22,6 +22,7 @@ module VariantPositions
         variant_sequences: variant_records.count,
         sequences: window_records.count,
         locations: locations,
+        map_points: map_points,
         lineages: lineages
       }
     end
@@ -46,13 +47,10 @@ module VariantPositions
     def locations
       totals = window_records.where.not(detailed_geo_location_id: nil).group(:detailed_geo_location_id).count
       variants = variant_records.where.not(detailed_geo_location_id: nil).group(:detailed_geo_location_id).count
-      names = DetailedGeoLocation.includes(:detailed_geo_location_alias).where(id: variants.keys).index_by(&:id)
+      names = DetailedGeoLocation.where(id: variants.keys).index_by(&:id)
 
       rows = variants.map do |location_id, variant_count|
-        location = names.fetch(location_id)
-        alias_record = location.detailed_geo_location_alias
-        build_row(location_name(location), variant_count, totals.fetch(location_id, 0),
-                  latitude: alias_record&.latitude, longitude: alias_record&.longitude)
+        build_row(location_name(names.fetch(location_id)), variant_count, totals.fetch(location_id, 0))
       end
       sort_rows(rows)
     end
@@ -82,10 +80,31 @@ module VariantPositions
       rows.sort_by { |row| [-row.variant_count, row.name] }
     end
 
-    def build_row(name, variant_count, sequence_count, latitude: nil, longitude: nil)
+    def build_row(name, variant_count, sequence_count)
       Row.new(name:, variant_count:, sequence_count:,
-              fraction: sequence_count.zero? ? 0.0 : variant_count.to_f / sequence_count,
-              latitude:, longitude:)
+              fraction: sequence_count.zero? ? 0.0 : variant_count.to_f / sequence_count)
+    end
+
+    # one point per country for the map, at its centroid; sequences whose country is unknown appear only in the table
+    def map_points
+      variants = centroid_sums(variant_records)
+      sequences = centroid_sums(window_records)
+      rows = variants.map do |country, variant_count|
+        centroid = CountryCentroids.lookup(country)
+        build_row(country, variant_count, sequences.fetch(country, 0)).to_h.merge(latitude: centroid['lat'],
+                                                                                  longitude: centroid['lng'])
+      end
+      rows.sort_by { |row| [-row[:variant_count], row[:name]] }
+    end
+
+    # variant or sequence counts per country, keyed by the country's centroid name
+    def centroid_sums(records)
+      counts = records.joins(:detailed_geo_location).where.not(detailed_geo_locations: { subregion: nil })
+                      .group('detailed_geo_locations.subregion').count
+      counts.each_with_object(Hash.new(0)) do |(subregion, count), sums|
+        centroid = CountryCentroids.lookup(subregion)
+        sums[centroid['name']] += count if centroid
+      end
     end
   end
 end

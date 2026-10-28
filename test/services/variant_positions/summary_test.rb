@@ -52,11 +52,13 @@ module VariantPositions
       assert_in_delta 1.0, warumungu.fraction
     end
 
-    test 'locations carry their coordinates for the map' do
-      darwin = summarize(100)[:locations].first
+    test 'map has one point per country, at its centroid, summing its locations' do
+      point = summarize(100)[:map_points].sole
 
-      assert_in_delta detailed_geo_location_aliases(:darwin).latitude, darwin.latitude
-      assert_in_delta detailed_geo_location_aliases(:darwin).longitude, darwin.longitude
+      assert_equal 'Australia', point[:name]
+      assert_equal [2, 3], [point[:variant_count], point[:sequence_count]]
+      assert_in_delta(-27.0, point[:latitude], 0.01)
+      assert_in_delta 133.0, point[:longitude], 0.01
     end
 
     test 'lists only named lineages that carry the variant' do

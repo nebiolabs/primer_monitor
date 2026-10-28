@@ -37,7 +37,7 @@ class VariantPositionsControllerTest < ActionDispatch::IntegrationTest
 
     assert_select 'div#variant_igv'
     assert_select 'p#variant_position_config', text: /primer_track_url/
-    assert_select 'div#variant_map[data-locations*="Darwin"]'
+    assert_select 'div#variant_map[data-locations*="Australia"]'
   end
 
   test 'serves the variant and primer tracks as BED' do
