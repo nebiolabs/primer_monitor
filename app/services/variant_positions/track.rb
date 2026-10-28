@@ -10,6 +10,7 @@ module VariantPositions
     CACHE_TTL = 1.hour
 
     Allele = Struct.new(:ref_start, :ref_end, :variant_type, :variant, :sequences, keyword_init: true)
+    COMPLEMENT = { 'A' => 'T', 'C' => 'G', 'G' => 'C', 'T' => 'A' }.freeze
     PrimerTrack = Struct.new(:ref_start, :ref_end, :name, :impact, :strand, keyword_init: true)
 
     def initialize(organism:, coordinate:, days:)
@@ -43,7 +44,7 @@ module VariantPositions
       variant_span = allele.ref_start...[allele.ref_end, allele.ref_start + 1].max
       primer_positions.filter_map do |position|
         Disruption.primer_score(variant_type: allele.variant_type, variant_span:,
-                                primer_span: position.ref_start...position.ref_end, strand: position.oligo.strand)
+                                primer_span: position.ref_start...position.ref_end, strand: primer_strand(position))
       end.max
     end
 
@@ -68,7 +69,7 @@ module VariantPositions
           oligo = position.oligo
           PrimerTrack.new(ref_start: position.ref_start, ref_end: position.ref_end,
                           name: "#{oligo.primer_set.name} #{oligo.label}", impact: primer_impacts[oligo.id],
-                          strand: strand(oligo))
+                          strand: primer_strand(position))
         end
         built.sort_by { |primer| -(primer.impact || -Float::INFINITY) }
       end
@@ -144,7 +145,7 @@ module VariantPositions
 
     def primer_disruption(position, variant_type, variant_span)
       Disruption.primer_score(variant_type:, variant_span:, primer_span: position.ref_start...position.ref_end,
-                              strand: strand(position.oligo))
+                              strand: primer_strand(position))
     end
 
     # the diagram makes one request per track, all for the same data, so share it for a while
@@ -162,9 +163,53 @@ module VariantPositions
                                                   .to_a
     end
 
-    # the primer's direction along the reference; '.' when it is not recorded
-    def strand(oligo)
-      %w[+ -].include?(oligo.strand) ? oligo.strand : '.'
+    # the primer's direction along the reference: the recorded strand, or one inferred from its sequence when none is
+    # recorded; '.' when neither settles it
+    def primer_strand(position)
+      primer_strands.fetch(position.oligo.id, '.')
+    end
+
+    def primer_strands
+      @primer_strands ||= cached(:primer_strands) do
+        primer_positions.to_h { |position| [position.oligo.id, strand_of(position)] }
+      end
+    end
+
+    def strand_of(position)
+      recorded = position.oligo.strand
+      return recorded if %w[+ -].include?(recorded)
+
+      inferred_strand(position) || '.'
+    end
+
+    # '+' when the primer reads along the reference, '-' when its reverse complement does; nil unless one of them
+    # matches at least 90% of the bases
+    def inferred_strand(position)
+      reference = reference_sequence
+      sequence = position.oligo.sequence.to_s.upcase.tr('U', 'T')
+      return if reference.nil? || sequence.empty?
+
+      span = reference[position.ref_start...position.ref_end]
+      return if span.nil? || span.length != sequence.length
+
+      forward = identity(span, sequence)
+      reverse = identity(span, reverse_complement(sequence))
+      return if [forward, reverse].max < 0.9
+
+      forward >= reverse ? '+' : '-'
+    end
+
+    def reference_sequence
+      @reference_sequence = VariantSite.load_reference_sequence(taxon) unless defined?(@reference_sequence)
+      @reference_sequence
+    end
+
+    def identity(expected, actual)
+      expected.chars.zip(actual.chars).count { |a, b| a == b } / expected.length.to_f
+    end
+
+    def reverse_complement(sequence)
+      sequence.reverse.chars.map { |base| COMPLEMENT.fetch(base, 'N') }.join
     end
 
     # igv.js splits BED lines on whitespace unless told otherwise, so names must not contain any

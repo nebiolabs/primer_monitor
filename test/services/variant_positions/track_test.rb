@@ -76,6 +76,18 @@ module VariantPositions
       assert_equal Disruption.color(primer.impact), track.primer_color(primer)
     end
 
+    test 'an unrecorded primer strand is inferred from its sequence against the reference' do
+      reference = VariantSite.load_reference_sequence(@taxon)
+      forward = reference[95...115]
+      oligos(:one).update!(sequence: forward, strand: nil)
+
+      assert_equal '+', Track.new(organism: @organism, coordinate: 100, days: 30).primers.first.strand
+
+      oligos(:one).update!(sequence: forward.reverse.tr('ACGT', 'TGCA'))
+
+      assert_equal '-', Track.new(organism: @organism, coordinate: 100, days: 30).primers.first.strand
+    end
+
     test 'primer track gives each primer its strand' do
       oligos(:one).update!(strand: '-')
 
