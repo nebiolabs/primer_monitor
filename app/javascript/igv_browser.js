@@ -38,6 +38,7 @@ export function referenceConfig(config) {
                 "type": "annotation",
                 "url": dataServer + "/" + slug + "/ref/" + slug + ".gff3",
                 "format": "gff3",
+                "description": "",
                 "filterTypes": ['CDS', 'mature_protein_region_of_CDS', 'region', 'stem_loop', 'five_prime_UTR', 'three_prime_UTR'],
                 "displayMode": "EXPANDED",
                 "colorBy": "gbkey",
