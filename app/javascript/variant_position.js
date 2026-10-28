@@ -1,4 +1,4 @@
-import { createBrowser, removeBrowser, referenceConfig } from 'igv_browser';
+import { createBrowser, removeBrowser, referenceConfig, trackDescription } from 'igv_browser';
 import { drawPointMap, linkTableRows } from 'point_map';
 import { registerPageModule } from 'turbo_page_module';
 
@@ -19,7 +19,7 @@ function initDiagram(config) {
                 "displayMode": "SQUISHED",
                 "height": 17,
                 "autoHeight": false,
-                ...(primer.description ? { "description": primer.description } : {})
+                ...trackDescription(primer.description)
             })),
             // one track per allele, most frequent first; the name carries its frequency
             ...(config['variant_tracks'] || []).map(variant => ({
@@ -29,7 +29,8 @@ function initDiagram(config) {
                 "color": variant.color || "#d62828",
                 "displayMode": "SQUISHED",
                 "height": 12,
-                "autoHeight": false
+                "autoHeight": false,
+                ...trackDescription(variant.description)
             }))
         ]
     };

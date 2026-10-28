@@ -11,7 +11,7 @@ module VariantPositions
 
     Allele = Struct.new(:ref_start, :ref_end, :variant_type, :variant, :ref, :sequences, keyword_init: true)
     # also: labels of the other primers at the same coordinates, which the track's description lists
-    PrimerTrack = Struct.new(:ref_start, :ref_end, :name, :impact, :strand, :also, keyword_init: true)
+    PrimerTrack = Struct.new(:ref_start, :ref_end, :scheme, :label, :impact, :strand, :also, keyword_init: true)
 
     def initialize(organism:, coordinate:, days:)
       @coordinate = coordinate
@@ -84,21 +84,39 @@ module VariantPositions
     # one track for primers sharing coordinates: the most recent primer set, then the highest oligo id, names it
     def primer_track(group)
       latest, *others = group.sort_by { |p| [p.oligo.primer_set.created_at, p.oligo.id] }.reverse
-      PrimerTrack.new(ref_start: latest.ref_start, ref_end: latest.ref_end, name: primer_label(latest),
-                      impact: group.filter_map { |p| primer_impacts[p.oligo.id] }.max,
-                      strand: primer_strand(latest),
-                      also: others.map { |p| "#{primer_label(p)} (#{impact_text(primer_impacts[p.oligo.id])})" })
+      PrimerTrack.new(ref_start: latest.ref_start, ref_end: latest.ref_end, scheme: latest.oligo.primer_set.name,
+                      label: latest.oligo.label, impact: group.filter_map { |p| primer_impacts[p.oligo.id] }.max,
+                      strand: primer_strand(latest), also: other_primer_labels(others))
     end
 
-    # the track's popup text: the other primers at the same coordinates, or nil when there are none
-    def primer_description(primer)
-      return if primer.also.empty?
+    def other_primer_labels(others)
+      others.map { |p| "#{primer_label(p)} (#{impact_text(primer_impacts[p.oligo.id])})" }
+    end
 
-      "Same coordinates: #{primer.also.join('; ')}"
+    # the track's name: the primer scheme (primer set); the primer and its impact are in the description
+    def primer_track_name(primer)
+      primer.scheme
+    end
+
+    # the track's popup text: the primer and its impact, then any other primers at the same coordinates
+    def primer_description(primer)
+      text = "#{primer.label}, impact #{impact_text(primer.impact)}"
+      text += ". Same coordinates: #{primer.also.join('; ')}" if primer.also.any?
+      text
+    end
+
+    # the variant track's name: the allele; its share of sequences and disruption are in the description
+    def allele_track_name(allele)
+      allele_label(allele)
+    end
+
+    def allele_description(allele)
+      "#{percent(allele.sequences)}% of sequences in the window (#{allele.sequences}); " \
+        "disruption #{disruption(allele) || 'none'}"
     end
 
     def primer_name(primer)
-      "#{primer.name}, impact #{impact_text(primer.impact)}"
+      "#{primer.scheme} #{primer.label}, impact #{impact_text(primer.impact)}"
     end
 
     def primer_label(position)

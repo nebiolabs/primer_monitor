@@ -40,12 +40,13 @@ class VariantPositionsController < ApplicationController
     @organism.igv_config.merge(
       locus: @track.locus,
       variant_tracks: @track.alleles.each_with_index.map do |allele, index|
-        { name: @track.allele_name(allele), color: @track.allele_color(allele),
+        { name: @track.allele_track_name(allele), description: @track.allele_description(allele),
+          color: @track.allele_color(allele),
           url: organism_variant_position_url(@organism, coordinate: @coordinate, days: @days,
                                                         track: 'variant', allele: index, format: :text) }
       end,
       primer_tracks: @track.primers.each_with_index.map do |primer, index|
-        { name: @track.primer_name(primer), color: @track.primer_color(primer),
+        { name: @track.primer_track_name(primer), color: @track.primer_color(primer),
           description: @track.primer_description(primer),
           url: organism_variant_position_url(@organism, coordinate: @coordinate, days: @days,
                                                         track: 'primer', primer: index, format: :text) }

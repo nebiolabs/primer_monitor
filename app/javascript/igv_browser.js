@@ -22,6 +22,21 @@ export function currentBrowser() {
     return pending;
 }
 
+// Popup text for a track: igv.js shows a track's description when its name is clicked, but only when it is a function
+// returning an element. A string is wrapped in a function returning the string, which igv cannot display, so the text
+// is wrapped here. Spread into a track's config; nothing is added when there is no text.
+export function trackDescription(text) {
+    if (!text) return {};
+    return {
+        description: () => {
+            const row = document.createElement('div');
+            row.className = 'igv-track-label-popover__row';
+            row.textContent = text;
+            return row;
+        }
+    };
+}
+
 // The organism's reference genome with its gene annotations, for the diagrams on the organism's pages
 export function referenceConfig(config) {
     const reference = config['reference_accession'];

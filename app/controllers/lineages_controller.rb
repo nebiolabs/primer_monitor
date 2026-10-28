@@ -56,7 +56,9 @@ class LineagesController < ApplicationController
 
   def primer_set_tracks
     @impacts.sets.map do |primer_set|
-      { name: "#{primer_set.name}, impact #{primer_set.impact ? format('%.1f', primer_set.impact) : 'none'}",
+      { name: primer_set.name,
+        description: "Impact #{primer_set.impact ? format('%.1f', primer_set.impact) : 'none'}; " \
+                     "#{primer_set.primers.count(&:impact)} of #{primer_set.primers.size} primers affected",
         color: VariantPositions::Disruption.color(primer_set.impact),
         url: organism_lineage_primer_track_url(@organism, lineage: @lineage.name, set: primer_set.id, days: @days,
                                                           format: :text) }

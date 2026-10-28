@@ -106,7 +106,7 @@ module VariantPositions
       track = Track.new(organism: @organism, coordinate: 100, days: 30)
 
       assert_equal 1, track.primers.size
-      assert_includes track.primers.first.name, 'probe-dup'
+      assert_includes track.primers.first.label, 'probe-dup'
       assert_includes track.primer_description(track.primers.first), oligos(:one).label
     end
 

@@ -1,4 +1,4 @@
-import { createBrowser, removeBrowser, referenceConfig } from 'igv_browser';
+import { createBrowser, removeBrowser, referenceConfig, trackDescription } from 'igv_browser';
 import { drawPointMap, linkTableRows } from 'point_map';
 import { registerPageModule } from 'turbo_page_module';
 
@@ -15,7 +15,8 @@ function initDiagram(config) {
             "color": primerSet.color,
             "displayMode": "SQUISHED",
             "height": 17,
-            "autoHeight": false
+            "autoHeight": false,
+            ...trackDescription(primerSet.description)
         }))
     });
 }
