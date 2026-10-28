@@ -29,6 +29,7 @@ Rails.application.routes.draw do
     end
     resources :lineages, param: :name, constraints: { name: /[A-z0-9.]+/ }
     resources :primer_sets, only: [:index]
+    resources :variant_positions, only: :show, param: :coordinate, constraints: { coordinate: /\d+/ }
   end
 
   resources :oligos

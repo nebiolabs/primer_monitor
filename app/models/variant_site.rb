@@ -2,6 +2,16 @@
 
 class VariantSite < ApplicationRecord
   self.ignored_columns += %w[usable_del_or_snp usable_insertion]
+
+  # the usable variants that oligo_variant_overlaps reports at a 0-based reference position: SNPs and deletions
+  # cover their reference span, insertions only their start
+  scope :at_position, lambda { |position|
+    where(<<~SQL.squish, position:)
+      (variant_type IN ('X', 'D') AND variant NOT LIKE '%N%' AND ref_start <= :position AND ref_end > :position)
+      OR (variant_type = 'I' AND variant NOT LIKE '%N%' AND ref_start = :position)
+    SQL
+  }
+
   def self.parse(variants_tsv, taxon)
     raise "Unable to find counts file #{variants_tsv}" unless File.exist?(variants_tsv)
 
