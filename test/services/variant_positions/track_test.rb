@@ -3,7 +3,7 @@
 require 'test_helper'
 
 module VariantPositions
-  class TrackTest < ActiveSupport::TestCase
+  class TrackTest < ActiveSupport::TestCase # rubocop:disable Metrics/ClassLength -- one test per track behaviour
     setup do
       @organism = organisms(:sars_cov2)
       @taxon = organism_taxa(:sars_cov_2_taxon)
@@ -88,6 +88,18 @@ module VariantPositions
       assert_equal '-', Track.new(organism: @organism, coordinate: 100, days: 30).primers.first.strand
     end
 
+    test 'allele labels show the reference base: A>G, deltaA, and A>AAAA for insertions' do
+      track = Track.new(organism: @organism, coordinate: 100, days: 30)
+      label = ->(type, variant, ref) { track.allele_label(Track::Allele.new(variant_type: type, variant:, ref:)) }
+
+      assert_equal 'A>G', label.call('X', 'G', 'A')
+      assert_equal 'ΔAGT', label.call('D', '3-', 'AGT')
+      assert_equal 'A>AAAA', label.call('I', 'AAA', 'A')
+      assert_equal '?>G', label.call('X', 'G', nil)
+      assert_equal 'Δ3 bp', label.call('D', '3-', nil)
+      assert_equal '+AAA', label.call('I', 'AAA', nil)
+    end
+
     test 'primer track gives each primer its strand' do
       oligos(:one).update!(strand: '-')
 
@@ -100,8 +112,8 @@ module VariantPositions
           record = FastaRecord.create!(strain: "track/#{variant}#{i}", organism_taxon_id: @taxon.id,
                                        detailed_geo_location: detailed_geo_locations(:darwin),
                                        date_collected: Date.current)
-          VariantSite.create!(fasta_record_id: record.id, organism_taxon_id: @taxon.id, ref: nil,
-                              ref_start: 100, ref_end: 101, variant_type: 'X', variant:)
+          VariantSite.create!(fasta_record_id: record.id, organism_taxon_id: @taxon.id,
+                              ref_start: 100, ref_end: 101, variant_type: 'X', variant:, ref: 'C')
         end
       end
       FastaRecord.create!(strain: 'track/clean', detailed_geo_location: detailed_geo_locations(:darwin),
@@ -109,9 +121,9 @@ module VariantPositions
 
       tab = "\t"
 
-      assert_equal "#{@taxon.reference_accession}#{tab}100#{tab}101#{tab}X:A_(50.0%),_disruption_4#{tab}2#{tab}.",
+      assert_equal "#{@taxon.reference_accession}#{tab}100#{tab}101#{tab}C>A_(50.0%),_disruption_4#{tab}2#{tab}.",
                    @track.variant_bed(0)
-      assert_equal "#{@taxon.reference_accession}#{tab}100#{tab}101#{tab}X:G_(25.0%),_disruption_4#{tab}1#{tab}.",
+      assert_equal "#{@taxon.reference_accession}#{tab}100#{tab}101#{tab}C>G_(25.0%),_disruption_4#{tab}1#{tab}.",
                    @track.variant_bed(1)
       assert_nil @track.variant_bed(2)
     end

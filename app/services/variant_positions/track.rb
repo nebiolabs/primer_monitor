@@ -9,8 +9,7 @@ module VariantPositions
     PADDING = 25
     CACHE_TTL = 1.hour
 
-    Allele = Struct.new(:ref_start, :ref_end, :variant_type, :variant, :sequences, keyword_init: true)
-    COMPLEMENT = { 'A' => 'T', 'C' => 'G', 'G' => 'C', 'T' => 'A' }.freeze
+    Allele = Struct.new(:ref_start, :ref_end, :variant_type, :variant, :ref, :sequences, keyword_init: true)
     PrimerTrack = Struct.new(:ref_start, :ref_end, :name, :impact, :strand, keyword_init: true)
 
     def initialize(organism:, coordinate:, days:)
@@ -26,8 +25,8 @@ module VariantPositions
     # the variant alleles at the position, most frequent first; each one is a track of its own so the order holds
     def alleles
       @alleles ||= cached(:alleles) do
-        built = allele_counts.map do |(start, stop, type, variant), sequences|
-          Allele.new(ref_start: start, ref_end: stop, variant_type: type, variant:, sequences:)
+        built = allele_counts.map do |(start, stop, type, variant, ref), sequences|
+          Allele.new(ref_start: start, ref_end: stop, variant_type: type, variant:, ref:, sequences:)
         end
         built.sort_by { |a| [-a.sequences, a.ref_start, a.variant_type, a.variant] }
       end
@@ -35,7 +34,17 @@ module VariantPositions
 
     def allele_name(allele)
       impact = disruption(allele) || 'none'
-      "#{allele.variant_type}:#{allele.variant} (#{percent(allele.sequences)}%), disruption #{impact}"
+      "#{allele_label(allele)} (#{percent(allele.sequences)}%), disruption #{impact}"
+    end
+
+    # HGVS-like label: A>G for a mismatch, ΔAGT for a deletion of AGT, A>AAAA for an insertion after anchor base A.
+    # Falls back to the length or a '?' when the reference base was not recorded.
+    def allele_label(allele)
+      case allele.variant_type
+      when 'X' then "#{allele.ref || '?'}>#{allele.variant}"
+      when 'D' then allele.ref.present? ? "Δ#{allele.ref}" : "Δ#{allele.variant.to_i} bp"
+      else allele.ref.present? ? "#{allele.ref}>#{allele.ref}#{allele.variant}" : "+#{allele.variant}"
+      end
     end
 
     # the largest disruption the allele causes to a primer overlapping the position (see Disruption), or nil when
@@ -108,7 +117,7 @@ module VariantPositions
 
     def allele_counts
       VariantSite.where(organism_taxon_id: taxon&.id).at_position(coordinate)
-                 .group(:ref_start, :ref_end, :variant_type, :variant).count
+                 .group(:ref_start, :ref_end, :variant_type, :variant, :ref).count
     end
 
     # share of the sequences in the window that carry the allele
@@ -163,53 +172,22 @@ module VariantPositions
                                                   .to_a
     end
 
-    # the primer's direction along the reference: the recorded strand, or one inferred from its sequence when none is
-    # recorded; '.' when neither settles it
+    # the primer's direction along the reference, see Strand
     def primer_strand(position)
       primer_strands.fetch(position.oligo.id, '.')
     end
 
     def primer_strands
       @primer_strands ||= cached(:primer_strands) do
-        primer_positions.to_h { |position| [position.oligo.id, strand_of(position)] }
+        primer_positions.to_h do |position|
+          [position.oligo.id, Strand.of(position.oligo, position.ref_start, position.ref_end, reference_sequence)]
+        end
       end
-    end
-
-    def strand_of(position)
-      recorded = position.oligo.strand
-      return recorded if %w[+ -].include?(recorded)
-
-      inferred_strand(position) || '.'
-    end
-
-    # '+' when the primer reads along the reference, '-' when its reverse complement does; nil unless one of them
-    # matches at least 90% of the bases
-    def inferred_strand(position)
-      reference = reference_sequence
-      sequence = position.oligo.sequence.to_s.upcase.tr('U', 'T')
-      return if reference.nil? || sequence.empty?
-
-      span = reference[position.ref_start...position.ref_end]
-      return if span.nil? || span.length != sequence.length
-
-      forward = identity(span, sequence)
-      reverse = identity(span, reverse_complement(sequence))
-      return if [forward, reverse].max < 0.9
-
-      forward >= reverse ? '+' : '-'
     end
 
     def reference_sequence
       @reference_sequence = VariantSite.load_reference_sequence(taxon) unless defined?(@reference_sequence)
       @reference_sequence
-    end
-
-    def identity(expected, actual)
-      expected.chars.zip(actual.chars).count { |a, b| a == b } / expected.length.to_f
-    end
-
-    def reverse_complement(sequence)
-      sequence.reverse.chars.map { |base| COMPLEMENT.fetch(base, 'N') }.join
     end
 
     # igv.js splits BED lines on whitespace unless told otherwise, so names must not contain any

@@ -1,3 +1,7 @@
+<% content_for :head do %>
+  <%= javascript_import_module_tag "lineage_page" %>
+<% end %>
+
 <h1 class="title"><%= @lineage.organism %> lineage <%= @lineage.name %> </h1>
 
 <h3 class="title">Overview:</h3>
@@ -17,3 +21,51 @@
 <br>
 
 <p><span class="bold-text">Note:</span> In the above data, "seen" refers to the date the sample was collected, unless that date was not provided for a sequence, in which case it refers to the date it was submitted to NCBI.</p>
+
+<h2 class="title is-5">Where it is seen</h2>
+<p>Sequences collected in the last <%= pluralize(@days, 'day') %>: <strong><%= @geography[:lineage_sequences] %></strong> of <%= @geography[:sequences] %>.</p>
+<% if @geography[:points].any? %>
+  <div id="lineage_map" class="variant-map" data-points="<%= @geography[:points].to_json %>"></div>
+  <p class="help">One circle per country, or per US state: sized by how many of this lineage's sequences were collected there, and coloured by the lineage's share of that location's sequences (yellow low, red high). Click a circle or a row to zoom to it.</p>
+  <div class="table-container">
+    <table class="table is-striped is-narrow is-hoverable">
+      <thead>
+        <tr><th>Geographic region</th><th class="has-text-right">Lineage sequences</th><th class="has-text-right">All sequences</th><th class="has-text-right">Share</th></tr>
+      </thead>
+      <tbody>
+        <% @geography[:points].each do |row| %>
+          <%= tag.tr(data: { map_point: row[:name] }, class: 'is-clickable') do %>
+            <td><%= row[:name] %></td>
+            <td class="has-text-right"><%= row[:variant_count] %></td>
+            <td class="has-text-right"><%= row[:sequence_count] %></td>
+            <td class="has-text-right"><%= (row[:fraction] * 100).round(1) %>%</td>
+          <% end %>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+<% else %>
+  <p>No sequences of this lineage were collected in this window in a place with a map position.</p>
+<% end %>
+
+<h2 class="title is-5">Primer sets by impact of this lineage's variants</h2>
+<p class="help">Variants the lineage carries in at least 10 sequences and at least 1% of its sequences in the last <%= pluralize(@days, 'day') %> are scored against the primers they overlap. Each primer set is a track coloured by its most affected primer, grey when no primer is affected, then yellow through red as the impact rises. Arrows show each primer's direction.</p>
+<p id="lineage_config" class="invisible"><%= @igv_config.to_json %></p>
+<div id="lineage_igv" class="igv_div"></div>
+
+<div class="table-container">
+  <table class="table is-striped is-narrow is-hoverable">
+    <thead>
+      <tr><th>Primer set</th><th class="has-text-right">Impact</th><th class="has-text-right">Primers affected</th></tr>
+    </thead>
+    <tbody>
+      <% @impacts.sets.each do |primer_set| %>
+        <tr>
+          <td><%= link_to primer_set.name, organism_primer_sets_path(@organism.slug) %></td>
+          <td class="has-text-right"><%= primer_set.impact ? format('%.1f', primer_set.impact) : 'none' %></td>
+          <td class="has-text-right"><%= primer_set.primers.count(&:impact) %> of <%= primer_set.primers.size %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>
