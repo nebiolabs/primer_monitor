@@ -6,6 +6,7 @@ pin "@rails/activestorage", to: "activestorage.esm.js"
 
 pin "tom-select" # @2.6.2 (vendored tom-select.complete.min.js; defines window.TomSelect)
 pin "igv" # @3.8.9
+pin "leaflet" # @1.9.4 (vendored leaflet.js; defines window.L)
 pin "jszip" # @3.10.1 (vendored dist/jszip.min.js; defines window.JSZip for the Excel button)
 pin_all_from "app/javascript"
 pin "datatables.net" # @3.1.3 (dependency-free; no jQuery)

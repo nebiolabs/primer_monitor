@@ -21,6 +21,7 @@ $blue: #4556ba;
 @use "datatables/responsive.bulma"; // datatables.net-responsive-bm 4.1.1
 @use "datatables/columnControl.bulma"; // datatables.net-columncontrol-bm 2.1.2
 @use "tom-select/tom-select"; // tom-select 2.6.2
+@use "leaflet/leaflet"; // leaflet 1.9.4
 
 @use "scaffolds";
 @use "searchable-select";
@@ -165,4 +166,16 @@ button.dt-button.buttons-copy.buttons-html5 {
 
 #primer_set_selection {
   max-width: 60rem;
+}
+
+// the variant position map on the position summary page
+.variant-map {
+  height: 380px;
+  width: 100%;
+  margin-bottom: 0.5rem;
+}
+
+// geography table rows that zoom the map to their country
+tr.is-clickable {
+  cursor: pointer;
 }

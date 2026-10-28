@@ -1,0 +1,69 @@
+<% content_for :head do %>
+  <%= javascript_import_module_tag "variant_position" %>
+<% end %>
+
+<h1 class="title"><%= @organism.name %> variant at position <%= @coordinate %></h1>
+
+<p>
+  Sequences collected in the last <%= pluralize(@days, 'day') %> that carry a variant at this position:
+  <strong><%= @summary[:variant_sequences] %></strong> of <%= @summary[:sequences] %>.
+</p>
+<p class="block">
+  <%= link_to 'Last 30 days', organism_variant_position_path(@organism, coordinate: @coordinate, days: 30) %> ·
+  <%= link_to 'Last 90 days', organism_variant_position_path(@organism, coordinate: @coordinate, days: 90) %>
+</p>
+
+<h2 class="title is-5">Primers and variant</h2>
+<p id="variant_position_config" class="invisible"><%= @igv_config.to_json %></p>
+<div id="variant_igv" class="igv_div"></div>
+<p class="help">Primers and variants are coloured by impact, from grey (none) through yellow to red (highest), so the most disruptive ones stand out. Arrows show each primer's direction (+ or − strand); variants have no direction. Click a track name or feature for details.</p>
+
+<h2 class="title is-5">Geographic distribution</h2>
+<% if @summary[:locations].any? %>
+  <div id="variant_map" class="variant-map" data-locations="<%= @summary[:map_points].to_json %>"></div>
+  <p class="help">One circle per country: sized by the number of sequences with the variant and coloured by the fraction of that country's sequences carrying it. Click a circle to zoom to it; click the background to show all.</p>
+  <div class="table-container">
+    <table class="table is-striped is-narrow is-hoverable">
+      <thead>
+        <tr><th>Geographic region</th><th class="has-text-right">Sequences with variant</th><th class="has-text-right">Sequences in region</th><th class="has-text-right">Fraction</th></tr>
+      </thead>
+      <tbody>
+        <% @summary[:locations].each do |row| %>
+          <%= tag.tr(data: { map_point: row.map_name }, class: ('is-clickable' if row.map_name)) do %>
+            <td><%= row.name %></td>
+            <td class="has-text-right"><%= row.variant_count %></td>
+            <td class="has-text-right"><%= row.sequence_count %></td>
+            <td class="has-text-right"><%= row.fraction.round(2) %></td>
+          <% end %>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+<% else %>
+  <p>No sequences in this window carry a variant at this position.</p>
+<% end %>
+
+<h2 class="title is-5">Named lineages</h2>
+<% if @summary[:lineages].any? %>
+  <div class="table-container">
+    <table class="table is-striped is-narrow is-hoverable">
+      <thead>
+        <tr><th>Lineage</th><th class="has-text-right">Sequences with variant</th><th class="has-text-right">Sequences in lineage</th><th class="has-text-right">Fraction</th></tr>
+      </thead>
+      <tbody>
+        <% @summary[:lineages].each do |row| %>
+          <tr>
+            <td><%= link_to row.name, organism_lineage_path(@organism, row.name) %></td>
+            <td class="has-text-right"><%= row.variant_count %></td>
+            <td class="has-text-right"><%= row.sequence_count %></td>
+            <td class="has-text-right"><%= row.fraction.round(2) %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+<% else %>
+  <p>No named lineages in this window carry a variant at this position.</p>
+<% end %>
+
+<p><%= link_to 'Back to notifications', notifications_path %></p>

@@ -27,6 +27,7 @@ class Ability
     can :show, Oligo
     can :show, Organism
     can %i[index show], LineagesController
+    can :show, VariantPositionsController
     can :index, LineageVariantsController
     can %i[new create], User
     can %i[index read], PrimerSet, status: 'complete'

@@ -48,7 +48,7 @@ class VerifiedNotification < ApplicationRecord
 
     Rails.logger.info("Sending notification to #{user.formatted_email}")
     notifications = ProposedNotification.where(verified_notification_id: id)
-                                        .includes(:oligo, :primer_set,
+                                        .includes(:oligo, { primer_set: :organism },
                                                   :subscribed_geo_location, :detailed_geo_location_alias)
                                         .reorder('primer_sets.name, proposed_notifications.coordinate, oligos.name,' \
                                                  'region, subregion, division, subdivision')

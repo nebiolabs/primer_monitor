@@ -1,0 +1,286 @@
+{
+ "attribution": "State centroids computed from the U.S. Census Bureau state boundaries (public domain) as published in us-atlas@3.0.1 (https://github.com/topojson/us-atlas). Each is the area-weighted centroid of the state's outline.",
+ "country": "United States",
+ "states": [
+  {
+   "name": "Alabama",
+   "lat": 32.7887,
+   "lng": -86.8285
+  },
+  {
+   "name": "Alaska",
+   "lat": 64.2018,
+   "lng": -152.2199
+  },
+  {
+   "name": "American Samoa",
+   "lat": -14.2754,
+   "lng": -170.4076
+  },
+  {
+   "name": "Arizona",
+   "lat": 34.2928,
+   "lng": -111.6648
+  },
+  {
+   "name": "Arkansas",
+   "lat": 34.8998,
+   "lng": -92.4395
+  },
+  {
+   "name": "California",
+   "lat": 37.2461,
+   "lng": -119.6115
+  },
+  {
+   "name": "Colorado",
+   "lat": 38.9982,
+   "lng": -105.5481
+  },
+  {
+   "name": "Commonwealth of the Northern Mariana Islands",
+   "lat": 15.6792,
+   "lng": 145.6207
+  },
+  {
+   "name": "Connecticut",
+   "lat": 41.6202,
+   "lng": -72.7263
+  },
+  {
+   "name": "Delaware",
+   "lat": 38.9925,
+   "lng": -75.5014
+  },
+  {
+   "name": "District of Columbia",
+   "lat": 38.9037,
+   "lng": -77.0153
+  },
+  {
+   "name": "Florida",
+   "lat": 28.6203,
+   "lng": -82.4973
+  },
+  {
+   "name": "Georgia",
+   "lat": 32.6488,
+   "lng": -83.4461
+  },
+  {
+   "name": "Guam",
+   "lat": 13.4437,
+   "lng": 144.7745
+  },
+  {
+   "name": "Hawaii",
+   "lat": 20.2531,
+   "lng": -156.3522
+  },
+  {
+   "name": "Idaho",
+   "lat": 44.3886,
+   "lng": -114.6593
+  },
+  {
+   "name": "Illinois",
+   "lat": 40.0651,
+   "lng": -89.1986
+  },
+  {
+   "name": "Indiana",
+   "lat": 39.9085,
+   "lng": -86.2758
+  },
+  {
+   "name": "Iowa",
+   "lat": 42.0743,
+   "lng": -93.4998
+  },
+  {
+   "name": "Kansas",
+   "lat": 38.4844,
+   "lng": -98.3802
+  },
+  {
+   "name": "Kentucky",
+   "lat": 37.5267,
+   "lng": -85.2909
+  },
+  {
+   "name": "Louisiana",
+   "lat": 31.0482,
+   "lng": -91.973
+  },
+  {
+   "name": "Maine",
+   "lat": 45.3598,
+   "lng": -69.2236
+  },
+  {
+   "name": "Maryland",
+   "lat": 39.0311,
+   "lng": -76.7669
+  },
+  {
+   "name": "Massachusetts",
+   "lat": 42.2523,
+   "lng": -71.7964
+  },
+  {
+   "name": "Michigan",
+   "lat": 44.3514,
+   "lng": -85.4358
+  },
+  {
+   "name": "Minnesota",
+   "lat": 46.316,
+   "lng": -94.3091
+  },
+  {
+   "name": "Mississippi",
+   "lat": 32.7493,
+   "lng": -89.6647
+  },
+  {
+   "name": "Missouri",
+   "lat": 38.3672,
+   "lng": -92.4772
+  },
+  {
+   "name": "Montana",
+   "lat": 47.0333,
+   "lng": -109.6449
+  },
+  {
+   "name": "Nebraska",
+   "lat": 41.5269,
+   "lng": -99.8103
+  },
+  {
+   "name": "Nevada",
+   "lat": 39.3555,
+   "lng": -116.6552
+  },
+  {
+   "name": "New Hampshire",
+   "lat": 43.6853,
+   "lng": -71.5777
+  },
+  {
+   "name": "New Jersey",
+   "lat": 40.1833,
+   "lng": -74.6615
+  },
+  {
+   "name": "New Mexico",
+   "lat": 34.4211,
+   "lng": -106.1082
+  },
+  {
+   "name": "New York",
+   "lat": 42.9395,
+   "lng": -75.5029
+  },
+  {
+   "name": "North Carolina",
+   "lat": 35.5395,
+   "lng": -79.3574
+  },
+  {
+   "name": "North Dakota",
+   "lat": 47.4463,
+   "lng": -100.4695
+  },
+  {
+   "name": "Ohio",
+   "lat": 40.2932,
+   "lng": -82.7902
+  },
+  {
+   "name": "Oklahoma",
+   "lat": 35.5832,
+   "lng": -97.508
+  },
+  {
+   "name": "Oregon",
+   "lat": 43.9363,
+   "lng": -120.5559
+  },
+  {
+   "name": "Pennsylvania",
+   "lat": 40.8736,
+   "lng": -77.8005
+  },
+  {
+   "name": "Puerto Rico",
+   "lat": 18.2228,
+   "lng": -66.4598
+  },
+  {
+   "name": "Rhode Island",
+   "lat": 41.6758,
+   "lng": -71.5524
+  },
+  {
+   "name": "South Carolina",
+   "lat": 33.9074,
+   "lng": -80.8957
+  },
+  {
+   "name": "South Dakota",
+   "lat": 44.4359,
+   "lng": -100.2312
+  },
+  {
+   "name": "Tennessee",
+   "lat": 35.8429,
+   "lng": -86.3439
+  },
+  {
+   "name": "Texas",
+   "lat": 31.4825,
+   "lng": -99.349
+  },
+  {
+   "name": "United States Virgin Islands",
+   "lat": 18.0149,
+   "lng": -64.8172
+  },
+  {
+   "name": "Utah",
+   "lat": 39.3235,
+   "lng": -111.6782
+  },
+  {
+   "name": "Vermont",
+   "lat": 44.0746,
+   "lng": -72.6633
+  },
+  {
+   "name": "Virginia",
+   "lat": 37.5153,
+   "lng": -78.8084
+  },
+  {
+   "name": "Washington",
+   "lat": 47.3819,
+   "lng": -120.4507
+  },
+  {
+   "name": "West Virginia",
+   "lat": 38.6414,
+   "lng": -80.6151
+  },
+  {
+   "name": "Wisconsin",
+   "lat": 44.6389,
+   "lng": -90.011
+  },
+  {
+   "name": "Wyoming",
+   "lat": 42.9992,
+   "lng": -107.5514
+  }
+ ]
+}

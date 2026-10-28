@@ -28,14 +28,16 @@ Rails.application.routes.draw do
       get :variant_overlaps, on: :collection
     end
     resources :lineages, param: :name, constraints: { name: /[A-z0-9.]+/ }
+    get 'lineage_primer_track', to: 'lineages#primer_track', as: :lineage_primer_track
     resources :primer_sets, only: [:index]
+    resources :variant_positions, only: :show, param: :coordinate, constraints: { coordinate: /\d+/ }
   end
 
   resources :oligos
   # accounts are created by signing up (Devise) or with Google/Microsoft, so admins only list, edit and delete
   resources :users, except: %i[new create]
-  resources :primer_set_subscriptions, only: [:create, :destroy]
+  resources :primer_set_subscriptions, only: %i[create destroy]
   # admin dashboard of notification emails sent to users
   resources :notifications, only: %i[index show]
-  resources :primer_sets, only: [:new, :show, :create, :destroy, :update, :edit]
+  resources :primer_sets, only: %i[new show create destroy update edit]
 end

@@ -21,3 +21,46 @@ export function removeBrowser() {
 export function currentBrowser() {
     return pending;
 }
+
+// Popup text for a track: igv.js shows a track's description when its name is clicked, but only when it is a function
+// returning an element. A string is wrapped in a function returning the string, which igv cannot display, so the text
+// is wrapped here. Spread into a track's config; nothing is added when there is no text.
+export function trackDescription(text) {
+    if (!text) return {};
+    return {
+        description: () => {
+            const row = document.createElement('div');
+            row.className = 'igv-track-label-popover__row';
+            row.style.whiteSpace = 'pre-line'; // keep the line breaks in the text
+            row.textContent = text;
+            return row;
+        }
+    };
+}
+
+// The organism's reference genome with its gene annotations, for the diagrams on the organism's pages
+export function referenceConfig(config) {
+    const reference = config['reference_accession'];
+    const slug = config['organism_slug'];
+    const dataServer = config['data_server'];
+    return {
+        "id": reference,
+        "name": config['organism_name'] + " (" + reference + ")",
+        "fastaURL": dataServer + "/" + slug + "/ref/" + slug + ".fasta",
+        "indexURL": dataServer + "/" + slug + "/ref/" + slug + ".fasta.fai",
+        tracks: [
+            {
+                "name": "Genes",
+                "type": "annotation",
+                "url": dataServer + "/" + slug + "/ref/" + slug + ".gff3",
+                "format": "gff3",
+                "filterTypes": ['CDS', 'mature_protein_region_of_CDS', 'region', 'stem_loop', 'five_prime_UTR', 'three_prime_UTR'],
+                "displayMode": "EXPANDED",
+                "colorBy": "gbkey",
+                "colorTable": {
+                    "Gene": "rgb(0,190,0)",
+                }
+            }
+        ]
+    };
+}
