@@ -46,6 +46,7 @@ class VariantPositionsController < ApplicationController
       end,
       primer_tracks: @track.primers.each_with_index.map do |primer, index|
         { name: @track.primer_name(primer), color: @track.primer_color(primer),
+          description: @track.primer_description(primer),
           url: organism_variant_position_url(@organism, coordinate: @coordinate, days: @days,
                                                         track: 'primer', primer: index, format: :text) }
       end

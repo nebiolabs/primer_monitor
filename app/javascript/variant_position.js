@@ -18,7 +18,8 @@ function initDiagram(config) {
                 "color": primer.color,
                 "displayMode": "SQUISHED",
                 "height": 17,
-                "autoHeight": false
+                "autoHeight": false,
+                ...(primer.description ? { "description": primer.description } : {})
             })),
             // one track per allele, most frequent first; the name carries its frequency
             ...(config['variant_tracks'] || []).map(variant => ({

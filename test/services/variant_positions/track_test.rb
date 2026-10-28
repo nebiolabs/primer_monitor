@@ -100,6 +100,16 @@ module VariantPositions
       assert_equal '+AAA', label.call('I', 'AAA', nil)
     end
 
+    test 'primers at the same coordinates share one track, named by the most recent, the rest in its description' do
+      duplicate = Oligo.create!(name: 'probe-dup', sequence: 'GCAATTTATATACATATA', primer_set: primer_sets(:one))
+      OligoAlignmentPosition.create!(oligo: duplicate, organism_taxon: @taxon, ref_start: 95, ref_end: 115)
+      track = Track.new(organism: @organism, coordinate: 100, days: 30)
+
+      assert_equal 1, track.primers.size
+      assert_includes track.primers.first.name, 'probe-dup'
+      assert_includes track.primer_description(track.primers.first), oligos(:one).label
+    end
+
     test 'primer track gives each primer its strand' do
       oligos(:one).update!(strand: '-')
 

@@ -10,7 +10,8 @@ module VariantPositions
     CACHE_TTL = 1.hour
 
     Allele = Struct.new(:ref_start, :ref_end, :variant_type, :variant, :ref, :sequences, keyword_init: true)
-    PrimerTrack = Struct.new(:ref_start, :ref_end, :name, :impact, :strand, keyword_init: true)
+    # also: labels of the other primers at the same coordinates, which the track's description lists
+    PrimerTrack = Struct.new(:ref_start, :ref_end, :name, :impact, :strand, :also, keyword_init: true)
 
     def initialize(organism:, coordinate:, days:)
       @coordinate = coordinate
@@ -74,18 +75,38 @@ module VariantPositions
     # the primers overlapping the position, most impacted first; each is a track of its own so its colour holds
     def primers
       @primers ||= begin
-        built = primer_positions.map do |position|
-          oligo = position.oligo
-          PrimerTrack.new(ref_start: position.ref_start, ref_end: position.ref_end,
-                          name: "#{oligo.primer_set.name} #{oligo.label}", impact: primer_impacts[oligo.id],
-                          strand: primer_strand(position))
-        end
+        groups = primer_positions.group_by { |position| [position.ref_start, position.ref_end] }
+        built = groups.values.map { |group| primer_track(group) }
         built.sort_by { |primer| -(primer.impact || -Float::INFINITY) }
       end
     end
 
+    # one track for primers sharing coordinates: the most recent primer set, then the highest oligo id, names it
+    def primer_track(group)
+      latest, *others = group.sort_by { |p| [p.oligo.primer_set.created_at, p.oligo.id] }.reverse
+      PrimerTrack.new(ref_start: latest.ref_start, ref_end: latest.ref_end, name: primer_label(latest),
+                      impact: group.filter_map { |p| primer_impacts[p.oligo.id] }.max,
+                      strand: primer_strand(latest),
+                      also: others.map { |p| "#{primer_label(p)} (#{impact_text(primer_impacts[p.oligo.id])})" })
+    end
+
+    # the track's popup text: the other primers at the same coordinates, or nil when there are none
+    def primer_description(primer)
+      return if primer.also.empty?
+
+      "Same coordinates: #{primer.also.join('; ')}"
+    end
+
     def primer_name(primer)
-      "#{primer.name}, impact #{primer.impact ? format('%.1f', primer.impact) : 'none'}"
+      "#{primer.name}, impact #{impact_text(primer.impact)}"
+    end
+
+    def primer_label(position)
+      "#{position.oligo.primer_set.name} #{position.oligo.label}"
+    end
+
+    def impact_text(impact)
+      impact ? format('%.1f', impact) : 'none'
     end
 
     # track colour for the primer, from its impact, see Disruption.color
