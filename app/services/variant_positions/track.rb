@@ -90,7 +90,9 @@ module VariantPositions
     end
 
     def other_primer_labels(others)
-      others.map { |p| "#{primer_label(p)} (#{impact_text(primer_impacts[p.oligo.id])})" }
+      others.map do |p|
+        "#{p.oligo.primer_set.name}: #{p.oligo.label} (impact #{impact_text(primer_impacts[p.oligo.id])})"
+      end
     end
 
     # the track's name: the primer scheme (primer set); the primer and its impact are in the description
@@ -99,10 +101,11 @@ module VariantPositions
     end
 
     # the track's popup text: the primer and its impact, then any other primers at the same coordinates
+    # one line for the primer and its impact, then, when others share its coordinates, a line for each as set: primer
     def primer_description(primer)
-      text = "#{primer.label}, impact #{impact_text(primer.impact)}"
-      text += ". Same coordinates: #{primer.also.join('; ')}" if primer.also.any?
-      text
+      lines = ["#{primer.label}, impact #{impact_text(primer.impact)}"]
+      lines += ['Same coordinates:', *primer.also] if primer.also.any?
+      lines.join("\n")
     end
 
     # the variant track's name: the allele; its share of sequences and disruption are in the description

@@ -31,6 +31,7 @@ export function trackDescription(text) {
         description: () => {
             const row = document.createElement('div');
             row.className = 'igv-track-label-popover__row';
+            row.style.whiteSpace = 'pre-line'; // keep the line breaks in the text
             row.textContent = text;
             return row;
         }
