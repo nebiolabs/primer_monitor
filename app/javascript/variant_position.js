@@ -34,19 +34,22 @@ function initDiagram(config) {
         },
         locus: config['locus'],
         tracks: [
-            {
-                "name": "Primers overlapping position",
-                "url": config['primer_track_url'],
+            // one track per primer, most impacted first, coloured by impact
+            ...(config['primer_tracks'] || []).map(primer => ({
+                "name": primer.name,
+                "url": primer.url,
                 "format": "bed",
+                "color": primer.color,
                 "displayMode": "SQUISHED",
-                "autoHeight": true
-            },
+                "height": 12,
+                "autoHeight": false
+            })),
             // one track per allele, most frequent first; the name carries its frequency
             ...(config['variant_tracks'] || []).map(variant => ({
                 "name": variant.name,
                 "url": variant.url,
                 "format": "bed",
-                "color": "#d62828",
+                "color": variant.color || "#d62828",
                 "displayMode": "SQUISHED",
                 "height": 12,
                 "autoHeight": false

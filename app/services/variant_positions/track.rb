@@ -1,14 +1,16 @@
 # frozen_string_literal: true
 
 module VariantPositions
-  # The igv.js diagram for one 0-based reference position: a BED track per variant allele seen there, most frequent
-  # first, the primers overlapping the position, and a locus that frames those primers. Frequencies are over the
-  # sequences collected within the last `days` days. Uses the organism's first taxon, like the organism browser.
-  class Track
+  # The igv.js diagram for one 0-based reference position: a BED track per primer overlapping it, most impacted first,
+  # and a BED track per variant allele seen there, most frequent first, and a locus that frames the primers. Each
+  # track is coloured by impact (see Disruption). Frequencies are over the sequences collected within the last `days`
+  # days. Uses the organism's first taxon, like the organism browser.
+  class Track # rubocop:disable Metrics/ClassLength -- the variant and primer tracks each need their own data and naming
     PADDING = 25
     CACHE_TTL = 1.hour
 
     Allele = Struct.new(:ref_start, :ref_end, :variant_type, :variant, :sequences, keyword_init: true)
+    PrimerTrack = Struct.new(:ref_start, :ref_end, :name, :impact, :strand, keyword_init: true)
 
     def initialize(organism:, coordinate:, days:)
       @coordinate = coordinate
@@ -31,7 +33,23 @@ module VariantPositions
     end
 
     def allele_name(allele)
-      "#{allele.variant_type}:#{allele.variant} (#{percent(allele.sequences)}%)"
+      impact = disruption(allele) || 'none'
+      "#{allele.variant_type}:#{allele.variant} (#{percent(allele.sequences)}%), disruption #{impact}"
+    end
+
+    # the largest disruption the allele causes to a primer overlapping the position (see Disruption), or nil when
+    # it affects none of them
+    def disruption(allele)
+      variant_span = allele.ref_start...[allele.ref_end, allele.ref_start + 1].max
+      primer_positions.filter_map do |position|
+        Disruption.primer_score(variant_type: allele.variant_type, variant_span:,
+                                primer_span: position.ref_start...position.ref_end, strand: position.oligo.strand)
+      end.max
+    end
+
+    # track colour for the allele, see Disruption.color
+    def allele_color(allele)
+      Disruption.color(disruption(allele))
     end
 
     # BED line of one allele, by its index in #alleles; nil when there is no such allele. The score is the number of
@@ -43,15 +61,35 @@ module VariantPositions
       bed([[allele.ref_start, [allele.ref_end, allele.ref_start + 1].max, allele_name(allele), allele.sequences]])
     end
 
-    # BED lines of the primers overlapping the position, named by primer set and primer. The score is the number of
-    # distinct variant sites in the window overlapping the primer.
-    def primer_bed
-      counts = primer_variant_counts
-      bed(primer_positions.map do |position|
-        oligo = position.oligo
-        [position.ref_start, position.ref_end, "#{oligo.primer_set.name} #{oligo.label}",
-         counts.fetch(oligo.id, 0), strand(oligo)]
-      end)
+    # the primers overlapping the position, most impacted first; each is a track of its own so its colour holds
+    def primers
+      @primers ||= begin
+        built = primer_positions.map do |position|
+          oligo = position.oligo
+          PrimerTrack.new(ref_start: position.ref_start, ref_end: position.ref_end,
+                          name: "#{oligo.primer_set.name} #{oligo.label}", impact: primer_impacts[oligo.id],
+                          strand: strand(oligo))
+        end
+        built.sort_by { |primer| -(primer.impact || -Float::INFINITY) }
+      end
+    end
+
+    def primer_name(primer)
+      "#{primer.name}, impact #{primer.impact ? format('%.1f', primer.impact) : 'none'}"
+    end
+
+    # track colour for the primer, from its impact, see Disruption.color
+    def primer_color(primer)
+      Disruption.color(primer.impact)
+    end
+
+    # BED line of one primer, by its index in #primers; nil when there is no such primer. The score is the rounded
+    # impact.
+    def primer_bed(index)
+      primer = primers[index]
+      return if primer.nil?
+
+      bed([[primer.ref_start, primer.ref_end, primer_name(primer), (primer.impact || 0).round, primer.strand]])
     end
 
     # 1-based igv locus framing the overlapping primers and the position
@@ -84,16 +122,32 @@ module VariantPositions
       end
     end
 
-    # oligo id => distinct variant sites in the window overlapping that primer, in one query against the nightly
-    # overlap view (which is why the page caps its window at the view's 168 days)
-    def primer_variant_counts
-      @primer_variant_counts ||= cached(:primer_variant_counts) do
-        OligoVariantOverlap.where(oligo_id: primer_positions.map { |p| p.oligo.id })
-                           .where(date_collected: since..).group(:oligo_id).distinct.count(:variant_id)
+    # oligo id => the primer's impact: log2 of the sum over its distinct variant sites in the window of 2 ** disruption,
+    # the composite score the classifier thresholds. Nil for a primer no variant in the window affects. Read from the
+    # nightly overlap view, which is why the page caps its window at the view's 168 days.
+    def primer_impacts
+      @primer_impacts ||= cached(:primer_impacts) do
+        spans = primer_positions.index_by { |position| position.oligo.id }
+        scores = Hash.new { |hash, key| hash[key] = [] }
+        overlap_rows(spans.keys).each do |oligo_id, type, start, stop|
+          score = primer_disruption(spans.fetch(oligo_id), type, start...stop)
+          scores[oligo_id] << score if score
+        end
+        scores.transform_values { |exponents| Disruption.log2_sum(exponents) }
       end
     end
 
-    # the diagram makes one request per allele track, all for the same data, so share it for a while
+    def overlap_rows(oligo_ids)
+      OligoVariantOverlap.where(oligo_id: oligo_ids).where(date_collected: since..).distinct
+                         .pluck(:oligo_id, :variant_type, :variant_start, :variant_end)
+    end
+
+    def primer_disruption(position, variant_type, variant_span)
+      Disruption.primer_score(variant_type:, variant_span:, primer_span: position.ref_start...position.ref_end,
+                              strand: strand(position.oligo))
+    end
+
+    # the diagram makes one request per track, all for the same data, so share it for a while
     def cached(name, &)
       Rails.cache.fetch(['variant_position_track', taxon&.id, coordinate, since, name], expires_in: CACHE_TTL, &)
     end

@@ -39,7 +39,7 @@ class VariantPositionsControllerTest < ActionDispatch::IntegrationTest
     get organism_variant_position_url(organism_slug: @organism.slug, coordinate: 100)
 
     assert_select 'div#variant_igv'
-    assert_select 'p#variant_position_config', text: /primer_track_url/
+    assert_select 'p#variant_position_config', text: /primer_tracks/
     assert_select 'div#variant_map[data-locations*="Australia"]'
   end
 
@@ -49,14 +49,15 @@ class VariantPositionsControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_equal 'text/plain', response.media_type
-    assert_includes response.body, "100\t101\tX:A_(100.0%)\t1\t."
+    assert_includes response.body, "100\t101\tX:A_(100.0%),_disruption_4\t1\t."
 
     get organism_variant_position_url(organism_slug: @organism.slug, coordinate: 100, track: 'variant', allele: 9,
                                       format: :text)
 
     assert_response :not_found
 
-    get organism_variant_position_url(organism_slug: @organism.slug, coordinate: 100, track: 'primers', format: :text)
+    get organism_variant_position_url(organism_slug: @organism.slug, coordinate: 100, track: 'primer', primer: 0,
+                                      format: :text)
 
     assert_includes response.body, '95'
   end

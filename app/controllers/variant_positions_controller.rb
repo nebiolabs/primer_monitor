@@ -18,7 +18,10 @@ class VariantPositionsController < ApplicationController
     respond_to do |format|
       format.html { @igv_config = igv_config }
       format.text do
-        body = params[:track] == 'primers' ? @track.primer_bed : @track.variant_bed(params[:allele].to_i)
+        body = case params[:track]
+               when 'primer' then @track.primer_bed(params[:primer].to_i)
+               when 'variant' then @track.variant_bed(params[:allele].to_i)
+               end
         body ? render(plain: body) : head(:not_found)
       end
     end
@@ -37,12 +40,15 @@ class VariantPositionsController < ApplicationController
     @organism.igv_config.merge(
       locus: @track.locus,
       variant_tracks: @track.alleles.each_with_index.map do |allele, index|
-        { name: @track.allele_name(allele),
+        { name: @track.allele_name(allele), color: @track.allele_color(allele),
           url: organism_variant_position_url(@organism, coordinate: @coordinate, days: @days,
                                                         track: 'variant', allele: index, format: :text) }
       end,
-      primer_track_url: organism_variant_position_url(@organism, coordinate: @coordinate, days: @days,
-                                                                 track: 'primers', format: :text)
+      primer_tracks: @track.primers.each_with_index.map do |primer, index|
+        { name: @track.primer_name(primer), color: @track.primer_color(primer),
+          url: organism_variant_position_url(@organism, coordinate: @coordinate, days: @days,
+                                                        track: 'primer', primer: index, format: :text) }
+      end
     )
   end
 end

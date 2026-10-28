@@ -16,7 +16,7 @@
 <h2 class="title is-5">Primers and variant</h2>
 <p id="variant_position_config" class="invisible"><%= @igv_config.to_json %></p>
 <div id="variant_igv" class="igv_div"></div>
-<p class="help">Arrows show each primer's direction (+ or − strand); click a primer or variant for its name. Red marks the variant, which has no direction.</p>
+<p class="help">Primers and variants are coloured by impact, from grey (none) through yellow to red (highest), so the most disruptive ones stand out. Arrows show each primer's direction (+ or − strand); variants have no direction. Click a track name or feature for details.</p>
 
 <h2 class="title is-5">Geographic distribution</h2>
 <% if @summary[:locations].any? %>
