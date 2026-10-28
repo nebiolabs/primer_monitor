@@ -29,12 +29,12 @@
       </thead>
       <tbody>
         <% @summary[:locations].each do |row| %>
-          <tr>
+          <%= tag.tr(data: { map_point: row.map_name }, class: ('is-clickable' if row.map_name)) do %>
             <td><%= row.name %></td>
             <td class="has-text-right"><%= row.variant_count %></td>
             <td class="has-text-right"><%= row.sequence_count %></td>
             <td class="has-text-right"><%= row.fraction.round(2) %></td>
-          </tr>
+          <% end %>
         <% end %>
       </tbody>
     </table>

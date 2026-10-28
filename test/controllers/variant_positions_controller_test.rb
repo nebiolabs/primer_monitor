@@ -41,6 +41,7 @@ class VariantPositionsControllerTest < ActionDispatch::IntegrationTest
     assert_select 'div#variant_igv'
     assert_select 'p#variant_position_config', text: /primer_tracks/
     assert_select 'div#variant_map[data-locations*="Australia"]'
+    assert_select 'tr.is-clickable[data-map-point="Australia"]'
   end
 
   test 'serves the variant and primer tracks as BED' do

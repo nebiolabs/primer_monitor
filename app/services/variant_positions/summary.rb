@@ -5,7 +5,8 @@ module VariantPositions
   # which named lineages those sequences belong to. Fractions are over all sequences in the same location or lineage
   # within the window, the same denominator the notification emails use.
   class Summary
-    Row = Struct.new(:name, :variant_count, :sequence_count, :fraction, keyword_init: true)
+    # map_name is the name of the country's circle on the map, nil when the country has none
+    Row = Struct.new(:name, :variant_count, :sequence_count, :fraction, :map_name, keyword_init: true)
 
     def self.call(organism:, coordinate:, days:)
       new(organism:, coordinate:, days:).call
@@ -50,7 +51,10 @@ module VariantPositions
       names = DetailedGeoLocation.where(id: variants.keys).index_by(&:id)
 
       rows = variants.map do |location_id, variant_count|
-        build_row(location_name(names.fetch(location_id)), variant_count, totals.fetch(location_id, 0))
+        location = names.fetch(location_id)
+        centroid = CountryCentroids.lookup(location.subregion)
+        build_row(location_name(location), variant_count, totals.fetch(location_id, 0),
+                  map_name: centroid&.fetch('name'))
       end
       sort_rows(rows)
     end
@@ -80,8 +84,8 @@ module VariantPositions
       rows.sort_by { |row| [-row.variant_count, row.name] }
     end
 
-    def build_row(name, variant_count, sequence_count)
-      Row.new(name:, variant_count:, sequence_count:,
+    def build_row(name, variant_count, sequence_count, map_name: nil)
+      Row.new(name:, variant_count:, sequence_count:, map_name:,
               fraction: sequence_count.zero? ? 0.0 : variant_count.to_f / sequence_count)
     end
 

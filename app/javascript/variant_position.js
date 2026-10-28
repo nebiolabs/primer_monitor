@@ -76,6 +76,12 @@ function initMap(element) {
         if (points.length > 0) leafletMap.fitBounds(points, { padding: [30, 30], maxZoom: 5 });
     };
 
+    const markersByName = new Map();
+    const focusMarker = marker => {
+        leafletMap.flyTo(marker.getLatLng(), Math.max(leafletMap.getZoom(), 5));
+        marker.openPopup();
+    };
+
     locations.forEach(location => {
         const point = [location.latitude, location.longitude];
         const hue = Math.round((1 - location.fraction) * 60); // yellow (all sequences) to red (none)
@@ -87,7 +93,8 @@ function initMap(element) {
             fillOpacity: 0.8,
             bubblingMouseEvents: false // so clicking a circle does not also count as a background click
         }).addTo(leafletMap);
-        marker.on('click', () => leafletMap.flyTo(point, Math.max(leafletMap.getZoom(), 5)));
+        marker.on('click', () => focusMarker(marker));
+        markersByName.set(location.name, marker);
 
         const popup = document.createElement('div');
         const name = document.createElement('strong');
@@ -97,6 +104,16 @@ function initMap(element) {
             `(${(location.fraction * 100).toFixed(1)}%)`;
         popup.append(name, detail);
         marker.bindPopup(popup);
+    });
+
+    // table rows for countries with a circle zoom the map to it, scrolling the map into view first
+    document.querySelectorAll('tr[data-map-point]').forEach(row => {
+        const marker = markersByName.get(row.dataset.mapPoint);
+        if (!marker) return;
+        row.addEventListener('click', () => {
+            leafletMap.getContainer().scrollIntoView({ behavior: 'smooth', block: 'center' });
+            focusMarker(marker);
+        });
     });
 
     leafletMap.on('click', showAll);
