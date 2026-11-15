@@ -85,10 +85,21 @@ namespace :backend do # rubocop:disable Metrics/BlockLength
 
   desc 'Install gems'
   task :bundle do
-    on roles(:backend, :cluster) do
+    # hpc-g has its own rbenv, so it can build its gems locally.
+    on roles(:backend) do
       within "#{fetch(:backend_deploy_to)}/current" do
         execute(:bundle, :install)
       end
+    end
+    # The cluster host shares HOME=/data/primer-monitor and its rbenv with the SGE nodes. Run bundle install on
+    # a node so native extensions link against the nodes' glibc (2.28) rather than the submit host's.
+    # -sync y blocks until the job ends and returns its exit status, so a failed install fails the deploy.
+    on roles(:cluster) do
+      execute(:qsub, '-sync y -b y -j y -N bundle_install',
+              "-o #{fetch(:backend_deploy_to)}/bundle_install.log",
+              "bash -lc 'cd #{fetch(:backend_deploy_to)}/current && bundle install'")
+      # Fail the deploy if any extension in the shared rbenv still needs a newer glibc than the nodes have.
+      execute("bash -lc 'cd #{fetch(:backend_deploy_to)}/current && bin/check_glibc_compat 2.28'")
     end
   end
 end

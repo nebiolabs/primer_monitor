@@ -1,0 +1,48 @@
+#!/usr/bin/env bash
+# Fail if any shared library needs a newer glibc than the SGE compute nodes provide.
+#
+# Usage: bin/check_glibc_compat [MAX_GLIBC] [DIR...]
+#
+# MAX_GLIBC defaults to 2.28, the glibc on the Rocky 8 nodes. DIR defaults to the prefix of the Ruby that
+# rbenv selects in the current directory, which holds Ruby's own extensions and the installed gems.
+# A native extension compiled on a newer host (EL9, Ubuntu) loads fine there but fails on the nodes with
+# "version `GLIBC_2.xx' not found". The deploy runs this so that failure shows up at deploy time.
+set -euo pipefail
+
+max=${1:-2.28}
+shift || true
+
+if ! command -v objdump >/dev/null; then
+  echo "check_glibc_compat: objdump not found; cannot check native extensions" >&2
+  exit 2
+fi
+
+if [ $# -eq 0 ]; then
+  set -- "$(ruby -e 'print RbConfig::CONFIG["prefix"]')"
+fi
+
+scanned=0
+bad=0
+while IFS= read -r -d '' so; do
+  scanned=$((scanned + 1))
+  need=$(objdump -T "$so" 2>/dev/null | grep -oE 'GLIBC_[0-9]+(\.[0-9]+)+' | sed 's/^GLIBC_//' | sort -uV | tail -1 || true)
+  [ -n "$need" ] || continue
+  if [ "$(printf '%s\n%s\n' "$need" "$max" | sort -V | tail -1)" != "$max" ]; then
+    echo "needs glibc $need (> $max): $so" >&2
+    bad=$((bad + 1))
+  fi
+done < <(find "$@" -name '*.so' -type f -print0)
+
+# An empty scan would look exactly like a clean one, so treat it as an error.
+if [ "$scanned" -eq 0 ]; then
+  echo "check_glibc_compat: no .so files found under: $*" >&2
+  exit 2
+fi
+
+if [ "$bad" -gt 0 ]; then
+  echo "check_glibc_compat: $bad of $scanned libraries need glibc newer than $max." >&2
+  echo "Rebuild them on a compute node, e.g. qsub -sync y -b y bash -lc 'cd <app> && gem pristine <gem>'" >&2
+  exit 1
+fi
+
+echo "check_glibc_compat: $scanned libraries OK for glibc <= $max"
