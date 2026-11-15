@@ -56,4 +56,15 @@ class UserTest < ActiveSupport::TestCase
 
     assert_equal %w[Cher -], [user.first, user.last]
   end
+
+  test 'to_s falls back to the email when the names are blank strings' do
+    user = User.new(first: '', last: '', email: 'blank@example.org', login: 'blank@example.org')
+    assert_equal 'blank@example.org', user.to_s
+    assert_equal 'blank@example.org', user.formatted_email
+  end
+
+  test 'to_s uses whichever name parts are present' do
+    assert_equal 'Ada Lovelace', User.new(first: 'Ada', last: 'Lovelace').to_s
+    assert_equal 'Ada', User.new(first: 'Ada', last: '', login: 'x').to_s
+  end
 end

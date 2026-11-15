@@ -7,5 +7,9 @@
 <p>
   A primer set has been created/updated: <%= @url %>.
 </p>
+<p>
+  Name: <%= @primer_set.name %><br/>
+  Creator: <%= @primer_set.user %> (<%= @primer_set.user&.email %>)
+</p>
 </body>
 </html>

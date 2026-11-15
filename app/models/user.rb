@@ -73,12 +73,13 @@ class User < ApplicationRecord
     self.subscribed_geo_locations = recs
   end
 
+  # sign-up leaves the name fields optional, so they are often blank strings rather than nil
   def to_s
-    if first && last
-      "#{first} #{last}"
-    else
-      login
-    end
+    full_name.presence || login.presence || email
+  end
+
+  def full_name
+    [first, last].compact_blank.join(' ')
   end
 
   def set_login_from_email
@@ -106,7 +107,7 @@ class User < ApplicationRecord
 
   def formatted_email
     m = Mail::Address.new email
-    m.display_name = "#{first.capitalize} #{last.capitalize}"
+    m.display_name = [first, last].compact_blank.map(&:capitalize).join(' ').presence
     m.format
   end
 

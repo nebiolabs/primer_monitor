@@ -16,6 +16,7 @@ class PrimerSetMailerTest < ActionMailer::TestCase
     assert_equal ['me@example.com'], email.to
     assert_equal [ENV.fetch('ADMIN_EMAIL', nil)], email.from
     assert_equal 'Primer Set Created or Updated', email.subject
+    assert_includes email.body.to_s, primer_sets(:one).user.email
   end
 
   test 'primer_overlap_notification_email links each position to its variant summary' do
