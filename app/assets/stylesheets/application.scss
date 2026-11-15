@@ -236,12 +236,14 @@ tr.is-clickable {
     vertical-align: middle;
   }
 
-  // name and sequence take the spare width; the short columns stay narrow
-  td:nth-child(2) { min-width: 16rem; }
-  td:nth-child(3) { width: 6rem; }
-  td:nth-child(4) { width: 8rem; }
-  td:nth-child(5) { width: 8rem; }
-  td:nth-child(6) { min-width: 22rem; width: 45%; }
+  // sized to fit the page without scrolling sideways; name and sequence take the spare width
+  td:nth-child(1), td:nth-child(8) { width: 2rem; }
+  td:nth-child(2) { min-width: 15rem; }
+  td:nth-child(3) { width: 5rem; }
+  td:nth-child(4) { width: 6rem; }
+  td:nth-child(5) { min-width: 7.5rem; width: 7.5rem; }
+  td:nth-child(6) { min-width: 14rem; width: 35%; }
+  td:nth-child(7) { width: 4rem; }
 
   .oligo-sequence {
     font-family: monospace;
@@ -265,6 +267,11 @@ tr.is-clickable {
 
   tr.is-removed td {
     opacity: 0.45;
+
+    // the remove button undoes the removal, so keep it plain to see
+    &:last-child {
+      opacity: 1;
+    }
 
     input, select {
       text-decoration: line-through;

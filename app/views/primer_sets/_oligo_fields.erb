@@ -27,8 +27,6 @@
   <td class="has-text-right" data-oligo-length></td>
   <td>
     <%= f.hidden_field :_destroy %>
-    <button type="button" class="button is-white is-small" data-nested-remove title="Remove oligo">
-      <%= image_tag('remove_icon.svg', alt: 'remove oligo', class: 'icon') %>
-    </button>
+    <button type="button" class="delete" data-nested-remove title="Remove" aria-label="Remove oligo"></button>
   </td>
 </tr>

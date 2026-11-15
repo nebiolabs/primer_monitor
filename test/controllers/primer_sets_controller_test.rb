@@ -88,6 +88,7 @@ class PrimerSetsControllerTest < ActionDispatch::IntegrationTest
 
     assert_select '#igv'
     config = JSON.parse(css_select('#config').first.text)
+
     assert_equal [{ 'chr' => 'NC_045512.2', 'start' => 95, 'end' => 115, 'name' => 'probe1' }],
                  config['alignment_features']
   end

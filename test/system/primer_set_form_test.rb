@@ -78,7 +78,7 @@ class PrimerSetFormTest < ApplicationSystemTestCase
   test 'pasting several lines into a cell fills the rows below and adds rows as needed' do
     edit_set_with(%w[x_1_LEFT])
     first('#samples input[data-col="sequence"]').click
-    page.execute_script(<<~JS)
+    page.execute_script(<<~'JS')
       const input = document.querySelector('#samples input[data-col="sequence"]');
       const data = new DataTransfer();
       data.setData('text/plain', 'AAAACCCC\nGGGGTTTT\n');
