@@ -192,7 +192,9 @@ workflow {
     get_caller_version()
     download_data()
     extract_new_records(download_data.out)
-    transform_data(extract_new_records.out.splitText(file: true, by: 2500).filter{ it.size()>77 })
+    // Each chunk becomes one pangolin task and one load_lineage_data task. Loading 2,500 records took
+    // seconds, so per-task scheduling overhead dominated; larger chunks mean fewer, longer tasks.
+    transform_data(extract_new_records.out.splitText(file: true, by: 17500).filter{ it.size()>77 })
     lineage_calls(get_caller_version.out, transform_data.out)
     load_lineage_data(lineage_calls.out)
     update_calls(load_lineage_data.out.collect())
