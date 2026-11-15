@@ -17,6 +17,19 @@ function primerSetTrack() {
     };
 }
 
+const STRAND_COLORS = { '+': 'rgb(31,119,180)', '-': 'rgb(214,39,40)', '': 'rgb(90,90,90)' };
+
+// Before the set is published, its alignments come inline from the database
+function alignmentPreviewTrack() {
+    return {
+        "name": config['primer_set_display_name'] + " (alignment preview)",
+        "type": "annotation",
+        "features": config['alignment_features'].map(f => ({ ...f, color: STRAND_COLORS[f.strand] || STRAND_COLORS[''] })),
+        "displayMode": "EXPANDED",
+        "autoHeight": true
+    };
+}
+
 // The lineage's variants, then this primer set colored by whether those variants likely impact each primer
 function lineageTrackConfigs(lineage) {
     const base = config['data_server'] + "/" + config['organism_slug'];
@@ -62,6 +75,10 @@ async function showLineage(lineage) {
     }
 }
 
+function primerTrack() {
+    return config['alignment_features'] ? alignmentPreviewTrack() : primerSetTrack();
+}
+
 function initBrowser() {
 
     const browserConfig =
@@ -85,7 +102,7 @@ function initBrowser() {
                         }
                     },
                     // without lineage data, show just where the primers bind
-                    ...(config['initial_lineage'] ? [] : [primerSetTrack()])
+                    ...(config['initial_lineage'] ? [] : [primerTrack()])
                 ]
             }
         };
@@ -116,7 +133,7 @@ registerPageModule(
     () => !!document.querySelector('#config[data-igv-page="primer_set"]'),
     () => {
         config = JSON.parse(document.getElementById('config').innerHTML);
-        if ('primer_set_name' in config) initBrowser();
+        if (document.getElementById('igv')) initBrowser();
     },
     () => {
         removeBrowser();

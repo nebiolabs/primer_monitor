@@ -57,6 +57,7 @@ class PrimerSetsControllerTest < ActionDispatch::IntegrationTest
 
   test 'show marks FASTA and BED pending until the primer set is on the data server' do
     @primer_set.update!(status: :complete)
+    OligoAlignmentPosition.delete_all
     Organism.any_instance.stubs(:primer_sets_config).returns([{ data_server: 'http://data' }, {}])
     get primer_set_url(@primer_set)
 
@@ -79,6 +80,26 @@ class PrimerSetsControllerTest < ActionDispatch::IntegrationTest
     assert_select 'a[href=?]', 'http://data/sars-cov-2/primer_sets_fasta/Charite.fasta'
     assert_select 'a[href=?]', 'http://data/sars-cov-2/primer_sets_bed/Charite.bed'
     assert_select '#igv'
+  end
+
+  test 'show previews the database alignments before the primer set is published' do
+    Organism.any_instance.stubs(:primer_sets_config).returns([{ data_server: 'http://data' }, {}])
+    get primer_set_url(@primer_set)
+
+    assert_select '#igv'
+    config = JSON.parse(css_select('#config').first.text)
+    assert_equal [{ 'chr' => 'NC_045512.2', 'start' => 95, 'end' => 115, 'name' => 'probe1' }],
+                 config['alignment_features']
+  end
+
+  test 'show uses the published track instead of the preview once the set is complete' do
+    @primer_set.update!(status: :complete)
+    Organism.any_instance.stubs(:primer_sets_config)
+            .returns([{ data_server: 'http://data', organism_slug: 'sars-cov-2' }, { @primer_set.name => 'Charite' }])
+    Organism.any_instance.stubs(:lineage_variants_data).returns({ data_fetched: false })
+    get primer_set_url(@primer_set)
+
+    assert_nil JSON.parse(css_select('#config').first.text)['alignment_features']
   end
 
   test 'should get edit' do

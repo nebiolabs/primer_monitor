@@ -18,12 +18,15 @@ class PrimerSetsController < ApplicationController
   # GET /primer_sets/1.json
   def show
     @config, primer_sets = @primer_set.organism.primer_sets_config
-
-    return unless primer_sets.key? @primer_set.name
-
     @config['primer_set_display_name'] = @primer_set.name
-    @config['primer_set_name'] = primer_sets[@primer_set.name]
-    prepare_lineage_display
+
+    if primer_sets.key? @primer_set.name
+      @config['primer_set_name'] = primer_sets[@primer_set.name]
+      prepare_lineage_display
+    end
+
+    # until the published BED exists, draw the set from the database alignments so reviewers can check it
+    @config[:alignment_features] = @primer_set.alignment_features unless published_track?
   end
 
   # GET /primer_sets/new
@@ -100,6 +103,11 @@ class PrimerSetsController < ApplicationController
     @config[:lineage_names] = @lineage_sets
     @config[:variant_overlaps_path] = variant_overlaps_organism_lineage_variants_path(organism, format: :json)
   end
+
+  def published_track?
+    @primer_set.complete? && @config.key?('primer_set_name')
+  end
+  helper_method :published_track?
 
   # Use callbacks to share common setup or constraints between actions.
   def set_primer_set

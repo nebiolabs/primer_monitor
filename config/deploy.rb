@@ -113,6 +113,10 @@ namespace :deploy do # rubocop:disable Metrics/BlockLength
         # --frozen installs exactly what pixi.lock says; packages come from pixi's cache after the first deploy
         execute("source #{shared_path}/.env && \"${PIXI_BIN_PATH:+$PIXI_BIN_PATH/}pixi\" install --frozen " \
                 "--manifest-path #{release_path}/lib/alignment/pixi.toml")
+        # fail the deploy, not a later primer set upload, when a tool update_primers.sh calls is missing
+        execute("source #{shared_path}/.env && \"${PIXI_BIN_PATH:+$PIXI_BIN_PATH/}pixi\" run --frozen " \
+                "--manifest-path #{release_path}/lib/alignment/pixi.toml " \
+                "bash -c 'command -v psql bowtie2 samtools bedtools'")
       end
     end
   end

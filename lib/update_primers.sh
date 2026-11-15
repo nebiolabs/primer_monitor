@@ -24,6 +24,13 @@ pixi_hook=$("${PIXI_BIN_PATH:+$PIXI_BIN_PATH/}pixi" shell-hook --frozen --manife
 }
 eval "$pixi_hook"
 
+for tool in psql bowtie2 samtools bedtools; do
+  command -v "$tool" >/dev/null || {
+    log "FAILED: $tool is not on PATH after activating $pixi_manifest"
+    exit 1
+  }
+done
+
 # you need to export DB_HOST, DB_NAME and DB_USER before running this
 
 log "aligning primer sets $* to $bt2_index"

@@ -52,6 +52,19 @@ class PrimerSet < ApplicationRecord
     end
   end
 
+  STRANDS = { 'Forward' => '+', 'Reverse' => '-' }.freeze
+
+  # Where the alignment step (lib/update_primers.sh) placed each oligo on the reference, as igv.js features.
+  # This lets the show page draw the set before it is approved and published to the data server.
+  def alignment_features
+    positions = OligoAlignmentPosition.joins(:oligo, :organism_taxon)
+                                      .where(oligos: { primer_set_id: id }).order(:ref_start)
+    rows = positions.pluck('organism_taxa.reference_accession', :ref_start, :ref_end, 'oligos.name', 'oligos.category')
+    rows.map do |chr, start, stop, name, category|
+      { chr:, start:, end: stop, name:, strand: STRANDS[category], category: }.compact
+    end
+  end
+
   # TODO: switch this to use delayed job, avoid multiple alignments in succession
   def align_primers
     shared_dir = ENV.fetch('DEPLOY_SHARED_DIR', nil)

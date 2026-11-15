@@ -80,7 +80,7 @@
 
 <p id="config" class="invisible" data-igv-page="primer_set"><%= @config.to_json %></p>
 
-<% if @primer_set.complete? && @config.key?('primer_set_name') %>
+<% if published_track? %>
 
 <% if @sorted_lineages %>
 <div class="block">
@@ -114,10 +114,19 @@
 </div>
 <% end %>
 
+<% elsif @config[:alignment_features].present? %>
+
+<div class="block">
+  <p>This preview shows where each primer aligned to the reference, read from the database.
+  Forward primers are blue and point right. Reverse primers are red and point left. The full view with lineage variants will appear
+  once the primer set has been approved and processed.</p>
+</div>
+<div id="igv" class="igv_div"></div>
+
 <% else %>
 
 <p class="igv-message">
-  The genome view of this primer set will appear once it has been approved and processed.
+  The genome view of this primer set will appear once its primers have been aligned to the reference.
 </p>
 
 <% end %>
