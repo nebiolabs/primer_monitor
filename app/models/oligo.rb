@@ -10,6 +10,7 @@ class Oligo < ApplicationRecord
                     Forward: 'Forward', Probe: 'Probe', Reverse: 'Reverse' }
 
   before_validation :infer_locus_and_category
+  before_validation :infer_short_name
 
   validates :short_name, length: 1..5, allow_blank: true
 
@@ -29,6 +30,10 @@ class Oligo < ApplicationRecord
   end
 
   private
+
+  def infer_short_name
+    self.short_name = OligoNameParser.short_name(name) if short_name.blank?
+  end
 
   # FASTA uploads carry only names; fill blanks from the name and leave anything entered by hand alone
   def infer_locus_and_category

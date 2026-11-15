@@ -19,6 +19,60 @@ module OligoNameParser
     'P' => 'Probe', 'PR' => 'Probe', 'PROBE' => 'Probe'
   }.freeze
 
+  SHORT_NAME_MAX = 5
+  SHORT_CATEGORIES = { 'Forward' => 'F', 'Reverse' => 'R', 'Probe' => 'P' }.freeze
+
+  # A short name of at most 5 characters that tells oligos in one set apart: 10L, 10R_2 (alt 2), 1aL (RSV
+  # Amp1a), N1-F, E1FIP. Returns nil when the name gives nothing better than a truncated prefix.
+  def short_name(name)
+    base = name.to_s.split.first.to_s
+    return if base.empty?
+
+    tiled_short_name(base) || suffix_short_name(base) || trailing_short_name(base)
+  end
+
+  def tiled_short_name(base)
+    parsed = parse_tiled(base.gsub(ALT_MARKER, ''))
+    return unless parsed && parsed[:locus]
+
+    amplicon = parsed[:locus].split('_').last.sub(/\Aamp/i, '')
+    side = parsed[:category] == 'Forward' ? 'L' : 'R'
+    fit("#{amplicon}#{side}", alt_index(base))
+  end
+
+  # alt3 / Alt / a trailing _1 after the side (ARTIC v5.3 numbers its alternates SARS-CoV-2_400_10_LEFT_1)
+  def alt_index(base)
+    marker = base[ALT_MARKER]
+    return marker[/\d+/] || 'a' if marker
+
+    index = base[/_(?:LEFT|RIGHT|L|R)_(\d+)\z/i, 1]
+    index unless index.nil? || index.to_i.zero?
+  end
+
+  def suffix_short_name(base)
+    parsed = parse_suffix(base)
+    return unless parsed
+
+    category = SHORT_CATEGORIES.fetch(parsed[:category], parsed[:category])
+    ["#{parsed[:locus]}-#{category}", "#{parsed[:locus]}#{category}"].find { |c| c.size <= SHORT_NAME_MAX }
+  end
+
+  # unrecognized schemes still tend to put the distinguishing part last: covid19genome_..._s15860_U_42R -> U_42R
+  def trailing_short_name(base)
+    tokens = base.split(/[_-]/).compact_blank
+    return base if base.size <= SHORT_NAME_MAX
+    return if tokens.size < 2
+
+    previous, last = tokens.last(2)
+    ["#{previous}_#{last}", "#{previous}#{last}", last].find { |c| c.size <= SHORT_NAME_MAX }
+  end
+
+  def fit(core, alt)
+    return core.first(SHORT_NAME_MAX) unless alt
+
+    ["#{core}_#{alt}", "#{core}#{alt}"].find { |c| c.size <= SHORT_NAME_MAX } || "#{core}#{alt}".first(SHORT_NAME_MAX)
+  end
+
   def parse(name)
     base = name.to_s.split.first.to_s.gsub(ALT_MARKER, '')
     return { locus: nil, category: nil } if base.empty?

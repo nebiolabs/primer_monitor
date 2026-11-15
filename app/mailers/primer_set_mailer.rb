@@ -4,6 +4,7 @@ class PrimerSetMailer < ApplicationMailer
   default from: "NEB Primer Monitor <#{ENV.fetch('ADMIN_EMAIL', nil)}>"
 
   def updated_primer_set_email(email, primer_set)
+    @primer_set = primer_set
     @url = primer_set_url(primer_set)
     mail(to: email, subject: 'Primer Set Created or Updated')
   end

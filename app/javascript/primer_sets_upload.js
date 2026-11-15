@@ -18,10 +18,11 @@ document.addEventListener('change', (event) => {
     upload.files[0].text().then(text => processFasta(text, upload.files[0].name));
 });
 
-function fillRow(row, longName, shortName, sequence) {
+// short_name stays blank so the server derives it from the name (Oligo#infer_short_name)
+function fillRow(row, longName, sequence) {
     row.querySelectorAll('input').forEach(input => {
-        if (input.id.endsWith('short_name')) input.value = shortName;
-        else if (input.id.endsWith('name')) input.value = longName;
+        if (input.id.endsWith('short_name')) return;
+        if (input.id.endsWith('name')) input.value = longName;
         else if (input.id.endsWith('sequence')) input.value = sequence;
     });
 }
@@ -38,10 +39,9 @@ function processFasta(fastaText, fileName) {
         const lines = seq.split('\n');
         const longName = lines[0];
         const sequence = lines.slice(1).join('');
-        const shortName = longName.split(' ')[0].slice(0, 5);
         if (invalidSeqRE.test(sequence)) {
             confirm(`Non-sequence character detected in file '${fileName}'.\n\nSequence:\n>${seq}\n\nContinue?`);
         }
-        fillRow(addNestedRow(container), longName, shortName, sequence);
+        fillRow(addNestedRow(container), longName, sequence);
     });
 }

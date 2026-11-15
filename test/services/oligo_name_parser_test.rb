@@ -35,4 +35,34 @@ class OligoNameParserTest < ActiveSupport::TestCase
     end
     assert_equal({ locus: nil, category: nil }, OligoNameParser.parse(nil))
   end
+
+  {
+    'SARS-CoV-2-1200_10_LEFT' => '10L',
+    'SARS-CoV-2-1200_10_RIGHT' => '10R',
+    'varskip-0317-1_01_LEFT_ALT3' => '01L_3',
+    'SARS-CoV-2_10_RIGHT_alt1' => '10R_1',
+    'nCoV-2019_7_LEFT_alt0' => '7L_0',
+    'SARS-CoV-2_400_10_LEFT_0' => '10L',
+    'SARS-CoV-2_400_10_LEFT_1' => '10L_1',
+    'PM1_rsva_Amp1a_l' => '1aL',
+    'PM1_rsva_Amp15a_l_alt1' => '15aL1',
+    'PM1_panr_Amp11_r' => '11R',
+    'PM1_rsva_Amp7a_alt_r' => '7aR_a',
+    'varskip-0317-1_100_RIGHT_ALT12' => '100R1',
+    'N1-F' => 'N1-F',
+    '2019-nCoV_N1-P' => 'N1-P',
+    'E1-FIP' => 'E1FIP',
+    'covid19genome_200-29703_s15860_U_42R' => 'U_42R',
+    'covid19genome_200-29703_s15860_U_100R' => 'U100R',
+    'MS1' => 'MS1'
+  }.each do |name, short|
+    test "short name for #{name}" do
+      assert_equal short, OligoNameParser.short_name(name)
+    end
+  end
+
+  test 'short name is nil when the name gives nothing distinctive' do
+    assert_nil OligoNameParser.short_name('probe12345')
+    assert_nil OligoNameParser.short_name(nil)
+  end
 end
