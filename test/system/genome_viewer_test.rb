@@ -31,6 +31,18 @@ class GenomeViewerTest < ApplicationSystemTestCase
     assert_current_path primer_set_path(primer_sets(:two), lineage: 'B')
   end
 
+  test 'an unpublished primer set shows its alignment preview, also after an administrator approves it' do
+    sign_in users(:admin_user)
+    visit primer_set_path(primer_sets(:one))
+
+    assert_igv_tracks ['Genes', 'Charité (alignment preview)']
+
+    click_on 'Approve and publish'
+
+    assert_text 'Approved, publishing'
+    assert_igv_tracks ['Genes', 'Charité (alignment preview)'], 'the redirect back to the page sets up igv again'
+  end
+
   test "a primer set's page opens on the lineage in its URL" do
     primer_sets(:two).update!(status: :complete)
 

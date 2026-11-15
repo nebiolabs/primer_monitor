@@ -3,6 +3,9 @@
 <% end %>
 
 <h1 class="title">Primer Set: <%= @primer_set.name %> </h1>
+<% if can?(:confirm, PrimerSet) || can?(:edit, @primer_set) %>
+  <%= render 'review', primer_set: @primer_set %>
+<% end %>
 <div class="columns is-multiline">
   <div class="column is-narrow">
     <div class="box">
@@ -21,14 +24,6 @@
       <div class="box">
       <strong> Source: </strong>
           <%= external_link @primer_set.display_url, @primer_set.display_url %>
-      </div>
-    </div>
-  <% end %>
-  <% if can?(:confirm, PrimerSet) %>
-    <div class="column is-narrow">
-      <div class="box">
-      <strong>Status: </strong>
-      <%= @primer_set.status %>
       </div>
     </div>
   <% end %>
@@ -119,7 +114,7 @@
 <div class="block">
   <p>This preview shows where each primer aligned to the reference, read from the database.
   Forward primers are blue and point right. Reverse primers are red and point left. The full view with lineage variants will appear
-  once the primer set has been approved and processed.</p>
+  once the primer set is published.</p>
 </div>
 <div id="igv" class="igv_div"></div>
 

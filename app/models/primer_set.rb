@@ -12,6 +12,16 @@ class PrimerSet < ApplicationRecord
 
   enum :status, { created: 'created', complete: 'complete', failed: 'failed', processing: 'processing' }
 
+  # The review lifecycle. A new set waits for an administrator. Approving it sets processing, and the backend cron
+  # job (lib/backend_scripts/process-primer-sets.sh) then builds the public tracks for every processing set whose
+  # oligos are all aligned and marks it complete. Nothing sets failed automatically; it means rejected.
+  STATUS_LABELS = {
+    'created' => 'Awaiting review',
+    'processing' => 'Approved, publishing',
+    'complete' => 'Published',
+    'failed' => 'Rejected'
+  }.freeze
+
   accepts_nested_attributes_for :oligos, reject_if: :all_blank, allow_destroy: true
 
   validates :name, uniqueness: true, presence: true
@@ -38,6 +48,15 @@ class PrimerSet < ApplicationRecord
 
   def doi_url
     "https://doi.org/#{doi}" if doi.present?
+  end
+
+  def status_label
+    STATUS_LABELS.fetch(status.to_s, status.to_s)
+  end
+
+  # the backend only publishes a set once every oligo has an alignment position
+  def unaligned_oligos_count
+    oligos.where.not(id: OligoAlignmentPosition.select(:oligo_id)).count
   end
 
   def subscription_for_user(user)

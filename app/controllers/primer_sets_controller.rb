@@ -20,13 +20,15 @@ class PrimerSetsController < ApplicationController
     @config, primer_sets = @primer_set.organism.primer_sets_config
     @config['primer_set_display_name'] = @primer_set.name
 
-    if primer_sets.key? @primer_set.name
-      @config['primer_set_name'] = primer_sets[@primer_set.name]
-      prepare_lineage_display
-    end
+    @config['primer_set_name'] = primer_sets[@primer_set.name] if primer_sets.key? @primer_set.name
 
-    # until the published BED exists, draw the set from the database alignments so reviewers can check it
-    @config[:alignment_features] = @primer_set.alignment_features unless published_track?
+    # until the set is published, draw it from the database alignments so reviewers can check it. A set can have
+    # files on the data server before then, e.g. while the backend is still publishing it.
+    if published_track?
+      prepare_lineage_display
+    else
+      @config[:alignment_features] = @primer_set.alignment_features
+    end
   end
 
   # GET /primer_sets/new
@@ -114,12 +116,13 @@ class PrimerSetsController < ApplicationController
     @primer_set = PrimerSet.find(params.expect(:id))
   end
 
-  # Only allow a list of trusted parameters through.
+  # Only allow a list of trusted parameters through. Only administrators may set the status (the review decision)
+  # or the submitter; the form hides those fields from everyone else, and this ignores them if sent anyway.
   def primer_set_params
     # [[...]] accepts the index-keyed hash that fields_for submits for nested oligos
-    params.expect(primer_set: [:name, :user_id, :amplification_method_id, :organism_id, :status,
-                               :citation_url, :doi,
-                               { oligos_attributes: [%i[id primer_set_id name short_name
-                                                        locus category sequence _destroy]] }])
+    permitted = [:name, :amplification_method_id, :organism_id, :citation_url, :doi,
+                 { oligos_attributes: [%i[id primer_set_id name short_name locus category sequence _destroy]] }]
+    permitted += %i[status user_id] if can?(:confirm, PrimerSet)
+    params.expect(primer_set: permitted)
   end
 end

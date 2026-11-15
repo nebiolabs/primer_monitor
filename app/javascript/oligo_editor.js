@@ -28,7 +28,11 @@ function cellValue(row, key) {
 }
 
 function isEdited(element) {
-    if (element.tagName === 'SELECT') return [...element.options].some(o => o.selected !== o.defaultSelected);
+    if (element.tagName === 'SELECT') {
+        // with no option marked selected in the HTML, the browser starts on the first one
+        const initial = [...element.options].find(o => o.defaultSelected) || element.options[0];
+        return !initial?.selected;
+    }
     return element.value !== element.defaultValue;
 }
 

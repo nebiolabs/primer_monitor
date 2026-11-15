@@ -1,0 +1,46 @@
+<%# Where the primer set is in review, and for administrators the decision buttons. %>
+<% reviewer = can?(:confirm, PrimerSet) %>
+<% unaligned = primer_set.unaligned_oligos_count %>
+<div class="<%= class_names(primer_set_status_notification_class(primer_set)) %>" id="review_status">
+  <p class="mb-2"><strong>Status:</strong> <%= primer_set_status_tag(primer_set) %></p>
+
+  <% case primer_set.status %>
+  <% when 'created' %>
+    <% if reviewer %>
+      <p>This primer set is waiting for your review. Check the primers and the alignment preview below. Approve it
+      to publish it on the public primer sets page, or reject it to keep it hidden.</p>
+    <% else %>
+      <p>An administrator will review this primer set before it is published. Until then only you and the
+      administrators can see it.</p>
+    <% end %>
+  <% when 'processing' %>
+    <p>Approved. The backend checks for approved primer sets every minute and builds their public genome tracks.
+    The status changes to Published when that finishes, usually within a few minutes.</p>
+  <% when 'complete' %>
+    <p>Published. Everyone can see this primer set on the public primer sets page.</p>
+  <% when 'failed' %>
+    <p>Rejected. Only the submitter and administrators can see this primer set.</p>
+  <% end %>
+
+  <% if unaligned.positive? && !primer_set.complete? %>
+    <p class="mt-2"><strong><%= pluralize(unaligned, 'oligo') %> of <%= primer_set.oligos.size %> did not align to
+    the reference.</strong> The primer set cannot be published until every oligo aligns. Check those sequences for
+    typos or labels such as FAM or BHQ1.</p>
+  <% end %>
+
+  <% if reviewer %>
+    <div class="buttons mt-3">
+      <% if primer_set.created? || primer_set.failed? %>
+        <%= button_to 'Approve and publish', primer_set_review_path(primer_set), method: :patch,
+                      params: { decision: 'approve' },
+                      class: 'button is-success', form: { class: 'is-inline' } %>
+      <% end %>
+      <% if primer_set.created? || primer_set.processing? %>
+        <%= button_to 'Reject', primer_set_review_path(primer_set), method: :patch,
+                      params: { decision: 'reject' },
+                      class: 'button is-danger is-outlined', form: { class: 'is-inline' },
+                      data: { turbo_confirm: 'Reject this primer set? It will stay hidden from the public.' } %>
+      <% end %>
+    </div>
+  <% end %>
+</div>

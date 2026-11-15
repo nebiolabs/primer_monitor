@@ -39,5 +39,8 @@ Rails.application.routes.draw do
   resources :primer_set_subscriptions, only: %i[create destroy]
   # admin dashboard of notification emails sent to users
   resources :notifications, only: %i[index show]
-  resources :primer_sets, only: %i[new show create destroy update edit]
+  resources :primer_sets, only: %i[new show create destroy update edit] do
+    # an administrator's approve or reject decision (PrimerSets::ReviewsController)
+    resource :review, only: :update, module: :primer_sets
+  end
 end

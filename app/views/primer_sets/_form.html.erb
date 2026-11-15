@@ -48,7 +48,11 @@
         <%= form.label :status %>
       </div>
       <div class="control field-body">
-        <%= form.select :status, PrimerSet.statuses.keys %>
+        <div>
+          <%= form.select :status, PrimerSet.statuses.keys.map { |s| [PrimerSet::STATUS_LABELS[s], s] } %>
+          <p class="help">Approved sets are published by the backend within a few minutes. The primer set page also
+          has Approve and Reject buttons.</p>
+        </div>
       </div>
     </div>
   <% end %>
