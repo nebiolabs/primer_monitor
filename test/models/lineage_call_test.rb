@@ -43,4 +43,35 @@ class LineageCallTest < ActiveSupport::TestCase
   test 'empty batch is a no-op' do
     assert_nothing_raised { LineageCall.update_fasta_recs(true, []) }
   end
+
+  def calls_csv(*rows)
+    @csv = Tempfile.new(['calls', '.csv'])
+    @csv.write((['taxon,lineage,conflict,ambiguity_score'] + rows).join("\n") << "\n")
+    @csv.close
+    @csv.path
+  end
+
+  teardown { @csv&.unlink }
+
+  test 'parse builds a call per row with the lineage id' do
+    calls = LineageCall.parse(calls_csv('OX000001.1,BA.2,0.0,', 'OX000002.1,BA.2,0.5,0.9'), @caller.id)
+
+    assert_equal %w[OX000001.1 OX000002.1], calls.map(&:taxon)
+    assert_equal [@lineage.id], calls.map(&:lineage_id).uniq
+    assert_equal [@caller.id], calls.map(&:lineage_caller_id).uniq
+  end
+
+  test 'parse uses one query regardless of row count' do
+    path = calls_csv(*Array.new(200) { |i| "OX#{i}.1,BA.2,0.0," })
+
+    # upload.rb runs without the query cache that tests have, so turn it off to count real queries.
+    Lineage.uncached do
+      assert_queries_count(1) { LineageCall.parse(path, @caller.id) }
+    end
+  end
+
+  test 'parse raises on a lineage missing from the database' do
+    error = assert_raises(RuntimeError) { LineageCall.parse(calls_csv('OX000001.1,NOPE.1,0.0,'), @caller.id) }
+    assert_match 'Failed to find lineage NOPE.1', error.message
+  end
 end

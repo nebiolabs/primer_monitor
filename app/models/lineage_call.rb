@@ -4,34 +4,33 @@ class LineageCall < ApplicationRecord
   belongs_to :lineage
   has_one :fasta_record, dependent: :nullify
 
+  # Returns unsaved LineageCall records for each row of calls_csv. Every lineage named in the file must
+  # already exist; Lineage.parse and its import run first.
   def self.parse(calls_csv, caller_id)
-    raise "Unable to find calls file #{calls_csv}" unless File.exist?(calls_csv)
+    # Resolve every lineage name in one query rather than one round trip per row.
+    lineage_ids = Lineage.ids_by_name(Lineage.lineage_names(calls_csv))
 
     new_calls = []
-    record_count = 0
-
-    File.readlines(calls_csv).each do |line|
+    File.foreach(calls_csv) do |line|
       next if line.start_with?('taxon,', 'seqName,')
 
-      record_count += 1
-      record = build_lineage_call(line, caller_id)
+      record = build_lineage_call(line, caller_id, lineage_ids)
       new_calls << record if record
     end
-    raise "Unable to parse any records from #{calls_csv}" if record_count.zero?
 
     new_calls
   end
 
-  def self.build_lineage_call(line, caller_id)
+  def self.build_lineage_call(line, caller_id, lineage_ids)
     (taxon, lineage, metadata) = line.chomp.split(',', 4)
 
     return unless taxon && lineage
 
-    lineage_rec = Lineage.find_by(name: lineage)
+    lineage_id = lineage_ids[lineage]
 
-    raise "Failed to find lineage #{lineage}" if lineage_rec.nil?
+    raise "Failed to find lineage #{lineage}" if lineage_id.nil?
 
-    LineageCall.new(taxon:, lineage_id: lineage_rec.id, lineage_caller_id: caller_id, metadata:)
+    LineageCall.new(taxon:, lineage_id:, lineage_caller_id: caller_id, metadata:)
   end
 
   # Points fasta records at the calls just imported (call_ids). Limiting this to the batch keeps the parallel
