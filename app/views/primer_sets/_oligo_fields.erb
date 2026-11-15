@@ -1,14 +1,34 @@
-<div class='nested-fields is-horizontal' data-persisted="<%= f.object.persisted? %>">
-  <div class="field-body is-horizontal mx-1">
-    <%= f.text_field :name, placeholder: "Oligo name", size: 12 %>
-    <%= f.text_field :short_name, placeholder: "Short name", size: 10, maxlength:5 %>
-    <%= f.text_field :locus, placeholder: "locus (e.g. N1)", size: 12 %>
-    <%= f.text_field :sequence, placeholder: "DNA sequence (GCAT)", maxlength: 40 %>
-    <%= f.select :category, Oligo.categories.keys, prompt: 'Select' %>
-
+<% oligo = f.object %>
+<%# a failed save re-renders removed rows still marked for destruction %>
+<tr class="<%= class_names('nested-fields', 'is-invalid': oligo.errors.any?, 'is-removed': oligo.marked_for_destruction?) %>"
+    data-persisted="<%= oligo.persisted? %>">
+  <td><input type="checkbox" aria-label="Select oligo" data-oligo-select></td>
+  <td>
+    <%= f.hidden_field :id if oligo.persisted? %>
+    <%= f.text_field :name, class: 'input is-small', placeholder: 'Oligo name', data: { col: 'name' } %>
+    <% if oligo.errors.any? %>
+      <p class="help is-danger"><%= oligo.errors.full_messages.to_sentence %></p>
+    <% end %>
+  </td>
+  <td>
+    <%= f.text_field :short_name, class: 'input is-small', placeholder: 'auto', maxlength: 5,
+                                  data: { col: 'short_name' } %>
+  </td>
+  <td><%= f.text_field :locus, class: 'input is-small', placeholder: 'auto', data: { col: 'locus' } %></td>
+  <td>
+    <div class="select is-small is-fullwidth">
+      <%= f.select :category, Oligo.categories.keys, { include_blank: 'auto' }, data: { col: 'category' } %>
+    </div>
+  </td>
+  <td>
+    <%= f.text_field :sequence, class: 'input is-small oligo-sequence', placeholder: 'DNA sequence (ACGT)',
+                                spellcheck: false, autocomplete: 'off', data: { col: 'sequence' } %>
+  </td>
+  <td class="has-text-right" data-oligo-length></td>
+  <td>
     <%= f.hidden_field :_destroy %>
     <button type="button" class="button is-white is-small" data-nested-remove title="Remove oligo">
-      <%= image_tag("remove_icon.svg", alt: 'remove oligo', class: 'icon') %>
+      <%= image_tag('remove_icon.svg', alt: 'remove oligo', class: 'icon') %>
     </button>
-  </div>
-</div>
+  </td>
+</tr>

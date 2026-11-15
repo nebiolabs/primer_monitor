@@ -179,3 +179,95 @@ button.dt-button.buttons-copy.buttons-html5 {
 tr.is-clickable {
   cursor: pointer;
 }
+
+// The oligo table on the primer set form (oligo_editor.js). It scrolls inside its own box under a sticky header,
+// so long sets stay on one page.
+.oligo-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+  margin-bottom: 0.25rem;
+
+  .field {
+    margin-bottom: 0;
+  }
+
+  .locus-input {
+    width: 7rem;
+  }
+}
+
+.oligo-table-wrap {
+  max-height: 70vh;
+  overflow: auto;
+  border: 1px solid var(--bulma-border);
+}
+
+.oligo-table {
+  th {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    background: var(--bulma-scheme-main);
+    white-space: nowrap;
+  }
+
+  th[data-sort-key] {
+    cursor: pointer;
+    user-select: none;
+
+    &::after {
+      content: " \2195";
+      opacity: 0.3;
+    }
+
+    &[aria-sort="ascending"]::after {
+      content: " \25B2";
+      opacity: 1;
+    }
+
+    &[aria-sort="descending"]::after {
+      content: " \25BC";
+      opacity: 1;
+    }
+  }
+
+  td {
+    vertical-align: middle;
+  }
+
+  // name and sequence take the spare width; the short columns stay narrow
+  td:nth-child(2) { min-width: 16rem; }
+  td:nth-child(3) { width: 6rem; }
+  td:nth-child(4) { width: 8rem; }
+  td:nth-child(5) { width: 8rem; }
+  td:nth-child(6) { min-width: 22rem; width: 45%; }
+
+  .oligo-sequence {
+    font-family: monospace;
+  }
+
+  tr[hidden] {
+    display: none;
+  }
+
+  tr.is-new td {
+    background-color: #effaf5;
+  }
+
+  tr.is-changed td {
+    background-color: #fffaeb;
+  }
+
+  tr.is-invalid td {
+    background-color: #feecf0;
+  }
+
+  tr.is-removed td {
+    opacity: 0.45;
+
+    input, select {
+      text-decoration: line-through;
+    }
+  }
+}

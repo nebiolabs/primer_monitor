@@ -1,5 +1,5 @@
 <% content_for :head do %>
-  <%= javascript_import_module_tag "primer_sets_upload" %>
+  <%= javascript_import_module_tag "oligo_editor" %>
 <% end %>
 
 <%= form_with(model: primer_set, local: true) do |form| %>
@@ -67,33 +67,92 @@
     </div>
   </div>
 
-  <section class="section">
-    <div class="container">
-      <h4 class="subtitle is-4">Oligos</h4>
-      <div id="samples" data-nested-fields>
-        <%= form.fields_for :oligos do |es| %>
-          <%= render 'oligo_fields', f: es %>
-        <% end %>
-        <template data-nested-template>
-          <%= form.fields_for :oligos, Oligo.new, child_index: 'NEW_RECORD' do |es| %>
-            <%= render 'oligo_fields', f: es %>
-          <% end %>
-        </template>
-        <div id="add-new" class="buttons">
-          <button type="button" class="button" data-nested-add>Add Oligo</button>
+  <section class="oligo-editor block" data-oligo-editor>
+    <h4 class="subtitle is-4">Oligos <span class="tag is-light" data-oligo-summary></span></h4>
+
+    <div class="oligo-toolbar">
+      <div class="field has-addons">
+        <div class="control">
+          <input type="search" class="input is-small" placeholder="Filter oligos" aria-label="Filter oligos"
+                 data-oligo-filter>
         </div>
-        <div class="file" id="fasta_div">
-          <label class="file-label" id="fasta_upload_label">
-            <input class="file-input" type="file" name="fasta" id="fasta_upload">
-            <span class="file-cta white-button">
-              <span class="file-label">
-                Upload FASTA...
-              </span>
-            </span>
-          </label>
+      </div>
+      <div class="field has-addons" title="Applies to the checked rows">
+        <div class="control"><span class="button is-small is-static" data-oligo-selected-count>0 selected</span></div>
+        <div class="control">
+          <div class="select is-small">
+            <select aria-label="Category for checked rows" data-bulk-category>
+              <option value="">category: auto</option>
+              <% Oligo.categories.each_key do |category| %>
+                <option value="<%= category %>"><%= category %></option>
+              <% end %>
+            </select>
+          </div>
+        </div>
+        <div class="control">
+          <button type="button" class="button is-small" data-bulk-action="category">Set category</button>
+        </div>
+        <div class="control">
+          <input type="text" class="input is-small locus-input" placeholder="locus" aria-label="Locus for checked rows"
+                 data-bulk-locus>
+        </div>
+        <div class="control">
+          <button type="button" class="button is-small" data-bulk-action="locus">Set locus</button>
+        </div>
+        <div class="control">
+          <button type="button" class="button is-small" data-bulk-action="short_name"
+                  title="Clear the short names so they are derived from the oligo names on save">Auto short names</button>
+        </div>
+        <div class="control">
+          <button type="button" class="button is-small is-danger is-outlined" data-bulk-action="remove">Remove</button>
         </div>
       </div>
     </div>
+    <p class="help mb-2">
+      Click a column heading to sort. Paste several lines from a spreadsheet into a cell to fill the rows below it;
+      tab-separated columns fill the cells to the right. Blank short name, locus and category are derived from the
+      oligo name when saved.
+    </p>
+
+    <div class="oligo-table-wrap">
+      <table class="table is-narrow is-fullwidth oligo-table" data-datatable="off">
+        <thead>
+          <tr>
+            <th><input type="checkbox" aria-label="Select all shown oligos" data-select-all></th>
+            <th data-sort-key="name">Name</th>
+            <th data-sort-key="short_name">Short name</th>
+            <th data-sort-key="locus">Locus</th>
+            <th data-sort-key="category">Category</th>
+            <th data-sort-key="sequence">Sequence</th>
+            <th data-sort-key="length" class="has-text-right">Length</th>
+            <th><span class="is-sr-only">Remove</span></th>
+          </tr>
+        </thead>
+        <tbody id="samples" data-nested-fields>
+          <%= form.fields_for :oligos, include_id: false do |es| %>
+            <%= render 'oligo_fields', f: es %>
+          <% end %>
+          <template data-nested-template>
+            <%= form.fields_for :oligos, Oligo.new, child_index: 'NEW_RECORD', include_id: false do |es| %>
+              <%= render 'oligo_fields', f: es %>
+            <% end %>
+          </template>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="buttons mt-3">
+      <button type="button" class="button" data-nested-add="#samples">Add Oligo</button>
+      <div class="file" id="fasta_div">
+        <label class="file-label" id="fasta_upload_label">
+          <input class="file-input" type="file" name="fasta" id="fasta_upload" accept=".fa,.fasta,.fna,.txt">
+          <span class="file-cta white-button">
+            <span class="file-label">Upload FASTA...</span>
+          </span>
+        </label>
+      </div>
+    </div>
+    <p class="help">Uploaded sequences replace the sequence of an oligo with the same name and add the rest as new rows.</p>
   </section>
 
   <div class="actions">
