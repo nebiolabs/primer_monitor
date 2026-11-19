@@ -654,7 +654,7 @@ DEPENDENCIES
   whenever
 
 RUBY VERSION
-  ruby 3.4.11p137
+  ruby 3.4.13p195
 
 BUNDLED WITH
   4.0.22
